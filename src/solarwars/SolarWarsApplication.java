@@ -44,8 +44,7 @@ public class SolarWarsApplication extends Application {
     protected boolean showSettings = true;
     private boolean showFps = true;
     private AppActionListener actionListener = new AppActionListener();
-    
-    
+
     public IsoCamera getIsoCam() {
         return isoCam;
     }
@@ -70,6 +69,49 @@ public class SolarWarsApplication extends Application {
 
     public boolean isShowSettings() {
         return showSettings;
+    }
+
+    /**
+     * Toggles settings window to display at start-up
+     * @param showSettings Sets true/false
+     *
+     */
+    public void setShowSettings(boolean showSettings) {
+        this.showSettings = showSettings;
+    }
+
+    /**
+     * Attaches FPS statistics to guiNode and displays it on the screen.
+     *
+     */
+    public void loadFPSText() {
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        fpsText = new BitmapText(guiFont, false);
+        fpsText.setLocalTranslation(0, fpsText.getLineHeight(), 0);
+        fpsText.setText("Frames per second");
+        guiNode.attachChild(fpsText);
+    }
+
+    public void setDisplayFps(boolean show) {
+        showFps = show;
+        fpsText.setCullHint(show ? CullHint.Never : CullHint.Always);
+    }
+
+    public void setDisplayStatView(boolean show) {
+        statsView.setEnabled(show);
+        statsView.setCullHint(show ? CullHint.Never : CullHint.Always);
+    }
+
+    /**
+     * Attaches Statistics View to guiNode and displays it on the screen
+     * above FPS statistics line.
+     *
+     */
+    public void loadStatsView() {
+        statsView = new StatsView("Statistics View", assetManager, renderer.getStatistics());
+        // move it up so it appears above fps text
+        statsView.setLocalTranslation(0, fpsText.getLineHeight(), 0);
+        guiNode.attachChild(statsView);
     }
 
     private class AppActionListener implements ActionListener {
@@ -138,8 +180,8 @@ public class SolarWarsApplication extends Application {
         guiViewPort.attachScene(guiNode);
 
         if (inputManager != null) {
-            isoCam = new FlyByCamera(cam);
-            isoCam.setMoveSpeed(1f);
+            isoCam = new IsoCamera(cam, rootNode);
+            isoCam.setMoveSpeed(5f);
             isoCam.registerWithInput(inputManager);
 
             if (context.getType() == Type.Display) {
@@ -153,8 +195,8 @@ public class SolarWarsApplication extends Application {
                     INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
 
         }
-
-        this.se
+        
+        //isoCam.setEnabled(true);
         
         Level l = new Level(rootNode, assetManager);
         l.generateLevel(System.currentTimeMillis());
@@ -162,17 +204,56 @@ public class SolarWarsApplication extends Application {
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(1, -10, 0).normalizeLocal());
         sun.setColor(ColorRGBA.White);
-
         rootNode.addLight(sun);
+        
+        DirectionalLight spot = new DirectionalLight();
+        spot.setDirection(new Vector3f(0, -1, 0).normalizeLocal());
+        spot.setColor(ColorRGBA.Yellow);
+        isoCam.getCamNode().addLight(spot);
+    }
+    
+    @Override
+    public void update() {
+        super.update(); // makes sure to execute AppTasks
+        if (speed == 0 || paused) {
+            return;
+        }
+
+        float tpf = timer.getTimePerFrame() * speed;
+
+        if (showFps) {
+            secondCounter += timer.getTimePerFrame();
+            frameCounter ++;
+            if (secondCounter >= 1.0f) {
+                int fps = (int) (frameCounter / secondCounter);
+                fpsText.setText("Frames per second: " + fps);
+                secondCounter = 0.0f;
+                frameCounter = 0;
+            }          
+        }
+
+        // update states
+        stateManager.update(tpf);
+
+        // simple update and root node
+        simpleUpdate(tpf);
+        rootNode.updateLogicalState(tpf);
+        guiNode.updateLogicalState(tpf);
+        rootNode.updateGeometricState();
+        guiNode.updateGeometricState();
+
+        // render states
+        stateManager.render(renderManager);
+        renderManager.render(tpf, context.isRenderable());
+        simpleRender(renderManager);
+        stateManager.postRender();
     }
 
-    @Override
     public void simpleUpdate(float tpf) {
-        //TODO: add update code
+        
     }
 
-    @Override
     public void simpleRender(RenderManager rm) {
-        //TODO: add render code
+        
     }
 }
