@@ -21,12 +21,12 @@ import level.Level;
  */
 public class BasePlanet extends AbstractPlanet {
 
-    public BasePlanet(Level level, Vector3f position, float size) {
-        super(level, position, size);
+    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
+        super(assetManager, level, position, size);
     }
 
     @Override
-    public void createPlanet(AssetManager assetManager) {
+    public void createPlanet() {
         //Geometry
 
         Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);

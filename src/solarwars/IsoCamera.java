@@ -21,11 +21,20 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 
 /**
- *
+ *  
  * @author Hans
  */
 public class IsoCamera implements AnalogListener, ActionListener {
 
+    private static IsoCamera instance;
+    
+    public static IsoCamera getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        return instance = new IsoCamera();
+    }
+    
     public static final float CAMERA_HEIGHT = 8;
     public static final float CAMERA_ANGLE = 8f * (((float) Math.PI) / 18f) ;
     
@@ -45,8 +54,11 @@ public class IsoCamera implements AnalogListener, ActionListener {
      * Creates a new FlyByCamera to control the given Camera object.
      * @param cam
      */
-    public IsoCamera(Camera cam, Node rootNode) {
+    private IsoCamera() {
         super();
+    }
+    
+    public void initialize(Camera cam, Node rootNode) {
         this.rootNode = rootNode;
         float[] rot = {CAMERA_ANGLE, 0, 0};
         this.cam = cam;
@@ -58,7 +70,10 @@ public class IsoCamera implements AnalogListener, ActionListener {
         camLight.setPosition(cam.getLocation());
         camLight.setColor(ColorRGBA.White);
         rootNode.addLight(camLight);
-
+    }
+    
+    public Camera getCam() {
+        return cam;
     }
 
     /**
