@@ -26,6 +26,10 @@ public abstract class AbstractPlanet {
     }
     
     protected Geometry geometry;
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
     protected Node transformNode;
     protected float size;
     protected Level level;

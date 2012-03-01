@@ -5,7 +5,6 @@
 package solarwars;
 
 import com.jme3.collision.MotionAllowedListener;
-import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -13,6 +12,8 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
+import com.jme3.light.PointLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -29,7 +30,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     public static final float CAMERA_ANGLE = 8f * (((float) Math.PI) / 18f) ;
     
     protected Camera cam;
-    protected Node camNode;
+    protected PointLight camLight;
     protected Node rootNode;
     protected Vector3f initialUpVec;
     protected float rotationSpeed = 1f;
@@ -53,18 +54,11 @@ public class IsoCamera implements AnalogListener, ActionListener {
         cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, 0));
         cam.setRotation(new Quaternion(rot));
         
-        camNode = new Node("Camera Position");
-        camNode.setLocalTranslation(cam.getLocation());
-        
-        rootNode.attachChild(camNode);
-    }
-    /**
-     * Gets the node that is always at the cameras world position.
-     * Does not move the cam!
-     * @return A node that is located at the cameras actual position.
-     */
-    public Node getCamNode() {
-        return camNode;
+        camLight = new PointLight();
+        camLight.setPosition(cam.getLocation());
+        camLight.setColor(ColorRGBA.White);
+        rootNode.addLight(camLight);
+
     }
 
     /**
@@ -232,7 +226,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     }
 
     protected void riseCamera(float value) {
-        Vector3f vel = new Vector3f(0, value * moveSpeed/2, 0);
+        Vector3f vel = new Vector3f(0, value / moveSpeed, 0);
         Vector3f pos = cam.getLocation().clone();
 
         if (motionAllowed != null) {
@@ -242,7 +236,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         }
 
         cam.setLocation(pos);
-        camNode.setLocalTranslation(pos);
+        camLight.setPosition(cam.getLocation());
     }
 
     protected void moveCamera(float value, boolean sideways) {
@@ -264,7 +258,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         }
 
         cam.setLocation(pos);
-        camNode.setLocalTranslation(pos);
+        camLight.setPosition(cam.getLocation());
     }
 
     public void onAnalog(String name, float value, float tpf) {

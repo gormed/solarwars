@@ -11,6 +11,7 @@ import entities.AbstractPlanet;
 import entities.BasePlanet;
 import java.util.ArrayList;
 import java.util.Random;
+import solarwars.IsoControl;
 
 /**
  *
@@ -22,15 +23,17 @@ public class Level {
     private Node levelNode;
     private ArrayList<AbstractPlanet> planetList;
     private AssetManager assetManager;
+    private IsoControl control;
 
     public Node getLevelNode() {
         return levelNode;
     }
 
-    public Level(Node rootNode, AssetManager assetManager) {
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control) {
         this.rootNode = rootNode;
         this.assetManager = assetManager;
         this.planetList = new ArrayList<AbstractPlanet>();
+        this.control = control;
     }
 
     public void generateLevel(long seed) {
@@ -47,10 +50,11 @@ public class Level {
                     p = new BasePlanet(this, new Vector3f(-9 + i, 0, -9 + j), (0.3f + r.nextFloat()) / 3);
                     p.createPlanet(assetManager);
                     planetList.add(p);
+                    //control.addShootable(p.getGeometry());
                 }
             }
         }
-
-        rootNode.attachChild(levelNode);
+        control.addShootable(levelNode);
+        //rootNode.attachChild(control.getShootablesNode());
     }
 }
