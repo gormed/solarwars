@@ -12,7 +12,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
-import java.util.Random;
 import level.Level;
 
 /**
@@ -35,22 +34,19 @@ public class BasePlanet extends AbstractPlanet {
         geometry = new Geometry("BasePlanet_" + id, s);
 
         //Material
-
-        Random r = new Random(System.currentTimeMillis());
-
-        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setBoolean("UseMaterialColors", true);
-        mat.setColor("Specular", new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
-        geometry.setMaterial(mat);
+        material.setBoolean("UseMaterialColors", true);
+        material.setColor("Specular", new ColorRGBA(0.3f, 0.3f, 0.3f, 1.0f));//new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
+        geometry.setMaterial(material);
 
-        if (mat.getMaterialDef().getName().equals("Phong Lighting")) {
+        if (material.getMaterialDef().getName().equals("Phong Lighting")) {
             Texture t = assetManager.loadTexture("Textures/Shader/toon.png");
             //t.setMinFilter(Texture.MinFilter.NearestNoMipMaps);
             //t.setMagFilter(Texture.MagFilter.Nearest);
-            mat.setTexture("ColorRamp", t);
-            mat.setColor("Diffuse", new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
-            mat.setBoolean("VertexLighting", true);
+            material.setTexture("ColorRamp", t);
+            material.setColor("Diffuse", new ColorRGBA(0.3f, 0.3f, 0.3f, 1.0f));
+            material.setBoolean("VertexLighting", true);
         }
 
         transformNode.attachChild(geometry);

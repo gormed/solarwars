@@ -36,7 +36,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     }
     
     public static final float CAMERA_HEIGHT = 8;
-    public static final float CAMERA_ANGLE = 8f * (((float) Math.PI) / 18f) ;
+    public static final float CAMERA_ANGLE = (float)Math.PI/2;//8f * (((float) Math.PI) / 18f) ;
     
     protected Camera cam;
     protected PointLight camLight;

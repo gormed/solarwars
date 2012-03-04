@@ -23,6 +23,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import entities.AbstractPlanet;
 
 /**
  *
@@ -84,7 +85,7 @@ public class IsoControl {
         //marker.getParticleInfluencer().setVelocityVariation(.60f);
         markerNode.attachChild(marker);
         marker.emitAllParticles();
-        
+
         initialize(rootNode, inputManager);
     }
 
@@ -129,7 +130,20 @@ public class IsoControl {
                         }
                         lastNode = closest.getGeometry().getParent();
                         lastNode.attachChild(markerNode);
+
+                        AbstractPlanet p = null;
+                        Node n = lastNode.getParent();
+
                         marker.killAllParticles();
+
+                        if (n instanceof AbstractPlanet) {
+                            p = (AbstractPlanet) n;
+//                            marker.setLowLife(0.55f);
+//                            marker.setHighLife(0.6f);
+                            marker.setStartSize(p.getSize() + 0.15f);
+                            marker.setEndSize(p.getSize() + 0.2f);
+                        }
+
                         marker.emitAllParticles();
                         //markerNode.setLocalScale(tpf, tpf, tpf);
                         //rootNode.attachChild(markerNode);

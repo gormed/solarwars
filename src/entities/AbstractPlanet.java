@@ -9,6 +9,7 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
 import com.jme3.font.Rectangle;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
@@ -17,6 +18,7 @@ import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import level.Level;
+import logic.Player;
 import solarwars.FontLoader;
 import solarwars.IsoCamera;
 
@@ -35,13 +37,17 @@ public abstract class AbstractPlanet extends Node {
     public static final int SPHERE_RADIAL_SAMPLES = 20;
     protected AssetManager assetManager;
     protected Geometry geometry;
+    protected Material material;
     protected Node transformNode;
     protected float size;
-    protected int shipIncrement;
     protected Level level;
     protected int id;
     protected Vector3f position;
     protected BitmapText label;
+    protected float shipIncrement;
+    protected int ships = 0;
+    protected float time;
+    protected Player owner;
 
     public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
         this.id = getContiniousID();
@@ -51,11 +57,13 @@ public abstract class AbstractPlanet extends Node {
         this.transformNode = new Node("Planet Transform Node " + id);
         this.transformNode.setLocalTranslation(position);
         this.assetManager = assetManager;
+        this.owner = null;
         createLabel();
 
         this.attachChild(transformNode);
-        level.getLevelNode().attachChild(this);
         level.getLabelNode().attachChild(label);
+        //this.attachChild(label);
+
     }
 
     public void createLabel() {
@@ -64,7 +72,7 @@ public abstract class AbstractPlanet extends Node {
         label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
         label.setQueueBucket(Bucket.Transparent);
         label.setSize(0.3f);
-        label.setColor(ColorRGBA.DarkGray);
+        label.setColor(ColorRGBA.White);
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);
         label.setCullHint(CullHint.Never);
@@ -92,16 +100,26 @@ public abstract class AbstractPlanet extends Node {
 
         Quaternion look = new Quaternion();
         look.fromAxes(left, up, dir);
-        
+
         Vector3f newPos = dir.clone();
         newPos.normalizeLocal();
         newPos.mult(size);
 
         newPos = position.add(newPos);
-        
+
         Transform t = new Transform(newPos, look);
-        
+
         label.setLocalTransform(t);
+    }
+    
+    public Player isOwnedBy() {
+        return owner;
+    }
+    
+    public void setOwner(Player p) {
+        owner = p;
+        material.setColor("Specular", owner.getColor());
+        material.setColor("Diffuse", ColorRGBA.White);
     }
 
     public abstract void createPlanet();
@@ -119,16 +137,22 @@ public abstract class AbstractPlanet extends Node {
     }
 
     protected void calculateIncrement() {
-        float seed = (4 * size) - 0.8f;
-        shipIncrement = (int) (seed * 10.0f);
+        float seed = (4 * size) - 0.6f;
+        shipIncrement = (1 - (seed)) + 0.09f;
+        if (shipIncrement > 1) {
+            shipIncrement = 1;
+        }
     }
 
-    @Override
-    public void updateLogicalState(float tpf) {
-        label.setText(shipIncrement + "");
-    }
-
-    public void updateLabel() {
+    public void updateLabel(float tpf) {
         refreshFont();
+
+        time += tpf;
+        if (time > 10 * shipIncrement) {
+            time = 0;
+            ships += 1;
+        }
+
+        label.setText(ships + "");
     }
 }

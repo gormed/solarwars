@@ -3,9 +3,7 @@ package solarwars;
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
-import com.jme3.font.Rectangle;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -40,23 +38,24 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_MEMORY = "SOLARWARS_Memory";
     public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
     public static final String INPUT_MAPPING_CLICK = "SOLARWARS_Click";
-    
     protected Node rootNode = new Node("Root Node");
     protected Node guiNode = new Node("Gui Node");
     protected float secondCounter = 0.0f;
     protected int frameCounter = 0;
-    protected FontLoader fontLoader;
+    
     protected BitmapText fpsText;
     protected BitmapFont guiFont;
     protected StatsView statsView;
+    
     protected IsoCamera isoCam;
     protected IsoControl isoControl;
+    
     protected boolean showSettings = true;
     private boolean showFps = true;
     private AppActionListener actionListener = new AppActionListener();
     private FilterPostProcessor postProcessor;
     
-    private Level currentLevel;
+    private SolarWarsGame game;
 
     public IsoCamera getIsoCam() {
         return isoCam;
@@ -78,6 +77,10 @@ public class SolarWarsApplication extends Application {
      */
     public Node getRootNode() {
         return rootNode;
+    }
+
+    public IsoControl getIsoControl() {
+        return isoControl;
     }
 
     public boolean isShowSettings() {
@@ -205,10 +208,7 @@ public class SolarWarsApplication extends Application {
 
         // Init controls
         isoControl = new IsoControl(assetManager, rootNode, cam, inputManager);
-        // Init fonts
-        fontLoader = FontLoader.getInstance();
-        fontLoader.initialize(assetManager);
-                
+        
         // Setup Controls of the cam for debug
         if (inputManager != null) {
             isoCam = IsoCamera.getInstance();
@@ -220,7 +220,7 @@ public class SolarWarsApplication extends Application {
             if (context.getType() == Type.Display) {
                 inputManager.addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
             }
-            
+
             inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
             inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
             inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F5));
@@ -229,49 +229,21 @@ public class SolarWarsApplication extends Application {
 
             // Map left-button click
             inputManager.addMapping(INPUT_MAPPING_CLICK,
-                    new MouseButtonTrigger(MouseInput.BUTTON_LEFT)); 
+                    new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
             inputManager.addListener(isoControl.getActionListener(), INPUT_MAPPING_CLICK);
 
         }
 
         // SETUP GAME CONTENT
-        
-        //isoCam.setEnabled(true);
-
-        currentLevel = new Level(rootNode, assetManager, isoControl);
-        currentLevel.generateLevel(System.currentTimeMillis());
 
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
         sun.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 0.7f));
         rootNode.addLight(sun);
         
-//        BitmapFont font = guiFont;
-//        BitmapText txt = new BitmapText(font, false);
-//        txt.setBox(new Rectangle(0f, 0f, 6f, 3f));
-//        txt.setQueueBucket(Bucket.Transparent);
-//        txt.setSize(0.5f);
-//        txt.setText("Hello World!");
-//        txt.setAlignment(Align.Center);
-//        float angles[] = {3*(float) Math.PI/2,(float)Math.PI,0};
-//        txt.setLocalRotation(new Quaternion(angles));
-//        txt.setLocalTranslation(0, 1, 0);
-//        rootNode.attachChild(txt);
-        
-//        BitmapText label;
-//        BitmapFont f = guiFont;
-//                //FontLoader.getInstance().getFont("SolarWars32");
-//        label = new BitmapText(f, false);
-//        //label.setBox(new Rectangle(0, 0, 100, 100));
-//        label.setQueueBucket(Bucket.Transparent);
-//        //label.setAlignment(Align.Center);
-//        label.setSize(1f);      // font size
-//        label.setColor(ColorRGBA.White);                             // font color
-//        label.setText("You can write any string here");             // the text
-//        label.setLocalTranslation(0, 2f, 0);
-//        //label.setLocalTranslation(300, label.getLineHeight(), 0); // position
-//        rootNode.attachChild(label);
-        
+        game = SolarWarsGame.getInstance();
+        game.initialize(this); 
+        game.start();
     }
 
     @Override
@@ -312,8 +284,7 @@ public class SolarWarsApplication extends Application {
     }
 
     public void simpleUpdate(float tpf) {
-        currentLevel.updateLevel(tpf);
-        
+        Level.getCurrentLevel().updateLevel(tpf);
     }
 
     public void simpleRender(RenderManager rm) {

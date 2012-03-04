@@ -6,6 +6,7 @@ package entities;
 
 import com.jme3.scene.Node;
 import java.util.ArrayList;
+import logic.Player;
 
 /**
  *
@@ -13,9 +14,11 @@ import java.util.ArrayList;
  */
 public class ShipGroup extends Node {
     private ArrayList<AbstractShip> ships;
+    private Player owner;
     
-    public ShipGroup(ArrayList<AbstractShip> ships) {
+    public ShipGroup(ArrayList<AbstractShip> ships, Player p) {
         this.ships = ships;
+        this.owner = p;
         attachAll();
     }
     
