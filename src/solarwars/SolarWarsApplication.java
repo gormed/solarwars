@@ -37,7 +37,9 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
     public static final String INPUT_MAPPING_MEMORY = "SOLARWARS_Memory";
     public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
-    public static final String INPUT_MAPPING_CLICK = "SOLARWARS_Click";
+    public static final String INPUT_MAPPING_LEFT_CLICK = "SOLARWARS_LeftClick";
+    public static final String INPUT_MAPPING_RIGHT_CLICK = "SOLARWARS_RightClick";
+    
     protected Node rootNode = new Node("Root Node");
     protected Node guiNode = new Node("Gui Node");
     protected float secondCounter = 0.0f;
@@ -228,9 +230,12 @@ public class SolarWarsApplication extends Application {
                     INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
 
             // Map left-button click
-            inputManager.addMapping(INPUT_MAPPING_CLICK,
+            inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
                     new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            inputManager.addListener(isoControl.getActionListener(), INPUT_MAPPING_CLICK);
+            inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK, 
+                    new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+            inputManager.addListener(isoControl.getActionListener(), 
+                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK);
 
         }
 

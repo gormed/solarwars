@@ -4,6 +4,7 @@
  */
 package level;
 
+import solarwars.Hub;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -38,6 +39,7 @@ public class Level {
     private Node freePlanetsNode;
     private Node labelNode;
     private Node allShipsNode;
+    
     private HashMap<Player, Node> shipNodes;
     private ArrayList<AbstractPlanet> planetList;
     private ArrayList<AbstractShip> shipList;
@@ -141,6 +143,7 @@ public class Level {
     public void addShip(Player p, AbstractShip s) {
         Node shipNode = shipNodes.get(p);
         shipNode.attachChild(s);
+        shipList.add(s);
     }
 
     public void removeShip(Player p, AbstractShip s) {
@@ -153,16 +156,16 @@ public class Level {
         boolean found = false;
 
         int idx = r.nextInt(planetList.size());
-        AbstractPlanet planet = planetList.get(idx - 1);;
+        AbstractPlanet planet = planetList.get(idx);
 
         while (!found) {
 
-            if (planet.isOwnedBy() == null) {
+            if (planet.getOwner() == null && planet.getSize() > 0.3f) {
                 found = true;
                 break;
             }
             idx = r.nextInt(planetList.size());
-            planet = planetList.get(idx - 1);
+            planet = planetList.get(idx);
         }
 
         planet.setOwner(p);
@@ -176,6 +179,9 @@ public class Level {
     public void updateLevel(float tpf) {
         for (AbstractPlanet p : planetList) {
             p.updateLabel(tpf);
+        }
+        for (AbstractShip s : shipList) {
+            s.updateShip(tpf);
         }
     }
 }

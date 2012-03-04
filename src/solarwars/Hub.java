@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package level;
+package solarwars;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,12 @@ import logic.Player;
 public class Hub {
     public static ArrayList<String> playerNames;
     private HashMap<String, Player> players;
+    
+    private static Player localPlayer;
+    
+    public static Player getLocalPlayer() {
+        return localPlayer;
+    }
     
     private static Hub instance;
     
@@ -31,6 +37,11 @@ public class Hub {
     
     public void initialize() {
         
+    }
+    
+    void setLocalPlayer(Player p) {
+        if (localPlayer == null)
+            localPlayer = p;
     }
     
     public void addPlayer(Player p) {

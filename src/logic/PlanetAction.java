@@ -4,10 +4,23 @@
  */
 package logic;
 
+import entities.AbstractPlanet;
+
 /**
  *
  * @author Hans
  */
-public class PlanetAction {
-    
+public abstract class PlanetAction {
+
+    private final String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public PlanetAction(String name) {
+        this.name = name;
+    }
+
+    public abstract void doAction(AbstractPlanet planet, Player p);
 }

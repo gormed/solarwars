@@ -28,8 +28,6 @@ public class SimpleShip extends AbstractShip {
 
     @Override
     public void createShip() {
-
-
         Quad q = new Quad(SHIP_SIZE, SHIP_SIZE);
         geometry = new Geometry("SimpleShip " + id, q);
 
@@ -45,16 +43,19 @@ public class SimpleShip extends AbstractShip {
         geometry.setQueueBucket(Bucket.Transparent);
 
         float angles[] = {
-            (float) -Math.PI / 2, (float) Math.PI, 0
+            (float) -Math.PI / 2, (float) -Math.PI/2, 0
         };
-        Vector3f offset = new Vector3f(SHIP_SIZE/2, 0, -SHIP_SIZE/2);
+        
+        Vector3f offset = new Vector3f(0, 0, -SHIP_SIZE/2);
 
-        geometry.setLocalTranslation(position.x + offset.x,
-                position.y + offset.y, position.z + offset.z);
+        geometry.setLocalTranslation(offset.x,
+                offset.y, offset.z);
         geometry.setLocalRotation(new Quaternion(angles));
 
         Cross c = new Cross(assetManager);
         transformNode.attachChild(c);
         transformNode.attachChild(geometry);
+        
+        transformNode.setLocalTranslation(position);
     }
 }

@@ -4,10 +4,23 @@
  */
 package logic;
 
+import entities.AbstractShip;
+
 /**
  *
  * @author Hans
  */
-public class ShipAction {
-    
+public abstract class ShipAction {
+
+    private final String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public ShipAction(String name) {
+        this.name = name;
+    }
+
+    public abstract void doAction(AbstractShip ship, Player p);
 }

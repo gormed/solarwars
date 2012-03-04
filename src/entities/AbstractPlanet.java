@@ -111,11 +111,11 @@ public abstract class AbstractPlanet extends Node {
 
         label.setLocalTransform(t);
     }
-    
-    public Player isOwnedBy() {
+
+    public Player getOwner() {
         return owner;
     }
-    
+
     public void setOwner(Player p) {
         owner = p;
         material.setColor("Specular", owner.getColor());
@@ -131,9 +131,26 @@ public abstract class AbstractPlanet extends Node {
     public float getSize() {
         return size;
     }
+    
 
     public Geometry getGeometry() {
         return geometry;
+    }
+
+    public int getShips() {
+        return ships;
+    }
+    
+    public void decrementShips() {
+        ships--;
+    }
+
+    public void incrementShips() {
+        ships++;
+    }
+    
+    public Vector3f getPosition() {
+        return position;
     }
 
     protected void calculateIncrement() {

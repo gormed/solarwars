@@ -24,6 +24,9 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import entities.AbstractPlanet;
+import entities.AbstractShip;
+import logic.ActionLib;
+import logic.Gameplay;
 
 /**
  *
@@ -42,6 +45,7 @@ public class IsoControl {
     private ParticleEmitter marker;
     private Camera cam;
     private ActionListener actionListener;
+    private ActionLib actionLib;
 
     /**
      * Returns the action listener of the control. 
@@ -62,7 +66,7 @@ public class IsoControl {
     public IsoControl(AssetManager assetManager, Node rootNode, Camera cam, InputManager inputManager) {
         this.rootNode = rootNode;
         this.cam = cam;
-
+        this.actionLib = ActionLib.getInstance();
 
         markerNode = new Node("Marker Transform");
 
@@ -96,7 +100,19 @@ public class IsoControl {
         actionListener = new ActionListener() {
 
             public void onAction(String name, boolean keyPressed, float tpf) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_CLICK) && !keyPressed) {
+                
+                int click = -1;
+                // LEFT CLICK = 1
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK))
+                    click = 1;
+                // RIGHT CLICK = 2
+                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK))
+                    click = 2;
+                else 
+                    click = 0;
+                
+                
+                if ( click > 0 && !keyPressed) {
                     // 1. Reset results list.
                     CollisionResults results = new CollisionResults();
                     // 2. calculate ray from camera to mouse pointer
@@ -128,25 +144,30 @@ public class IsoControl {
                         if (lastNode != null) {
                             lastNode.detachChild(markerNode);
                         }
+                        
                         lastNode = closest.getGeometry().getParent();
-                        lastNode.attachChild(markerNode);
-
+                        
                         AbstractPlanet p = null;
+                        AbstractShip s = null;
                         Node n = lastNode.getParent();
-
-                        marker.killAllParticles();
-
+                        
                         if (n instanceof AbstractPlanet) {
                             p = (AbstractPlanet) n;
-//                            marker.setLowLife(0.55f);
-//                            marker.setHighLife(0.6f);
+                            
+                            lastNode.attachChild(markerNode);
+                            
+                            marker.killAllParticles();
                             marker.setStartSize(p.getSize() + 0.15f);
                             marker.setEndSize(p.getSize() + 0.2f);
+                            marker.emitAllParticles();
+                            if (click == 1)
+                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_SELECT);
+                            else if (click == 2)
+                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
+                        } else if (n instanceof AbstractShip) {
+                            s = (AbstractShip) n;
                         }
 
-                        marker.emitAllParticles();
-                        //markerNode.setLocalScale(tpf, tpf, tpf);
-                        //rootNode.attachChild(markerNode);
                     } else {
                         // No hits? Then remove the mark.
                         if (lastNode != null) {
