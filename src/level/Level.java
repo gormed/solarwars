@@ -64,6 +64,7 @@ public class Level {
         setup(rootNode, assetManager, control, seed);
 
         generateLevel(this.seed);
+        setupPlayers();
     }
 
     private void setup(Node rootNode, AssetManager assetManager, IsoControl control, long seed) {
@@ -109,24 +110,26 @@ public class Level {
         this.seed = seed;
         Random r = new Random(seed);
         
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 20; j++) {
+        for (int i = 0; i < 14; i++) {
+            for (int j = 0; j < 14; j++) {
                 if (r.nextBoolean()) {
-                    p = new BasePlanet(assetManager, this, new Vector3f(-9 + i, 0, -9 + j), generateSize(r));
+                    p = new BasePlanet(assetManager, this, new Vector3f(-7 + i, 0, -9 + j), generateSize(r));
                     p.createPlanet();
+                    p.setShipCount(5 + r.nextInt(10));
+                    
                     planetList.add(p);
                     freePlanetsNode.attachChild(p);
                     //control.addShootable(p.getGeometry());
                 }
             }
         }
-        setupPlayers();
+        
         control.addShootable(levelNode);
         currentLevel = this;
         //rootNode.attachChild(control.getShootablesNode());
     }
 
-    private void setupPlayers() {
+    public void setupPlayers() {
         for (String s : Hub.playerNames) {
             Player p = hub.getPlayer(s);
             Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
@@ -147,7 +150,7 @@ public class Level {
     }
 
     public void removeShip(Player p, AbstractShip s) {
-        Node shipNode = shipNodes.remove(p);
+        Node shipNode = shipNodes.get(p);
         shipNode.detachChild(s);
     }
 
@@ -167,8 +170,9 @@ public class Level {
             idx = r.nextInt(planetList.size());
             planet = planetList.get(idx);
         }
-
+        
         planet.setOwner(p);
+        planet.setShipCount(100);
         return planet;
     }
 

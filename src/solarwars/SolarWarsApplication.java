@@ -8,10 +8,12 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.CartoonEdgeFilter;
@@ -39,24 +41,22 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
     public static final String INPUT_MAPPING_LEFT_CLICK = "SOLARWARS_LeftClick";
     public static final String INPUT_MAPPING_RIGHT_CLICK = "SOLARWARS_RightClick";
-    
+    public static final String INPUT_MAPPING_WHEEL_UP = "SOLARWARS_WheelUp";
+    public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
     protected Node rootNode = new Node("Root Node");
     protected Node guiNode = new Node("Gui Node");
     protected float secondCounter = 0.0f;
     protected int frameCounter = 0;
-    
     protected BitmapText fpsText;
     protected BitmapFont guiFont;
     protected StatsView statsView;
-    
     protected IsoCamera isoCam;
+    protected Vector2f lastScreenPos;
     protected IsoControl isoControl;
-    
     protected boolean showSettings = true;
     private boolean showFps = true;
     private AppActionListener actionListener = new AppActionListener();
     private FilterPostProcessor postProcessor;
-    
     private SolarWarsGame game;
 
     public IsoCamera getIsoCam() {
@@ -210,13 +210,14 @@ public class SolarWarsApplication extends Application {
 
         // Init controls
         isoControl = new IsoControl(assetManager, rootNode, cam, inputManager);
-        
+
         // Setup Controls of the cam for debug
         if (inputManager != null) {
             isoCam = IsoCamera.getInstance();
             isoCam.initialize(cam, rootNode);
             isoCam.setMoveSpeed(5f);
             isoCam.registerWithInput(inputManager);
+            lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
             // Map C, M, F5 and ESC
             if (context.getType() == Type.Display) {
@@ -232,10 +233,17 @@ public class SolarWarsApplication extends Application {
             // Map left-button click
             inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
                     new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK, 
+            inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK,
                     new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-            inputManager.addListener(isoControl.getActionListener(), 
-                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK);
+            inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN, 
+                    new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
+            inputManager.addMapping(INPUT_MAPPING_WHEEL_UP, 
+                    new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
+
+
+            inputManager.addListener(isoControl.getActionListener(),
+                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK,
+                    INPUT_MAPPING_WHEEL_DOWN, INPUT_MAPPING_WHEEL_UP);
 
         }
 
@@ -245,9 +253,9 @@ public class SolarWarsApplication extends Application {
         sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
         sun.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 0.7f));
         rootNode.addLight(sun);
-        
+
         game = SolarWarsGame.getInstance();
-        game.initialize(this); 
+        game.initialize(this);
         game.start();
     }
 
@@ -289,7 +297,16 @@ public class SolarWarsApplication extends Application {
     }
 
     public void simpleUpdate(float tpf) {
-        Level.getCurrentLevel().updateLevel(tpf);
+        game.update(tpf);
+        
+        if (isoCam.isDragged()) {
+
+            Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
+            isoCam.dragCamera(tpf, currentSceenPos);
+            //inputManager.setCursorVisible(!value);
+
+            //lastScreenPos = currentSceenPos;
+        }
     }
 
     public void simpleRender(RenderManager rm) {

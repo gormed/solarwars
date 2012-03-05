@@ -7,6 +7,8 @@ package solarwars;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
 import com.jme3.math.ColorRGBA;
+import gui.GameGUI;
+import gui.Percentage;
 import level.Level;
 import logic.ActionLib;
 import logic.Gameplay;
@@ -43,6 +45,8 @@ public class SolarWarsGame {
     private Hub hub;
     private FontLoader fontLoader;
     private ActionLib actionLib;
+    
+    private GameGUI gui;
 
     public void initialize(SolarWarsApplication app) {
         application = app;
@@ -66,6 +70,12 @@ public class SolarWarsGame {
         Player ai = new Player("AI", ColorRGBA.Red);
         hub.addPlayer(ai);
     }
+    
+    private void setupGUI() {
+        gui = new GameGUI(this);
+        gui.addGUIElement(new Percentage(gui));
+        
+    }
 
     public void load(long seed) {
         currentLevel = new Level(
@@ -78,10 +88,11 @@ public class SolarWarsGame {
 
     public void start() {
         setupSingleplayer();
+        setupGUI();
         currentLevel = new Level(
                 application.rootNode, assetManager, isoControl);
         currentLevel.generateLevel(System.currentTimeMillis());
-        
+        currentLevel.setupPlayers();
         
         //SimpleShip s = new SimpleShip(assetManager, currentLevel, new Vector3f(0, 0, 0), p);
         //s.createShip();
@@ -100,5 +111,11 @@ public class SolarWarsGame {
     }
 
     public void terminate() {
+    }
+    
+    void update(float tpf) {
+        currentLevel.updateLevel(tpf);
+        gui.updateGUIElements(tpf);
+        
     }
 }

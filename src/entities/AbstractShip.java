@@ -7,7 +7,6 @@ package entities;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Matrix3f;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -25,7 +24,7 @@ public abstract class AbstractShip extends Node {
     private static int getContiniousID() {
         return SHIP_ID++;
     }
-    protected static float SHIP_SIZE = 0.25f;
+    protected static float SHIP_SIZE = 0.15f;
     protected AssetManager assetManager;
     protected Geometry geometry;
     protected Material material;
@@ -95,6 +94,7 @@ public abstract class AbstractShip extends Node {
                         order.setOwner(owner);
                     }
                 }
+                level.removeShip(owner, this);
                 order = null;
             } else {
                 dir.normalizeLocal();

@@ -30,6 +30,8 @@ public class Player {
     private ShipGroup selectedShipGroup;
     
     private int selectedShips = 0;
+    
+    private float shipPercentage = 0.5f;
 
     public Player(String name, ColorRGBA color) {
         this.name = name;
@@ -66,12 +68,16 @@ public class Player {
         return selectedPlanet;
     }
     
-    int getShipSelectionCount() {
-        return selectedShips;
+    public void setShipPercentage(float p) {
+        if (p > 1.0f)
+            p = 1.0f;
+        if (p < 0.0f)
+            p = 0.0f;
+        shipPercentage = p;
     }
     
-    void setShipSelectionCount(int count) {
-        selectedShips = count;
+    public float getShipPercentage() {
+        return shipPercentage;
     }
 
     void selectShip(AbstractShip s) {

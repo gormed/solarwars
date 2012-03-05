@@ -27,6 +27,7 @@ import entities.AbstractPlanet;
 import entities.AbstractShip;
 import logic.ActionLib;
 import logic.Gameplay;
+import logic.Player;
 
 /**
  *
@@ -49,7 +50,7 @@ public class IsoControl {
 
     /**
      * Returns the action listener of the control. 
-     * It determines wether a node was hit or not on a given click.
+     * It determines wether a node was hit or not on a given action.
      * 
      * @return 
      */
@@ -100,19 +101,24 @@ public class IsoControl {
         actionListener = new ActionListener() {
 
             public void onAction(String name, boolean keyPressed, float tpf) {
-                
-                int click = -1;
+
+                int action = -1;
+
                 // LEFT CLICK = 1
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK))
-                    click = 1;
-                // RIGHT CLICK = 2
-                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK))
-                    click = 2;
-                else 
-                    click = 0;
-                
-                
-                if ( click > 0 && !keyPressed) {
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+                    action = 1;
+                } // RIGHT CLICK = 2
+                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)) {
+                    action = 2;
+                } // WHEEL DOWN
+                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN)) {
+                    action = 3;
+                } // WHEEL UP
+                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_UP)) {
+                    action = 4;
+                }
+
+                if ((action == 1 || action == 2) && !keyPressed) {
                     // 1. Reset results list.
                     CollisionResults results = new CollisionResults();
                     // 2. calculate ray from camera to mouse pointer
@@ -141,29 +147,36 @@ public class IsoControl {
 
                         // Let's interact - we mark the hit with a red dot.
                         //markerNode.setLocalTranslation(closest.getContactPoint());
-                        if (lastNode != null) {
-                            lastNode.detachChild(markerNode);
-                        }
-                        
+
+
                         lastNode = closest.getGeometry().getParent();
-                        
+
                         AbstractPlanet p = null;
                         AbstractShip s = null;
                         Node n = lastNode.getParent();
-                        
+
                         if (n instanceof AbstractPlanet) {
                             p = (AbstractPlanet) n;
-                            
-                            lastNode.attachChild(markerNode);
-                            
-                            marker.killAllParticles();
-                            marker.setStartSize(p.getSize() + 0.15f);
-                            marker.setEndSize(p.getSize() + 0.2f);
-                            marker.emitAllParticles();
-                            if (click == 1)
+
+
+                            if (action == 1) {
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_SELECT);
-                            else if (click == 2)
+                                
+                                if (lastNode != null) {
+                                    lastNode.detachChild(markerNode);
+                                }
+                                
+                                lastNode.attachChild(markerNode);
+
+                                marker.killAllParticles();
+                                marker.setStartSize(p.getSize() + 0.15f);
+                                marker.setEndSize(p.getSize() + 0.2f);
+                                marker.emitAllParticles();
+
+                            } else if (action == 2) {
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
+                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_MOVE);
+                            }
                         } else if (n instanceof AbstractShip) {
                             s = (AbstractShip) n;
                         }
@@ -175,6 +188,16 @@ public class IsoControl {
                         }
                         //rootNode.detachChild(markerNode);
                     }
+                }
+
+                if (action == 3 || action == 4) {
+                    float percentage = Hub.getLocalPlayer().getShipPercentage();
+                    if (action == 3) {
+                        percentage += 0.025f;
+                    } else {
+                        percentage -= 0.025f;
+                    }
+                    Hub.getLocalPlayer().setShipPercentage(percentage);
                 }
             }
         };
@@ -194,16 +217,5 @@ public class IsoControl {
      */
     public void removeShootable(Spatial spat) {
         shootablesNode.detachChild(spat);
-    }
-
-    /** 
-     * Declaring the "Shoot" action and mapping to 
-     * its triggers. 
-     */
-    public void setupContols(InputManager input) {
-        input.addMapping("Shoot",
-                new KeyTrigger(KeyInput.KEY_SPACE), // trigger 1: spacebar
-                new MouseButtonTrigger(MouseInput.BUTTON_LEFT)); // trigger 2: left-button click
-        input.addListener(actionListener, "Shoot");
     }
 }

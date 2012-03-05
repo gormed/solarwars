@@ -40,7 +40,7 @@ public class SimpleShip extends AbstractShip {
 
         /** Objects with transparency need to be in 
          * the render bucket for transparent objects: */
-        geometry.setQueueBucket(Bucket.Transparent);
+        geometry.setQueueBucket(Bucket.Translucent);
 
         float angles[] = {
             (float) -Math.PI / 2, (float) -Math.PI/2, 0
@@ -52,8 +52,8 @@ public class SimpleShip extends AbstractShip {
                 offset.y, offset.z);
         geometry.setLocalRotation(new Quaternion(angles));
 
-        Cross c = new Cross(assetManager);
-        transformNode.attachChild(c);
+        //Cross c = new Cross(assetManager);
+        //transformNode.attachChild(c);
         transformNode.attachChild(geometry);
         
         transformNode.setLocalTranslation(position);

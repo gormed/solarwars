@@ -141,6 +141,10 @@ public abstract class AbstractPlanet extends Node {
         return ships;
     }
     
+    public void setShipCount(int c) {
+        ships = c;
+    }
+    
     public void decrementShips() {
         ships--;
     }

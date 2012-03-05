@@ -5,6 +5,7 @@
 package solarwars;
 
 import com.jme3.collision.MotionAllowedListener;
+import com.jme3.input.FlyByCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -12,13 +13,16 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import java.awt.geom.Point2D;
 
 /**
  *  
@@ -27,27 +31,27 @@ import com.jme3.scene.Node;
 public class IsoCamera implements AnalogListener, ActionListener {
 
     private static IsoCamera instance;
-    
+
     public static IsoCamera getInstance() {
         if (instance != null) {
             return instance;
         }
         return instance = new IsoCamera();
     }
-    
-    public static final float CAMERA_HEIGHT = 8;
-    public static final float CAMERA_ANGLE = (float)Math.PI/2;//8f * (((float) Math.PI) / 18f) ;
-    
+    public static final float CAMERA_HEIGHT = 12;
+    public static final float CAMERA_ANGLE = (float) Math.PI / 2;//8f * (((float) Math.PI) / 18f) ;
     protected Camera cam;
     protected PointLight camLight;
     protected Node rootNode;
     protected Vector3f initialUpVec;
-    protected float rotationSpeed = 1f;
+    protected float dragSpeed = 3f;
     protected float moveSpeed = 3f;
     protected MotionAllowedListener motionAllowed = null;
     protected boolean enabled = true;
-    protected boolean dragToRotate = false;
-    protected boolean canRotate = false;
+    protected boolean lastClickState;
+    protected boolean currentClickState;
+    protected boolean isDragged;
+    protected Vector2f initialDragPos;
     protected InputManager inputManager;
 
     /**
@@ -57,7 +61,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     private IsoCamera() {
         super();
     }
-    
+
     public void initialize(Camera cam, Node rootNode) {
         this.rootNode = rootNode;
         float[] rot = {CAMERA_ANGLE, 0, 0};
@@ -65,13 +69,15 @@ public class IsoCamera implements AnalogListener, ActionListener {
         initialUpVec = cam.getUp().clone();
         cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, 0));
         cam.setRotation(new Quaternion(rot));
-        
+
         camLight = new PointLight();
         camLight.setPosition(cam.getLocation());
         camLight.setColor(ColorRGBA.White);
         rootNode.addLight(camLight);
+
+
     }
-    
+
     public Camera getCam() {
         return cam;
     }
@@ -98,21 +104,16 @@ public class IsoCamera implements AnalogListener, ActionListener {
 
     /**
      * Sets the rotation speed.
-     * @param rotationSpeed
+     * @param dragSpeed
      */
     public void setRotationSpeed(float rotationSpeed) {
-        this.rotationSpeed = rotationSpeed;
+        this.dragSpeed = rotationSpeed;
     }
 
     /**
      * @param enable If false, the camera will ignore input.
      */
     public void setEnabled(boolean enable) {
-        if (enabled && !enable) {
-            if (!dragToRotate || (dragToRotate && canRotate)) {
-                inputManager.setCursorVisible(true);
-            }
-        }
         enabled = enable;
     }
 
@@ -127,26 +128,14 @@ public class IsoCamera implements AnalogListener, ActionListener {
     /**
      * @return If drag to rotate feature is enabled.
      *
-     * @see FlyByCamera#setDragToRotate(boolean) 
+     * @see FlyByCamera#setDragToMove(boolean) 
      */
-    public boolean isDragToRotate() {
-        return dragToRotate;
+    public boolean isDragged() {
+        return isDragged;
     }
 
-    /**
-     * Set if drag to rotate mode is enabled.
-     * 
-     * When true, the user must hold the mouse button
-     * and drag over the screen to rotate the camera, and the cursor is
-     * visible until dragged. Otherwise, the cursor is invisible at all times
-     * and holding the mouse button is not needed to rotate the camera.
-     * This feature is disabled by default.
-     * 
-     * @param dragToRotate True if drag to rotate mode is enabled.
-     */
-    public void setDragToRotate(boolean dragToRotate) {
-        this.dragToRotate = dragToRotate;
-        inputManager.setCursorVisible(dragToRotate);
+    public Vector2f getInitialDragPosition() {
+        return initialDragPos;
     }
 
     /**
@@ -163,13 +152,14 @@ public class IsoCamera implements AnalogListener, ActionListener {
             "ISOCAM_Up",
             "ISOCAM_Down",
             "ISOCAM_Forward",
-            "ISOCAM_Backward"
+            "ISOCAM_Backward",
+            "ISOCAM_DragMove"
         };
 
         // mouse only - zoom in/out with wheel, and rotate drag
-        inputManager.addMapping("ISOCAM_Down", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-        inputManager.addMapping("ISOCAM_Up", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-        //inputManager.addMapping("FLYCAM_RotateDrag", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping("ISOCAM_Down", new KeyTrigger(KeyInput.KEY_E));
+        inputManager.addMapping("ISOCAM_Up", new KeyTrigger(KeyInput.KEY_Q));
+        inputManager.addMapping("ISOCAM_DragMove", new MouseButtonTrigger(MouseInput.BUTTON_MIDDLE));
 
         // keyboard only WASD for movement and WZ for rise/lower height
         inputManager.addMapping("ISOCAM_Left", new KeyTrigger(KeyInput.KEY_A));
@@ -180,42 +170,42 @@ public class IsoCamera implements AnalogListener, ActionListener {
         inputManager.addMapping("ISOCAM_Down", new KeyTrigger(KeyInput.KEY_Z));
 
         inputManager.addListener(this, mappings);
-        //inputManager.setCursorVisible(dragToRotate);
+        //inputManager.setCursorVisible(dragToMove);
 
         /*Joystick[] joysticks = inputManager.getJoysticks();
         if (joysticks != null && joysticks.length > 0) {
-            Joystick joystick = joysticks[0];
-            joystick.assignAxis("FLYCAM_StrafeRight", "FLYCAM_StrafeLeft", JoyInput.AXIS_POV_X);
-            joystick.assignAxis("FLYCAM_Forward", "FLYCAM_Backward", JoyInput.AXIS_POV_Y);
-            joystick.assignAxis("FLYCAM_Right", "FLYCAM_Left", joystick.getXAxisIndex());
-            joystick.assignAxis("FLYCAM_Down", "FLYCAM_Up", joystick.getYAxisIndex());
+        Joystick joystick = joysticks[0];
+        joystick.assignAxis("FLYCAM_StrafeRight", "FLYCAM_StrafeLeft", JoyInput.AXIS_POV_X);
+        joystick.assignAxis("FLYCAM_Forward", "FLYCAM_Backward", JoyInput.AXIS_POV_Y);
+        joystick.assignAxis("FLYCAM_Right", "FLYCAM_Left", joystick.getXAxisIndex());
+        joystick.assignAxis("FLYCAM_Down", "FLYCAM_Up", joystick.getYAxisIndex());
         }*/
     }
 
     protected void rotateCamera(float value, Vector3f axis) {
-        /*if (dragToRotate) {
-            if (canRotate) {
-//                value = -value;
-            } else {
-                return;
-            }
+        /*if (dragToMove) {
+        if (canDragMove) {
+        //                value = -value;
+        } else {
+        return;
         }
-
+        }
+        
         Matrix3f mat = new Matrix3f();
-        mat.fromAngleNormalAxis(rotationSpeed * value, axis);
-
+        mat.fromAngleNormalAxis(dragSpeed * value, axis);
+        
         Vector3f up = cam.getUp();
         Vector3f left = cam.getLeft();
         Vector3f dir = cam.getDirection();
-
+        
         mat.mult(up, up);
         mat.mult(left, left);
         mat.mult(dir, dir);
-
+        
         Quaternion q = new Quaternion();
         q.fromAxes(left, up, dir);
         q.normalize();
-
+        
         cam.setAxes(q);*/
     }
 
@@ -241,7 +231,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     }
 
     protected void riseCamera(float value) {
-        Vector3f vel = new Vector3f(0, value / moveSpeed, 0);
+        Vector3f vel = new Vector3f(0, value * moveSpeed, 0);
         Vector3f pos = cam.getLocation().clone();
 
         if (motionAllowed != null) {
@@ -276,11 +266,32 @@ public class IsoCamera implements AnalogListener, ActionListener {
         camLight.setPosition(cam.getLocation());
     }
 
+    void dragCamera(float value, Vector2f to) {
+        Vector3f vel = new Vector3f();
+        Vector3f pos = cam.getLocation().clone();
+
+        Vector2f dir = to.subtract(initialDragPos);
+
+        dir.normalizeLocal();
+
+        vel = new Vector3f(dir.x, 0, -dir.y);
+        vel.multLocal(value * dragSpeed);
+
+        if (motionAllowed != null) {
+            motionAllowed.checkMotionAllowed(pos, vel);
+        } else {
+            pos.addLocal(vel);
+        }
+
+        cam.setLocation(pos);
+        camLight.setPosition(cam.getLocation());
+    }
+
     public void onAnalog(String name, float value, float tpf) {
         if (!enabled) {
             return;
         }
-            
+
         if (name.equals("ISOCAM_Forward")) {
             moveCamera(value, false);
         } else if (name.equals("ISOCAM_Backward")) {
@@ -294,9 +305,9 @@ public class IsoCamera implements AnalogListener, ActionListener {
         } else if (name.equals("ISOCAM_Down")) {
             riseCamera(-value);
         } /*else if (name.equals("FLYCAM_ZoomIn")) {
-            zoomCamera(value);
+        zoomCamera(value);
         } else if (name.equals("FLYCAM_ZoomOut")) {
-            zoomCamera(-value);
+        zoomCamera(-value);
         }*/
     }
 
@@ -304,10 +315,22 @@ public class IsoCamera implements AnalogListener, ActionListener {
         if (!enabled) {
             return;
         }
-
-        /*if (name.equals("FLYCAM_RotateDrag") && dragToRotate) {
-            canRotate = value;
-            inputManager.setCursorVisible(!value);
-        }*/
+        currentClickState = value;
+        if (name.equals("ISOCAM_DragMove")) {
+            isDragged = value;
+            if (isDragged) {
+                initialDragPos = inputManager.getCursorPosition().clone();
+            }
+            //!currentClickState && lastClickState;
+//            Vector2f currentSceenPos = inputManager.getCursorPosition();
+//            Vector2f dir = lastScreenPos.subtract(currentSceenPos);
+//            dir.normalizeLocal();
+//            
+//            dragCamera(tpf, dir);
+//            //inputManager.setCursorVisible(!value);
+//            
+//            lastScreenPos = currentSceenPos;
+        }
+        lastClickState = currentClickState;
     }
 }
