@@ -11,7 +11,6 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 import level.Level;
 import logic.Player;
@@ -22,8 +21,8 @@ import logic.Player;
  */
 public class SimpleShip extends AbstractShip {
 
-    public SimpleShip(AssetManager assetManager, Level level, Vector3f position, Player p) {
-        super(assetManager, level, position, p);
+    public SimpleShip(AssetManager assetManager, Level level, Vector3f position, Player p, ShipGroup g) {
+        super(assetManager, level, position, p, g);
     }
 
     @Override

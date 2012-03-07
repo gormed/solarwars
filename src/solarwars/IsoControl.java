@@ -10,11 +10,7 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
@@ -25,9 +21,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
+import entities.ShipGroup;
 import logic.ActionLib;
 import logic.Gameplay;
-import logic.Player;
 
 /**
  *
@@ -78,11 +74,14 @@ public class IsoControl {
         marker.setMaterial(debris_mat);
         marker.setImagesX(1);
         marker.setImagesY(1); // 3x3 texture animation
-        marker.setStartSize(0.51f);
+        marker.setStartSize(0.5f);
         marker.setEndSize(0.5f);
-        marker.setLowLife(0.55f);
-        marker.setHighLife(0.6f);
+        marker.setLowLife(0.18f);
+        marker.setHighLife(0.18f);
 
+//        marker.setLowLife(0.55f);
+//        marker.setHighLife(0.6f);
+        
         marker.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 0, 0));
         marker.setStartColor(new ColorRGBA(0.1f, 0.1f, 1f, 1f));
         marker.setEndColor(new ColorRGBA(0.1f, 0.1f, 1f, 0.3f));
@@ -152,7 +151,7 @@ public class IsoControl {
                         lastNode = closest.getGeometry().getParent();
 
                         AbstractPlanet p = null;
-                        AbstractShip s = null;
+                        ShipGroup sg = null;
                         Node n = lastNode.getParent();
 
                         if (n instanceof AbstractPlanet) {
@@ -161,24 +160,16 @@ public class IsoControl {
 
                             if (action == 1) {
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_SELECT);
-                                
-                                if (lastNode != null) {
-                                    lastNode.detachChild(markerNode);
-                                }
-                                
-                                lastNode.attachChild(markerNode);
 
-                                marker.killAllParticles();
-                                marker.setStartSize(p.getSize() + 0.15f);
-                                marker.setEndSize(p.getSize() + 0.2f);
-                                marker.emitAllParticles();
+                                repositMarker(p);
 
                             } else if (action == 2) {
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_MOVE);
                             }
-                        } else if (n instanceof AbstractShip) {
-                            s = (AbstractShip) n;
+                        } else if (n instanceof ShipGroup) {
+                            sg = (ShipGroup) n;
+                            repositMarker(sg);
                         }
 
                     } else {
@@ -201,6 +192,32 @@ public class IsoControl {
                 }
             }
         };
+    }
+
+    private void repositMarker(AbstractPlanet p) {
+        if (lastNode != null) {
+            lastNode.detachChild(markerNode);
+        }
+
+        lastNode.attachChild(markerNode);
+
+        marker.killAllParticles();
+        marker.setStartSize(p.getSize() + 0.2f);
+        marker.setEndSize(p.getSize() + 0.2f);
+        marker.emitAllParticles();
+    }
+
+    private void repositMarker(ShipGroup g) {
+        if (lastNode != null) {
+            lastNode.detachChild(markerNode);
+        }
+
+        lastNode.attachChild(markerNode);
+
+        marker.killAllParticles();
+        marker.setStartSize(g.getSize()*8 + 0.2f);
+        marker.setEndSize(g.getSize()*8 + 0.2f);
+        marker.emitAllParticles();
     }
 
     /**

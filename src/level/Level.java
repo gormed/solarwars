@@ -39,11 +39,13 @@ public class Level {
     private Node freePlanetsNode;
     private Node labelNode;
     private Node allShipsNode;
-    
     private HashMap<Player, Node> shipNodes;
     private ArrayList<AbstractPlanet> planetList;
     private ArrayList<AbstractShip> shipList;
     private ArrayList<ShipGroup> shipGroupList;
+    
+    private ArrayList<AbstractShip> removeShipsList;
+    
     private AssetManager assetManager;
     private IsoControl control;
     private Hub hub;
@@ -69,27 +71,28 @@ public class Level {
 
     private void setup(Node rootNode, AssetManager assetManager, IsoControl control, long seed) {
         this.seed = seed;
-        
+
         // Init needed system refs
         this.rootNode = rootNode;
         this.assetManager = assetManager;
         this.hub = Hub.getInstance();
         this.control = control;
-        
+
         // Init lists
         this.planetList = new ArrayList<AbstractPlanet>();
         this.shipList = new ArrayList<AbstractShip>();
         this.shipGroupList = new ArrayList<ShipGroup>();
         this.planetNodes = new HashMap<Player, Node>();
         this.shipNodes = new HashMap<Player, Node>();
-        
+        this.removeShipsList = new ArrayList<AbstractShip>();
+
         // create base-nodes
         this.levelNode = new Node("Level Node");
         this.freePlanetsNode = new Node("Free Planets Node");
         this.levelNode.attachChild(freePlanetsNode);
         this.allShipsNode = new Node("Level All Ships");
         this.levelNode.attachChild(allShipsNode);
-        
+
         // create a ship node for each player
         for (int i = 0; i < hub.getPlayerCount(); i++) {
             Player p = hub.getPlayer(i);
@@ -105,25 +108,25 @@ public class Level {
     }
 
     public void generateLevel(long seed) {
-        
+
         AbstractPlanet p;
         this.seed = seed;
         Random r = new Random(seed);
-        
+
         for (int i = 0; i < 14; i++) {
             for (int j = 0; j < 14; j++) {
                 if (r.nextBoolean()) {
                     p = new BasePlanet(assetManager, this, new Vector3f(-7 + i, 0, -9 + j), generateSize(r));
                     p.createPlanet();
                     p.setShipCount(5 + r.nextInt(10));
-                    
+
                     planetList.add(p);
                     freePlanetsNode.attachChild(p);
                     //control.addShootable(p.getGeometry());
                 }
             }
         }
-        
+
         control.addShootable(levelNode);
         currentLevel = this;
         //rootNode.attachChild(control.getShootablesNode());
@@ -149,9 +152,22 @@ public class Level {
         shipList.add(s);
     }
 
+    public void addShipGroup(Player p, ShipGroup s) {
+        Node shipNode = shipNodes.get(p);
+        shipNode.attachChild(s);
+        shipGroupList.add(s);
+    }
+
     public void removeShip(Player p, AbstractShip s) {
         Node shipNode = shipNodes.get(p);
         shipNode.detachChild(s);
+        removeShipsList.add(s);
+    }
+
+    public void removeShipGroup(Player p, ShipGroup s) {
+        Node shipNode = shipNodes.get(p);
+        shipNode.detachChild(s);
+        shipGroupList.remove(s);        
     }
 
     private AbstractPlanet getRandomPlanet(Player p) {
@@ -170,7 +186,7 @@ public class Level {
             idx = r.nextInt(planetList.size());
             planet = planetList.get(idx);
         }
-        
+
         planet.setOwner(p);
         planet.setShipCount(100);
         return planet;
@@ -184,8 +200,17 @@ public class Level {
         for (AbstractPlanet p : planetList) {
             p.updateLabel(tpf);
         }
+        for (ShipGroup sg : shipGroupList) {
+            sg.updateShipGroup(tpf);
+        }
         for (AbstractShip s : shipList) {
             s.updateShip(tpf);
         }
+        
+        for (AbstractShip s : removeShipsList) {
+            shipList.remove(s);
+        }
+        
+        removeShipsList.clear();
     }
 }

@@ -36,15 +36,17 @@ public abstract class AbstractShip extends Node {
     protected Player owner;
     protected AbstractPlanet order;
 
-    public AbstractShip(AssetManager assetManager, Level level, Vector3f position, Player p) {
+    public AbstractShip(AssetManager assetManager, Level level, Vector3f position, Player p, ShipGroup g) {
         super();
-        id = getContiniousID();
+        
+        this.id = getContiniousID();
         this.owner = p;
         this.assetManager = assetManager;
         this.level = level;
         this.position = position;
+        this.shipGroup = g;
 
-        transformNode = new Node("Ship Transform Node " + id);
+        this.transformNode = new Node("Ship Transform Node " + id);
         this.attachChild(transformNode);
     }
 
@@ -64,6 +66,14 @@ public abstract class AbstractShip extends Node {
 
     public ShipGroup getShipGroup() {
         return shipGroup;
+    }
+    
+    private void removeFromShipGroup() {
+        if (shipGroup == null)
+            return;
+        
+        shipGroup.removeShip(this);
+
     }
 
     public void moveToPlanet(AbstractPlanet p) {
@@ -94,6 +104,7 @@ public abstract class AbstractShip extends Node {
                         order.setOwner(owner);
                     }
                 }
+                removeFromShipGroup();
                 level.removeShip(owner, this);
                 order = null;
             } else {
@@ -102,8 +113,6 @@ public abstract class AbstractShip extends Node {
                 position.addLocal(dir);
                 transformNode.setLocalTranslation(position);
             }
-
-
         }
     }
 }
