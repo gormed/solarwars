@@ -8,19 +8,21 @@ import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
-import com.jme3.effect.ParticleMesh;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
+import com.jme3.material.RenderState.BlendMode;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Quad;
 import entities.AbstractPlanet;
-import entities.AbstractShip;
 import entities.ShipGroup;
 import logic.ActionLib;
 import logic.Gameplay;
@@ -40,6 +42,7 @@ public class IsoControl {
     private Node markerNode;
     private Node lastNode;
     private ParticleEmitter marker;
+    private Geometry geometry;
     private Camera cam;
     private ActionListener actionListener;
     private ActionLib actionLib;
@@ -67,28 +70,55 @@ public class IsoControl {
 
         markerNode = new Node("Marker Transform");
 
-        /** Explosion effect. Uses Texture from jme3-test-data library! */
-        marker = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 1);
-        Material debris_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
-        debris_mat.setTexture("Texture", assetManager.loadTexture("Textures/Effects/marker.png"));
-        marker.setMaterial(debris_mat);
-        marker.setImagesX(1);
-        marker.setImagesY(1); // 3x3 texture animation
-        marker.setStartSize(0.5f);
-        marker.setEndSize(0.5f);
-        marker.setLowLife(0.18f);
-        marker.setHighLife(0.18f);
 
-//        marker.setLowLife(0.55f);
-//        marker.setHighLife(0.6f);
-        
-        marker.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 0, 0));
-        marker.setStartColor(new ColorRGBA(0.1f, 0.1f, 1f, 1f));
-        marker.setEndColor(new ColorRGBA(0.1f, 0.1f, 1f, 0.3f));
-        //debris.getParticleInfluencer().setGravity(6f);
-        //marker.getParticleInfluencer().setVelocityVariation(.60f);
-        markerNode.attachChild(marker);
-        marker.emitAllParticles();
+        Quad q = new Quad(1, 1);
+
+        geometry = new Geometry("MarkerGeometry", q);
+        Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        material.setTexture("ColorMap", assetManager.loadTexture("Textures/gui/marker.png"));
+        //material.setColor("Color", new ColorRGBA(0, 0, 0, 0));
+
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+
+
+        geometry.setMaterial(material);
+
+        /** Objects with transparency need to be in 
+         * the render bucket for transparent objects: */
+        geometry.setQueueBucket(Bucket.Translucent);
+
+
+        float angles[] = {
+            (float) -Math.PI / 2, (float) -Math.PI / 2, 0
+        };
+
+        //geometry.setLocalTranslation(-0.5f, 0, -0.5f);
+        geometry.setLocalRotation(new Quaternion(angles));
+
+        markerNode.attachChild(geometry);
+
+//        /** Explosion effect. Uses Texture from jme3-test-data library! */
+//        marker = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 1);
+//        Material debris_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+//        debris_mat.setTexture("Texture", assetManager.loadTexture("Textures/Effects/marker.png"));
+//        marker.setMaterial(debris_mat);
+//        marker.setImagesX(1);
+//        marker.setImagesY(1); // 3x3 texture animation
+//        marker.setStartSize(0.5f);
+//        marker.setEndSize(0.5f);
+//        marker.setLowLife(0.18f);
+//        marker.setHighLife(0.18f);
+//
+////        marker.setLowLife(0.55f);
+////        marker.setHighLife(0.6f);
+//        
+//        marker.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 0, 0));
+//        marker.setStartColor(new ColorRGBA(0.1f, 0.1f, 1f, 1f));
+//        marker.setEndColor(new ColorRGBA(0.1f, 0.1f, 1f, 0.3f));
+//        //debris.getParticleInfluencer().setGravity(6f);
+//        //marker.getParticleInfluencer().setVelocityVariation(.60f);
+//        markerNode.attachChild(marker);
+//        marker.emitAllParticles();
 
         initialize(rootNode, inputManager);
     }
@@ -147,7 +177,6 @@ public class IsoControl {
                         // Let's interact - we mark the hit with a red dot.
                         //markerNode.setLocalTranslation(closest.getContactPoint());
 
-
                         lastNode = closest.getGeometry().getParent();
 
                         AbstractPlanet p = null;
@@ -165,11 +194,13 @@ public class IsoControl {
 
                             } else if (action == 2) {
                                 actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
-                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_MOVE);
                             }
                         } else if (n instanceof ShipGroup) {
-                            sg = (ShipGroup) n;
-                            repositMarker(sg);
+                            if (action == 1) {
+                                sg = (ShipGroup) n;
+                                repositMarker(sg);
+                                actionLib.invokeShipAction(sg, Hub.getLocalPlayer(), Gameplay.SHIP_REDIRECT);
+                            }
                         }
 
                     } else {
@@ -201,10 +232,14 @@ public class IsoControl {
 
         lastNode.attachChild(markerNode);
 
-        marker.killAllParticles();
-        marker.setStartSize(p.getSize() + 0.2f);
-        marker.setEndSize(p.getSize() + 0.2f);
-        marker.emitAllParticles();
+        float s = p.getSize() * 2.6f;
+
+        geometry.setLocalScale(s);
+        geometry.setLocalTranslation(-s / 2, 0, -s / 2);
+//        marker.killAllParticles();
+//        marker.setStartSize(p.getSize() + 0.2f);
+//        marker.setEndSize(p.getSize() + 0.2f);
+//        marker.emitAllParticles();
     }
 
     private void repositMarker(ShipGroup g) {
@@ -214,10 +249,14 @@ public class IsoControl {
 
         lastNode.attachChild(markerNode);
 
-        marker.killAllParticles();
-        marker.setStartSize(g.getSize()*8 + 0.2f);
-        marker.setEndSize(g.getSize()*8 + 0.2f);
-        marker.emitAllParticles();
+        float s = g.getSize() * 2.0f;
+
+        geometry.setLocalScale(s);
+        geometry.setLocalTranslation(-s / 2, 0, -s / 2);
+//        marker.killAllParticles();
+//        marker.setStartSize(g.getSize()*8 + 0.2f);
+//        marker.setEndSize(g.getSize()*8 + 0.2f);
+//        marker.emitAllParticles();
     }
 
     /**

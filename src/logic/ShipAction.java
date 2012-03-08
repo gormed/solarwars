@@ -4,7 +4,7 @@
  */
 package logic;
 
-import entities.AbstractShip;
+import entities.ShipGroup;
 
 /**
  *
@@ -22,5 +22,5 @@ public abstract class ShipAction {
         this.name = name;
     }
 
-    public abstract void doAction(AbstractShip ship, Player p);
+    public abstract void doAction(ShipGroup shipGroup, Player p);
 }

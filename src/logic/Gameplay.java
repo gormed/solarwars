@@ -6,6 +6,7 @@ package logic;
 
 import com.jme3.math.Vector3f;
 import entities.AbstractPlanet;
+import entities.AbstractShip;
 import entities.ShipGroup;
 import entities.SimpleShip;
 import java.util.Random;
@@ -20,7 +21,7 @@ public class Gameplay {
 
     public static final String PLANET_SELECT = "SelectPlanet";
     public static final String PLANET_ATTACK = "AttackPlanet";
-    public static final String PLANET_MOVE = "MovePlanet";
+    public static final String SHIP_REDIRECT = "RedirectShip";
     private SolarWarsGame game;
     private SolarWarsApplication application;
     private ActionLib actionLib;
@@ -61,58 +62,47 @@ public class Gameplay {
 
             @Override
             public void doAction(AbstractPlanet planet, Player p) {
-                if (planet.getOwner() != p) {
-                    if (p.hasSelectedPlanet()) {
-                        AbstractPlanet sel = p.getSelectedPlanet();
-                        if (sel.getOwner() == p) {
+                if (p.hasSelectedPlanet()) {
+                    AbstractPlanet sel = p.getSelectedPlanet();
+                    if (sel.getOwner() == p && !sel.equals(planet)) {
 
-                            int selected = (int) (sel.getShips() * p.getShipPercentage());
-                            ShipGroup sg = new ShipGroup(
-                                    application.getAssetManager(),
-                                    level.Level.getCurrentLevel(),
-                                    p,
-                                    sel,
-                                    planet,
-                                    selected);
-                            level.Level.getCurrentLevel().addShipGroup(p, sg);
-
-                        }
-                    }
-                }
-            }
-        };
-
-        PlanetAction movePlanet = new PlanetAction(PLANET_MOVE) {
-
-            @Override
-            public void doAction(AbstractPlanet planet, Player p) {
-                if (planet.getOwner() == p) {
-                    if (p.hasSelectedPlanet()) {
-                        int selected = (int) (p.getSelectedPlanet().getShips() * p.getShipPercentage());
+                        int selected = (int) (sel.getShips() * p.getShipPercentage());
                         ShipGroup sg = new ShipGroup(
                                 application.getAssetManager(),
                                 level.Level.getCurrentLevel(),
                                 p,
-                                p.getSelectedPlanet(),
+                                sel,
                                 planet,
                                 selected);
                         level.Level.getCurrentLevel().addShipGroup(p, sg);
+
                     }
+                } else if (p.hasSelectedShipGroup()) {
+                    ShipGroup sg = p.getSelectedShipGroup();
+                    sg.moveToPlanet(planet);
                 }
+
             }
         };
 
         actionLib.getPlanetActions().put(PLANET_SELECT, selectPlanet);
         actionLib.getPlanetActions().put(PLANET_ATTACK, attackPlanet);
-        actionLib.getPlanetActions().put(PLANET_MOVE, movePlanet);
-
 
         // ========================================================
         // SHIP ACTIONS
         // ========================================================
 
+        ShipAction redirectShipGroup = new ShipAction(SHIP_REDIRECT) {
 
+            @Override
+            public void doAction(ShipGroup shipGroup, Player p) {
+                if (shipGroup.getOwner() == p) {
+                    p.selectShipGroup(shipGroup);
+                }
+            }
+        };
 
+        actionLib.getShipActions().put(SHIP_REDIRECT, redirectShipGroup);
 
         // ========================================================
         // GENERAL ACTIONS

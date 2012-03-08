@@ -26,7 +26,7 @@ public class Player {
     private int shipCount = 0;
     
     private AbstractPlanet selectedPlanet;
-    private AbstractShip selectedShip;
+    //private AbstractShip selectedShip;
     private ShipGroup selectedShipGroup;
     
     private int selectedShips = 0;
@@ -56,7 +56,6 @@ public class Player {
 
     void selectPlanet(AbstractPlanet p) {
         selectedPlanet = p;
-        selectedShip = null;
         selectedShipGroup = null;
     }
     
@@ -80,15 +79,16 @@ public class Player {
         return shipPercentage;
     }
 
-    void selectShip(AbstractShip s) {
-        selectedShip = s;
-        selectedPlanet = null;
-        selectedShipGroup = null;
-    }
-
     void selectShipGroup(ShipGroup g) {
         selectedShipGroup = g;
         selectedPlanet = null;
-        selectedShip = null;
+    }
+    
+    boolean hasSelectedShipGroup() {
+        return selectedShipGroup != null;
+    }
+
+    ShipGroup getSelectedShipGroup() {
+        return selectedShipGroup;
     }
 }

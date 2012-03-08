@@ -96,16 +96,18 @@ public class ShipGroup extends Node {
         minX = maxX - minX;
         minZ = maxZ - minZ;
 
+        if (shipCount > 1)
+            size = (minX > minZ) ? minX : minZ;
+        else
+            size = 0.2f;
         Sphere s = new Sphere(6, 6,
-                (minX > minZ) ? minX : minZ);
-
-        Quad q = new Quad(minX, minZ);
+                size);
 
         geometry = new Geometry("ShipGroup_" + id, s);
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         //material.setTexture("ColorMap", assetManager.loadTexture("Textures/gui/marker.png"));
-        material.setColor("Color", new ColorRGBA(0, 0, 0, 0));
-        
+        material.setColor("Color", new ColorRGBA(0, 0, 1, 0.1f));
+
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
 
@@ -162,8 +164,16 @@ public class ShipGroup extends Node {
             level.removeShipGroup(owner, this);
         }
     }
-    
+
     public float getSize() {
         return size;
+    }
+
+    public AbstractPlanet getOrder() {
+        return order;
+    }
+
+    public Player getOwner() {
+        return owner;
     }
 }

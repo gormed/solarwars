@@ -6,6 +6,7 @@ package logic;
 
 import entities.AbstractPlanet;
 import entities.AbstractShip;
+import entities.ShipGroup;
 import java.util.HashMap;
 
 /**
@@ -55,7 +56,7 @@ public class ActionLib {
         planetActions.get(actionName).doAction(planet, p);
     }
 
-    public void invokeShipAction(AbstractShip ship, Player p, String actionName) {
-        shipActions.get(actionName).doAction(ship, p);
+    public void invokeShipAction(ShipGroup shipGroup, Player p, String actionName) {
+        shipActions.get(actionName).doAction(shipGroup, p);
     }
 }
