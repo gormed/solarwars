@@ -19,5 +19,5 @@ public abstract class GeneralAction {
         this.name = name;
     }
     
-    public abstract void doAction(Player p);
+    abstract void doAction(Object sender, Player p);
 }

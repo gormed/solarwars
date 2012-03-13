@@ -22,5 +22,7 @@ public abstract class PlanetAction {
         this.name = name;
     }
 
-    public abstract void doAction(AbstractPlanet planet, Player p);
+    //public abstract void doAction(Object sender, AbstractPlanet planet, Player p);
+
+    abstract void doAction(Object sender, AbstractPlanet planet, Player p);
 }

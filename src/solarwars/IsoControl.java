@@ -188,18 +188,18 @@ public class IsoControl {
 
 
                             if (action == 1) {
-                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_SELECT);
+                                actionLib.invokePlanetAction(null, p, Hub.getLocalPlayer(), Gameplay.PLANET_SELECT);
 
                                 repositMarker(p);
 
                             } else if (action == 2) {
-                                actionLib.invokePlanetAction(p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
+                                actionLib.invokePlanetAction(null, p, Hub.getLocalPlayer(), Gameplay.PLANET_ATTACK);
                             }
                         } else if (n instanceof ShipGroup) {
                             if (action == 1) {
                                 sg = (ShipGroup) n;
                                 repositMarker(sg);
-                                actionLib.invokeShipAction(sg, Hub.getLocalPlayer(), Gameplay.SHIP_REDIRECT);
+                                actionLib.invokeShipAction(null, sg, Hub.getLocalPlayer(), Gameplay.SHIP_REDIRECT);
                             }
                         }
 

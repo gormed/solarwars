@@ -17,7 +17,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import level.Level;
+import logic.level.Level;
 import logic.Player;
 import solarwars.FontLoader;
 import solarwars.IsoCamera;
@@ -27,6 +27,8 @@ import solarwars.IsoCamera;
  * @author Hans
  */
 public abstract class AbstractPlanet extends Node {
+    
+    private static final int SHIP_REFRESH_MULTIPILER = 5;
 
     private static int PLANET_ID = 0;
 
@@ -173,7 +175,7 @@ public abstract class AbstractPlanet extends Node {
         refreshFont();
 
         time += tpf;
-        if (time > 10 * shipIncrement) {
+        if (time > SHIP_REFRESH_MULTIPILER * shipIncrement) {
             time = 0;
             ships += 1;
         }

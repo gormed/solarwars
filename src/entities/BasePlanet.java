@@ -12,7 +12,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
-import level.Level;
+import logic.level.Level;
 
 /**
  *

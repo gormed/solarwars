@@ -22,5 +22,5 @@ public abstract class ShipAction {
         this.name = name;
     }
 
-    public abstract void doAction(ShipGroup shipGroup, Player p);
+    abstract void doAction(Object sender, ShipGroup shipGroup, Player p);
 }

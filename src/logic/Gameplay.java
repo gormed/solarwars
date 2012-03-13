@@ -5,6 +5,7 @@
 package logic;
 
 import entities.AbstractPlanet;
+import entities.AbstractShip;
 import entities.ShipGroup;
 import java.util.Random;
 import solarwars.SolarWarsApplication;
@@ -46,7 +47,7 @@ public class Gameplay {
         PlanetAction selectPlanet = new PlanetAction(PLANET_SELECT) {
 
             @Override
-            public void doAction(AbstractPlanet planet, Player p) {
+            public void doAction(Object sender, AbstractPlanet planet, Player p) {
                 if (planet.getOwner() == p) {
 
                     p.selectPlanet(planet);
@@ -60,7 +61,7 @@ public class Gameplay {
         PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
 
             @Override
-            public void doAction(AbstractPlanet planet, Player p) {
+            public void doAction(Object sender, AbstractPlanet planet, Player p) {
                 if (p.hasSelectedPlanet()) {
                     AbstractPlanet sel = p.getSelectedPlanet();
                     if (sel.getOwner() == p && !sel.equals(planet)) {
@@ -68,27 +69,25 @@ public class Gameplay {
                         int selected = (int) (sel.getShips() * p.getShipPercentage());
                         ShipGroup sg = new ShipGroup(
                                 application.getAssetManager(),
-                                level.Level.getCurrentLevel(),
+                                logic.level.Level.getCurrentLevel(),
                                 p,
                                 sel,
                                 planet,
                                 selected);
-                        level.Level.getCurrentLevel().addShipGroup(p, sg);
+                        logic.level.Level.getCurrentLevel().addShipGroup(p, sg);
                         p.createShipGroup(sg);
                     }
                 } else if (p.hasSelectedShipGroup()) {
                     ShipGroup sg = p.getSelectedShipGroup();
                     sg.moveToPlanet(planet);
                 }
-
             }
         };
 
         PlanetAction capturePlanet = new PlanetAction(PLANET_CAPTURE) {
 
             @Override
-            public void doAction(AbstractPlanet planet, Player p) {
-
+            public void doAction(Object sender, AbstractPlanet planet, Player p) {
                 if (planet.getOwner() == p) {
                     planet.incrementShips();
                 } else {
@@ -111,24 +110,31 @@ public class Gameplay {
         ShipAction redirectShipGroup = new ShipAction(SHIP_REDIRECT) {
 
             @Override
-            public void doAction(ShipGroup shipGroup, Player p) {
+            public void doAction(Object sender, ShipGroup shipGroup, Player p) {
                 if (shipGroup.getOwner() == p) {
                     p.selectShipGroup(shipGroup);
                 }
             }
         };
-        
+
         ShipAction shipArrives = new ShipAction(SHIP_ARRIVES) {
 
             @Override
-            public void doAction(ShipGroup shipGroup, Player p) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public void doAction(Object sender, ShipGroup shipGroup, Player p) {
+                if (sender instanceof AbstractShip) {
+                    AbstractShip s = (AbstractShip) sender;
+                    shipGroup.removeShip(s);
+                    if (shipGroup.getShipCount() < 1) {
+                        logic.level.Level.getCurrentLevel().removeShipGroup(p, shipGroup);
+                        p.destroyShipGroup(shipGroup);
+                    }
+                }
             }
         };
 
         actionLib.getShipActions().put(SHIP_REDIRECT, redirectShipGroup);
         actionLib.getShipActions().put(SHIP_ARRIVES, shipArrives);
-        
+
         // ========================================================
         // GENERAL ACTIONS
         // ========================================================

@@ -9,7 +9,7 @@ import com.jme3.input.InputManager;
 import com.jme3.math.ColorRGBA;
 import gui.GameGUI;
 import gui.Percentage;
-import level.Level;
+import logic.level.Level;
 import logic.ActionLib;
 import logic.Gameplay;
 import logic.Player;

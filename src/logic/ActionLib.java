@@ -48,15 +48,15 @@ public class ActionLib {
         return shipActions;
     }
 
-    public void invokeGeneralAction(Player p, String actionName) {
-        generalActions.get(actionName).doAction(p);
+    public void invokeGeneralAction(Object sender, Player p, String actionName) {
+        generalActions.get(actionName).doAction(sender, p);
     }
 
-    public void invokePlanetAction(AbstractPlanet planet, Player p, String actionName) {
-        planetActions.get(actionName).doAction(planet, p);
+    public void invokePlanetAction(Object sender, AbstractPlanet planet, Player p, String actionName) {
+        planetActions.get(actionName).doAction(sender, planet, p);
     }
 
-    public void invokeShipAction(ShipGroup shipGroup, Player p, String actionName) {
-        shipActions.get(actionName).doAction(shipGroup, p);
+    public void invokeShipAction(Object sender, ShipGroup shipGroup, Player p, String actionName) {
+        shipActions.get(actionName).doAction(sender, shipGroup, p);
     }
 }

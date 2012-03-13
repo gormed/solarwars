@@ -10,7 +10,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import level.Level;
+import logic.level.Level;
 import logic.ActionLib;
 import logic.Gameplay;
 import logic.Player;
@@ -40,7 +40,7 @@ public abstract class AbstractShip extends Node {
 
     public AbstractShip(AssetManager assetManager, Level level, Vector3f position, Player p, ShipGroup g) {
         super();
-        
+
         this.id = getContiniousID();
         this.owner = p;
         this.assetManager = assetManager;
@@ -69,13 +69,14 @@ public abstract class AbstractShip extends Node {
     public ShipGroup getShipGroup() {
         return shipGroup;
     }
-    
-    private void removeFromShipGroup() {
-        if (shipGroup == null)
-            return;
-        
-        shipGroup.removeShip(this);
 
+    private void removeFromShipGroup() {
+        if (shipGroup == null) {
+            return;
+        } else {
+            ActionLib.getInstance().invokeShipAction(
+                    this, shipGroup, owner, Gameplay.SHIP_ARRIVES);
+        }
     }
 
     public void moveToPlanet(AbstractPlanet p) {
@@ -86,7 +87,7 @@ public abstract class AbstractShip extends Node {
 
         Vector3f left = dir.cross(Vector3f.UNIT_Y);
         left.normalizeLocal();
-        
+
         Matrix3f mat = new Matrix3f();
         mat.fromAxes(dir, Vector3f.UNIT_Y, left);
 
@@ -98,13 +99,14 @@ public abstract class AbstractShip extends Node {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
             if (dir.length() < 0.1f) {
-                
-                ActionLib.getInstance().invokePlanetAction(order, owner, Gameplay.PLANET_CAPTURE);
+
+                ActionLib.getInstance().invokePlanetAction(
+                        this, order, owner, Gameplay.PLANET_CAPTURE);
 
                 removeFromShipGroup();
                 level.removeShip(owner, this);
                 order = null;
-                
+
             } else {
                 dir.normalizeLocal();
                 dir.multLocal(tpf);

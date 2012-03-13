@@ -17,7 +17,7 @@ import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Random;
-import level.Level;
+import logic.level.Level;
 import logic.Player;
 
 /**
@@ -160,10 +160,10 @@ public class ShipGroup extends Node {
 
     public void removeShip(AbstractShip s) {
         ships.remove(s);
-        if (ships.isEmpty()) {
-            level.removeShipGroup(owner, this);
-            
-        }
+    }
+    
+    public int getShipCount() {
+        return ships.size();
     }
 
     public float getSize() {

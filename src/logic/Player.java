@@ -29,14 +29,14 @@ public class Player {
     private ShipGroup selectedShipGroup;
     private float shipPercentage = 0.5f;
     private ArrayList<AbstractPlanet> planets;
-    private ArrayList<ShipGroup> shipGroup;
+    private ArrayList<ShipGroup> shipGroups;
 
     public Player(String name, ColorRGBA color) {
         this.name = name;
         this.color = color;
         this.id = getContiniousID();
         planets = new ArrayList<AbstractPlanet>();
-        shipGroup = new ArrayList<ShipGroup>();
+        shipGroups = new ArrayList<ShipGroup>();
     }
 
     public ColorRGBA getColor() {
@@ -107,11 +107,11 @@ public class Player {
     }
 
     void createShipGroup(ShipGroup sg) {
-        shipGroup.add(sg);
+        shipGroups.add(sg);
     }
 
     void destroyShipGroup(ShipGroup sg) {
-        shipGroup.remove(sg);
+        shipGroups.remove(sg);
     }
 
     void capturePlanet(AbstractPlanet planet) {
@@ -124,5 +124,13 @@ public class Player {
 
     void uncapturePlanet(AbstractPlanet planet) {
         planets.remove(planet);
+    }
+
+    ArrayList<AbstractPlanet> getPlanets() {
+        return planets;
+    }
+
+    ArrayList<ShipGroup> getShipGroups() {
+        return shipGroups;
     }
 }
