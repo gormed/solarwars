@@ -26,7 +26,6 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext.Type;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
-import level.Level;
 
 /**
  * SolarWars SolarWarsApplication Class
@@ -235,9 +234,9 @@ public class SolarWarsApplication extends Application {
                     new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
             inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK,
                     new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-            inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN, 
+            inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN,
                     new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-            inputManager.addMapping(INPUT_MAPPING_WHEEL_UP, 
+            inputManager.addMapping(INPUT_MAPPING_WHEEL_UP,
                     new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
 
 
@@ -297,8 +296,10 @@ public class SolarWarsApplication extends Application {
     }
 
     public void simpleUpdate(float tpf) {
+
         game.update(tpf);
-        
+
+
         if (isoCam.isDragged()) {
 
             Vector2f currentSceenPos = inputManager.getCursorPosition().clone();

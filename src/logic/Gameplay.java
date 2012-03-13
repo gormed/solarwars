@@ -4,11 +4,8 @@
  */
 package logic;
 
-import com.jme3.math.Vector3f;
 import entities.AbstractPlanet;
-import entities.AbstractShip;
 import entities.ShipGroup;
-import entities.SimpleShip;
 import java.util.Random;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -22,6 +19,8 @@ public class Gameplay {
     public static final String PLANET_SELECT = "SelectPlanet";
     public static final String PLANET_ATTACK = "AttackPlanet";
     public static final String SHIP_REDIRECT = "RedirectShip";
+    public static final String SHIP_ARRIVES = "ArrivesShip";
+    public static final String PLANET_CAPTURE = "CapturePlanet";
     private SolarWarsGame game;
     private SolarWarsApplication application;
     private ActionLib actionLib;
@@ -75,7 +74,7 @@ public class Gameplay {
                                 planet,
                                 selected);
                         level.Level.getCurrentLevel().addShipGroup(p, sg);
-
+                        p.createShipGroup(sg);
                     }
                 } else if (p.hasSelectedShipGroup()) {
                     ShipGroup sg = p.getSelectedShipGroup();
@@ -85,8 +84,25 @@ public class Gameplay {
             }
         };
 
+        PlanetAction capturePlanet = new PlanetAction(PLANET_CAPTURE) {
+
+            @Override
+            public void doAction(AbstractPlanet planet, Player p) {
+
+                if (planet.getOwner() == p) {
+                    planet.incrementShips();
+                } else {
+                    planet.decrementShips();
+                    if (planet.getShips() == 0) {
+                        p.capturePlanet(planet);
+                    }
+                }
+            }
+        };
+
         actionLib.getPlanetActions().put(PLANET_SELECT, selectPlanet);
         actionLib.getPlanetActions().put(PLANET_ATTACK, attackPlanet);
+        actionLib.getPlanetActions().put(PLANET_CAPTURE, capturePlanet);
 
         // ========================================================
         // SHIP ACTIONS
@@ -101,12 +117,23 @@ public class Gameplay {
                 }
             }
         };
+        
+        ShipAction shipArrives = new ShipAction(SHIP_ARRIVES) {
+
+            @Override
+            public void doAction(ShipGroup shipGroup, Player p) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
 
         actionLib.getShipActions().put(SHIP_REDIRECT, redirectShipGroup);
-
+        actionLib.getShipActions().put(SHIP_ARRIVES, shipArrives);
+        
         // ========================================================
         // GENERAL ACTIONS
         // ========================================================
+
+
 
     }
 }

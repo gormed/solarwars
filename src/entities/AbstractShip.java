@@ -11,6 +11,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import level.Level;
+import logic.ActionLib;
+import logic.Gameplay;
 import logic.Player;
 
 /**
@@ -96,17 +98,13 @@ public abstract class AbstractShip extends Node {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
             if (dir.length() < 0.1f) {
-                if (order.getOwner() == owner) {
-                    order.incrementShips();
-                } else {
-                    order.decrementShips();
-                    if (order.getShips() == 0) {
-                        order.setOwner(owner);
-                    }
-                }
+                
+                ActionLib.getInstance().invokePlanetAction(order, owner, Gameplay.PLANET_CAPTURE);
+
                 removeFromShipGroup();
                 level.removeShip(owner, this);
                 order = null;
+                
             } else {
                 dir.normalizeLocal();
                 dir.multLocal(tpf);

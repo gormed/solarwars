@@ -111,6 +111,10 @@ public abstract class AbstractPlanet extends Node {
 
         label.setLocalTransform(t);
     }
+    
+    public boolean hasOwner() {
+        return owner != null;
+    }
 
     public Player getOwner() {
         return owner;

@@ -162,6 +162,7 @@ public class ShipGroup extends Node {
         ships.remove(s);
         if (ships.isEmpty()) {
             level.removeShipGroup(owner, this);
+            
         }
     }
 

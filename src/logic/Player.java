@@ -6,8 +6,8 @@ package logic;
 
 import com.jme3.math.ColorRGBA;
 import entities.AbstractPlanet;
-import entities.AbstractShip;
 import entities.ShipGroup;
+import java.util.ArrayList;
 
 /**
  *
@@ -24,19 +24,19 @@ public class Player {
     private ColorRGBA color;
     private int id;
     private int shipCount = 0;
-    
+    private AI artificial;
     private AbstractPlanet selectedPlanet;
-    //private AbstractShip selectedShip;
     private ShipGroup selectedShipGroup;
-    
-    private int selectedShips = 0;
-    
     private float shipPercentage = 0.5f;
+    private ArrayList<AbstractPlanet> planets;
+    private ArrayList<ShipGroup> shipGroup;
 
     public Player(String name, ColorRGBA color) {
         this.name = name;
         this.color = color;
         this.id = getContiniousID();
+        planets = new ArrayList<AbstractPlanet>();
+        shipGroup = new ArrayList<ShipGroup>();
     }
 
     public ColorRGBA getColor() {
@@ -58,23 +58,25 @@ public class Player {
         selectedPlanet = p;
         selectedShipGroup = null;
     }
-    
+
     boolean hasSelectedPlanet() {
         return selectedPlanet != null;
     }
-    
+
     AbstractPlanet getSelectedPlanet() {
         return selectedPlanet;
     }
-    
+
     public void setShipPercentage(float p) {
-        if (p > 1.0f)
+        if (p > 1.0f) {
             p = 1.0f;
-        if (p < 0.0f)
+        }
+        if (p < 0.0f) {
             p = 0.0f;
+        }
         shipPercentage = p;
     }
-    
+
     public float getShipPercentage() {
         return shipPercentage;
     }
@@ -83,12 +85,44 @@ public class Player {
         selectedShipGroup = g;
         selectedPlanet = null;
     }
-    
+
     boolean hasSelectedShipGroup() {
         return selectedShipGroup != null;
     }
 
     ShipGroup getSelectedShipGroup() {
         return selectedShipGroup;
+    }
+
+    public boolean isAI() {
+        return artificial != null;
+    }
+
+    AI getAI() {
+        return artificial;
+    }
+
+    void setAI(AI ai) {
+        artificial = ai;
+    }
+
+    void createShipGroup(ShipGroup sg) {
+        shipGroup.add(sg);
+    }
+
+    void destroyShipGroup(ShipGroup sg) {
+        shipGroup.remove(sg);
+    }
+
+    void capturePlanet(AbstractPlanet planet) {
+        if (planet.hasOwner()) {
+            planet.getOwner().uncapturePlanet(planet);
+        }
+        planet.setOwner(this);
+        planets.add(planet);
+    }
+
+    void uncapturePlanet(AbstractPlanet planet) {
+        planets.remove(planet);
     }
 }
