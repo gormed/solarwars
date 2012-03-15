@@ -9,9 +9,9 @@ package net;
  * @author Hans
  */
 public class NetworkManager {
-    private NetworkManager instance;
+    private static NetworkManager instance;
     
-    public NetworkManager getInstance() {
+    public static NetworkManager getInstance() {
         if (instance != null)
             return instance;
         return instance = new NetworkManager();

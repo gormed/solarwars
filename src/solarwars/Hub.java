@@ -39,7 +39,7 @@ public class Hub {
         
     }
     
-    void setLocalPlayer(Player p) {
+    public void setLocalPlayer(Player p) {
         if (localPlayer == null)
             localPlayer = p;
     }

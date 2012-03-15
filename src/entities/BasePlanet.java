@@ -9,6 +9,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
@@ -29,6 +30,7 @@ public class BasePlanet extends AbstractPlanet {
         //Geometry
 
         Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);
+
         s.setTextureMode(Sphere.TextureMode.Projected);
         TangentBinormalGenerator.generate(s);
         geometry = new Geometry("BasePlanet_" + id, s);

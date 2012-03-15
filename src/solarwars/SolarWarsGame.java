@@ -6,13 +6,11 @@ package solarwars;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
-import com.jme3.math.ColorRGBA;
-import gui.GameGUI;
-import gui.Percentage;
-import logic.level.Level;
+import gamestates.GamestateManager;
+import gamestates.lib.Singelplayer;
 import logic.ActionLib;
 import logic.Gameplay;
-import logic.Player;
+import net.NetworkManager;
 
 /**
  *
@@ -31,91 +29,61 @@ public class SolarWarsGame {
         }
         return instance = new SolarWarsGame();
     }
-    
     private SolarWarsApplication application;
 
     public SolarWarsApplication getApplication() {
         return application;
     }
     
-    private Level currentLevel;
     private AssetManager assetManager;
+    private GamestateManager gamestateManager;
+    private NetworkManager networkManager;
     private IsoControl isoControl;
     private InputManager inputManager;
-    private Hub hub;
     private FontLoader fontLoader;
     private ActionLib actionLib;
     
-    private GameGUI gui;
 
     public void initialize(SolarWarsApplication app) {
         application = app;
         assetManager = app.getAssetManager();
         isoControl = app.getIsoControl();
+        gamestateManager = GamestateManager.getInstance();
+        networkManager = NetworkManager.getInstance();
+        
         actionLib = ActionLib.getInstance();
         // Init fonts
         fontLoader = FontLoader.getInstance();
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
-        hub = Hub.getInstance();
         
+
         Gameplay.initialize();
     }
 
-    private void setupSingleplayer() {
-        Player human = new Player("Human", ColorRGBA.Blue);
-        hub.addPlayer(human);
-        hub.setLocalPlayer(human);
-        
-        Player ai = new Player("AI", ColorRGBA.Red);
-        hub.addPlayer(ai);
-    }
-    
-    private void setupGUI() {
-        gui = new GameGUI(this);
-        gui.addGUIElement(new Percentage(gui));
-        
-    }
-
-    public void load(long seed) {
-        currentLevel = new Level(
-                application.rootNode, assetManager, isoControl, seed);
-    }
-
-    public Level save() {
-        return currentLevel;
-    }
-
     public void start() {
-        setupSingleplayer();
-        setupGUI();
-        currentLevel = new Level(
-                application.rootNode, assetManager, isoControl);
-        currentLevel.generateLevel(System.currentTimeMillis());
-        currentLevel.setupPlayers();
-        
-        //SimpleShip s = new SimpleShip(assetManager, currentLevel, new Vector3f(0, 0, 0), p);
-        //s.createShip();
-        //currentLevel.addShip(p, s);
-
+        Singelplayer s = new Singelplayer(this);
+        gamestateManager.initialize(s);
+        gamestateManager.start();
     }
 
     public void pause() {
-        
+        gamestateManager.pause();
     }
 
     public void resume() {
+        gamestateManager.resume();
     }
 
     public void reset() {
+        gamestateManager.reset();
     }
 
     public void terminate() {
+        gamestateManager.terminate();
     }
-    
+
     void update(float tpf) {
-        currentLevel.updateLevel(tpf);
-        gui.updateGUIElements(tpf);
-        
+        gamestateManager.update(tpf);
     }
 }
