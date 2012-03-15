@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: ShipGroup.java
+ * Type: entities.ShipGroup
+ * 
+ * Documentation created: 15.03.2012 - 20:36:19 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
 import com.jme3.asset.AssetManager;
@@ -13,7 +30,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,26 +37,59 @@ import logic.level.Level;
 import logic.Player;
 
 /**
- *
- * @author Hans
+ * The Class ShipGroup.
  */
 public class ShipGroup extends Node {
 
+    /** The SHI p_ id. */
     private static int SHIP_ID = 0;
 
+    /**
+     * Gets the continious id.
+     *
+     * @return the continious id
+     */
     private static int getContiniousID() {
         return SHIP_ID++;
     }
+    
+    /** The ships. */
     private ArrayList<AbstractShip> ships;
+    
+    /** The owner. */
     private Player owner;
+    
+    /** The transform node. */
     protected Node transformNode;
+    
+    /** The order. */
     private AbstractPlanet order;
+    
+    /** The position. */
     private Vector3f position;
+    
+    /** The geometry. */
     private Geometry geometry;
+    
+    /** The id. */
     private int id;
+    
+    /** The level. */
     private Level level;
+    
+    /** The size. */
     private float size;
 
+    /**
+     * Instantiates a new ship group.
+     *
+     * @param assetManager the asset manager
+     * @param level the level
+     * @param p the p
+     * @param creator the creator
+     * @param target the target
+     * @param shipCount the ship count
+     */
     public ShipGroup(AssetManager assetManager, Level level, Player p, AbstractPlanet creator, AbstractPlanet target, int shipCount) {
         this.owner = p;
         this.order = target;
@@ -53,6 +102,14 @@ public class ShipGroup extends Node {
 
     }
 
+    /**
+     * Creates the ships.
+     *
+     * @param assetManager the asset manager
+     * @param creator the creator
+     * @param target the target
+     * @param shipCount the ship count
+     */
     private void createShips(AssetManager assetManager, AbstractPlanet creator, AbstractPlanet target, int shipCount) {
         Random r = new Random(System.currentTimeMillis());
 
@@ -127,6 +184,13 @@ public class ShipGroup extends Node {
         transformNode.attachChild(geometry);
     }
 
+    /**
+     * Gets the random position.
+     *
+     * @param p the p
+     * @param r the r
+     * @return the random position
+     */
     private Vector3f getRandomPosition(AbstractPlanet p, Random r) {
         Vector3f pos = p.getPosition().clone();
         float randX = -p.getSize() + r.nextFloat() * p.getSize() * 2;
@@ -137,6 +201,11 @@ public class ShipGroup extends Node {
         return pos.add(rand);
     }
 
+    /**
+     * Move to planet.
+     *
+     * @param p the p
+     */
     public void moveToPlanet(AbstractPlanet p) {
         order = p;
         for (AbstractShip s : ships) {
@@ -144,6 +213,11 @@ public class ShipGroup extends Node {
         }
     }
 
+    /**
+     * Updates the ship group.
+     *
+     * @param tpf the tpf
+     */
     public void updateShipGroup(float tpf) {
         if (order != null) {
             Vector3f planetLoc = order.getPosition();
@@ -158,22 +232,47 @@ public class ShipGroup extends Node {
         }
     }
 
+    /**
+     * Removes the ship.
+     *
+     * @param s the s
+     */
     public void removeShip(AbstractShip s) {
         ships.remove(s);
     }
     
+    /**
+     * Gets the ship count.
+     *
+     * @return the ship count
+     */
     public int getShipCount() {
         return ships.size();
     }
 
+    /**
+     * Gets the size.
+     *
+     * @return the size
+     */
     public float getSize() {
         return size;
     }
 
+    /**
+     * Gets the order.
+     *
+     * @return the order
+     */
     public AbstractPlanet getOrder() {
         return order;
     }
 
+    /**
+     * Gets the owner.
+     *
+     * @return the owner
+     */
     public Player getOwner() {
         return owner;
     }

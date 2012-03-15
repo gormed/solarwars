@@ -1,3 +1,24 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: SolarWarsApplication.java
+ * Type: solarwars.SolarWarsApplication
+ * 
+ * Documentation created: 15.03.2012 - 20:36:19 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
 
 import com.jme3.app.Application;
@@ -28,75 +49,136 @@ import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
 
 /**
- * SolarWars SolarWarsApplication Class
- * 
- * @author Hans Ferchland
+ * The Class SolarWarsApplication.
  */
 public class SolarWarsApplication extends Application {
 
+    /** The Constant INPUT_MAPPING_EXIT. */
     public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
+    
+    /** The Constant INPUT_MAPPING_CAMERA_POS. */
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
+    
+    /** The Constant INPUT_MAPPING_MEMORY. */
     public static final String INPUT_MAPPING_MEMORY = "SOLARWARS_Memory";
+    
+    /** The Constant INPUT_MAPPING_HIDE_STATS. */
     public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
+    
+    /** The Constant INPUT_MAPPING_LEFT_CLICK. */
     public static final String INPUT_MAPPING_LEFT_CLICK = "SOLARWARS_LeftClick";
+    
+    /** The Constant INPUT_MAPPING_RIGHT_CLICK. */
     public static final String INPUT_MAPPING_RIGHT_CLICK = "SOLARWARS_RightClick";
+    
+    /** The Constant INPUT_MAPPING_WHEEL_UP. */
     public static final String INPUT_MAPPING_WHEEL_UP = "SOLARWARS_WheelUp";
+    
+    /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
+    
+    /** The root node. */
     protected Node rootNode = new Node("Root Node");
+    
+    /** The gui node. */
     protected Node guiNode = new Node("Gui Node");
+    
+    /** The second counter. */
     protected float secondCounter = 0.0f;
+    
+    /** The frame counter. */
     protected int frameCounter = 0;
+    
+    /** The fps text. */
     protected BitmapText fpsText;
+    
+    /** The gui font. */
     protected BitmapFont guiFont;
+    
+    /** The stats view. */
     protected StatsView statsView;
+    
+    /** The iso cam. */
     protected IsoCamera isoCam;
+    
+    /** The last screen pos. */
     protected Vector2f lastScreenPos;
+    
+    /** The iso control. */
     protected IsoControl isoControl;
+    
+    /** The show settings. */
     protected boolean showSettings = true;
+    
+    /** The show fps. */
     private boolean showFps = true;
+    
+    /** The action listener. */
     private AppActionListener actionListener = new AppActionListener();
+    
+    /** The post processor. */
     private FilterPostProcessor postProcessor;
+    
+    /** The game. */
     private SolarWarsGame game;
 
+    /**
+     * Gets the iso cam.
+     *
+     * @return the iso cam
+     */
     public IsoCamera getIsoCam() {
         return isoCam;
     }
 
     /**
-     * Retrieves guiNode
-     * @return guiNode Node object
+     * Gets the gui node.
      *
+     * @return the gui node
      */
     public Node getGuiNode() {
         return guiNode;
     }
 
     /**
-     * Retrieves rootNode
-     * @return rootNode Node object
+     * Gets the root node.
      *
+     * @return the root node
      */
     public Node getRootNode() {
         return rootNode;
     }
 
+    /**
+     * Gets the iso control.
+     *
+     * @return the iso control
+     */
     public IsoControl getIsoControl() {
         return isoControl;
     }
 
+    /**
+     * Checks if is show settings.
+     *
+     * @return true, if is show settings
+     */
     public boolean isShowSettings() {
         return showSettings;
     }
 
     /**
-     * Toggles settings window to display at start-up
-     * @param showSettings Sets true/false
+     * Sets the show settings.
      *
+     * @param showSettings the new show settings
      */
     public void setShowSettings(boolean showSettings) {
         this.showSettings = showSettings;
     }
 
+    /**
+     * Setup filters.
+     */
     public void setupFilters() {
         if (renderer.getCaps().contains(Caps.GLSL100)) {
             postProcessor = new FilterPostProcessor(assetManager);
@@ -109,8 +191,7 @@ public class SolarWarsApplication extends Application {
     }
 
     /**
-     * Attaches FPS statistics to guiNode and displays it on the screen.
-     *
+     * Load fps text.
      */
     public void loadFPSText() {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
@@ -120,20 +201,28 @@ public class SolarWarsApplication extends Application {
         guiNode.attachChild(fpsText);
     }
 
+    /**
+     * Sets the display fps.
+     *
+     * @param show the new display fps
+     */
     public void setDisplayFps(boolean show) {
         showFps = show;
         fpsText.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 
+    /**
+     * Sets the display stat view.
+     *
+     * @param show the new display stat view
+     */
     public void setDisplayStatView(boolean show) {
         statsView.setEnabled(show);
         statsView.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 
     /**
-     * Attaches Statistics View to guiNode and displays it on the screen
-     * above FPS statistics line.
-     *
+     * Load stats view.
      */
     public void loadStatsView() {
         statsView = new StatsView("Statistics View", assetManager, renderer.getStatistics());
@@ -142,8 +231,22 @@ public class SolarWarsApplication extends Application {
         guiNode.attachChild(statsView);
     }
 
+    /**
+     * The listener interface for receiving appAction events.
+     * The class that is interested in processing a appAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addAppActionListener<code> method. When
+     * the appAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see AppActionEvent
+     */
     private class AppActionListener implements ActionListener {
 
+        /* (non-Javadoc)
+         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+         */
         public void onAction(String name, boolean value, float tpf) {
             if (!value) {
                 return;
@@ -170,11 +273,19 @@ public class SolarWarsApplication extends Application {
         }
     }
 
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
         SolarWarsApplication app = new SolarWarsApplication();
         app.start();
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#start()
+     */
     @Override
     public void start() {
         // set some default settings in-case
@@ -196,6 +307,9 @@ public class SolarWarsApplication extends Application {
         super.start();
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#initialize()
+     */
     @Override
     public void initialize() {
         super.initialize();
@@ -258,6 +372,9 @@ public class SolarWarsApplication extends Application {
         game.start();
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#update()
+     */
     @Override
     public void update() {
         super.update(); // makes sure to execute AppTasks
@@ -295,6 +412,11 @@ public class SolarWarsApplication extends Application {
         stateManager.postRender();
     }
 
+    /**
+     * Simple update.
+     *
+     * @param tpf the tpf
+     */
     public void simpleUpdate(float tpf) {
 
         game.update(tpf);
@@ -310,6 +432,11 @@ public class SolarWarsApplication extends Application {
         }
     }
 
+    /**
+     * Simple render.
+     *
+     * @param rm the rm
+     */
     public void simpleRender(RenderManager rm) {
     }
 }

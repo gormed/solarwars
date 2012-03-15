@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: Gameplay.java
+ * Type: logic.Gameplay
+ * 
+ * Documentation created: 15.03.2012 - 20:36:18 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
 
 import entities.AbstractPlanet;
@@ -12,27 +29,49 @@ import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
- *
- * @author Hans
+ * The Class Gameplay.
  */
 public class Gameplay {
 
+    /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
+    
+    /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
+    
+    /** The Constant SHIP_REDIRECT. */
     public static final String SHIP_REDIRECT = "RedirectShip";
+    
+    /** The Constant SHIP_ARRIVES. */
     public static final String SHIP_ARRIVES = "ArrivesShip";
+    
+    /** The Constant PLANET_CAPTURE. */
     public static final String PLANET_CAPTURE = "CapturePlanet";
+    
+    /** The game. */
     private SolarWarsGame game;
+    
+    /** The application. */
     private SolarWarsApplication application;
+    
+    /** The action lib. */
     private ActionLib actionLib;
+    
+    /** The instance. */
     private static Gameplay instance;
 
+    /**
+     * Initializes the.
+     */
     public static void initialize() {
         if (instance == null) {
             instance = new Gameplay();
         }
     }
 
+    /**
+     * Instantiates a new gameplay.
+     */
     private Gameplay() {
         actionLib = ActionLib.getInstance();
         game = SolarWarsGame.getInstance();

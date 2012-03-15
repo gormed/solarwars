@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: BasePlanet.java
+ * Type: entities.BasePlanet
+ * 
+ * Documentation created: 15.03.2012 - 20:36:18 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
 import com.jme3.asset.AssetManager;
@@ -9,22 +26,31 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
 import logic.level.Level;
 
 /**
- *
- * @author Hans
+ * The Class BasePlanet.
  */
 public class BasePlanet extends AbstractPlanet {
 
+    /**
+     * Instantiates a new base planet.
+     *
+     * @param assetManager the asset manager
+     * @param level the level
+     * @param position the position
+     * @param size the size
+     */
     public BasePlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
         super(assetManager, level, position, size);
     }
 
+    /* (non-Javadoc)
+     * @see entities.AbstractPlanet#createPlanet()
+     */
     @Override
     public void createPlanet() {
         //Geometry

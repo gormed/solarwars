@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: IsoCamera.java
+ * Type: solarwars.IsoCamera
+ * 
+ * Documentation created: 15.03.2012 - 20:36:18 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
 
 import com.jme3.collision.MotionAllowedListener;
@@ -12,7 +29,6 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
@@ -22,46 +38,85 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
-import java.awt.geom.Point2D;
 
 /**
- *  
- * @author Hans
+ * The Class IsoCamera.
  */
 public class IsoCamera implements AnalogListener, ActionListener {
 
+    /** The instance. */
     private static IsoCamera instance;
 
+    /**
+     * Gets the single instance of IsoCamera.
+     *
+     * @return single instance of IsoCamera
+     */
     public static IsoCamera getInstance() {
         if (instance != null) {
             return instance;
         }
         return instance = new IsoCamera();
     }
+    
+    /** The Constant CAMERA_HEIGHT. */
     public static final float CAMERA_HEIGHT = 12;
+    
+    /** The Constant CAMERA_ANGLE. */
     public static final float CAMERA_ANGLE = (float) Math.PI / 2;//8f * (((float) Math.PI) / 18f) ;
+    
+    /** The cam. */
     protected Camera cam;
+    
+    /** The cam light. */
     protected PointLight camLight;
+    
+    /** The root node. */
     protected Node rootNode;
+    
+    /** The initial up vec. */
     protected Vector3f initialUpVec;
+    
+    /** The drag speed. */
     protected float dragSpeed = 3f;
+    
+    /** The move speed. */
     protected float moveSpeed = 3f;
+    
+    /** The motion allowed. */
     protected MotionAllowedListener motionAllowed = null;
+    
+    /** The enabled. */
     protected boolean enabled = true;
+    
+    /** The last click state. */
     protected boolean lastClickState;
+    
+    /** The current click state. */
     protected boolean currentClickState;
+    
+    /** The is dragged. */
     protected boolean isDragged;
+    
+    /** The initial drag pos. */
     protected Vector2f initialDragPos;
+    
+    /** The input manager. */
     protected InputManager inputManager;
 
     /**
-     * Creates a new FlyByCamera to control the given Camera object.
-     * @param cam
+     * Instantiates a new iso camera.
      */
     private IsoCamera() {
         super();
     }
 
+    /**
+     * Initializes the.
+     *
+     * @param cam the cam
+     * @param rootNode the root node
+     */
     public void initialize(Camera cam, Node rootNode) {
         this.rootNode = rootNode;
         float[] rot = {CAMERA_ANGLE, 0, 0};
@@ -78,25 +133,37 @@ public class IsoCamera implements AnalogListener, ActionListener {
 
     }
 
+    /**
+     * Gets the cam.
+     *
+     * @return the cam
+     */
     public Camera getCam() {
         return cam;
     }
 
     /**
-     * Sets the up vector that should be used for the camera.
-     * @param upVec
+     * Sets the up vector.
+     *
+     * @param upVec the new up vector
      */
     public void setUpVector(Vector3f upVec) {
         initialUpVec.set(upVec);
     }
 
+    /**
+     * Sets the motion allowed listener.
+     *
+     * @param listener the new motion allowed listener
+     */
     public void setMotionAllowedListener(MotionAllowedListener listener) {
         this.motionAllowed = listener;
     }
 
     /**
-     * Sets the move speed. The speed is given in world units per second.
-     * @param moveSpeed
+     * Sets the move speed.
+     *
+     * @param moveSpeed the new move speed
      */
     public void setMoveSpeed(float moveSpeed) {
         this.moveSpeed = moveSpeed;
@@ -104,44 +171,53 @@ public class IsoCamera implements AnalogListener, ActionListener {
 
     /**
      * Sets the rotation speed.
-     * @param dragSpeed
+     *
+     * @param rotationSpeed the new rotation speed
      */
     public void setRotationSpeed(float rotationSpeed) {
         this.dragSpeed = rotationSpeed;
     }
 
     /**
-     * @param enable If false, the camera will ignore input.
+     * Sets the enabled.
+     *
+     * @param enable the new enabled
      */
     public void setEnabled(boolean enable) {
         enabled = enable;
     }
 
     /**
-     * @return If enabled
-     * @see FlyByCamera#setEnabled(boolean)
+     * Checks if is enabled.
+     *
+     * @return true, if is enabled
      */
     public boolean isEnabled() {
         return enabled;
     }
 
     /**
-     * @return If drag to rotate feature is enabled.
+     * Checks if is dragged.
      *
-     * @see FlyByCamera#setDragToMove(boolean) 
+     * @return true, if is dragged
      */
     public boolean isDragged() {
         return isDragged;
     }
 
+    /**
+     * Gets the initial drag position.
+     *
+     * @return the initial drag position
+     */
     public Vector2f getInitialDragPosition() {
         return initialDragPos;
     }
 
     /**
-     * Registers the FlyByCamera to receive input events from the provided
-     * Dispatcher.
-     * @param inputManager
+     * Register with input.
+     *
+     * @param inputManager the input manager
      */
     public void registerWithInput(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -182,6 +258,12 @@ public class IsoCamera implements AnalogListener, ActionListener {
         }*/
     }
 
+    /**
+     * Rotate camera.
+     *
+     * @param value the value
+     * @param axis the axis
+     */
     protected void rotateCamera(float value, Vector3f axis) {
         /*if (dragToMove) {
         if (canDragMove) {
@@ -209,6 +291,11 @@ public class IsoCamera implements AnalogListener, ActionListener {
         cam.setAxes(q);*/
     }
 
+    /**
+     * Zoom camera.
+     *
+     * @param value the value
+     */
     protected void zoomCamera(float value) {
         // derive fovY value
         float h = cam.getFrustumTop();
@@ -230,6 +317,11 @@ public class IsoCamera implements AnalogListener, ActionListener {
         cam.setFrustumRight(w);
     }
 
+    /**
+     * Rise camera.
+     *
+     * @param value the value
+     */
     protected void riseCamera(float value) {
         Vector3f vel = new Vector3f(0, value * moveSpeed, 0);
         Vector3f pos = cam.getLocation().clone();
@@ -244,6 +336,12 @@ public class IsoCamera implements AnalogListener, ActionListener {
         camLight.setPosition(cam.getLocation());
     }
 
+    /**
+     * Move camera.
+     *
+     * @param value the value
+     * @param sideways the sideways
+     */
     protected void moveCamera(float value, boolean sideways) {
         Vector3f vel = new Vector3f();
         Vector3f pos = cam.getLocation().clone();
@@ -266,6 +364,12 @@ public class IsoCamera implements AnalogListener, ActionListener {
         camLight.setPosition(cam.getLocation());
     }
 
+    /**
+     * Drag camera.
+     *
+     * @param value the value
+     * @param to the to
+     */
     void dragCamera(float value, Vector2f to) {
         Vector3f vel = new Vector3f();
         Vector3f pos = cam.getLocation().clone();
@@ -287,6 +391,9 @@ public class IsoCamera implements AnalogListener, ActionListener {
         camLight.setPosition(cam.getLocation());
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.input.controls.AnalogListener#onAnalog(java.lang.String, float, float)
+     */
     public void onAnalog(String name, float value, float tpf) {
         if (!enabled) {
             return;
@@ -311,6 +418,9 @@ public class IsoCamera implements AnalogListener, ActionListener {
         }*/
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+     */
     public void onAction(String name, boolean value, float tpf) {
         if (!enabled) {
             return;
