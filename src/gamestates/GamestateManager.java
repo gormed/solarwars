@@ -27,6 +27,11 @@ import java.util.HashMap;
  * The Class GamestateManager.
  */
 public class GamestateManager {
+    
+    public static final String SINGLEPLAYER_STATE = "Singleplayer";
+    public static final String MULTIPLAYER_STATE = "Multiplayer";
+    public static final String MAINMENU_STATE = "Mainmenu";
+    public static final String OPTIONS_STATE = "Options";
 
     /** The instance. */
     private static GamestateManager instance;

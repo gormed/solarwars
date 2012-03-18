@@ -50,7 +50,7 @@ public abstract class AbstractShip extends Node {
     }
     
     /** The SHI p_ size. */
-    protected static float SHIP_SIZE = 0.15f;
+    protected static float SHIP_SIZE = 0.175f;
     
     /** The asset manager. */
     protected AssetManager assetManager;

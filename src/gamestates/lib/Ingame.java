@@ -21,7 +21,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
+import com.jme3.asset.AssetManager;
 import gamestates.Gamestate;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class Ingame.
@@ -34,13 +36,9 @@ public class Ingame extends Gamestate {
     public Ingame() {
         super("Ingame State");
     }
-    
-    
-    /* (non-Javadoc)
-     * @see gamestates.Gamestate#loadContent()
-     */
+
     @Override
-    protected void loadContent() {
+    protected void loadContent(SolarWarsGame game) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -59,5 +57,4 @@ public class Ingame extends Gamestate {
     public void update(float tpf) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
 }

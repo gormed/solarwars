@@ -163,7 +163,7 @@ public class ShipGroup extends Node {
         geometry = new Geometry("ShipGroup_" + id, s);
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         //material.setTexture("ColorMap", assetManager.loadTexture("Textures/gui/marker.png"));
-        material.setColor("Color", new ColorRGBA(0, 0, 1, 0.1f));
+        material.setColor("Color", new ColorRGBA(0, 0, 1, 0));
 
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 

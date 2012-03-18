@@ -74,6 +74,8 @@ public class Level {
     /** The label node. */
     private Node labelNode;
     
+    private LevelBackground background;
+    
     /** The all ships node. */
     private Node allShipsNode;
     
@@ -189,6 +191,9 @@ public class Level {
         this.labelNode = new Node("Planet Labels");
         // attach the labels on the root!
         this.rootNode.attachChild(labelNode);
+        
+        this.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+        this.rootNode.attachChild(background);
     }
 
     /**
@@ -202,10 +207,10 @@ public class Level {
         this.seed = seed;
         Random r = new Random(seed);
 
-        for (int i = 0; i < 14; i++) {
-            for (int j = 0; j < 14; j++) {
+        for (int i = 0; i < 12; i++) {
+            for (int j = 0; j < 12; j++) {
                 if (r.nextBoolean()) {
-                    p = new BasePlanet(assetManager, this, new Vector3f(-7 + i, 0, -9 + j), generateSize(r));
+                    p = new BasePlanet(assetManager, this, new Vector3f(-6 + i, 0, -6 + j), generateSize(r));
                     p.createPlanet();
                     p.setShipCount(5 + r.nextInt(5));
 
@@ -310,7 +315,7 @@ public class Level {
 
         while (!found) {
 
-            if (planet.getOwner() == null && planet.getSize() > 0.3f) {
+            if (planet.getOwner() == null && planet.getSize() > 0.35f) {
                 found = true;
                 break;
             }

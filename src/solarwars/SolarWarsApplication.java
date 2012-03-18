@@ -56,6 +56,8 @@ public class SolarWarsApplication extends Application {
     /** The Constant INPUT_MAPPING_EXIT. */
     public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
     
+    public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
+    
     /** The Constant INPUT_MAPPING_CAMERA_POS. */
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
     
@@ -333,9 +335,9 @@ public class SolarWarsApplication extends Application {
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
             // Map C, M, F5 and ESC
-            if (context.getType() == Type.Display) {
-                inputManager.addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
-            }
+//            if (context.getType() == Type.Display) {
+//                inputManager.addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
+//            }
 
             inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
             inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));

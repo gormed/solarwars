@@ -21,24 +21,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
 
-import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapText;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
 import solarwars.Hub;
 
 /**
  * The Class Percentage.
  */
-public class Percentage extends GUIElement {
-
-    /** The font. */
-    private BitmapFont font;
-    
-    /** The text. */
-    private BitmapText text;
-    
-    /** The gui. */
-    private GameGUI gui;
+public class Percentage extends Button {
 
     /**
      * Instantiates a new percentage.
@@ -46,16 +37,32 @@ public class Percentage extends GUIElement {
      * @param gui the gui
      */
     public Percentage(GameGUI gui) {
-        this.gui = gui;
-        font = gui.game.getApplication().getAssetManager().loadFont("Interface/Fonts/Default.fnt");
-        text = new BitmapText(font, false);
-        text.setText("Percentage: " + (int) (Hub.getLocalPlayer().getShipPercentage() * 100) + "%");
-        text.setColor(ColorRGBA.Cyan);
+        super("Percentage: " + (int) (Hub.getLocalPlayer().getShipPercentage() * 100) + "%",
+               new Vector3f(
+                    gui.getWidth()/2, 
+                    gui.getHeight(), 
+                    0), 
+                new Vector3f(0.75f, 0.75f, 1), 
+                ColorRGBA.Orange, gui);
         
-        text.setLocalTranslation(gui.getWidth()/2 - text.getLineWidth()/2, gui.getHeight() - text.getLineHeight(), 0);
-        
-        this.attachChild(text);
-        setVisible(true);
+//        font = FontLoader.getInstance().getFont("SolarWarsFont32");
+//        text = new BitmapText(font, false);
+//        text.setText();
+//        text.setColor(ColorRGBA.Orange);
+//        
+//        Vector3f scale = new Vector3f(0.5f, 0.5f, 1);
+//        Vector3f pos = new Vector3f(
+//                gui.getWidth()/2 - text.getLineWidth()/2, 
+//                gui.getHeight() - text.getLineHeight(), 
+//                0);
+//        pos.multLocal(scale);
+//        
+//        setLocalTranslation(pos);
+//        text.setLocalScale(scale);
+//        
+//        this.attachChild(text);
+//        
+//        setVisible(true);
     }
 
     /* (non-Javadoc)
@@ -72,5 +79,10 @@ public class Percentage extends GUIElement {
     @Override
     public void setVisible(boolean show) {
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
+    }
+
+    @Override
+    public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+        
     }
 }

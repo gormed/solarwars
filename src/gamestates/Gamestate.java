@@ -21,6 +21,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates;
 
+import solarwars.SolarWarsGame;
+
 /**
  * The Class Gamestate.
  */
@@ -35,6 +37,7 @@ public abstract class Gamestate {
      * @param name the name
      */
     public Gamestate(String name) {
+        this.name = name;
     }
 
     /**
@@ -50,7 +53,7 @@ public abstract class Gamestate {
      * Enter.
      */
     void enter() {
-        loadContent();
+        loadContent(SolarWarsGame.getInstance());
     }
 
     /**
@@ -94,7 +97,7 @@ public abstract class Gamestate {
     /**
      * Load content.
      */
-    protected abstract void loadContent();
+    protected abstract void loadContent(SolarWarsGame game);
 
     /**
      * Unload content.

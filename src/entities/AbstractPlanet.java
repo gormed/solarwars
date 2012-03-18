@@ -133,12 +133,12 @@ public abstract class AbstractPlanet extends Node {
      * Creates the label.
      */
     public void createLabel() {
-        BitmapFont f = FontLoader.getInstance().getFont("SolarWars32");
+        BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont32");
         label = new BitmapText(f, false);
         label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
         label.setQueueBucket(Bucket.Transparent);
         label.setSize(0.3f);
-        label.setColor(ColorRGBA.White);
+        label.setColor(ColorRGBA.Orange);
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);
         label.setCullHint(CullHint.Never);
