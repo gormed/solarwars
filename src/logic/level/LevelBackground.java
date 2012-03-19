@@ -6,10 +6,7 @@ package logic.level;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
@@ -41,7 +38,7 @@ public class LevelBackground extends Node {
         geometry = new Geometry("BackgroundGeometry", q);
 
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Enviorment/starmap_1.png"));
+        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Enviorment/starmap_1.jpg"));
 
 
         geometry.setMaterial(material);

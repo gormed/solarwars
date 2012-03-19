@@ -28,8 +28,8 @@ import com.jme3.math.ColorRGBA;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
-import gui.PauseGUI;
-import gui.Percentage;
+import gui.elements.PauseGUI;
+import gui.elements.Percentage;
 import logic.Player;
 import logic.level.Level;
 import solarwars.Hub;
@@ -70,6 +70,8 @@ public class Singleplayer extends Gamestate {
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
         hub = Hub.getInstance();
+        Hub.resetPlayerID();
+        hub.initialize(new Player("Human", ColorRGBA.Blue));
         setupSingleplayer();
         setupGUI();
         currentLevel = new Level(
@@ -100,9 +102,7 @@ public class Singleplayer extends Gamestate {
      * Setup singleplayer.
      */
     private void setupSingleplayer() {
-        Player human = new Player("Human", ColorRGBA.Blue);
-        hub.addPlayer(human);
-        hub.setLocalPlayer(human);
+        
 
         Player ai = new Player("AI", ColorRGBA.Red);
         hub.addPlayer(ai);

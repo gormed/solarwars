@@ -44,7 +44,7 @@ import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.AppSettings;
-import com.jme3.system.JmeContext.Type;
+import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
 
@@ -78,6 +78,14 @@ public class SolarWarsApplication extends Application {
     
     /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
+    
+    private static SolarWarsApplication instance;
+    
+    public static SolarWarsApplication getInstance() {
+        if (instance != null)
+            return instance;
+        return instance = new SolarWarsApplication();
+    }
     
     /** The root node. */
     protected Node rootNode = new Node("Root Node");
@@ -123,6 +131,10 @@ public class SolarWarsApplication extends Application {
     
     /** The game. */
     private SolarWarsGame game;
+    
+    private SolarWarsApplication() {
+        super();
+    }
 
     /**
      * Gets the iso cam.
@@ -281,8 +293,7 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        SolarWarsApplication app = new SolarWarsApplication();
-        app.start();
+        getInstance().start();
     }
 
     /* (non-Javadoc)
@@ -306,7 +317,7 @@ public class SolarWarsApplication extends Application {
         }
         //re-setting settings they can have been merged from the registry.
         setSettings(settings);
-        super.start();
+        super.start(JmeContext.Type.Display);
     }
 
     /* (non-Javadoc)

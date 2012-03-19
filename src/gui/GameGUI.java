@@ -30,6 +30,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import gui.elements.TextBox;
 import java.util.ArrayList;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -46,6 +47,11 @@ public class GameGUI {
     /** The width. */
     private float width;
     private ActionListener actionListener;
+    private GUIElement focus;
+    /** The height. */
+    private float height;
+    private Node clickableNode;
+    private Node decoNode;
 
     /**
      * Gets the height.
@@ -64,8 +70,10 @@ public class GameGUI {
     public float getWidth() {
         return width;
     }
-    /** The height. */
-    private float height;
+
+    public GUIElement getFocusElement() {
+        return focus;
+    }
 
     /**
      * Instantiates a new game gui.
@@ -78,9 +86,15 @@ public class GameGUI {
         this.height = game.getApplication().getCamera().getHeight();
         this.guiElemetns = new ArrayList<GUIElement>();
 
+        this.clickableNode = new Node("ClickableGUI");
+        this.decoNode = new Node("DecoNode");
+
         final InputManager inputManager = game.getApplication().getInputManager();
         final Camera cam = game.getApplication().getCamera();
         final Node guiNode = game.getApplication().getGuiNode();
+
+        guiNode.attachChild(decoNode);
+        guiNode.attachChild(clickableNode);
 
         this.actionListener = new ActionListener() {
 
@@ -97,7 +111,7 @@ public class GameGUI {
                     Ray ray = new Ray(click3d, dir);
                     // 3. Collect intersections between Ray and Shootables in
                     // results list.
-                    guiNode.collideWith(ray, results);
+                    clickableNode.collideWith(ray, results);
                     // 4. Print the results
                     System.out.println("----- ScreenCollisions? " + results.size()
                             + "-----");
@@ -115,13 +129,25 @@ public class GameGUI {
                     if (results.size() > 0) {
                         // The closest collision point is what was truly hit:
                         CollisionResult closest = results.getClosestCollision();
-                        Node n = closest.getGeometry().getParent().getParent();
+                        Node n = closest.getGeometry().getParent();
+
                         if (n instanceof ClickableGUI) {
                             ClickableGUI g = (ClickableGUI) n;
+                            setFocus(g);
+                            g.onClick(click2d, isPressed, tpf);
+                        } else if (n.getParent() instanceof ClickableGUI) {
+                            ClickableGUI g = (ClickableGUI) n.getParent();
+                            setFocus(g);
                             g.onClick(click2d, isPressed, tpf);
                         }
                     }
                 } else {
+                }
+            }
+
+            private void setFocus(ClickableGUI g) {
+                if (g instanceof GUIElement) {
+                    focus = (GUIElement) g;
                 }
             }
             //}
@@ -136,7 +162,11 @@ public class GameGUI {
      * @param guiElement the gui element
      */
     public void addGUIElement(GUIElement guiElement) {
-        game.getApplication().getGuiNode().attachChild(guiElement);
+        if (guiElement instanceof ClickableGUI) {
+            clickableNode.attachChild(guiElement);
+        } else {
+            decoNode.attachChild(guiElement);
+        }
         guiElemetns.add(guiElement);
     }
 
@@ -146,8 +176,18 @@ public class GameGUI {
      * @param guiElement the gui element
      */
     public void removeGUIElement(GUIElement guiElement) {
-        game.getApplication().getGuiNode().detachChild(guiElement);
+        if (guiElement instanceof ClickableGUI) {
+            clickableNode.detachChild(guiElement);
+            //take care of the listeners
+            if (guiElement instanceof TextBox) {
+                TextBox tb = (TextBox) guiElement;
+                tb.destroy();
+            }
+        } else {
+            decoNode.detachChild(guiElement);
+        }
         guiElemetns.remove(guiElement);
+        
     }
 
     /**
@@ -160,7 +200,7 @@ public class GameGUI {
             e.updateGUI(tpf);
         }
     }
-    
+
     public boolean containsGUIElement(GUIElement e) {
         return guiElemetns.contains(e);
     }

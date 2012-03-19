@@ -25,23 +25,13 @@ import com.jme3.math.ColorRGBA;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
 import java.util.ArrayList;
+import solarwars.Hub;
 
 /**
  * The Class Player.
  */
 public class Player {
 
-    /** The PLAYE r_ id. */
-    private static int PLAYER_ID = 0;
-
-    /**
-     * Gets the continious id.
-     *
-     * @return the continious id
-     */
-    private static int getContiniousID() {
-        return PLAYER_ID++;
-    }
     
     /** The name. */
     private String name;
@@ -82,7 +72,7 @@ public class Player {
     public Player(String name, ColorRGBA color) {
         this.name = name;
         this.color = color;
-        this.id = getContiniousID();
+        this.id = Hub.getContiniousPlayerID();
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
     }

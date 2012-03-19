@@ -29,16 +29,30 @@ import logic.Player;
  * The Class Hub.
  */
 public class Hub {
+
+    /** The PLAYER ID. */
+    private static int PLAYER_ID = 0;
+
+    /**
+     * Gets the continious player id.
+     *
+     * @return the continious id
+     */
+    public static int getContiniousPlayerID() {
+        return PLAYER_ID++;
+    }
+    
+    public static void resetPlayerID() {
+        PLAYER_ID = 0;
+    }
     
     /** The player names. */
     public static ArrayList<String> playerNames;
-    
     /** The players. */
     private HashMap<String, Player> players;
-    
     /** The local player. */
     private static Player localPlayer;
-    
+
     /**
      * Gets the local player.
      *
@@ -47,18 +61,18 @@ public class Hub {
     public static Player getLocalPlayer() {
         return localPlayer;
     }
-    
     /** The instance. */
     private static Hub instance;
-    
+
     /**
      * Gets the single instance of Hub.
      *
      * @return single instance of Hub
      */
     public static Hub getInstance() {
-        if (instance != null)
+        if (instance != null) {
             return instance;
+        }
         return instance = new Hub();
     }
 
@@ -69,24 +83,19 @@ public class Hub {
         players = new HashMap<String, Player>();
         playerNames = new ArrayList<String>();
     }
-    
+
     /**
-     * Initializes the.
+     * Initializes the player-HUB.
      */
-    public void initialize() {
-        
+    public void initialize(Player localPlayer) {
+        if (this.localPlayer != null) {
+            players.remove(this.localPlayer.getName());
+            playerNames.remove(this.localPlayer.getId());
+        }
+        this.localPlayer = localPlayer;
+        addPlayer(localPlayer);
     }
-    
-    /**
-     * Sets the local player.
-     *
-     * @param p the new local player
-     */
-    public void setLocalPlayer(Player p) {
-        if (localPlayer == null)
-            localPlayer = p;
-    }
-    
+
     /**
      * Adds the player.
      *
@@ -94,9 +103,9 @@ public class Hub {
      */
     public void addPlayer(Player p) {
         players.put(p.getName(), p);
-        playerNames.add(p.getId(),p.getName());
+        playerNames.add(p.getId(), p.getName());
     }
-    
+
     /**
      * Removes the player.
      *
@@ -106,7 +115,7 @@ public class Hub {
         players.remove(p.getName());
         playerNames.remove(p.getId());
     }
-    
+
     /**
      * Gets the player.
      *
@@ -116,7 +125,7 @@ public class Hub {
     public Player getPlayer(String name) {
         return players.get(name);
     }
-    
+
     /**
      * Gets the player.
      *
@@ -126,7 +135,7 @@ public class Hub {
     public Player getPlayer(int id) {
         return players.get(playerNames.get(id));
     }
-    
+
     /**
      * Gets the player count.
      *

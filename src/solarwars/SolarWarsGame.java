@@ -24,7 +24,9 @@ package solarwars;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
 import gamestates.GamestateManager;
+import gamestates.lib.CreateServer;
 import gamestates.lib.Mainmenu;
+import gamestates.lib.Multiplayer;
 import gamestates.lib.Singleplayer;
 import logic.ActionLib;
 import logic.Gameplay;
@@ -116,8 +118,13 @@ public class SolarWarsGame {
      */
     public void start() {
         Mainmenu m = new Mainmenu(this);
-        Singleplayer s = new Singleplayer(this);
-        gamestateManager.addState(s);
+        Singleplayer sp = new Singleplayer(this);
+        Multiplayer mp = new Multiplayer();
+        CreateServer cs = new CreateServer();
+        gamestateManager.addState(sp);
+        gamestateManager.addState(mp);
+        gamestateManager.addState(m);
+        gamestateManager.addState(cs);
         gamestateManager.initialize(m);
         gamestateManager.start();
     }

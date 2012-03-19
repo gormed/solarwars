@@ -9,7 +9,8 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
-import gui.Button;
+import gui.elements.Button;
+import gui.elements.Label;
 import gui.GameGUI;
 import solarwars.SolarWarsGame;
 
@@ -21,9 +22,9 @@ public class Mainmenu extends Gamestate {
 
     /** The gui. */
     private GameGUI gui;
-    
-    private Button startButton;
-    private Button solarwars;
+    private Button singleplayerButton;
+    private Button multiplayerButton;
+    private Label solarwars;
     private Button quitButton;
     private SolarWarsGame game;
     /*
@@ -43,23 +44,23 @@ public class Mainmenu extends Gamestate {
     @Override
     protected void loadContent(SolarWarsGame swgame) {
         gui = new GameGUI(swgame);
-        
-        solarwars = new Button("SOLARWARS", new Vector3f(gui.getWidth() / 2,
-                gui.getHeight(), 4), new Vector3f(2, 2, 1), ColorRGBA.White, gui) {
 
-            private float time;        
-                    
+        solarwars = new Label("SOLARWARS", new Vector3f(gui.getWidth() / 2,
+                9 * gui.getHeight() / 10, 4), new Vector3f(2, 2, 1), ColorRGBA.White, gui) {
+
+            private float time;
+
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
 
             @Override
             public void updateGUI(float tpf) {
-                
+
                 time += tpf;
-                
+
                 if (time < 0.2f) {
-                    text.setText(title+"_");
+                    text.setText(title + "_");
                 } else if (time < 0.4f) {
                     text.setText(title);
                 } else {
@@ -67,14 +68,14 @@ public class Mainmenu extends Gamestate {
                 }
             }
         };
-        
-        
-        startButton = new Button("Singleplayer",
+
+
+        singleplayerButton = new Button("Singleplayer",
                 new Vector3f(gui.getWidth() / 2,
-                3 * gui.getHeight() / 4, 0),
+                7 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan
-                ,gui) {
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray, gui) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -87,10 +88,29 @@ public class Mainmenu extends Gamestate {
             public void updateGUI(float tpf) {
             }
         };
-        
+
+        multiplayerButton = new Button("Multiplayer",
+                new Vector3f(gui.getWidth() / 2,
+                6 * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray, gui) {
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                if (!isPressed) {
+                    startMultiplayer();
+                }
+            }
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+        };
+
         quitButton = new Button("Quit Game", new Vector3f(gui.getWidth() / 2,
-                2 *gui.getHeight() / 4, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Cyan, gui) {
+                5 * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ, ColorRGBA.Cyan, ColorRGBA.DarkGray, gui) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -101,24 +121,29 @@ public class Mainmenu extends Gamestate {
             public void updateGUI(float tpf) {
             }
         };
-        
+
         gui.addGUIElement(solarwars);
-        gui.addGUIElement(startButton);
+        gui.addGUIElement(singleplayerButton);
+        gui.addGUIElement(multiplayerButton);
         gui.addGUIElement(quitButton);
     }
 
     @Override
     protected void unloadContent() {
-        gui.removeGUIElement(startButton);
+        gui.removeGUIElement(singleplayerButton);
+        gui.removeGUIElement(multiplayerButton);
         gui.removeGUIElement(quitButton);
         gui.removeGUIElement(solarwars);
-        
+
         gui = null;
     }
-    
+
     private void startSingleplayer() {
-        GamestateManager gm = GamestateManager.getInstance();
-        
-        gm.enterState(GamestateManager.SINGLEPLAYER_STATE);
+        GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
+    }
+    
+    
+    private void startMultiplayer() {
+        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 }
