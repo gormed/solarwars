@@ -33,6 +33,7 @@ public class GamestateManager {
     public static final String MAINMENU_STATE = "Mainmenu";
     public static final String OPTIONS_STATE = "Options";
     public static final String CREATE_SERVER_STATE = "Create Server";
+    public static final String SERVER_LOBBY_STATE = "Server Lobby";
 
     /** The instance. */
     private static GamestateManager instance;
@@ -116,6 +117,12 @@ public class GamestateManager {
     public void removeState(Gamestate g) {
         gamestates.remove(g.getName());
         System.out.println("Gamestate: " + g.getName() + " removed!");
+    }
+    
+    public Gamestate getGamestate(String name) {
+        if (!gamestates.containsKey(name))
+            return null;
+        return gamestates.get(name);
     }
 
     /**

@@ -14,15 +14,20 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
-import logic.Player;
-import solarwars.Hub;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.NetworkManager;
 import solarwars.SolarWarsGame;
 
 /**
  *
  * @author Hans
  */
-public class Multiplayer extends Gamestate {
+public class MultiplayerState extends Gamestate {
 
     private Label multiplayerLabel;
     private Panel backgroundPanel;
@@ -33,9 +38,9 @@ public class Multiplayer extends Gamestate {
     private Button back;
     private TextBox serverip;
     private GameGUI gui;
-    private Hub hub;
+    private NetworkManager networkManager;
 
-    public Multiplayer() {
+    public MultiplayerState() {
         super(GamestateManager.MULTIPLAYER_STATE);
 
     }
@@ -48,6 +53,7 @@ public class Multiplayer extends Gamestate {
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
+        networkManager = NetworkManager.getInstance();
         playerName = new TextBox(
                 ColorRGBA.Blue,
                 new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
@@ -75,8 +81,9 @@ public class Multiplayer extends Gamestate {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed)
+                if (!isPressed) {
                     joinServer();
+                }
             }
         };
 
@@ -120,8 +127,9 @@ public class Multiplayer extends Gamestate {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed)
+                if (!isPressed) {
                     createServer();
+                }
             }
         };
 
@@ -184,20 +192,56 @@ public class Multiplayer extends Gamestate {
         gui.removeGUIElement(back);
         gui = null;
     }
-    
-    private void createHUB() {
-        Player human = new Player(playerName.getCaption(), ColorRGBA.Blue);
-        hub = Hub.getInstance();
-        Hub.resetPlayerID();
-        hub.initialize(human);
-    }
-    
+
     private void createServer() {
-        createHUB();
+        GamestateManager gm = GamestateManager.getInstance();
+        Gamestate g = gm.getGamestate(GamestateManager.CREATE_SERVER_STATE);
+        if (g instanceof CreateServerState) {
+            CreateServerState cs = (CreateServerState) g;
+            cs.setHostPlayerName(playerName.getCaption());
+            cs.setHostPlayerColor(ColorRGBA.Blue);
+        }
         GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
     }
-    
+
     private void joinServer() {
-        
+
+        String ip = serverip.getCaption();
+
+        if (NetworkManager.checkIP(ip)) {
+            try {
+                InetAddress add = InetAddress.getByAddress(NetworkManager.getByteInetAddress(ip));
+                networkManager.setServerIPAdress(add);
+                networkManager.setClientIPAdress(InetAddress.getLocalHost());
+
+                setupClient(playerName.getCaption(), ColorRGBA.Red);
+
+//                GamestateManager gm = GamestateManager.getInstance();
+//                Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
+//                if (g instanceof ServerLobbyState) {
+//                    ServerLobbyState cs = (ServerLobbyState) g;
+//                    cs.setClientPlayerName(playerName.getCaption());
+//                    cs.setClientPlayerColor(ColorRGBA.Red);
+//                }
+                GamestateManager.getInstance().enterState(GamestateManager.SERVER_LOBBY_STATE);
+
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+                serverip.setCaption("255.255.255.255");
+            } catch (IOException ex) {
+                Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+                serverip.setCaption("255.255.255.255");
+            }
+        } else {
+            serverip.setCaption("255.255.255.255");
+        }
+
+
+
+    }
+
+    private void setupClient(String name, ColorRGBA color)
+            throws IOException {
+        networkManager.setupClient(name, color);
     }
 }

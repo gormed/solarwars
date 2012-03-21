@@ -18,7 +18,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class Mainmenu extends Gamestate {
+public class MainmenuState extends Gamestate {
 
     /** The gui. */
     private GameGUI gui;
@@ -31,7 +31,7 @@ public class Mainmenu extends Gamestate {
      * 
      */
 
-    public Mainmenu(SolarWarsGame game) {
+    public MainmenuState(SolarWarsGame game) {
         super(GamestateManager.MAINMENU_STATE);
         this.game = game;
     }

@@ -40,6 +40,10 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     protected Vector3f scale;
     protected String caption;
 
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
     public String getCaption() {
         return caption;
     }

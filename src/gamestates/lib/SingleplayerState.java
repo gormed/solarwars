@@ -13,8 +13,8 @@
  * Email me: hans.ferchland@gmx.de
  * 
  * Project: SolarWars
- * File: Singleplayer.java
- * Type: gamestates.lib.Singleplayer
+ * File: SingleplayerState.java
+ * Type: gamestates.lib.SingleplayerState
  * 
  * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
  * 
@@ -36,9 +36,9 @@ import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
 /**
- * The Class Singleplayer.
+ * The Class SingleplayerState.
  */
-public class Singleplayer extends Gamestate {
+public class SingleplayerState extends Gamestate {
 
     /** The application. */
     private solarwars.SolarWarsApplication application;
@@ -58,7 +58,7 @@ public class Singleplayer extends Gamestate {
      *
      * @param game the game
      */
-    public Singleplayer(solarwars.SolarWarsGame game) {
+    public SingleplayerState(solarwars.SolarWarsGame game) {
         super(GamestateManager.SINGLEPLAYER_STATE);
         this.game = game;
         this.application = this.game.getApplication();

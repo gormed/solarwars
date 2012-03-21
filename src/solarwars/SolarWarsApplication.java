@@ -47,6 +47,7 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
+import net.NetworkManager;
 
 /**
  * The Class SolarWarsApplication.
@@ -452,4 +453,14 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleRender(RenderManager rm) {
     }
+
+    @Override
+    public void destroy() {
+        NetworkManager nm = NetworkManager.getInstance();
+        if ( nm != null && nm.isServerRunning()) {
+            NetworkManager.getInstance().closeServer();
+        }
+        super.destroy();
+    }
+        
 }

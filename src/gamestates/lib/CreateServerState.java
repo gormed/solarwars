@@ -7,6 +7,9 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.network.HostedConnection;
+import com.jme3.network.Message;
+import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -14,8 +17,16 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.Player;
+import net.NetworkManager;
+import net.PlayerConnectingMessage;
+import net.SolarWarsServer;
 import solarwars.Hub;
 import solarwars.SolarWarsGame;
 
@@ -23,24 +34,39 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class CreateServer extends Gamestate {
+public class CreateServerState extends Gamestate implements MessageListener<HostedConnection> {
 
     private Label createServerLabel;
+    private Label yourIP;
+    private Label address;
     private Panel backgroundPanel;
     private Panel line;
     private Panel playerPanel;
     private Button cancel;
+    private Button start;
     private Label maxPlayers;
     private TextBox playerCount;
     private GameGUI gui;
+    private Hub hub;
+    private SolarWarsServer solarWarsServer;
     private ArrayList<Vector3f> playerNamePos;
     private ArrayList<Label> playerLabels;
     private int maxPlayerNumber = 0;
+    private String hostPlayerName;
+    private ColorRGBA hostPlayerColor;
+    private NetworkManager networkManager;
 
-    public CreateServer() {
+    // Input Methods, that set the inital point of the state until loadContent is called
+    public void setHostPlayerColor(ColorRGBA hostPlayerColor) {
+        this.hostPlayerColor = hostPlayerColor;
+    }
+
+    public void setHostPlayerName(String hostPlayerName) {
+        this.hostPlayerName = hostPlayerName;
+    }
+
+    public CreateServerState() {
         super(GamestateManager.CREATE_SERVER_STATE);
-
-
     }
 
     @Override
@@ -51,8 +77,12 @@ public class CreateServer extends Gamestate {
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
+        networkManager = NetworkManager.getInstance();
+        hub = Hub.getInstance();
         playerNamePos = new ArrayList<Vector3f>();
         playerLabels = new ArrayList<Label>();
+
+
 
         for (int i = 0; i < 8; i++) {
             playerNamePos.add(new Vector3f(
@@ -108,7 +138,56 @@ public class CreateServer extends Gamestate {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+                cancelServer();
+            }
+        };
+
+        start = new Button("Start",
+                new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
+                ColorRGBA.White, gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+        };
+
+        yourIP = new Label("Your IP:",
+                new Vector3f(gui.getWidth() / 2, 1.75f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.White,
+                gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+        };
+
+        // =========================================
+        // SETUP SERVER
+        // =========================================
+        setupServer();
+        
+        address = new Label(networkManager.getServerIPAdress().getHostAddress(),
+                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.White,
+                gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
 
@@ -160,8 +239,10 @@ public class CreateServer extends Gamestate {
                 new Vector3f(gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
                 ColorRGBA.White);
+
+        //addConnectedPlayer(Hub.getLocalPlayer());
+
         
-        addConnectedPlayer(Hub.getLocalPlayer());
 
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
@@ -170,6 +251,9 @@ public class CreateServer extends Gamestate {
         gui.addGUIElement(maxPlayers);
         gui.addGUIElement(playerCount);
         gui.addGUIElement(playerPanel);
+        gui.addGUIElement(yourIP);
+        gui.addGUIElement(address);
+        gui.addGUIElement(start);
     }
 
     @Override
@@ -181,7 +265,12 @@ public class CreateServer extends Gamestate {
         gui.removeGUIElement(maxPlayers);
         gui.removeGUIElement(playerCount);
         gui.removeGUIElement(playerPanel);
-        
+        gui.removeGUIElement(yourIP);
+        gui.removeGUIElement(address);
+        gui.removeGUIElement(start);
+
+        solarWarsServer.removeClientMessageListener(this);
+
         for (Label l : playerLabels) {
             gui.removeGUIElement(l);
         }
@@ -190,11 +279,27 @@ public class CreateServer extends Gamestate {
 
         gui = null;
     }
-    
+
     private void setupServer() {
-        
+        hub = Hub.getInstance();
+        Hub.resetPlayerID();
+        try {
+            solarWarsServer = networkManager.setupServer(hostPlayerName, hostPlayerColor);
+
+            networkManager.setClientIPAdress(InetAddress.getLocalHost());
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(CreateServerState.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(CreateServerState.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
+    private void cancelServer() {
+        System.out.println("Closing server...");
+        networkManager.closeServer();
+        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+    }
+
     private void addConnectedPlayer(Player p) {
         int id = playerLabels.size();
         Label player = new Label(p.getName(),
@@ -216,5 +321,17 @@ public class CreateServer extends Gamestate {
         playerLabels.add(
                 id,
                 player);
+    }
+
+    public void messageReceived(HostedConnection source, Message message) {
+        if (message instanceof PlayerConnectingMessage) {
+
+            PlayerConnectingMessage pcm = (PlayerConnectingMessage) message;
+            // creates a connecting player on the server
+            Player newPlayer = new Player(pcm.getName(), pcm.getColor());
+            hub.addPlayer(newPlayer);
+            addConnectedPlayer(newPlayer);
+            System.out.println("Player " + newPlayer.getName() + "[" + newPlayer.getColor().toString() + "] joined the Game.");
+        }
     }
 }

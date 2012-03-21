@@ -44,12 +44,14 @@ public class Hub {
     
     public static void resetPlayerID() {
         PLAYER_ID = 0;
+        playerNames.clear();
+        players.clear();
     }
     
     /** The player names. */
     public static ArrayList<String> playerNames;
     /** The players. */
-    private HashMap<String, Player> players;
+    private static HashMap<String, Player> players;
     /** The local player. */
     private static Player localPlayer;
 

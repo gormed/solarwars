@@ -21,11 +21,16 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
+import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
+import com.jme3.network.Message;
+import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
 import java.io.IOException;
-import java.net.Inet4Address;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +39,7 @@ import java.util.logging.Logger;
  */
 public class NetworkManager {
 
+    public static final int DEFAULT_PORT = 6142;
     /** The instance. */
     private static NetworkManager instance;
 
@@ -54,17 +60,21 @@ public class NetworkManager {
      */
     private NetworkManager() {
     }
-    private int port;
-    private Inet4Address clientIPAdress;
-    private Inet4Address serverIPAdress;
+    private int port = DEFAULT_PORT;
+    private InetAddress clientIPAdress;
+    private InetAddress serverIPAdress;
     private Client thisClient;
     private SolarWarsServer thisServer;
 
-    public Inet4Address getClientIPAdress() {
+    public Client getThisClient() {
+        return thisClient;
+    }
+
+    public InetAddress getClientIPAdress() {
         return clientIPAdress;
     }
 
-    void setClientIPAdress(Inet4Address clientIPAdress) {
+    public void setClientIPAdress(InetAddress clientIPAdress) {
         this.clientIPAdress = clientIPAdress;
     }
 
@@ -72,38 +82,67 @@ public class NetworkManager {
         return port;
     }
 
-    void setPort(int port) {
+    public void setPort(int port) {
         this.port = port;
     }
 
-    public Inet4Address getServerIPAdress() {
+    public InetAddress getServerIPAdress() {
         return serverIPAdress;
     }
 
-    void setServerIPAdress(Inet4Address serverIPAdress) {
+    public void setServerIPAdress(InetAddress serverIPAdress) {
         this.serverIPAdress = serverIPAdress;
     }
 
-    public void setupClient() {
-        if (serverIPAdress == null || port < 1)
+    public void setupClient(String name, ColorRGBA color)
+            throws IOException, ConnectException {
+        if (serverIPAdress == null || port < 1) {
             return;
-        
-        try {
-            thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
-            thisClient.start();
-            thisClient.addMessageListener(new ClientListener(), StringMessage.class);
-            StringMessage s = new StringMessage("Hello server!");
-            thisClient.send(s);
-        } catch (IOException ex) {
-            Logger.getLogger(NetworkManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Serializer.registerClass(StringMessage.class);
+        Serializer.registerClass(PlayerConnectingMessage.class);
+
+        thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
+
+        thisClient.start();
+        thisClient.addMessageListener(new ClientListener(), StringMessage.class);
+
+        StringMessage s = new StringMessage("Hello server!");
+        PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color);
+        thisClient.send(s);
+        thisClient.send(pcm);
+
+
+
     }
-    
-    public void setupServer() {
+
+    public SolarWarsServer setupServer(String hostName, ColorRGBA hostColor)
+            throws IOException {
         thisServer = SolarWarsServer.getInstance();
         thisServer.start();
+        try {
+            serverIPAdress = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(NetworkManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        setupClient(hostName, hostColor);
+        return thisServer;
+    }
+
+    public void closeServer() {
+        thisClient.close();
+        thisClient = null;
+        thisServer.stop(true);
+        thisServer = null;
+
+        System.out.println("...Server closed!");
+    }
+    
+    public boolean isServerRunning() {
+        if (thisServer == null)
+            return false;
+        return thisServer.isRunning();
     }
 
     public static boolean checkIP(String sip) {
@@ -115,5 +154,36 @@ public class NetworkManager {
             }
         }
         return true;
+    }
+
+    public static byte[] getByteInetAddress(String ip) {
+        if (!checkIP(ip)) {
+            return null;
+        }
+
+        byte[] address = new byte[4];
+        int idx = 0;
+        String[] parts = ip.split("\\.");
+        for (String s : parts) {
+            int i = Integer.parseInt(s);
+            address[idx++] = (byte) i;
+        }
+
+        return address;
+    }
+
+    /**
+     *
+     * @author Hans
+     */
+    private class ClientListener implements MessageListener<Client> {
+
+        public void messageReceived(Client source, Message message) {
+            if (message instanceof StringMessage) {
+                // do something with the message
+                StringMessage stringMessage = (StringMessage) message;
+                System.out.println("Client #" + source.getId() + " received: '" + stringMessage.getMessage() + "'");
+            }
+        }
     }
 }

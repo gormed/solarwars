@@ -13,12 +13,16 @@ import com.jme3.network.serializing.Serializable;
  */
 @Serializable
 public class StringMessage extends AbstractMessage {
+
     private String message;
 
     public String getMessage() {
         return message;
     }
-    public StringMessage() {}
+
+    public StringMessage() {
+    }
+
     public StringMessage(String message) {
         this.message = message;
     }
