@@ -21,6 +21,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
+import net.messages.PlayerConnectingMessage;
+import net.messages.StringMessage;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.Message;
@@ -33,6 +35,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.messages.PlayerAcceptedMessage;
+import net.messages.PlayerLeavingMessage;
 
 /**
  * The Class NetworkManager.
@@ -95,13 +99,15 @@ public class NetworkManager {
     }
 
     public void setupClient(String name, ColorRGBA color)
-            throws IOException, ConnectException {
+            throws IOException {
         if (serverIPAdress == null || port < 1) {
             return;
         }
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
+        Serializer.registerClass(PlayerLeavingMessage.class);
+        Serializer.registerClass(PlayerAcceptedMessage.class);
 
         thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
 

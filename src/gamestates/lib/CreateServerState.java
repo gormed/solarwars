@@ -7,9 +7,11 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.network.ConnectionListener;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
+import com.jme3.network.Server;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -25,8 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import net.NetworkManager;
-import net.PlayerConnectingMessage;
+import net.messages.PlayerConnectingMessage;
 import net.SolarWarsServer;
+import net.messages.PlayerLeavingMessage;
 import solarwars.Hub;
 import solarwars.SolarWarsGame;
 
@@ -175,7 +178,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
         // SETUP SERVER
         // =========================================
         setupServer();
-        
+
         address = new Label(networkManager.getServerIPAdress().getHostAddress(),
                 new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
@@ -242,7 +245,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
 
         //addConnectedPlayer(Hub.getLocalPlayer());
 
-        
+
 
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
@@ -323,6 +326,13 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
                 player);
     }
 
+    private void removeLeavingPlayer(Player p) {
+        Label player = playerLabels.get(p.getId());
+        playerLabels.remove(player);
+        gui.removeGUIElement(player);
+
+    }
+
     public void messageReceived(HostedConnection source, Message message) {
         if (message instanceof PlayerConnectingMessage) {
 
@@ -332,6 +342,15 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
             hub.addPlayer(newPlayer);
             addConnectedPlayer(newPlayer);
             System.out.println("Player " + newPlayer.getName() + "[" + newPlayer.getColor().toString() + "] joined the Game.");
+            solarWarsServer.addConnectingPlayer(newPlayer, source);
+        } else if (message instanceof PlayerLeavingMessage) {
+            PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+            // removes the sending Player from server
+
+            Player p = plm.getPlayer();
+
+            removeLeavingPlayer(p);
+            solarWarsServer.removeLeavingPlayer(p, source);
         }
     }
 }

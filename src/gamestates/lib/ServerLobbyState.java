@@ -7,6 +7,7 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.network.Client;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.NetworkManager;
+import net.messages.PlayerLeavingMessage;
+import solarwars.Hub;
 import solarwars.SolarWarsGame;
 
 /**
@@ -65,8 +68,8 @@ public class ServerLobbyState extends Gamestate {
 
         playerNamePos = new ArrayList<Vector3f>();
         playerLabels = new ArrayList<Label>();
-        
-            
+
+
 
 
         lobby = new Label(
@@ -178,10 +181,14 @@ public class ServerLobbyState extends Gamestate {
         gui = null;
     }
 
-
     private void leaveServer() {
-        if (networkManager.getThisClient() != null)
-            networkManager.getThisClient().close();
+        if (networkManager.getThisClient() != null) {
+            Client thisClient = networkManager.getThisClient();
+            PlayerLeavingMessage plm = new PlayerLeavingMessage(Hub.getLocalPlayer());
+
+            thisClient.send(plm);
+            thisClient.close();
+        }
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 }

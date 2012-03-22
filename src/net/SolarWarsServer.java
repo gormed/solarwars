@@ -1,5 +1,7 @@
 package net;
 
+import net.messages.PlayerConnectingMessage;
+import net.messages.StringMessage;
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.HostedConnection;
@@ -15,8 +17,12 @@ import gamestates.lib.CreateServerState;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Player;
+import net.messages.PlayerAcceptedMessage;
+import net.messages.PlayerLeavingMessage;
 
 /**
  * test
@@ -32,14 +38,15 @@ public class SolarWarsServer extends SimpleApplication {
         }
         return serverApp = new SolarWarsServer();
     }
-    
 
     private SolarWarsServer() {
         super();
         // Add messages to serializer so they can be read, DO THIS FIRST
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
-        
+        Serializer.registerClass(PlayerLeavingMessage.class);
+        Serializer.registerClass(PlayerAcceptedMessage.class);
+
         this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
     private Server gameServer;
@@ -47,15 +54,16 @@ public class SolarWarsServer extends SimpleApplication {
     Server getGameServer() {
         return gameServer;
     }
-    
     private int port = NetworkManager.DEFAULT_PORT;
+    private HashMap<Player, HostedConnection> connectedPlayers;
     private UserListener connections = new UserListener();
     private CreateServerState createServer;
     private boolean isRunning;
-    
+
     @Override
     public void start() {
         super.start(JmeContext.Type.Headless);
+        connectedPlayers = new HashMap<Player, HostedConnection>(8);
         isRunning = true;
     }
 
@@ -66,7 +74,7 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer = Network.createServer(port);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
-            addClientMessageListener(createServer);
+            addClientMessageListener(createServer, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
@@ -91,7 +99,7 @@ public class SolarWarsServer extends SimpleApplication {
         isRunning = false;
         super.destroy();
     }
-    
+
     boolean isRunning() {
         return isRunning;
     }
@@ -117,12 +125,20 @@ public class SolarWarsServer extends SimpleApplication {
         gameServer.removeConnectionListener(l);
     }
 
-    public void addClientMessageListener(MessageListener<HostedConnection> hc) {
-        gameServer.addMessageListener(hc, PlayerConnectingMessage.class);
+    public void addClientMessageListener(MessageListener<HostedConnection> hc, Class... classes ) {
+        gameServer.addMessageListener(hc, classes);
     }
 
-    public void removeClientMessageListener(MessageListener<HostedConnection> hc) {
-        gameServer.removeMessageListener(hc, PlayerConnectingMessage.class);
+    public void removeClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
+        gameServer.removeMessageListener(hc, classes);
+    }
+
+    public void addConnectingPlayer(Player p, HostedConnection hc) {
+        connectedPlayers.put(p, hc);
+    }
+
+    public void removeLeavingPlayer(Player p, HostedConnection hc) {
+        connectedPlayers.remove(p);
     }
 
     /**
