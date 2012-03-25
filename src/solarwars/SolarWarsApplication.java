@@ -458,7 +458,7 @@ public class SolarWarsApplication extends Application {
     public void destroy() {
         NetworkManager nm = NetworkManager.getInstance();
         if ( nm != null && nm.isServerRunning()) {
-            NetworkManager.getInstance().closeServer();
+            NetworkManager.getInstance().closeServer(false);
         }
         super.destroy();
     }

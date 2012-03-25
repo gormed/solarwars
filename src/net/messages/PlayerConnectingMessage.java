@@ -17,6 +17,7 @@ public class PlayerConnectingMessage extends AbstractMessage {
 
     private String name;
     private ColorRGBA color;
+    private boolean isHost;
 
     public ColorRGBA getColor() {
         return color;
@@ -26,11 +27,16 @@ public class PlayerConnectingMessage extends AbstractMessage {
         return name;
     }
 
+    public boolean isHost() {
+        return isHost;
+    }
+
     public PlayerConnectingMessage() {
     }
 
-    public PlayerConnectingMessage(String name, ColorRGBA color) {
+    public PlayerConnectingMessage(String name, ColorRGBA color, boolean isHost) {
         this.name = name;
         this.color = color;
+        this.isHost = isHost;
     }
 }

@@ -22,6 +22,7 @@
 package logic;
 
 import com.jme3.math.ColorRGBA;
+import com.jme3.network.serializing.Serializable;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
 import java.util.ArrayList;
@@ -30,38 +31,34 @@ import solarwars.Hub;
 /**
  * The Class Player.
  */
+@Serializable
 public class Player {
 
-    
     /** The name. */
     private String name;
-    
     /** The color. */
     private ColorRGBA color;
-    
     /** The id. */
     private int id;
-    
     /** The ship count. */
     private int shipCount = 0;
-    
     /** The artificial. */
     private AI artificial;
-    
     /** The selected planet. */
     private AbstractPlanet selectedPlanet;
-    
     /** The selected ship group. */
     private ShipGroup selectedShipGroup;
-    
     /** The ship percentage. */
     private float shipPercentage = 0.5f;
-    
     /** The planets. */
     private ArrayList<AbstractPlanet> planets;
-    
     /** The ship groups. */
     private ArrayList<ShipGroup> shipGroups;
+    
+    private boolean isHost;
+
+    public Player() {
+    }
 
     /**
      * Instantiates a new player.
@@ -69,10 +66,24 @@ public class Player {
      * @param name the name
      * @param color the color
      */
-    public Player(String name, ColorRGBA color) {
+    public Player(String name, ColorRGBA color, int id) {
         this.name = name;
         this.color = color;
-        this.id = Hub.getContiniousPlayerID();
+        this.id = id;
+        planets = new ArrayList<AbstractPlanet>();
+        shipGroups = new ArrayList<ShipGroup>();
+    }
+
+    /**
+     * Instantiates a new player.
+     *
+     * @param name the name
+     * @param color the color
+     */
+    public Player(String name, ColorRGBA color, int id, boolean isHost) {
+        this.name = name;
+        this.color = color;
+        this.id = id;
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
     }
@@ -84,6 +95,10 @@ public class Player {
      */
     public ColorRGBA getColor() {
         return color;
+    }
+
+    public boolean isHost() {
+        return isHost;
     }
 
     /**

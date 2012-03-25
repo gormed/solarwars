@@ -8,18 +8,18 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
+import com.jme3.network.Message;
+import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
-import java.io.IOException;
-import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import logic.Player;
 import net.NetworkManager;
+import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import solarwars.Hub;
 import solarwars.SolarWarsGame;
@@ -38,11 +38,13 @@ public class ServerLobbyState extends Gamestate {
     private Button ready;
     private Label serverName;
     private GameGUI gui;
+    private Hub hub;
     private String clientPlayerName;
     private ColorRGBA clientPlayerColor;
     private NetworkManager networkManager;
     private ArrayList<Vector3f> playerNamePos;
     private ArrayList<Label> playerLabels;
+    public PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
 
     public void setClientPlayerColor(ColorRGBA clientPlayerColor) {
         this.clientPlayerColor = clientPlayerColor;
@@ -64,6 +66,8 @@ public class ServerLobbyState extends Gamestate {
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
+        hub = Hub.getInstance();
+
         networkManager = NetworkManager.getInstance();
 
         playerNamePos = new ArrayList<Vector3f>();
@@ -134,7 +138,6 @@ public class ServerLobbyState extends Gamestate {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                leaveServer();
             }
         };
 
@@ -182,13 +185,58 @@ public class ServerLobbyState extends Gamestate {
     }
 
     private void leaveServer() {
-        if (networkManager.getThisClient() != null) {
-            Client thisClient = networkManager.getThisClient();
+
+        Client thisClient = networkManager.getThisClient();
+        if (thisClient != null && thisClient.isConnected()) {
             PlayerLeavingMessage plm = new PlayerLeavingMessage(Hub.getLocalPlayer());
 
             thisClient.send(plm);
-            thisClient.close();
         }
-        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+    }
+
+    private void addConnectedPlayer(Player p) {
+        int id = playerLabels.size();
+        Label player = new Label(p.getName(),
+                playerNamePos.get(id),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Blue,
+                gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+        };
+
+        gui.addGUIElement(player);
+        playerLabels.add(
+                id,
+                player);
+    }
+
+    public class PlayerConnectionListener implements MessageListener<Client> {
+
+        public void messageReceived(Client source, Message message) {
+            if (message instanceof PlayerAcceptedMessage) {
+                PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
+                Player thisPlayer = pam.getPlayer();
+                ArrayList<Player> players = pam.getPlayers();
+
+                Hub.getInstance().initialize(thisPlayer, players);
+
+                for (Player p : players) {
+                    addConnectedPlayer(p);
+                }
+
+            } else if (message instanceof PlayerLeavingMessage) {
+                Client thisClient = networkManager.getThisClient();
+                thisClient.close();
+
+                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+            }
+        }
     }
 }

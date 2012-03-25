@@ -29,12 +29,13 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
+import gamestates.lib.ServerLobbyState;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Player;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 
@@ -98,7 +99,7 @@ public class NetworkManager {
         this.serverIPAdress = serverIPAdress;
     }
 
-    public void setupClient(String name, ColorRGBA color)
+    public void setupClient(String name, ColorRGBA color, boolean isHost, MessageListener<Client> listener, Class... classes)
             throws IOException {
         if (serverIPAdress == null || port < 1) {
             return;
@@ -108,22 +109,24 @@ public class NetworkManager {
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
+        Serializer.registerClass(Player.class);
 
         thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
 
         thisClient.start();
         thisClient.addMessageListener(new ClientListener(), StringMessage.class);
+        if (listener != null) {
+            // PlayerAcceptedMessage.class, PlayerLeavingMessage.class
+            thisClient.addMessageListener(listener, classes);
+        }
 
-        StringMessage s = new StringMessage("Hello server!");
-        PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color);
+        StringMessage s = new StringMessage(name + " joins the server!");
+        PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
         thisClient.send(s);
         thisClient.send(pcm);
-
-
-
     }
 
-    public SolarWarsServer setupServer(String hostName, ColorRGBA hostColor)
+    public SolarWarsServer setupServer()
             throws IOException {
         thisServer = SolarWarsServer.getInstance();
         thisServer.start();
@@ -132,22 +135,22 @@ public class NetworkManager {
         } catch (UnknownHostException ex) {
             Logger.getLogger(NetworkManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        setupClient(hostName, hostColor);
         return thisServer;
     }
 
-    public void closeServer() {
+    public void closeServer(boolean wait) {
         thisClient.close();
         thisClient = null;
-        thisServer.stop(true);
+        thisServer.stop(wait);
         thisServer = null;
 
         System.out.println("...Server closed!");
     }
-    
+
     public boolean isServerRunning() {
-        if (thisServer == null)
+        if (thisServer == null) {
             return false;
+        }
         return thisServer.isRunning();
     }
 

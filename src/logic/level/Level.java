@@ -32,6 +32,7 @@ import entities.ShipGroup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import logic.Player;
 import solarwars.IsoControl;
@@ -230,8 +231,8 @@ public class Level {
      * Setup players.
      */
     public void setupPlayers() {
-        for (String s : Hub.playerNames) {
-            Player p = hub.getPlayer(s);
+        for (Map.Entry<Integer, Player> entrySet : Hub.playersByID.entrySet()) {
+            Player p = entrySet.getValue();
             Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
             planetNodes.put(p, playersPlanetsNode);
             levelNode.attachChild(playersPlanetsNode);

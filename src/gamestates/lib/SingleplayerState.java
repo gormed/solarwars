@@ -32,6 +32,7 @@ import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import logic.Player;
 import logic.level.Level;
+import net.ServerHub;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
@@ -70,8 +71,7 @@ public class SingleplayerState extends Gamestate {
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
         hub = Hub.getInstance();
-        Hub.resetPlayerID();
-        hub.initialize(new Player("Human", ColorRGBA.Blue));
+        hub.initialize(new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID()), null);
         setupSingleplayer();
         setupGUI();
         currentLevel = new Level(
@@ -104,7 +104,7 @@ public class SingleplayerState extends Gamestate {
     private void setupSingleplayer() {
         
 
-        Player ai = new Player("AI", ColorRGBA.Red);
+        Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
         hub.addPlayer(ai);
     }
 

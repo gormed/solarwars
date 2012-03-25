@@ -3,7 +3,9 @@ package net;
 import net.messages.PlayerConnectingMessage;
 import net.messages.StringMessage;
 import com.jme3.app.SimpleApplication;
+import com.jme3.math.ColorRGBA;
 import com.jme3.network.ConnectionListener;
+import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
@@ -17,12 +19,14 @@ import gamestates.lib.CreateServerState;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
+import solarwars.Hub;
 
 /**
  * test
@@ -46,6 +50,7 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
+        Serializer.registerClass(Player.class);
 
         this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
@@ -56,6 +61,8 @@ public class SolarWarsServer extends SimpleApplication {
     }
     private int port = NetworkManager.DEFAULT_PORT;
     private HashMap<Player, HostedConnection> connectedPlayers;
+    private ArrayList<Player> joinedPlayers;
+    private ArrayList<Player> leavingPlayers;
     private UserListener connections = new UserListener();
     private CreateServerState createServer;
     private boolean isRunning;
@@ -64,6 +71,8 @@ public class SolarWarsServer extends SimpleApplication {
     public void start() {
         super.start(JmeContext.Type.Headless);
         connectedPlayers = new HashMap<Player, HostedConnection>(8);
+        joinedPlayers = new ArrayList<Player>();
+        leavingPlayers = new ArrayList<Player>();
         isRunning = true;
     }
 
@@ -74,7 +83,7 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer = Network.createServer(port);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
-            addClientMessageListener(createServer, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
+            addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
@@ -85,7 +94,15 @@ public class SolarWarsServer extends SimpleApplication {
 
     @Override
     public void simpleUpdate(float tpf) {
-        //TODO: add update code
+        for (Player p : joinedPlayers) {
+            respondPlayer(p, true);
+        }
+        joinedPlayers.clear();
+
+        for (Player p : leavingPlayers) {
+            respondPlayer(p, false);
+        }
+        leavingPlayers.clear();
     }
 
     @Override
@@ -95,6 +112,11 @@ public class SolarWarsServer extends SimpleApplication {
 
     @Override
     public void destroy() {
+        
+        connectedPlayers.clear();
+        joinedPlayers.clear();
+        leavingPlayers.clear();
+        gameServer.removeConnectionListener(connections);
         gameServer.close();
         isRunning = false;
         super.destroy();
@@ -125,7 +147,7 @@ public class SolarWarsServer extends SimpleApplication {
         gameServer.removeConnectionListener(l);
     }
 
-    public void addClientMessageListener(MessageListener<HostedConnection> hc, Class... classes ) {
+    public void addClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
         gameServer.addMessageListener(hc, classes);
     }
 
@@ -135,10 +157,30 @@ public class SolarWarsServer extends SimpleApplication {
 
     public void addConnectingPlayer(Player p, HostedConnection hc) {
         connectedPlayers.put(p, hc);
+        joinedPlayers.add(p);
     }
 
     public void removeLeavingPlayer(Player p, HostedConnection hc) {
         connectedPlayers.remove(p);
+        leavingPlayers.add(p);
+    }
+
+    private void respondPlayer(Player p, boolean connecting) {
+        if (connecting) {
+            boolean isHost = p.isHost();
+            HostedConnection hc = connectedPlayers.get(p);
+            PlayerAcceptedMessage pam = 
+                    new PlayerAcceptedMessage(p, 
+                            ServerHub.getPlayers(),  
+                            isHost);
+
+            gameServer.broadcast(Filters.equalTo(hc), pam);
+        } else {
+            HostedConnection hc = connectedPlayers.get(p);
+            PlayerLeavingMessage plm = new PlayerLeavingMessage(!connecting);
+
+            gameServer.broadcast(Filters.equalTo(hc), plm);
+        }
     }
 
     /**

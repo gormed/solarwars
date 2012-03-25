@@ -14,12 +14,14 @@ import com.jme3.input.controls.KeyTrigger;
  * @author Hans
  */
 public abstract class KeyboardListener implements ActionListener {
-    
+
     public KeyboardListener() {
-        
     }
-    
+
     public KeyboardListener(InputManager inputManager) {
+
+        deleteMappings(inputManager);
+
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2));
@@ -60,10 +62,10 @@ public abstract class KeyboardListener implements ActionListener {
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_SPACE, new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_UNDERSCORE, new KeyTrigger(KeyInput.KEY_UNDERLINE));
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
-        
+
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT, new KeyTrigger(KeyInput.KEY_PERIOD));
-        
-        inputManager.addListener(this, 
+
+        inputManager.addListener(this,
                 KeyInputMap.INPUT_MAPPING_0,
                 KeyInputMap.INPUT_MAPPING_1,
                 KeyInputMap.INPUT_MAPPING_2,
@@ -105,8 +107,55 @@ public abstract class KeyboardListener implements ActionListener {
                 KeyInputMap.INPUT_MAPPING_UNDERSCORE,
                 KeyInputMap.INPUT_MAPPING_BACKSPACE,
                 KeyInputMap.INPUT_MAPPING_POINT);
-        
+
     }
-    
+
+    private void deleteMappings(InputManager inputManager) {
+        try {
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_0);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_1);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_2);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_3);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_4);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_5);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_6);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_7);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_8);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_9);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_A);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_B);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_C);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_D);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_E);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_F);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_G);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_H);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_I);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_J);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_K);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_L);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_M);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_N);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_O);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_P);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_Q);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_R);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_S);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_T);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_U);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_V);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_W);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_X);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_Y);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_Z);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_SCORE);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_SPACE);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_UNDERSCORE);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE);
+            inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_POINT);
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
     public abstract void onAction(String name, boolean isPressed, float tpf);
 }

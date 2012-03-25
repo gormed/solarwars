@@ -1,25 +1,8 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
- * 
- * 
- * SolarWars is a strategy game in space. You have to eliminate 
- * all enemies to win. You can move ships between planets to capture 
- * other planets. Its oriented to multiplayer and singleplayer.
- * 
- * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
- * 
- * Email me: hans.ferchland@gmx.de
- * 
- * Project: SolarWars
- * File: Hub.java
- * Type: solarwars.Hub
- * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
- * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package solarwars;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package net;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,17 +10,41 @@ import java.util.Map;
 import logic.Player;
 
 /**
- * The Class Hub.
+ *
+ * @author Hans
  */
-public class Hub {
+public class ServerHub {
+
+    /** The PLAYER ID. */
+    private static int PLAYER_ID = 0;
+
+    /**
+     * Gets the continious player id.
+     *
+     * @return the continious id
+     */
+    public static int getContiniousPlayerID() {
+        return PLAYER_ID++;
+    }
+
+    public static int getCurrentPlayerID() {
+        return PLAYER_ID;
+    }
+
+    public static void resetPlayerID(int id) {
+        PLAYER_ID = id;
+        playersByID = new HashMap<Integer, Player>(8);
+        playersByName = new HashMap<String, Player>(8);
+    }
 
     public static ArrayList<Player> getPlayers() {
         ArrayList<Player> players = new ArrayList<Player>();
 
-        for (Map.Entry<String, Player> cursor : playersByName.entrySet()) {
-            players.add(cursor.getValue().getId(), cursor.getValue());
+        if (!playersByID.isEmpty()) {
+            for (Map.Entry<Integer, Player> cursor : playersByID.entrySet()) {
+                players.add(cursor.getValue());
+            }
         }
-
         return players;
     }
     /** The player names. */
@@ -45,35 +52,35 @@ public class Hub {
     /** The players. */
     private static HashMap<String, Player> playersByName;
     /** The local player. */
-    private static Player localPlayer;
+    private static Player hostPlayer;
 
     /**
      * Gets the local player.
      *
      * @return the local player
      */
-    public static Player getLocalPlayer() {
-        return localPlayer;
+    public static Player getHostPlayer() {
+        return hostPlayer;
     }
     /** The instance. */
-    private static Hub instance;
+    private static ServerHub instance;
 
     /**
      * Gets the single instance of Hub.
      *
      * @return single instance of Hub
      */
-    public static Hub getInstance() {
+    public static ServerHub getInstance() {
         if (instance != null) {
             return instance;
         }
-        return instance = new Hub();
+        return instance = new ServerHub();
     }
 
     /**
      * Instantiates a new hub.
      */
-    private Hub() {
+    private ServerHub() {
         playersByName = new HashMap<String, Player>(8);
         playersByID = new HashMap<Integer, Player>(8);
     }
@@ -81,8 +88,8 @@ public class Hub {
     /**
      * Initializes the player-HUB.
      */
-    public void initialize(Player localPlayer, ArrayList<Player> players) {
-        this.localPlayer = localPlayer;
+    public void initialize(Player hostPlayer, ArrayList<Player> players) {
+        this.hostPlayer = hostPlayer;
         if (players != null) {
             for (Player p : players) {
                 addPlayer(p);

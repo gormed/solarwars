@@ -7,6 +7,8 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.network.Client;
+import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -21,6 +23,8 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.NetworkManager;
+import net.messages.PlayerAcceptedMessage;
+import net.messages.PlayerLeavingMessage;
 import solarwars.SolarWarsGame;
 
 /**
@@ -214,34 +218,45 @@ public class MultiplayerState extends Gamestate {
                 networkManager.setServerIPAdress(add);
                 networkManager.setClientIPAdress(InetAddress.getLocalHost());
 
-                setupClient(playerName.getCaption(), ColorRGBA.Red);
 
-//                GamestateManager gm = GamestateManager.getInstance();
-//                Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
-//                if (g instanceof ServerLobbyState) {
-//                    ServerLobbyState cs = (ServerLobbyState) g;
-//                    cs.setClientPlayerName(playerName.getCaption());
-//                    cs.setClientPlayerColor(ColorRGBA.Red);
-//                }
-                GamestateManager.getInstance().enterState(GamestateManager.SERVER_LOBBY_STATE);
+
+                GamestateManager gm = GamestateManager.getInstance();
+                Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
+                if (g instanceof ServerLobbyState) {
+                    ServerLobbyState serverLobbyState = (ServerLobbyState) g;
+                    serverLobbyState.setClientPlayerName(playerName.getCaption());
+                    serverLobbyState.setClientPlayerColor(ColorRGBA.Red);
+
+                    setupClient(
+                            playerName.getCaption(),
+                            ColorRGBA.Red,
+                            serverLobbyState.playerConnectionListener,
+                            PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+                    gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
+                }
 
             } catch (UnknownHostException ex) {
-                Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("Unkown host! Please verify the IP.");
+                System.err.println(ex.getMessage());
+                //Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
                 serverip.setCaption("255.255.255.255");
             } catch (IOException ex) {
-                Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+                if (ex instanceof ConnectException) {
+                    System.err.println("Server " + serverip.getCaption() + " refused connection. Reason: " + ex.getMessage());
+                    
+                } else {
+                    Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 serverip.setCaption("255.255.255.255");
             }
         } else {
             serverip.setCaption("255.255.255.255");
         }
 
-
-
     }
 
-    private void setupClient(String name, ColorRGBA color)
+    private void setupClient(String name, ColorRGBA color, MessageListener<Client> messageListener, Class... classes)
             throws IOException {
-        networkManager.setupClient(name, color);
+        networkManager.setupClient(name, color, false, messageListener, classes);
     }
 }

@@ -6,6 +6,7 @@ package net.messages;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;
+import java.util.ArrayList;
 import logic.Player;
 
 /**
@@ -16,8 +17,17 @@ import logic.Player;
 public class PlayerAcceptedMessage extends AbstractMessage {
 
     private Player player;
-    
     private boolean isHost;
+    private ArrayList<Player> allPlayers;
+
+
+    public boolean isIsHost() {
+        return isHost;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return allPlayers;
+    }
 
     public Player getPlayer() {
         return player;
@@ -26,8 +36,11 @@ public class PlayerAcceptedMessage extends AbstractMessage {
     public PlayerAcceptedMessage() {
     }
 
-    public PlayerAcceptedMessage(Player player, boolean isHost) {
+    public PlayerAcceptedMessage(Player player,
+            ArrayList<Player> allPlayers,
+            boolean isHost) {
         this.player = player;
         this.isHost = isHost;
+        this.allPlayers = allPlayers;
     }
 }

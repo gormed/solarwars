@@ -7,11 +7,10 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.network.ConnectionListener;
+import com.jme3.network.Client;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
-import com.jme3.network.Server;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -27,8 +26,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import net.NetworkManager;
+import net.ServerHub;
 import net.messages.PlayerConnectingMessage;
 import net.SolarWarsServer;
+import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import solarwars.Hub;
 import solarwars.SolarWarsGame;
@@ -37,7 +38,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class CreateServerState extends Gamestate implements MessageListener<HostedConnection> {
+public class CreateServerState extends Gamestate {
 
     private Label createServerLabel;
     private Label yourIP;
@@ -50,7 +51,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
     private Label maxPlayers;
     private TextBox playerCount;
     private GameGUI gui;
-    private Hub hub;
+    private ServerHub serverHub;
     private SolarWarsServer solarWarsServer;
     private ArrayList<Vector3f> playerNamePos;
     private ArrayList<Label> playerLabels;
@@ -58,6 +59,8 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
     private NetworkManager networkManager;
+    public ClientConnectionListener clientConListener = new ClientConnectionListener();
+    public ServerConnetctionListener serverConListener = new ServerConnetctionListener();
 
     // Input Methods, that set the inital point of the state until loadContent is called
     public void setHostPlayerColor(ColorRGBA hostPlayerColor) {
@@ -81,7 +84,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
         networkManager = NetworkManager.getInstance();
-        hub = Hub.getInstance();
+        serverHub = ServerHub.getInstance();
         playerNamePos = new ArrayList<Vector3f>();
         playerLabels = new ArrayList<Label>();
 
@@ -243,7 +246,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
                 new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
                 ColorRGBA.White);
 
-        //addConnectedPlayer(Hub.getLocalPlayer());
+        //addConnectedPlayer(Hub.getHostPlayer());
 
 
 
@@ -272,7 +275,7 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
         gui.removeGUIElement(address);
         gui.removeGUIElement(start);
 
-        solarWarsServer.removeClientMessageListener(this);
+        solarWarsServer.removeClientMessageListener(serverConListener);
 
         for (Label l : playerLabels) {
             gui.removeGUIElement(l);
@@ -284,10 +287,16 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
     }
 
     private void setupServer() {
-        hub = Hub.getInstance();
-        Hub.resetPlayerID();
+        Player hostPlayer = new Player(hostPlayerName, hostPlayerColor, ServerHub.getContiniousPlayerID(), true);
+
+        ServerHub.resetPlayerID(0);
+        serverHub.initialize(hostPlayer, null);
+        //hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
-            solarWarsServer = networkManager.setupServer(hostPlayerName, hostPlayerColor);
+            solarWarsServer = networkManager.setupServer();
+            networkManager.setupClient(hostPlayerName,
+                    hostPlayerColor, true, clientConListener,
+                    PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
         } catch (UnknownHostException ex) {
@@ -299,7 +308,8 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
 
     private void cancelServer() {
         System.out.println("Closing server...");
-        networkManager.closeServer();
+        solarWarsServer.removeClientMessageListener(serverConListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+        networkManager.closeServer(false);
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
@@ -333,24 +343,53 @@ public class CreateServerState extends Gamestate implements MessageListener<Host
 
     }
 
-    public void messageReceived(HostedConnection source, Message message) {
-        if (message instanceof PlayerConnectingMessage) {
+    public class ServerConnetctionListener implements MessageListener<HostedConnection> {
 
-            PlayerConnectingMessage pcm = (PlayerConnectingMessage) message;
-            // creates a connecting player on the server
-            Player newPlayer = new Player(pcm.getName(), pcm.getColor());
-            hub.addPlayer(newPlayer);
-            addConnectedPlayer(newPlayer);
-            System.out.println("Player " + newPlayer.getName() + "[" + newPlayer.getColor().toString() + "] joined the Game.");
-            solarWarsServer.addConnectingPlayer(newPlayer, source);
-        } else if (message instanceof PlayerLeavingMessage) {
-            PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
-            // removes the sending Player from server
+        public void messageReceived(HostedConnection source, Message message) {
+            if (message instanceof PlayerConnectingMessage) {
 
-            Player p = plm.getPlayer();
+                PlayerConnectingMessage pcm = (PlayerConnectingMessage) message;
+                boolean isHost = pcm.isHost();
+                // creates a connecting player on the server
+                Player newPlayer = null;
+                if (!isHost) {
+                    newPlayer = new Player(
+                            pcm.getName(), pcm.getColor(), 
+                            ServerHub.getContiniousPlayerID());
+                } else {
+                    newPlayer = ServerHub.getHostPlayer();
+                }
+                serverHub.addPlayer(newPlayer);
 
-            removeLeavingPlayer(p);
-            solarWarsServer.removeLeavingPlayer(p, source);
+                addConnectedPlayer(newPlayer);
+                System.out.println("Player " + newPlayer.getName() + "[" + newPlayer.getColor().toString() + "] joined the Game.");
+                solarWarsServer.addConnectingPlayer(newPlayer, source);
+
+            } else if (message instanceof PlayerLeavingMessage) {
+                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+                // removes the sending Player from server
+
+                Player p = plm.getPlayer();
+
+                removeLeavingPlayer(p);
+                solarWarsServer.removeLeavingPlayer(p, source);
+            }
+        }
+    }
+
+    public class ClientConnectionListener implements MessageListener<Client> {
+
+        public void messageReceived(Client source, Message message) {
+            if (message instanceof PlayerAcceptedMessage) {
+                PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
+
+
+            } else if (message instanceof PlayerLeavingMessage) {
+                Client thisClient = networkManager.getThisClient();
+                thisClient.close();
+
+                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+            }
         }
     }
 }
