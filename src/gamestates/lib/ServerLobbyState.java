@@ -17,6 +17,7 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import logic.Player;
 import net.NetworkManager;
 import net.messages.PlayerAcceptedMessage;
@@ -42,8 +43,8 @@ public class ServerLobbyState extends Gamestate {
     private String clientPlayerName;
     private ColorRGBA clientPlayerColor;
     private NetworkManager networkManager;
-    private ArrayList<Vector3f> playerNamePos;
-    private ArrayList<Label> playerLabels;
+    private HashMap<Integer, Vector3f> playerNamePos;
+    private HashMap<Integer, Label> playerLabels;
     public PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
 
     public void setClientPlayerColor(ColorRGBA clientPlayerColor) {
@@ -70,8 +71,8 @@ public class ServerLobbyState extends Gamestate {
 
         networkManager = NetworkManager.getInstance();
 
-        playerNamePos = new ArrayList<Vector3f>();
-        playerLabels = new ArrayList<Label>();
+        playerNamePos = new HashMap<Integer, Vector3f>();
+        playerLabels = new HashMap<Integer, Label>();
 
 
 
@@ -212,8 +213,8 @@ public class ServerLobbyState extends Gamestate {
         };
 
         gui.addGUIElement(player);
-        playerLabels.add(
-                id,
+        playerLabels.put(
+                p.getId(),
                 player);
     }
 

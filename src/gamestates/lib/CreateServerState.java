@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
@@ -53,8 +55,8 @@ public class CreateServerState extends Gamestate {
     private GameGUI gui;
     private ServerHub serverHub;
     private SolarWarsServer solarWarsServer;
-    private ArrayList<Vector3f> playerNamePos;
-    private ArrayList<Label> playerLabels;
+    private HashMap<Integer, Vector3f> playerNamePos;
+    private HashMap<Integer, Label> playerLabels;
     private int maxPlayerNumber = 0;
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
@@ -85,13 +87,13 @@ public class CreateServerState extends Gamestate {
         gui = new GameGUI(game);
         networkManager = NetworkManager.getInstance();
         serverHub = ServerHub.getInstance();
-        playerNamePos = new ArrayList<Vector3f>();
-        playerLabels = new ArrayList<Label>();
+        playerNamePos = new HashMap<Integer, Vector3f>();
+        playerLabels = new HashMap<Integer, Label>();
 
 
 
         for (int i = 0; i < 8; i++) {
-            playerNamePos.add(new Vector3f(
+            playerNamePos.put(i, new Vector3f(
                     gui.getWidth() / 3,
                     (6 - i * 0.5f) * gui.getHeight() / 10,
                     0));
@@ -277,8 +279,8 @@ public class CreateServerState extends Gamestate {
 
         solarWarsServer.removeClientMessageListener(serverConListener);
 
-        for (Label l : playerLabels) {
-            gui.removeGUIElement(l);
+        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
+            gui.removeGUIElement(entry.getValue());
         }
         playerLabels.clear();
         playerNamePos.clear();
@@ -331,8 +333,8 @@ public class CreateServerState extends Gamestate {
         };
 
         gui.addGUIElement(player);
-        playerLabels.add(
-                id,
+        playerLabels.put(
+                p.getId(),
                 player);
     }
 
