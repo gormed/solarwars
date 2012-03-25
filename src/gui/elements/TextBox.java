@@ -167,7 +167,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         public NumberBoxActionListener(InputManager inputManager, TextBox textBox) {
             this.textBox = textBox;
             
-            deleteMappings(inputManager);
+            //deleteMappings(inputManager);
             
             inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
             inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));

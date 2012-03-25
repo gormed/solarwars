@@ -20,7 +20,7 @@ public abstract class KeyboardListener implements ActionListener {
 
     public KeyboardListener(InputManager inputManager) {
 
-        deleteMappings(inputManager);
+        //deleteMappings(inputManager);
 
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
         inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));

@@ -74,8 +74,12 @@ public class ServerLobbyState extends Gamestate {
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
 
-
-
+        for (int i = 0; i < 8; i++) {
+            playerNamePos.put(i, new Vector3f(
+                    gui.getWidth() / 3,
+                    (6 - i * 0.5f) * gui.getHeight() / 10,
+                    0));
+        }
 
         lobby = new Label(
                 "LOBBY",
