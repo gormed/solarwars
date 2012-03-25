@@ -340,7 +340,7 @@ public class CreateServerState extends Gamestate {
 
     private void removeLeavingPlayer(Player p) {
         Label player = playerLabels.get(p.getId());
-        playerLabels.remove(player);
+        playerLabels.remove(p.getId());
         gui.removeGUIElement(player);
 
     }
