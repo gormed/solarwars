@@ -266,17 +266,18 @@ public class CreateServerState extends Gamestate {
 
     @Override
     protected void unloadContent() {
-        gui.removeGUIElement(backgroundPanel);
-        gui.removeGUIElement(line);
-        gui.removeGUIElement(createServerLabel);
-        gui.removeGUIElement(cancel);
-        gui.removeGUIElement(maxPlayers);
-        gui.removeGUIElement(playerCount);
-        gui.removeGUIElement(playerPanel);
-        gui.removeGUIElement(yourIP);
-        gui.removeGUIElement(address);
-        gui.removeGUIElement(start);
-
+//        gui.removeGUIElement(backgroundPanel);
+//        gui.removeGUIElement(line);
+//        gui.removeGUIElement(createServerLabel);
+//        gui.removeGUIElement(cancel);
+//        gui.removeGUIElement(maxPlayers);
+//        gui.removeGUIElement(playerCount);
+//        gui.removeGUIElement(playerPanel);
+//        gui.removeGUIElement(yourIP);
+//        gui.removeGUIElement(address);
+//        gui.removeGUIElement(start);
+        gui.cleanUpGUI();
+        
         solarWarsServer.removeClientMessageListener(serverConListener);
 
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {

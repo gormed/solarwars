@@ -187,7 +187,7 @@ public class GameGUI {
             decoNode.detachChild(guiElement);
         }
         guiElemetns.remove(guiElement);
-        
+
     }
 
     /**
@@ -203,5 +203,21 @@ public class GameGUI {
 
     public boolean containsGUIElement(GUIElement e) {
         return guiElemetns.contains(e);
+    }
+
+    public void cleanUpGUI() {
+        for (GUIElement guiElement : guiElemetns) {
+            if (guiElement instanceof ClickableGUI) {
+                clickableNode.detachChild(guiElement);
+                //take care of the listeners
+                if (guiElement instanceof TextBox) {
+                    TextBox tb = (TextBox) guiElement;
+                    tb.destroy();
+                }
+            } else {
+                decoNode.detachChild(guiElement);
+            }
+        }
+        guiElemetns.clear();
     }
 }

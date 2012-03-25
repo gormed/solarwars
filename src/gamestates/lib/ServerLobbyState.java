@@ -179,13 +179,14 @@ public class ServerLobbyState extends Gamestate {
 
     @Override
     protected void unloadContent() {
-        gui.removeGUIElement(backgroundPanel);
-        gui.removeGUIElement(line);
-        gui.removeGUIElement(lobby);
-        gui.removeGUIElement(leave);
-        gui.removeGUIElement(serverName);
-        gui.removeGUIElement(playerPanel);
-        gui.removeGUIElement(ready);
+//        gui.removeGUIElement(backgroundPanel);
+//        gui.removeGUIElement(line);
+//        gui.removeGUIElement(lobby);
+//        gui.removeGUIElement(leave);
+//        gui.removeGUIElement(serverName);
+//        gui.removeGUIElement(playerPanel);
+//        gui.removeGUIElement(ready);
+        gui.cleanUpGUI();
         gui = null;
     }
 
@@ -197,6 +198,7 @@ public class ServerLobbyState extends Gamestate {
 
             thisClient.send(plm);
         }
+        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
     private void addConnectedPlayer(Player p) {
