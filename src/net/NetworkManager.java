@@ -139,8 +139,8 @@ public class NetworkManager {
     }
 
     public void closeServer(boolean wait) {
-        thisClient.close();
-        thisClient = null;
+        //thisClient.close();
+        //thisClient = null;
         thisServer.stop(wait);
         thisServer = null;
 
