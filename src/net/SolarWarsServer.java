@@ -83,7 +83,8 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer = Network.createServer(port);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
-            addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
+            NetworkManager.getInstance().registerServerListeners();
+            //addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
@@ -107,7 +108,6 @@ public class SolarWarsServer extends SimpleApplication {
 
     @Override
     public void simpleRender(RenderManager rm) {
-        //TODO: add render code
     }
 
     @Override

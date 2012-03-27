@@ -25,14 +25,16 @@ import net.messages.PlayerConnectingMessage;
 import net.messages.StringMessage;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
+import com.jme3.network.ConnectionListener;
+import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
-import gamestates.lib.ServerLobbyState;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
@@ -60,16 +62,49 @@ public class NetworkManager {
         return instance = new NetworkManager();
     }
 
+    public static boolean checkIP(String sip) {
+        String[] parts = sip.split("\\.");
+        for (String s : parts) {
+            int i = Integer.parseInt(s);
+            if (i < 0 || i > 255) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static byte[] getByteInetAddress(String ip) {
+        if (!checkIP(ip)) {
+            return null;
+        }
+
+        byte[] address = new byte[4];
+        int idx = 0;
+        String[] parts = ip.split("\\.");
+        for (String s : parts) {
+            int i = Integer.parseInt(s);
+            address[idx++] = (byte) i;
+        }
+
+        return address;
+    }
+
     /**
      * Instantiates a new network manager.
      */
     private NetworkManager() {
+        serverConnectionListeners = new ArrayList<ConnectionListener>();
+        serverMessageListeners = new ArrayList<MessageListener<HostedConnection>>();
+        clientMessageListeners = new ArrayList<MessageListener<Client>>();
     }
     private int port = DEFAULT_PORT;
     private InetAddress clientIPAdress;
     private InetAddress serverIPAdress;
     private Client thisClient;
     private SolarWarsServer thisServer;
+    private ArrayList<MessageListener<HostedConnection>> serverMessageListeners;
+    private ArrayList<ConnectionListener> serverConnectionListeners;
+    private ArrayList<MessageListener<Client>> clientMessageListeners;
 
     public Client getThisClient() {
         return thisClient;
@@ -98,12 +133,29 @@ public class NetworkManager {
     public void setServerIPAdress(InetAddress serverIPAdress) {
         this.serverIPAdress = serverIPAdress;
     }
+    
+    void registerServerListeners() {
+        for (MessageListener<HostedConnection> ml : serverMessageListeners) {
+            thisServer.addClientMessageListener(ml);
+        }
+        for (ConnectionListener cl : serverConnectionListeners) {
+            thisServer.addConnectionListener(cl);
+        }
+    }
+    
+    private void registerClientListeners() {
+        for (MessageListener<Client> ml : clientMessageListeners) {
+            thisClient.addMessageListener(ml);
+        }
+    }
 
-    public void setupClient(String name, ColorRGBA color, boolean isHost, MessageListener<Client> listener, Class... classes)
+    public void setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
         if (serverIPAdress == null || port < 1) {
             return;
         }
+        
+        addClientMessageListener(new ClientListener());
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
@@ -114,11 +166,8 @@ public class NetworkManager {
         thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
 
         thisClient.start();
-        thisClient.addMessageListener(new ClientListener(), StringMessage.class);
-        if (listener != null) {
-            // PlayerAcceptedMessage.class, PlayerLeavingMessage.class
-            thisClient.addMessageListener(listener, classes);
-        }
+        registerClientListeners();
+
 
         StringMessage s = new StringMessage(name + " joins the server!");
         PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
@@ -154,31 +203,19 @@ public class NetworkManager {
         return thisServer.isRunning();
     }
 
-    public static boolean checkIP(String sip) {
-        String[] parts = sip.split("\\.");
-        for (String s : parts) {
-            int i = Integer.parseInt(s);
-            if (i < 0 || i > 255) {
-                return false;
-            }
-        }
-        return true;
+    public void addServerMessageListener(MessageListener<HostedConnection> messageListener) {
+
+        this.serverMessageListeners.add(messageListener);
     }
 
-    public static byte[] getByteInetAddress(String ip) {
-        if (!checkIP(ip)) {
-            return null;
-        }
+    public void addServerConnectionListener(ConnectionListener messageListener) {
 
-        byte[] address = new byte[4];
-        int idx = 0;
-        String[] parts = ip.split("\\.");
-        for (String s : parts) {
-            int i = Integer.parseInt(s);
-            address[idx++] = (byte) i;
-        }
+        this.serverConnectionListeners.add(messageListener);
+    }
 
-        return address;
+    public void addClientMessageListener(MessageListener<Client> messageListener) {
+
+        this.clientMessageListeners.add(messageListener);
     }
 
     /**

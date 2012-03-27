@@ -61,8 +61,7 @@ public class CreateServerState extends Gamestate {
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
     private NetworkManager networkManager;
-    public ClientConnectionListener clientConListener = new ClientConnectionListener();
-    public ServerConnetctionListener serverConListener = new ServerConnetctionListener();
+    private ServerConnetctionListener serverConListener = new ServerConnetctionListener();
 
     // Input Methods, that set the inital point of the state until loadContent is called
     public void setHostPlayerColor(ColorRGBA hostPlayerColor) {
@@ -296,10 +295,11 @@ public class CreateServerState extends Gamestate {
         serverHub.initialize(hostPlayer, null);
         //hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
+            networkManager.addServerMessageListener(serverConListener);
             solarWarsServer = networkManager.setupServer();
+            
             networkManager.setupClient(hostPlayerName,
-                    hostPlayerColor, true, clientConListener,
-                    PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+                    hostPlayerColor, true);
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
         } catch (UnknownHostException ex) {
@@ -345,8 +345,10 @@ public class CreateServerState extends Gamestate {
         gui.removeGUIElement(player);
 
     }
+    
+    
 
-    public class ServerConnetctionListener implements MessageListener<HostedConnection> {
+    private class ServerConnetctionListener implements MessageListener<HostedConnection> {
 
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlayerConnectingMessage) {
@@ -376,22 +378,6 @@ public class CreateServerState extends Gamestate {
 
                 removeLeavingPlayer(p);
                 solarWarsServer.removeLeavingPlayer(p, source);
-            }
-        }
-    }
-
-    public class ClientConnectionListener implements MessageListener<Client> {
-
-        public void messageReceived(Client source, Message message) {
-            if (message instanceof PlayerAcceptedMessage) {
-                PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
-
-
-            } else if (message instanceof PlayerLeavingMessage) {
-                Client thisClient = networkManager.getThisClient();
-                thisClient.close();
-
-                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
             }
         }
     }
