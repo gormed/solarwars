@@ -93,12 +93,14 @@ public class NetworkManager {
      * Instantiates a new network manager.
      */
     private NetworkManager() {
+        clientRegisterListeners = new ArrayList<ClientRegisterListener>();
     }
     private int port = DEFAULT_PORT;
     private InetAddress clientIPAdress;
     private InetAddress serverIPAdress;
     private Client thisClient;
     private SolarWarsServer thisServer;
+    private ArrayList<ClientRegisterListener> clientRegisterListeners;
 
     public Client getThisClient() {
         return thisClient;
@@ -110,6 +112,10 @@ public class NetworkManager {
 
     public void setClientIPAdress(InetAddress clientIPAdress) {
         this.clientIPAdress = clientIPAdress;
+    }
+
+    public void addClientRegisterListener(ClientRegisterListener rl) {
+        clientRegisterListeners.add(rl);
     }
 
     public int getPort() {
@@ -141,9 +147,13 @@ public class NetworkManager {
         Serializer.registerClass(Player.class);
 
         thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
-
-        thisClient.start();
         
+        for (ClientRegisterListener rl : clientRegisterListeners) {
+            rl.registerListener(thisClient);
+        }
+        
+        thisClient.start();
+
         StringMessage s = new StringMessage(name + " joins the server!");
         PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
         thisClient.send(s);

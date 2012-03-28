@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import net.NetworkManager;
-import net.RegisterListener;
+import net.ServerRegisterListener;
 import net.ServerHub;
 import net.messages.PlayerConnectingMessage;
 import net.SolarWarsServer;
@@ -44,7 +44,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class CreateServerState extends Gamestate implements RegisterListener {
+public class CreateServerState extends Gamestate implements ServerRegisterListener {
 
     private Label createServerLabel;
     private Label yourIP;
@@ -282,8 +282,6 @@ public class CreateServerState extends Gamestate implements RegisterListener {
 //        gui.removeGUIElement(address);
 //        gui.removeGUIElement(start);
         gui.cleanUpGUI();
-
-        solarWarsServer.removeClientMessageListener(serverMessageListener);
 
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());

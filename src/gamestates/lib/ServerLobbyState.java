@@ -16,9 +16,16 @@ import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.Player;
+import net.ClientRegisterListener;
 import net.NetworkManager;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
@@ -29,7 +36,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class ServerLobbyState extends Gamestate {
+public class ServerLobbyState extends Gamestate implements ClientRegisterListener {
 
     private Label lobby;
     private Panel backgroundPanel;
@@ -42,6 +49,7 @@ public class ServerLobbyState extends Gamestate {
     private Hub hub;
     private String clientPlayerName;
     private ColorRGBA clientPlayerColor;
+    private String serverIPAddress;
     private NetworkManager networkManager;
     private HashMap<Integer, Vector3f> playerNamePos;
     private HashMap<Integer, Label> playerLabels;
@@ -49,6 +57,10 @@ public class ServerLobbyState extends Gamestate {
 
     public void setClientPlayerColor(ColorRGBA clientPlayerColor) {
         this.clientPlayerColor = clientPlayerColor;
+    }
+
+    public void setServerIPAddress(String serverIPAddress) {
+        this.serverIPAddress = serverIPAddress;
     }
 
     public void setClientPlayerName(String clientPlayerName) {
@@ -81,6 +93,8 @@ public class ServerLobbyState extends Gamestate {
                     0));
         }
 
+        joinServer();
+        
         lobby = new Label(
                 "LOBBY",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
@@ -200,6 +214,34 @@ public class ServerLobbyState extends Gamestate {
             thisClient.close();
         }
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+    }
+
+    private void joinServer() {
+        try {
+            InetAddress add = InetAddress.getByAddress(NetworkManager.getByteInetAddress(serverIPAddress));
+            networkManager.setServerIPAdress(add);
+            networkManager.setClientIPAdress(InetAddress.getLocalHost());
+            networkManager.addClientRegisterListener(this);
+            networkManager.setupClient(clientPlayerName, clientPlayerColor, false);
+        } catch (UnknownHostException ex) {
+            System.err.println("Unkown host! Please verify the IP.");
+            System.err.println(ex.getMessage());
+        } catch (IOException ex) {
+            if (ex instanceof ConnectException) {
+                System.err.println("Server " + serverIPAddress + " refused connection. Reason: " + ex.getMessage());
+
+            } else {
+                Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void registerListener(Client client) {
+
+        client.addMessageListener(playerConnectionListener,
+                PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+
+
     }
 
     private void addConnectedPlayer(Player p) {

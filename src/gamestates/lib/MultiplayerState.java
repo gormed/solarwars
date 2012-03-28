@@ -17,14 +17,8 @@ import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.NetworkManager;
-import net.messages.PlayerAcceptedMessage;
-import net.messages.PlayerLeavingMessage;
 import solarwars.SolarWarsGame;
 
 /**
@@ -213,41 +207,17 @@ public class MultiplayerState extends Gamestate {
         String ip = serverip.getCaption();
 
         if (NetworkManager.checkIP(ip)) {
-            try {
-                InetAddress add = InetAddress.getByAddress(NetworkManager.getByteInetAddress(ip));
-                networkManager.setServerIPAdress(add);
-                networkManager.setClientIPAdress(InetAddress.getLocalHost());
 
 
-
-                GamestateManager gm = GamestateManager.getInstance();
-                Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
-                if (g instanceof ServerLobbyState) {
-                    ServerLobbyState serverLobbyState = (ServerLobbyState) g;
-                    serverLobbyState.setClientPlayerName(playerName.getCaption());
-                    serverLobbyState.setClientPlayerColor(ColorRGBA.Red);
-
-                    setupClient(
-                            playerName.getCaption(),
-                            ColorRGBA.Red,
-                            serverLobbyState.playerConnectionListener,
-                            PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
-                    gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
-                }
-
-            } catch (UnknownHostException ex) {
-                System.err.println("Unkown host! Please verify the IP.");
-                System.err.println(ex.getMessage());
-                //Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
-                serverip.setCaption("255.255.255.255");
-            } catch (IOException ex) {
-                if (ex instanceof ConnectException) {
-                    System.err.println("Server " + serverip.getCaption() + " refused connection. Reason: " + ex.getMessage());
-                    
-                } else {
-                    Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                serverip.setCaption("255.255.255.255");
+            GamestateManager gm = GamestateManager.getInstance();
+            Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
+            if (g instanceof ServerLobbyState) {
+                ServerLobbyState serverLobbyState = (ServerLobbyState) g;
+                serverLobbyState.setClientPlayerName(playerName.getCaption());
+                serverLobbyState.setClientPlayerColor(ColorRGBA.Red);
+                serverLobbyState.setServerIPAddress(ip);
+                
+                gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
             }
         } else {
             serverip.setCaption("255.255.255.255");

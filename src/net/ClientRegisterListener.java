@@ -4,14 +4,14 @@
  */
 package net;
 
-import com.jme3.network.Server;
+import com.jme3.network.Client;
 
 /**
  *
  * @author Hans
  */
-public interface RegisterListener {
-    
-    public void registerListener(Server server);
+public interface ClientRegisterListener {
+        
+    public void registerListener(Client client);
     
 }

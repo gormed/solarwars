@@ -13,8 +13,6 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
-import gamestates.GamestateManager;
-import gamestates.lib.CreateServerState;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -61,7 +59,7 @@ public class SolarWarsServer extends SimpleApplication {
     
     private int port = NetworkManager.DEFAULT_PORT;
     private HashMap<Player, HostedConnection> connectedPlayers;
-    private ArrayList<RegisterListener> registerListeners;
+    private ArrayList<ServerRegisterListener> registerListeners;
     private ArrayList<Player> joinedPlayers;
     private ArrayList<Player> leavingPlayers;
     private boolean isRunning;
@@ -72,7 +70,7 @@ public class SolarWarsServer extends SimpleApplication {
         connectedPlayers = new HashMap<Player, HostedConnection>(8);
         joinedPlayers = new ArrayList<Player>();
         leavingPlayers = new ArrayList<Player>();
-        registerListeners = new ArrayList<RegisterListener>();
+        registerListeners = new ArrayList<ServerRegisterListener>();
         isRunning = true;
     }
 
@@ -83,7 +81,7 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer = Network.createServer(port);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
-            for (RegisterListener rl : registerListeners) {
+            for (ServerRegisterListener rl : registerListeners) {
                 rl.registerListener(gameServer);
             }
             
@@ -143,20 +141,12 @@ public class SolarWarsServer extends SimpleApplication {
         return InetAddress.getLocalHost().getHostAddress();
     }
     
-    public void addRegisterListener(RegisterListener rl) {
+    public void addRegisterListener(ServerRegisterListener rl) {
         registerListeners.add(rl);
-    }
-
-    public void addConnectionListener(ConnectionListener l) {
-        gameServer.addConnectionListener(l);
     }
 
     public void removeConnectionListener(ConnectionListener l) {
         gameServer.removeConnectionListener(l);
-    }
-
-    public void addClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
-        gameServer.addMessageListener(hc, classes);
     }
 
     public void removeClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
