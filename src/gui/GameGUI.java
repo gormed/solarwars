@@ -178,11 +178,6 @@ public class GameGUI {
     public void removeGUIElement(GUIElement guiElement) {
         if (guiElement instanceof ClickableGUI) {
             clickableNode.detachChild(guiElement);
-            //take care of the listeners
-            if (guiElement instanceof TextBox) {
-                TextBox tb = (TextBox) guiElement;
-                tb.destroy();
-            }
         } else {
             decoNode.detachChild(guiElement);
         }
@@ -206,18 +201,29 @@ public class GameGUI {
     }
 
     public void cleanUpGUI() {
+        
+        ArrayList<GUIElement> clickable = new ArrayList<GUIElement>();
+        ArrayList<GUIElement> elements = new ArrayList<GUIElement>();
+        
         for (GUIElement guiElement : guiElemetns) {
             if (guiElement instanceof ClickableGUI) {
-                clickableNode.detachChild(guiElement);
-                //take care of the listeners
-                if (guiElement instanceof TextBox) {
-                    TextBox tb = (TextBox) guiElement;
-                    tb.destroy();
-                }
+                clickable.add(guiElement);
+                //clickableNode.detachChild(guiElement);
             } else {
-                decoNode.detachChild(guiElement);
+                elements.add(guiElement);
+                //decoNode.detachChild(guiElement);
             }
         }
+        
+        for (GUIElement guie : elements) {
+            decoNode.detachChild(guie);
+        }
+        for (GUIElement cgui : clickable) {
+            clickableNode.detachChild(cgui);
+        }
+        
+        elements.clear();
+        clickable.clear();
         guiElemetns.clear();
     }
 }

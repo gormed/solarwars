@@ -93,18 +93,12 @@ public class NetworkManager {
      * Instantiates a new network manager.
      */
     private NetworkManager() {
-        serverConnectionListeners = new ArrayList<ConnectionListener>();
-        serverMessageListeners = new ArrayList<MessageListener<HostedConnection>>();
-        clientMessageListeners = new ArrayList<MessageListener<Client>>();
     }
     private int port = DEFAULT_PORT;
     private InetAddress clientIPAdress;
     private InetAddress serverIPAdress;
     private Client thisClient;
     private SolarWarsServer thisServer;
-    private ArrayList<MessageListener<HostedConnection>> serverMessageListeners;
-    private ArrayList<ConnectionListener> serverConnectionListeners;
-    private ArrayList<MessageListener<Client>> clientMessageListeners;
 
     public Client getThisClient() {
         return thisClient;
@@ -133,29 +127,12 @@ public class NetworkManager {
     public void setServerIPAdress(InetAddress serverIPAdress) {
         this.serverIPAdress = serverIPAdress;
     }
-    
-    void registerServerListeners() {
-        for (MessageListener<HostedConnection> ml : serverMessageListeners) {
-            thisServer.addClientMessageListener(ml);
-        }
-        for (ConnectionListener cl : serverConnectionListeners) {
-            thisServer.addConnectionListener(cl);
-        }
-    }
-    
-    private void registerClientListeners() {
-        for (MessageListener<Client> ml : clientMessageListeners) {
-            thisClient.addMessageListener(ml);
-        }
-    }
 
     public void setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
         if (serverIPAdress == null || port < 1) {
             return;
         }
-        
-        addClientMessageListener(new ClientListener());
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
@@ -166,9 +143,7 @@ public class NetworkManager {
         thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
 
         thisClient.start();
-        registerClientListeners();
-
-
+        
         StringMessage s = new StringMessage(name + " joins the server!");
         PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
         thisClient.send(s);
@@ -188,8 +163,8 @@ public class NetworkManager {
     }
 
     public void closeServer(boolean wait) {
-        //thisClient.close();
-        //thisClient = null;
+        thisClient.close();
+        thisClient = null;
         thisServer.stop(wait);
         thisServer = null;
 
@@ -201,21 +176,6 @@ public class NetworkManager {
             return false;
         }
         return thisServer.isRunning();
-    }
-
-    public void addServerMessageListener(MessageListener<HostedConnection> messageListener) {
-
-        this.serverMessageListeners.add(messageListener);
-    }
-
-    public void addServerConnectionListener(ConnectionListener messageListener) {
-
-        this.serverConnectionListeners.add(messageListener);
-    }
-
-    public void addClientMessageListener(MessageListener<Client> messageListener) {
-
-        this.clientMessageListeners.add(messageListener);
     }
 
     /**

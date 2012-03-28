@@ -3,7 +3,6 @@ package net;
 import net.messages.PlayerConnectingMessage;
 import net.messages.StringMessage;
 import com.jme3.app.SimpleApplication;
-import com.jme3.math.ColorRGBA;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 import logic.Player;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
-import solarwars.Hub;
 
 /**
  * test
@@ -52,19 +50,20 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(Player.class);
 
-        this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
+        //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
+    
     private Server gameServer;
 
-    Server getGameServer() {
+    public Server getGameServer() {
         return gameServer;
     }
+    
     private int port = NetworkManager.DEFAULT_PORT;
     private HashMap<Player, HostedConnection> connectedPlayers;
+    private ArrayList<RegisterListener> registerListeners;
     private ArrayList<Player> joinedPlayers;
     private ArrayList<Player> leavingPlayers;
-    private UserListener connections = new UserListener();
-    private CreateServerState createServer;
     private boolean isRunning;
 
     @Override
@@ -73,6 +72,7 @@ public class SolarWarsServer extends SimpleApplication {
         connectedPlayers = new HashMap<Player, HostedConnection>(8);
         joinedPlayers = new ArrayList<Player>();
         leavingPlayers = new ArrayList<Player>();
+        registerListeners = new ArrayList<RegisterListener>();
         isRunning = true;
     }
 
@@ -83,9 +83,13 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer = Network.createServer(port);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
-            NetworkManager.getInstance().registerServerListeners();
+            for (RegisterListener rl : registerListeners) {
+                rl.registerListener(gameServer);
+            }
+            
+            //NetworkManager.getInstance().registerServerListeners();
             //addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
-            gameServer.addConnectionListener(connections);
+            //gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
             Logger.getLogger(SolarWarsServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -116,7 +120,7 @@ public class SolarWarsServer extends SimpleApplication {
         connectedPlayers.clear();
         joinedPlayers.clear();
         leavingPlayers.clear();
-        gameServer.removeConnectionListener(connections);
+        //gameServer.removeConnectionListener(connections);
         gameServer.close();
         isRunning = false;
         super.destroy();
@@ -137,6 +141,10 @@ public class SolarWarsServer extends SimpleApplication {
     public String getIPAddress()
             throws UnknownHostException {
         return InetAddress.getLocalHost().getHostAddress();
+    }
+    
+    public void addRegisterListener(RegisterListener rl) {
+        registerListeners.add(rl);
     }
 
     public void addConnectionListener(ConnectionListener l) {
@@ -160,7 +168,7 @@ public class SolarWarsServer extends SimpleApplication {
         joinedPlayers.add(p);
     }
 
-    public void removeLeavingPlayer(Player p, HostedConnection hc) {
+    public void removeLeavingPlayer(Player p) {
         connectedPlayers.remove(p);
         leavingPlayers.add(p);
     }
@@ -180,21 +188,6 @@ public class SolarWarsServer extends SimpleApplication {
             PlayerLeavingMessage plm = new PlayerLeavingMessage(!connecting);
 
             gameServer.broadcast(Filters.equalTo(hc), plm);
-        }
-    }
-
-    /**
-     * 
-     * @author Hans
-     */
-    private class UserListener implements ConnectionListener {
-
-        public void connectionAdded(Server server, HostedConnection conn) {
-            StringMessage s = new StringMessage("Welcome client #" + conn.getId() + "!");
-            gameServer.broadcast(s);
-        }
-
-        public void connectionRemoved(Server server, HostedConnection conn) {
         }
     }
 

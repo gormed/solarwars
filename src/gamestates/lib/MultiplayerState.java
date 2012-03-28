@@ -257,7 +257,7 @@ public class MultiplayerState extends Gamestate {
 
     private void setupClient(String name, ColorRGBA color, MessageListener<Client> messageListener, Class... classes)
             throws IOException {
-        networkManager.addClientMessageListener(messageListener);
+        networkManager.getThisClient().addMessageListener(messageListener, classes);
         networkManager.setupClient(name, color, false);
     }
 }

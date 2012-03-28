@@ -194,9 +194,10 @@ public class ServerLobbyState extends Gamestate {
 
         Client thisClient = networkManager.getThisClient();
         if (thisClient != null && thisClient.isConnected()) {
-            PlayerLeavingMessage plm = new PlayerLeavingMessage(Hub.getLocalPlayer());
+            //PlayerLeavingMessage plm = new PlayerLeavingMessage(Hub.getLocalPlayer());
 
-            thisClient.send(plm);
+            //thisClient.send(plm);
+            thisClient.close();
         }
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
