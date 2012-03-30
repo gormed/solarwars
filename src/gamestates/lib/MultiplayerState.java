@@ -222,12 +222,5 @@ public class MultiplayerState extends Gamestate {
         } else {
             serverip.setCaption("255.255.255.255");
         }
-
-    }
-
-    private void setupClient(String name, ColorRGBA color, MessageListener<Client> messageListener, Class... classes)
-            throws IOException {
-        networkManager.getThisClient().addMessageListener(messageListener, classes);
-        networkManager.setupClient(name, color, false);
     }
 }

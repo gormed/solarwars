@@ -245,9 +245,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     }
 
     private void addConnectedPlayer(Player p) {
-        int id = playerLabels.size();
+        Label temp = playerLabels.get(p.getId());
+        if (temp != null) {
+            gui.removeGUIElement(temp);
+        }
+        playerLabels.remove(p.getId());
+
         Label player = new Label(p.getName(),
-                playerNamePos.get(id),
+                playerNamePos.get(p.getId()),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Blue,
                 gui) {

@@ -293,9 +293,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     }
 
     private void setupServer() {
+        ServerHub.resetPlayerID(0);
         Player hostPlayer = new Player(hostPlayerName, hostPlayerColor, ServerHub.getContiniousPlayerID(), true);
 
-        ServerHub.resetPlayerID(0);
         serverHub.initialize(hostPlayer, null);
         //hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
@@ -322,10 +322,12 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     }
 
     private void addConnectedPlayer(Player p) {
-        if (playerLabels.containsKey(p.getId())) {
-            gui.removeGUIElement(playerLabels.get(p.getId()));
+//        Label temp = playerLabels.get(p.getId());
+//        if (temp != null) {
+//            gui.removeGUIElement(temp);
+//        }
+//        playerLabels.remove(p.getId());
 
-        }
         Label player = new Label(p.getName(),
                 playerNamePos.get(p.getId()),
                 Vector3f.UNIT_XYZ,
@@ -349,9 +351,10 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     private void removeLeavingPlayer(Player p) {
         Label player = playerLabels.get(p.getId());
-        playerLabels.remove(p.getId());
-        gui.removeGUIElement(player);
-
+        if (player != null) {
+            playerLabels.remove(p.getId());
+            gui.removeGUIElement(player);
+        }
     }
 
     public void registerListener(Server gameServer) {
@@ -393,7 +396,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 serverHub.addPlayer(newPlayer);
 
                 addConnectedPlayer(newPlayer);
-                System.out.println("Player " + newPlayer.getName() + "[" + newPlayer.getColor().toString() + "] joined the Game.");
+                System.out.println("Player " + newPlayer.getName() + "[ID#" + newPlayer.getId() + "] joined the Game.");
                 solarWarsServer.addConnectingPlayer(newPlayer, source);
                 source.setAttribute("PlayerObject", newPlayer);
                 source.setAttribute("PlayerID", newPlayer.getId());
@@ -421,9 +424,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
                 Hub.getInstance().initialize(thisPlayer, players);
 
-                for (Player p : players) {
-                    addConnectedPlayer(p);
-                }
+//                for (Player p : players) {
+//                    addConnectedPlayer(p);
+//                }
 
             } else if (message instanceof PlayerLeavingMessage) {
 //                Client thisClient = networkManager.getThisClient();
