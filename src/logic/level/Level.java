@@ -42,53 +42,36 @@ import solarwars.IsoControl;
  */
 public class Level {
 
-
-    
     /** The seed. */
     private long seed = 0;
-    
     /** The root node. */
     private Node rootNode;
-    
     /** The level node. */
     private Node levelNode;
-    
     /** The planet nodes. */
     private HashMap<Player, Node> planetNodes;
-    
     /** The free planets node. */
     private Node freePlanetsNode;
-    
     /** The label node. */
     private Node labelNode;
-    
     /** The background. */
     private LevelBackground background;
-    
     /** The all ships node. */
     private Node allShipsNode;
-    
     /** The ship nodes. */
     private HashMap<Player, Node> shipNodes;
-    
     /** The planet list. */
     private ArrayList<AbstractPlanet> planetList;
-    
     /** The ship list. */
     private ArrayList<AbstractShip> shipList;
-    
     /** The ship group list. */
     private ArrayList<ShipGroup> shipGroupList;
-    
     /** The remove ships list. */
     private ArrayList<AbstractShip> removeShipsList;
-    
     /** The asset manager. */
     private AssetManager assetManager;
-    
     /** The control. */
     private IsoControl control;
-    
     /** The hub. */
     private Hub hub;
 
@@ -132,9 +115,6 @@ public class Level {
      */
     public Level(Node rootNode, AssetManager assetManager, IsoControl control, HashMap<Integer, Player> players, long seed) {
         setup(rootNode, assetManager, control, seed);
-
-        generateLevel(this.seed);
-        setupPlayers(players);
     }
 
     /**
@@ -170,21 +150,15 @@ public class Level {
         this.levelNode.attachChild(allShipsNode);
 
         // create a ship node for each player
-        
+
         for (Map.Entry<Integer, Player> entrySet : Hub.playersByID.entrySet()) {
             Player p = entrySet.getValue();
-            Node n = new Node(p.getName() + " ShipNode");
+            Node n = new Node("Player " + p.getId() + " ShipNode");
             this.shipNodes.put(p, n);
             this.allShipsNode.attachChild(n);
         }
 
-        // create a node for the planet-labels
-        this.labelNode = new Node("Planet Labels");
-        // attach the labels on the root!
-        this.rootNode.attachChild(labelNode);
-        
-        this.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
-        this.rootNode.attachChild(background);
+
     }
 
     /**
@@ -193,6 +167,13 @@ public class Level {
      * @param seed the seed
      */
     public void generateLevel(long seed) {
+
+        // create a node for the planet-labels
+        this.labelNode = new Node("Planet Labels");
+        // attach the labels on the root!
+        this.rootNode.attachChild(labelNode);
+        this.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+        this.rootNode.attachChild(background);
 
         AbstractPlanet p;
         this.seed = seed;
@@ -203,17 +184,18 @@ public class Level {
                 if (r.nextBoolean()) {
                     p = new BasePlanet(assetManager, this, new Vector3f(-6 + i, 0, -6 + j), generateSize(r));
                     p.createPlanet();
-                    p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize()*(r.nextFloat() * 100.0f)));
+                    p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
                     planetList.add(p);
                     freePlanetsNode.attachChild(p);
-                    //control.addShootable(p.getGeometry());
                 }
             }
         }
 
-        control.addShootable(levelNode);
-        //rootNode.attachChild(control.getShootablesNode());
+        if (control != null) {
+            control.addShootable(levelNode);
+        }
+
     }
 
     /**
@@ -280,9 +262,9 @@ public class Level {
     public void removeShipGroup(Player p, ShipGroup s) {
         Node shipNode = shipNodes.get(p);
         shipNode.detachChild(s);
-        shipGroupList.remove(s);        
+        shipGroupList.remove(s);
     }
-    
+
     /**
      * Gets the planet iterator.
      *
@@ -345,11 +327,11 @@ public class Level {
         for (AbstractShip s : shipList) {
             s.updateShip(tpf);
         }
-        
+
         for (AbstractShip s : removeShipsList) {
             shipList.remove(s);
         }
-        
+
         removeShipsList.clear();
     }
 }

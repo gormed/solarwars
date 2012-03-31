@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
@@ -49,13 +51,11 @@ import net.messages.PlayerLeavingMessage;
  * The Class SolarWarsServer.
  */
 public class SolarWarsServer extends SimpleApplication {
-    
+
     /** The Constant SERVER_VERSION. */
     public static final int SERVER_VERSION = 10;
-    
     /** The Constant SERVER_NAME. */
     public static final String SERVER_NAME = "SolarWars Server";
-
     /** The server app. */
     private static SolarWarsServer serverApp;
 
@@ -85,7 +85,6 @@ public class SolarWarsServer extends SimpleApplication {
 
         //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
-    
     /** The game server. */
     private Server gameServer;
 
@@ -97,28 +96,20 @@ public class SolarWarsServer extends SimpleApplication {
     public Server getGameServer() {
         return gameServer;
     }
-    
     /** The udp port. */
     private int udpPort = NetworkManager.DEFAULT_PORT;
-    
     /** The tcp port. */
     private int tcpPort = NetworkManager.DEFAULT_PORT;
-    
     /** The server name. */
     private String serverName = "unnamed";
-    
     /** The connected players. */
     private HashMap<Player, HostedConnection> connectedPlayers;
-    
     /** The register listeners. */
     private ArrayList<ServerRegisterListener> registerListeners;
-    
     /** The joined players. */
     private ArrayList<Player> joinedPlayers;
-    
     /** The leaving players. */
     private ArrayList<Player> leavingPlayers;
-    
     /** The is running. */
     private boolean isRunning;
 
@@ -131,7 +122,7 @@ public class SolarWarsServer extends SimpleApplication {
         this.serverName = serverName;
         start();
     }
-    
+
     /* (non-Javadoc)
      * @see com.jme3.app.SimpleApplication#start()
      */
@@ -153,15 +144,15 @@ public class SolarWarsServer extends SimpleApplication {
         try {
 
             gameServer = Network.createServer(
-                    SERVER_NAME, 
-                    SERVER_VERSION, 
+                    SERVER_NAME,
+                    SERVER_VERSION,
                     tcpPort, udpPort);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
             for (ServerRegisterListener rl : registerListeners) {
                 rl.registerServerListener(gameServer);
             }
-            
+
             //NetworkManager.getInstance().registerServerListeners();
             //addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             //gameServer.addConnectionListener(connections);
@@ -200,12 +191,12 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void destroy() {
-        
+
         connectedPlayers.clear();
         joinedPlayers.clear();
         leavingPlayers.clear();
         registerListeners.clear();
-        
+
         gameServer.close();
         isRunning = false;
         System.out.println("...Server closed!");
@@ -249,7 +240,7 @@ public class SolarWarsServer extends SimpleApplication {
             throws UnknownHostException {
         return InetAddress.getLocalHost().getHostAddress();
     }
-    
+
     /**
      * Adds the server register listener.
      *
@@ -295,7 +286,7 @@ public class SolarWarsServer extends SimpleApplication {
      * @param p the p
      */
     public void removeLeavingPlayer(Player p) {
-        
+
         leavingPlayers.add(p);
     }
 
@@ -309,12 +300,36 @@ public class SolarWarsServer extends SimpleApplication {
         if (connecting) {
             boolean isHost = p.isHost();
             HostedConnection hc = connectedPlayers.get(p);
-            PlayerAcceptedMessage pam = 
-                    new PlayerAcceptedMessage(p, 
-                            ServerHub.getPlayers(),  
-                            isHost);
+            PlayerAcceptedMessage joiningPlayer =
+                    new PlayerAcceptedMessage(p,
+                    ServerHub.getPlayers(),
+                    isHost, true);
 
-            gameServer.broadcast(Filters.equalTo(hc), pam);
+            gameServer.broadcast(Filters.equalTo(hc), joiningPlayer);
+
+            Collection<HostedConnection> connections = gameServer.getConnections();
+
+            for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
+                Player player = entrySet.getKey();
+                HostedConnection connection = entrySet.getValue();
+                
+                if (player != null && !player.equals(p) && connection != null) {
+                    isHost = player.isHost();
+                    PlayerAcceptedMessage otherPlayer =
+                            new PlayerAcceptedMessage(
+                                    p, 
+                                    ServerHub.getPlayers(), 
+                                    isHost,
+                                    false);
+                    gameServer.broadcast(Filters.equalTo(connection), otherPlayer);
+                }
+            }
+
+
+
+
+
+
         } else {
             HostedConnection hc = connectedPlayers.get(p);
             PlayerLeavingMessage plm = new PlayerLeavingMessage(p);

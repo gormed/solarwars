@@ -44,22 +44,16 @@ public class SingleplayerState extends Gamestate {
 
     /** The application. */
     private solarwars.SolarWarsApplication application;
-    
     /** The game. */
     private solarwars.SolarWarsGame game;
-    
     /** The current level. */
     private Level currentLevel;
-    
     /** The gui. */
     private GameGUI gui;
-    
     /** The pause. */
     private PauseGUI pause;
-    
     /** The hub. */
     private Hub hub;
-    
     /** The pause listener. */
     private PauseActionListener pauseListener;
 
@@ -113,7 +107,7 @@ public class SingleplayerState extends Gamestate {
     private void setupSingleplayer() {
         Player local = new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID(), true);
         Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
-        
+
         hub.initialize(local, null);
         hub.addPlayer(ai);
         hub.addPlayer(local);
@@ -130,8 +124,8 @@ public class SingleplayerState extends Gamestate {
         pauseListener = new PauseActionListener();
 
         game.getApplication().getInputManager().addMapping(
-                SolarWarsApplication.INPUT_MAPPING_PAUSE, 
-                new KeyTrigger(KeyInput.KEY_P), 
+                SolarWarsApplication.INPUT_MAPPING_PAUSE,
+                new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),
                 new KeyTrigger(KeyInput.KEY_ESCAPE));
         game.getApplication().getInputManager().addListener(

@@ -58,66 +58,49 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     /** The lobby. */
     private Label lobby;
-    
     /** The background panel. */
     private Panel backgroundPanel;
-    
     /** The line. */
     private Panel line;
-    
     /** The player panel. */
     private Panel playerPanel;
-    
     /** The leave. */
     private Button leave;
-    
     /** The ready. */
     private Button ready;
-    
     /** The server name. */
     private Label serverName;
-    
     /** The gui. */
     private GameGUI gui;
-    
     /** The hub. */
     private Hub hub;
-    
     /** The client player name. */
     private String clientPlayerName;
-    
     /** The client player color. */
     private ColorRGBA clientPlayerColor;
-    
     /** The server ip address. */
     private String serverIPAddress;
-    
     /** The network manager. */
     private NetworkManager networkManager;
-    
     /** The client. */
     private Client client;
-    
     /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
-    
     /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
-    
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
-    
     /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
-    
     /** The player connection listener. */
     private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
-    
     /** The no server found. */
     private boolean noServerFound;
 
     /**
      * Sets the client player color.
+     * 
+     * Input Methods, that set the inital point of the state until loadContent is called
      *
      * @param clientPlayerColor the new client player color
      */
@@ -127,6 +110,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     /**
      * Sets the server ip address.
+     * 
+     * Input Methods, that set the inital point of the state until loadContent is called
      *
      * @param serverIPAddress the new server ip address
      */
@@ -136,6 +121,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     /**
      * Sets the client player name.
+     * 
+     * Input Methods, that set the inital point of the state until loadContent is called
      *
      * @param clientPlayerName the new client player name
      */
@@ -286,15 +273,15 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     protected void unloadContent() {
-        
+
         playerLabels.clear();
         playerNamePos.clear();
-                gui.cleanUpGUI();
+        gui.cleanUpGUI();
 
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-        
+
         this.hub = null;
         this.networkManager = null;
         this.noServerFound = false;
@@ -364,32 +351,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param p the p
      */
     private void addConnectedPlayer(Player p) {
-
-//        Label temp = playerLabels.get(p.getId());
-//        if (temp != null) {
-//            gui.removeGUIElement(temp);
-//        }
-//        playerLabels.remove(p.getId());
-//
-//        Label player = new Label(p.getName(),
-//                playerNamePos.get(p.getId()),
-//                Vector3f.UNIT_XYZ,
-//                ColorRGBA.Blue,
-//                gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        gui.addGUIElement(player);
-//        playerLabels.put(
-//                p.getId(),
-//                player);
 
         int id = playerLabels.size();
 
@@ -482,19 +443,35 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
                 Player thisPlayer = pam.getPlayer();
+                boolean isConnecting = pam.isConnecting();
                 ArrayList<Player> players = pam.getPlayers();
 
-                Hub.getInstance().initialize(thisPlayer, players);
-
-                for (Player p : players) {
-                    addConnectedPlayer(p);
+                if (isConnecting) {
+                    Hub.getInstance().initialize(thisPlayer, players);
+                } else {
+                    Hub.getInstance().addPlayer(thisPlayer);
                 }
+                
+                refreshPlayers(players);
+
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
 
                 Hub.getInstance().removePlayer(p);
                 removeLeavingPlayer(p);
+            }
+        }
+
+        private void refreshPlayers(ArrayList<Player> players) {
+            for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
+                gui.removeGUIElement(entry.getValue());
+            }
+
+            playerLabels.clear();
+
+            for (Player p : players) {
+                addConnectedPlayer(p);
             }
         }
     }

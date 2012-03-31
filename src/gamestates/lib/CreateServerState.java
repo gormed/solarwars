@@ -65,76 +65,55 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /** The create server label. */
     private Label createServerLabel;
-    
     /** The your ip. */
     private Label yourIP;
-    
     /** The address. */
     private Label address;
-    
     /** The background panel. */
     private Panel backgroundPanel;
-    
     /** The line. */
     private Panel line;
-    
     /** The player panel. */
     private Panel playerPanel;
-    
     /** The cancel. */
     private Button cancel;
-    
     /** The start. */
     private Button start;
-    
     /** The max players. */
     private Label maxPlayers;
-    
     /** The player count. */
     private TextBox playerCount;
-    
     /** The gui. */
     private GameGUI gui;
-    
     /** The server hub. */
     private ServerHub serverHub;
-    
     /** The solar wars server. */
     private SolarWarsServer solarWarsServer;
-    
     /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
-    
     /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
-    
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
-    
     /** The max player number. */
     private int maxPlayerNumber = 0;
-    
     /** The host player name. */
     private String hostPlayerName;
-    
     /** The host player color. */
     private ColorRGBA hostPlayerColor;
-    
     /** The network manager. */
     private NetworkManager networkManager;
-    
     /** The client message listener. */
     private ClientMessageListener clientMessageListener = new ClientMessageListener();
-    
     /** The server message listener. */
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
-    
     /** The server connection listener. */
     private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
 
-    // Input Methods, that set the inital point of the state until loadContent is called
     /**
      * Sets the host player color.
+     * 
+     * Input Methods, that set the inital point of the state until loadContent is called
      *
      * @param hostPlayerColor the new host player color
      */
@@ -144,6 +123,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /**
      * Sets the host player name.
+     * 
+     * Input Methods, that set the inital point of the state until loadContent is called
      *
      * @param hostPlayerName the new host player name
      */
@@ -152,7 +133,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     }
 
     /**
-     * Instantiates a new creates the server state.
+     * Instantiates a new CreateServerState.
      */
     public CreateServerState() {
         super(GamestateManager.CREATE_SERVER_STATE);
@@ -400,14 +381,19 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Start server.
      */
     private void startServer() {
-        
+        createLevel();
     }
-    
+
     /**
      * Creates the level.
      */
     private void createLevel() {
-        
+        long seed = System.currentTimeMillis();
+//        logic.level.Level mpLevel = new logic.level.Level(
+//                solarWarsServer.getRootNode(), 
+//                solarWarsServer.getAssetManager(),
+//                null, ServerHub.playersByID, seed);
+
     }
 
     /**
@@ -432,6 +418,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 //            gui.removeGUIElement(temp);
 //        }
 //        playerLabels.remove(p.getId());
+
+
         int id = playerLabels.size();
 
         playerLabelIdx.put(p, id);
@@ -488,6 +476,21 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         client.addMessageListener(clientMessageListener,
                 PlayerAcceptedMessage.class,
                 PlayerLeavingMessage.class);
+    }
+
+    /*
+     * Refreshes the player labels
+     */
+    private void refreshPlayers(ArrayList<Player> players) {
+        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
+            gui.removeGUIElement(entry.getValue());
+        }
+
+        playerLabels.clear();
+
+        for (Player p : players) {
+            addConnectedPlayer(p);
+        }
     }
 
     /**
@@ -555,12 +558,14 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 }
                 serverHub.addPlayer(newPlayer);
 
-                addConnectedPlayer(newPlayer);
+
                 System.out.println("Player " + newPlayer.getName() + "[ID#" + newPlayer.getId() + "] joined the Game.");
                 solarWarsServer.addConnectingPlayer(newPlayer, source);
                 source.setAttribute("PlayerObject", newPlayer);
                 source.setAttribute("PlayerID", newPlayer.getId());
                 source.setAttribute("PlayerName", newPlayer.getName());
+
+                refreshPlayers(ServerHub.getPlayers());
             }
         }
     }
@@ -585,9 +590,14 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
                 Player thisPlayer = pam.getPlayer();
+                boolean isConnecting = pam.isConnecting();
                 ArrayList<Player> players = pam.getPlayers();
-
-                Hub.getInstance().initialize(thisPlayer, players);
+                
+                if (isConnecting) {
+                    Hub.getInstance().initialize(thisPlayer, players);
+                } else {
+                    Hub.getInstance().addPlayer(thisPlayer);
+                }
 
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;

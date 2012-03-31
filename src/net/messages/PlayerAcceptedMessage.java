@@ -38,6 +38,8 @@ public class PlayerAcceptedMessage extends AbstractMessage {
     /** The is host. */
     private boolean isHost;
     
+    private boolean isConnecting;
+    
     /** The all players. */
     private ArrayList<Player> allPlayers;
 
@@ -69,6 +71,10 @@ public class PlayerAcceptedMessage extends AbstractMessage {
         return player;
     }
 
+    public boolean isConnecting() {
+        return isConnecting;
+    }
+
     /**
      * Instantiates a new player accepted message.
      */
@@ -84,9 +90,11 @@ public class PlayerAcceptedMessage extends AbstractMessage {
      */
     public PlayerAcceptedMessage(Player player,
             ArrayList<Player> allPlayers,
-            boolean isHost) {
+            boolean isHost,
+            boolean isConnecting) {
         this.player = player;
         this.isHost = isHost;
         this.allPlayers = allPlayers;
+        this.isConnecting = isConnecting;
     }
 }
