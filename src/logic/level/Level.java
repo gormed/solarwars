@@ -42,20 +42,7 @@ import solarwars.IsoControl;
  */
 public class Level {
 
-    /** The current level. */
-    private static Level currentLevel = null;
 
-    /**
-     * Gets the current level.
-     *
-     * @return the current level
-     */
-    public static Level getCurrentLevel() {
-        if (currentLevel != null) {
-            return currentLevel;
-        }
-        return null;
-    }
     
     /** The seed. */
     private long seed = 0;
@@ -130,7 +117,7 @@ public class Level {
      * @param control the control
      */
     public Level(Node rootNode, AssetManager assetManager, IsoControl control) {
-        setup(rootNode, assetManager, control, 0);
+        setup(rootNode, assetManager, control, System.currentTimeMillis());
     }
 
     /**
@@ -141,11 +128,11 @@ public class Level {
      * @param control the control
      * @param seed the seed
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control, long seed) {
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control, HashMap<Integer, Player> players, long seed) {
         setup(rootNode, assetManager, control, seed);
 
         generateLevel(this.seed);
-        setupPlayers();
+        setupPlayers(players);
     }
 
     /**
@@ -181,8 +168,9 @@ public class Level {
         this.levelNode.attachChild(allShipsNode);
 
         // create a ship node for each player
-        for (int i = 0; i < hub.getPlayerCount(); i++) {
-            Player p = hub.getPlayer(i);
+        
+        for (Map.Entry<Integer, Player> entrySet : Hub.playersByID.entrySet()) {
+            Player p = entrySet.getValue();
             Node n = new Node(p.getName() + " ShipNode");
             this.shipNodes.put(p, n);
             this.allShipsNode.attachChild(n);
@@ -213,7 +201,7 @@ public class Level {
                 if (r.nextBoolean()) {
                     p = new BasePlanet(assetManager, this, new Vector3f(-6 + i, 0, -6 + j), generateSize(r));
                     p.createPlanet();
-                    p.setShipCount(5 + r.nextInt(5));
+                    p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize()*(r.nextFloat() * 100.0f)));
 
                     planetList.add(p);
                     freePlanetsNode.attachChild(p);
@@ -223,15 +211,14 @@ public class Level {
         }
 
         control.addShootable(levelNode);
-        currentLevel = this;
         //rootNode.attachChild(control.getShootablesNode());
     }
 
     /**
      * Setup players.
      */
-    public void setupPlayers() {
-        for (Map.Entry<Integer, Player> entrySet : Hub.playersByID.entrySet()) {
+    public void setupPlayers(HashMap<Integer, Player> players) {
+        for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
             Player p = entrySet.getValue();
             Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
             planetNodes.put(p, playersPlanetsNode);

@@ -16,11 +16,6 @@ import logic.Player;
 public class PlayerLeavingMessage extends AbstractMessage {
 
     private Player player;
-    private boolean closeConnection = false;
-
-    public boolean getCloseConnection() {
-        return closeConnection;
-    }
 
     public Player getPlayer() {
         return player;
@@ -31,9 +26,5 @@ public class PlayerLeavingMessage extends AbstractMessage {
 
     public PlayerLeavingMessage(Player player) {
         this.player = player;
-    }
-
-    public PlayerLeavingMessage(boolean closeConnection) {
-        this.closeConnection = closeConnection;
     }
 }

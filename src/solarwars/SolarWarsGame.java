@@ -111,7 +111,7 @@ public class SolarWarsGame {
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
 
-        Gameplay.initialize();
+        
     }
 
     /**

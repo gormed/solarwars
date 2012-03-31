@@ -27,7 +27,7 @@ public class ServerHub {
         return PLAYER_ID++;
     }
 
-    public static int getCurrentPlayerID() {
+    public static int getPlayerID() {
         return PLAYER_ID;
     }
 

@@ -12,6 +12,6 @@ import com.jme3.network.Server;
  */
 public interface ServerRegisterListener {
     
-    public void registerListener(Server server);
+    public void registerServerListener(Server server);
     
 }

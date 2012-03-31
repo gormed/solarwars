@@ -25,6 +25,7 @@ import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
 import java.util.Random;
+import logic.level.Level;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -35,37 +36,44 @@ public class Gameplay {
 
     /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
-    
     /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
-    
     /** The Constant SHIP_REDIRECT. */
     public static final String SHIP_REDIRECT = "RedirectShip";
-    
     /** The Constant SHIP_ARRIVES. */
     public static final String SHIP_ARRIVES = "ArrivesShip";
-    
     /** The Constant PLANET_CAPTURE. */
     public static final String PLANET_CAPTURE = "CapturePlanet";
-    
     /** The game. */
     private SolarWarsGame game;
-    
     /** The application. */
     private SolarWarsApplication application;
-    
     /** The action lib. */
     private ActionLib actionLib;
-    
     /** The instance. */
     private static Gameplay instance;
+    /** The current level. */
+    private static Level currentLevel = null;
+
+    /**
+     * Gets the current level.
+     *
+     * @return the current level
+     */
+    public static Level getCurrentLevel() {
+        if (currentLevel != null) {
+            return currentLevel;
+        }
+        return null;
+    }
 
     /**
      * Initializes the.
      */
-    public static void initialize() {
+    public static void initialize(Level level) {
         if (instance == null) {
             instance = new Gameplay();
+            currentLevel = level;
         }
     }
 
@@ -108,12 +116,12 @@ public class Gameplay {
                         int selected = (int) (sel.getShips() * p.getShipPercentage());
                         ShipGroup sg = new ShipGroup(
                                 application.getAssetManager(),
-                                logic.level.Level.getCurrentLevel(),
+                                currentLevel,
                                 p,
                                 sel,
                                 planet,
                                 selected);
-                        logic.level.Level.getCurrentLevel().addShipGroup(p, sg);
+                        currentLevel.addShipGroup(p, sg);
                         p.createShipGroup(sg);
                     }
                 } else if (p.hasSelectedShipGroup()) {
@@ -164,7 +172,7 @@ public class Gameplay {
                     AbstractShip s = (AbstractShip) sender;
                     shipGroup.removeShip(s);
                     if (shipGroup.getShipCount() < 1) {
-                        logic.level.Level.getCurrentLevel().removeShipGroup(p, shipGroup);
+                        currentLevel.removeShipGroup(p, shipGroup);
                         p.destroyShipGroup(shipGroup);
                     }
                 }

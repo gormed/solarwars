@@ -29,6 +29,9 @@ import net.messages.PlayerLeavingMessage;
  * @author normenhansen
  */
 public class SolarWarsServer extends SimpleApplication {
+    
+    public static final int SERVER_VERSION = 10;
+    public static final String SERVER_NAME = "SolarWars Server";
 
     private static SolarWarsServer serverApp;
 
@@ -57,13 +60,20 @@ public class SolarWarsServer extends SimpleApplication {
         return gameServer;
     }
     
-    private int port = NetworkManager.DEFAULT_PORT;
+    private int udpPort = NetworkManager.DEFAULT_PORT;
+    private int tcpPort = NetworkManager.DEFAULT_PORT;
+    private String serverName = "unnamed";
     private HashMap<Player, HostedConnection> connectedPlayers;
     private ArrayList<ServerRegisterListener> registerListeners;
     private ArrayList<Player> joinedPlayers;
     private ArrayList<Player> leavingPlayers;
     private boolean isRunning;
 
+    public void start(String serverName) {
+        this.serverName = serverName;
+        start();
+    }
+    
     @Override
     public void start() {
         super.start(JmeContext.Type.Headless);
@@ -78,11 +88,14 @@ public class SolarWarsServer extends SimpleApplication {
     public void simpleInitApp() {
         try {
 
-            gameServer = Network.createServer(port);
+            gameServer = Network.createServer(
+                    SERVER_NAME, 
+                    SERVER_VERSION, 
+                    tcpPort, udpPort);
             gameServer.start();
             gameServer.addMessageListener(new ServerListener(), StringMessage.class);
             for (ServerRegisterListener rl : registerListeners) {
-                rl.registerListener(gameServer);
+                rl.registerServerListener(gameServer);
             }
             
             //NetworkManager.getInstance().registerServerListeners();
@@ -118,9 +131,11 @@ public class SolarWarsServer extends SimpleApplication {
         connectedPlayers.clear();
         joinedPlayers.clear();
         leavingPlayers.clear();
-        //gameServer.removeConnectionListener(connections);
+        registerListeners.clear();
+        
         gameServer.close();
         isRunning = false;
+        System.out.println("...Server closed!");
         super.destroy();
     }
 
@@ -129,11 +144,11 @@ public class SolarWarsServer extends SimpleApplication {
     }
 
     public int getPort() {
-        return port;
+        return udpPort;
     }
 
     public void setPort(int port) {
-        this.port = port;
+        this.udpPort = port;
     }
 
     public String getIPAddress()
@@ -141,7 +156,7 @@ public class SolarWarsServer extends SimpleApplication {
         return InetAddress.getLocalHost().getHostAddress();
     }
     
-    public void addRegisterListener(ServerRegisterListener rl) {
+    public void addServerRegisterListener(ServerRegisterListener rl) {
         registerListeners.add(rl);
     }
 
@@ -159,7 +174,7 @@ public class SolarWarsServer extends SimpleApplication {
     }
 
     public void removeLeavingPlayer(Player p) {
-        connectedPlayers.remove(p);
+        
         leavingPlayers.add(p);
     }
 
@@ -175,9 +190,10 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer.broadcast(Filters.equalTo(hc), pam);
         } else {
             HostedConnection hc = connectedPlayers.get(p);
-            PlayerLeavingMessage plm = new PlayerLeavingMessage(!connecting);
+            PlayerLeavingMessage plm = new PlayerLeavingMessage(p);
 
-            gameServer.broadcast(Filters.equalTo(hc), plm);
+            gameServer.broadcast(Filters.notEqualTo(hc), plm);
+            connectedPlayers.remove(p);
         }
     }
 

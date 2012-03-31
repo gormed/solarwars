@@ -40,25 +40,26 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     protected Vector3f screenPosition;
     protected Vector3f scale;
     protected String caption;
-    
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-    
-    public String getCaption() {
-        return caption;
-    }
     protected Geometry geometry;
     protected Material material;
     protected ColorRGBA boxColor;
     protected KeyboardListener textListener;
     private float time;
     private boolean isNumberBox = false;
-    
+    private static boolean numericMappingsAdded = false;
+
     public boolean isIsNumberBox() {
         return isNumberBox;
     }
-    
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+
     public TextBox(ColorRGBA color, Vector3f screenPosition,
             Vector3f scale, String caption,
             ColorRGBA boxColor, GameGUI gui, boolean numberBox) {
@@ -74,13 +75,13 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         this.isNumberBox = numberBox;
         createListener();
     }
-    
+
     private void createListener() {
         if (!isNumberBox) {
             this.textListener = new TextBoxActionListener(
                     solarwars.SolarWarsApplication.getInstance().getInputManager(), this);
         } else {
-            
+
             this.textListener = new NumberBoxActionListener(
                     solarwars.SolarWarsApplication.getInstance().getInputManager(), this);
         }
@@ -88,18 +89,16 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
     @Override
     public int detachChild(Spatial child) {
-        
+
         destroy();
         return super.detachChild(child);
     }
-    
-    
-    
+
     private void destroy() {
         solarwars.SolarWarsApplication.getInstance().getInputManager().
                 removeListener(textListener);
     }
-    
+
     @Override
     public void updateGUI(float tpf) {
         text.setText(caption);
@@ -109,9 +108,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         offset.multLocal(scale);
         text.setLocalTranslation(screenPosition.add(offset));
         text.setLocalScale(scale);
-        
+
         time += tpf;
-        
+
         if (gui.getFocusElement() != null && gui.getFocusElement().equals(this)) {
             if (time < 0.2f) {
                 text.setText(caption + "_");
@@ -122,17 +121,17 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
         }
     }
-    
+
     @Override
     public void setVisible(boolean show) {
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
-    
+
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
-    
+
     protected abstract void onKeyTrigger(String key, boolean isPressed, float tpf);
-    
+
     private void createTextBox(GameGUI gui) {
         // Init
         AssetManager assetManager = solarwars.SolarWarsApplication.getInstance().getAssetManager();
@@ -152,46 +151,48 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         // Create Box
 
         float[] size = new float[2];
-        
+
         size[0] = gui.getWidth() / 5;
         size[1] = text.getLineHeight() / 1.5f;
-        
+
         Box b = new Box(size[0], size[1], 1);
         geometry = new Geometry(caption + "_TextBox", b);
-        
+
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", boxColor);
         geometry.setMaterial(material);
-        
+
         geometry.setLocalTranslation(screenPosition);
         geometry.setLocalScale(scale);
-        
+
         attachChild(geometry);
         attachChild(text);
     }
-    
+
     private class NumberBoxActionListener extends KeyboardListener {
-        
+
         private TextBox textBox;
-        
+
         public NumberBoxActionListener(InputManager inputManager, TextBox textBox) {
             this.textBox = textBox;
-            
+
             //deleteMappings(inputManager);
-            
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9));
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT, new KeyTrigger(KeyInput.KEY_PERIOD));
-            
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
+            if (!numericMappingsAdded) {
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT, new KeyTrigger(KeyInput.KEY_PERIOD));
+
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
+                numericMappingsAdded = true;
+            }
             
             inputManager.addListener(this,
                     KeyInputMap.INPUT_MAPPING_0,
@@ -207,26 +208,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                     KeyInputMap.INPUT_MAPPING_POINT,
                     KeyInputMap.INPUT_MAPPING_BACKSPACE);
         }
-        
-        private void deleteMappings(InputManager inputManager) {
-            try {
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_0);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_1);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_2);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_3);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_4);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_5);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_6);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_7);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_8);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_9);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_POINT);
-                inputManager.deleteMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE);
-            } catch (IllegalArgumentException e) {
-                
-            }
-        }
-        
+
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             GUIElement e = gui.getFocusElement();
@@ -236,7 +218,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             } else {
                 return;
             }
-            
+
             if (!isPressed && activeTextBox.equals(textBox)) {
                 if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
                     caption = caption.substring(0, caption.length() - 1);
@@ -247,19 +229,19 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
         }
     }
-    
+
     private class TextBoxActionListener extends KeyboardListener {
-        
+
         private TextBox textBox;
-        
+
         public TextBoxActionListener(InputManager inputManager, TextBox box) {
             super(inputManager);
             this.textBox = box;
         }
-        
+
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            
+
             GUIElement e = gui.getFocusElement();
             TextBox activeTextBox = null;
             if (e instanceof TextBox) {
@@ -267,7 +249,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             } else {
                 return;
             }
-            
+
             if (!isPressed && activeTextBox.equals(textBox)) {
                 if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
                     caption = caption.substring(0, caption.length() - 1);

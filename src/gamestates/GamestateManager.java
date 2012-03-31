@@ -34,6 +34,8 @@ public class GamestateManager {
     public static final String OPTIONS_STATE = "Options";
     public static final String CREATE_SERVER_STATE = "Create Server";
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
+    public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
+    
 
     /** The instance. */
     private static GamestateManager instance;

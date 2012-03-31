@@ -30,6 +30,7 @@ import gamestates.GamestateManager;
 import gui.GameGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
+import logic.Gameplay;
 import logic.Player;
 import logic.level.Level;
 import net.ServerHub;
@@ -71,7 +72,6 @@ public class SingleplayerState extends Gamestate {
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
         hub = Hub.getInstance();
-        hub.initialize(new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID()), null);
         setupSingleplayer();
         setupGUI();
         currentLevel = new Level(
@@ -79,7 +79,8 @@ public class SingleplayerState extends Gamestate {
                 application.getAssetManager(),
                 application.getIsoControl());
         currentLevel.generateLevel(System.currentTimeMillis());
-        currentLevel.setupPlayers();
+        currentLevel.setupPlayers(Hub.playersByID);
+        Gameplay.initialize(currentLevel);
     }
 
     /* (non-Javadoc)
@@ -102,10 +103,12 @@ public class SingleplayerState extends Gamestate {
      * Setup singleplayer.
      */
     private void setupSingleplayer() {
-        
-
+        Player local = new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID(), true);
         Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
+        
+        hub.initialize(local, null);
         hub.addPlayer(ai);
+        hub.addPlayer(local);
     }
 
     /**
@@ -138,6 +141,7 @@ public class SingleplayerState extends Gamestate {
                 application.getRootNode(),
                 application.getAssetManager(),
                 application.getIsoControl(),
+                Hub.playersByID,
                 seed);
     }
 

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
+import net.ClientRegisterListener;
 import net.NetworkManager;
 import net.ServerRegisterListener;
 import net.ServerHub;
@@ -44,7 +45,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class CreateServerState extends Gamestate implements ServerRegisterListener {
+public class CreateServerState extends Gamestate implements ServerRegisterListener, ClientRegisterListener {
 
     private Label createServerLabel;
     private Label yourIP;
@@ -61,6 +62,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private SolarWarsServer solarWarsServer;
     private HashMap<Integer, Vector3f> playerNamePos;
     private HashMap<Integer, Label> playerLabels;
+    private HashMap<Player, Integer> playerLabelIdx;
     private int maxPlayerNumber = 0;
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
@@ -94,7 +96,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         serverHub = ServerHub.getInstance();
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
-
+        playerLabelIdx = new HashMap<Player, Integer>();
 
 
         for (int i = 0; i < 8; i++) {
@@ -166,6 +168,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                startServer();
             }
         };
 
@@ -271,23 +274,15 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     @Override
     protected void unloadContent() {
-//        gui.removeGUIElement(backgroundPanel);
-//        gui.removeGUIElement(line);
-//        gui.removeGUIElement(createServerLabel);
-//        gui.removeGUIElement(cancel);
-//        gui.removeGUIElement(maxPlayers);
-//        gui.removeGUIElement(playerCount);
-//        gui.removeGUIElement(playerPanel);
-//        gui.removeGUIElement(yourIP);
-//        gui.removeGUIElement(address);
-//        gui.removeGUIElement(start);
+
+        playerLabels.clear();
+        playerNamePos.clear();
+
         gui.cleanUpGUI();
 
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-        playerLabels.clear();
-        playerNamePos.clear();
 
         gui = null;
     }
@@ -299,12 +294,13 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         serverHub.initialize(hostPlayer, null);
         //hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
-            solarWarsServer = networkManager.setupServer();
-            solarWarsServer.addRegisterListener(this);
+            solarWarsServer = networkManager.setupServer(hostPlayerName);
+            solarWarsServer.addServerRegisterListener(this);
+            networkManager.addClientRegisterListener(this);
             networkManager.setupClient(hostPlayerName,
                     hostPlayerColor, true);
 
-            networkManager.getThisClient().addMessageListener(clientMessageListener, PlayerAcceptedMessage.class);
+            //networkManager.getThisClient().addMessageListener(clientMessageListener, PlayerAcceptedMessage.class);
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
         } catch (UnknownHostException ex) {
@@ -314,9 +310,18 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         }
     }
 
+    private void startServer() {
+        
+    }
+    
+    private void createLevel() {
+        
+    }
+
     private void cancelServer() {
         System.out.println("Closing server...");
-        solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+        //solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+        networkManager.removeClientRegisterListener(this);
         networkManager.closeServer(false);
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
@@ -327,9 +332,12 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 //            gui.removeGUIElement(temp);
 //        }
 //        playerLabels.remove(p.getId());
+        int id = playerLabels.size();
+
+        playerLabelIdx.put(p, id);
 
         Label player = new Label(p.getName(),
-                playerNamePos.get(p.getId()),
+                playerNamePos.get(id),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Blue,
                 gui) {
@@ -345,22 +353,30 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         gui.addGUIElement(player);
         playerLabels.put(
-                p.getId(),
+                id,
                 player);
     }
 
     private void removeLeavingPlayer(Player p) {
-        Label player = playerLabels.get(p.getId());
+        int id = playerLabelIdx.get(p);
+        Label player = playerLabels.get(id);
         if (player != null) {
-            playerLabels.remove(p.getId());
+            playerLabels.remove(id);
             gui.removeGUIElement(player);
         }
     }
 
-    public void registerListener(Server gameServer) {
+    public void registerServerListener(Server gameServer) {
         gameServer.addConnectionListener(serverConnectionListener);
-        gameServer.addMessageListener(serverMessageListener, PlayerConnectingMessage.class);
+        gameServer.addMessageListener(serverMessageListener,
+                PlayerConnectingMessage.class);
 
+    }
+
+    public void registerClientListener(Client client) {
+        client.addMessageListener(clientMessageListener,
+                PlayerAcceptedMessage.class,
+                PlayerLeavingMessage.class);
     }
 
     private class ServerConnectionListener implements ConnectionListener {
@@ -374,6 +390,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             Player discPlayer = conn.getAttribute("PlayerObject");
             solarWarsServer.removeLeavingPlayer(discPlayer);
             removeLeavingPlayer(discPlayer);
+            serverHub.removePlayer(discPlayer);
         }
     }
 
@@ -389,7 +406,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 if (!isHost) {
                     newPlayer = new Player(
                             pcm.getName(), pcm.getColor(),
-                            ServerHub.getContiniousPlayerID());
+                            source.getId());
+                    //ServerHub.getContiniousPlayerID());
                 } else {
                     newPlayer = ServerHub.getHostPlayer();
                 }
@@ -401,15 +419,6 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 source.setAttribute("PlayerObject", newPlayer);
                 source.setAttribute("PlayerID", newPlayer.getId());
                 source.setAttribute("PlayerName", newPlayer.getName());
-
-            } else if (message instanceof PlayerLeavingMessage) {
-//                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
-//                // removes the sending Player from server
-//
-//                Player p = plm.getPlayer();
-//
-//                removeLeavingPlayer(p);
-//                solarWarsServer.removeLeavingPlayer(p);
             }
         }
     }
@@ -424,15 +433,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
                 Hub.getInstance().initialize(thisPlayer, players);
 
-//                for (Player p : players) {
-//                    addConnectedPlayer(p);
-//                }
-
             } else if (message instanceof PlayerLeavingMessage) {
-//                Client thisClient = networkManager.getThisClient();
-//                thisClient.close();
-//
-//                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+                Player p = plm.getPlayer();
+
+                Hub.getInstance().removePlayer(p);
             }
         }
     }

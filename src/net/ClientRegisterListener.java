@@ -12,6 +12,6 @@ import com.jme3.network.Client;
  */
 public interface ClientRegisterListener {
         
-    public void registerListener(Client client);
+    public void registerClientListener(Client client);
     
 }

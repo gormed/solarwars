@@ -152,8 +152,10 @@ public class GameGUI {
             }
             //}
         };
-        inputManager.addListener(actionListener,
-                SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK);
+        if (inputManager != null) {
+            inputManager.addListener(actionListener,
+                    SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK);
+        }
     }
 
     /**
@@ -201,10 +203,10 @@ public class GameGUI {
     }
 
     public void cleanUpGUI() {
-        
+
         ArrayList<GUIElement> clickable = new ArrayList<GUIElement>();
         ArrayList<GUIElement> elements = new ArrayList<GUIElement>();
-        
+
         for (GUIElement guiElement : guiElemetns) {
             if (guiElement instanceof ClickableGUI) {
                 clickable.add(guiElement);
@@ -214,14 +216,14 @@ public class GameGUI {
                 //decoNode.detachChild(guiElement);
             }
         }
-        
+
         for (GUIElement guie : elements) {
             decoNode.detachChild(guie);
         }
         for (GUIElement cgui : clickable) {
             clickableNode.detachChild(cgui);
         }
-        
+
         elements.clear();
         clickable.clear();
         guiElemetns.clear();

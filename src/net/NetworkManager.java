@@ -64,6 +64,8 @@ public class NetworkManager {
 
     public static boolean checkIP(String sip) {
         String[] parts = sip.split("\\.");
+        if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals("")))
+            return false;
         for (String s : parts) {
             int i = Integer.parseInt(s);
             if (i < 0 || i > 255) {
@@ -95,7 +97,8 @@ public class NetworkManager {
     private NetworkManager() {
         clientRegisterListeners = new ArrayList<ClientRegisterListener>();
     }
-    private int port = DEFAULT_PORT;
+    private int udpPort = DEFAULT_PORT;
+    private int tcpPort = DEFAULT_PORT;
     private InetAddress clientIPAdress;
     private InetAddress serverIPAdress;
     private Client thisClient;
@@ -118,12 +121,16 @@ public class NetworkManager {
         clientRegisterListeners.add(rl);
     }
 
+    public void removeClientRegisterListener(ClientRegisterListener rl) {
+        clientRegisterListeners.remove(rl);
+    }
+
     public int getPort() {
-        return port;
+        return udpPort;
     }
 
     public void setPort(int port) {
-        this.port = port;
+        this.udpPort = port;
     }
 
     public InetAddress getServerIPAdress() {
@@ -134,10 +141,10 @@ public class NetworkManager {
         this.serverIPAdress = serverIPAdress;
     }
 
-    public void setupClient(String name, ColorRGBA color, boolean isHost)
+    public Client setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
-        if (serverIPAdress == null || port < 1) {
-            return;
+        if (serverIPAdress == null || udpPort < 1) {
+            return null;
         }
 
         Serializer.registerClass(StringMessage.class);
@@ -146,24 +153,28 @@ public class NetworkManager {
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(Player.class);
 
-        thisClient = Network.connectToServer(serverIPAdress.getHostAddress(), port);
-        
+        thisClient = Network.connectToServer(
+                SolarWarsServer.SERVER_NAME, 
+                SolarWarsServer.SERVER_VERSION, 
+                serverIPAdress.getHostAddress(), tcpPort, udpPort);
+
         for (ClientRegisterListener rl : clientRegisterListeners) {
-            rl.registerListener(thisClient);
+            rl.registerClientListener(thisClient);
         }
-        
+
         thisClient.start();
 
         StringMessage s = new StringMessage(name + " joins the server!");
         PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
         thisClient.send(s);
         thisClient.send(pcm);
+        return thisClient;
     }
 
-    public SolarWarsServer setupServer()
+    public SolarWarsServer setupServer(String serverName)
             throws IOException {
         thisServer = SolarWarsServer.getInstance();
-        thisServer.start();
+        thisServer.start(serverName);
         try {
             serverIPAdress = InetAddress.getLocalHost();
         } catch (UnknownHostException ex) {
@@ -177,8 +188,6 @@ public class NetworkManager {
         thisClient = null;
         thisServer.stop(wait);
         thisServer = null;
-
-        System.out.println("...Server closed!");
     }
 
     public boolean isServerRunning() {
