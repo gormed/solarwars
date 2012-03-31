@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: AbstractPlanet.java
  * Type: entities.AbstractPlanet
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
@@ -46,6 +46,7 @@ public abstract class AbstractPlanet extends Node {
 
     /** The Constant SHIP_REFRESH_MULTIPILER. */
     private static final int SHIP_REFRESH_MULTIPILER = 5;
+    
     /** The PLANE t_ id. */
     private static int PLANET_ID = 0;
 
@@ -57,34 +58,49 @@ public abstract class AbstractPlanet extends Node {
     private static int getContiniousID() {
         return PLANET_ID++;
     }
+    
     /** The Constant SPHERE_Z_SAMPLES. */
     public static final int SPHERE_Z_SAMPLES = 20;
+    
     /** The Constant SPHERE_RADIAL_SAMPLES. */
     public static final int SPHERE_RADIAL_SAMPLES = 20;
+    
     /** The asset manager. */
     protected AssetManager assetManager;
+    
     /** The geometry. */
     protected Geometry geometry;
+    
     /** The material. */
     protected Material material;
+    
     /** The transform node. */
     protected Node transformNode;
+    
     /** The size. */
     protected float size;
+    
     /** The level. */
     protected Level level;
+    
     /** The id. */
     protected int id;
+    
     /** The position. */
     protected Vector3f position;
+    
     /** The label. */
     protected BitmapText label;
+    
     /** The ship increment. */
     protected float shipIncrement;
+    
     /** The ships. */
     protected int ships = 0;
+    
     /** The time. */
     protected float time;
+    
     /** The owner. */
     protected Player owner;
 

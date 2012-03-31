@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: ServerHub.java
+ * Type: net.ServerHub
+ * 
+ * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
 import java.util.ArrayList;
@@ -10,33 +27,47 @@ import java.util.Map;
 import logic.Player;
 
 /**
- *
- * @author Hans
+ * The Class ServerHub.
  */
 public class ServerHub {
 
-    /** The PLAYER ID. */
+    /** The PLAYE r_ id. */
     private static int PLAYER_ID = 0;
 
     /**
      * Gets the continious player id.
      *
-     * @return the continious id
+     * @return the continious player id
      */
     public static int getContiniousPlayerID() {
         return PLAYER_ID++;
     }
 
+    /**
+     * Gets the player id.
+     *
+     * @return the player id
+     */
     public static int getPlayerID() {
         return PLAYER_ID;
     }
 
+    /**
+     * Reset player id.
+     *
+     * @param id the id
+     */
     public static void resetPlayerID(int id) {
         PLAYER_ID = id;
         playersByID = new HashMap<Integer, Player>(8);
         playersByName = new HashMap<String, Player>(8);
     }
 
+    /**
+     * Gets the players.
+     *
+     * @return the players
+     */
     public static ArrayList<Player> getPlayers() {
         ArrayList<Player> players = new ArrayList<Player>();
 
@@ -47,28 +78,32 @@ public class ServerHub {
         }
         return players;
     }
-    /** The player names. */
+    
+    /** The players by id. */
     public static HashMap<Integer, Player> playersByID;
-    /** The players. */
+    
+    /** The players by name. */
     private static HashMap<String, Player> playersByName;
-    /** The local player. */
+    
+    /** The host player. */
     private static Player hostPlayer;
 
     /**
-     * Gets the local player.
+     * Gets the host player.
      *
-     * @return the local player
+     * @return the host player
      */
     public static Player getHostPlayer() {
         return hostPlayer;
     }
+    
     /** The instance. */
     private static ServerHub instance;
 
     /**
-     * Gets the single instance of Hub.
+     * Gets the single instance of ServerHub.
      *
-     * @return single instance of Hub
+     * @return single instance of ServerHub
      */
     public static ServerHub getInstance() {
         if (instance != null) {
@@ -78,7 +113,7 @@ public class ServerHub {
     }
 
     /**
-     * Instantiates a new hub.
+     * Instantiates a new server hub.
      */
     private ServerHub() {
         playersByName = new HashMap<String, Player>(8);
@@ -86,7 +121,10 @@ public class ServerHub {
     }
 
     /**
-     * Initializes the player-HUB.
+     * Initializes the.
+     *
+     * @param hostPlayer the host player
+     * @param players the players
      */
     public void initialize(Player hostPlayer, ArrayList<Player> players) {
         this.hostPlayer = hostPlayer;

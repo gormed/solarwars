@@ -1,3 +1,24 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: SolarWarsServer.java
+ * Type: net.SolarWarsServer
+ * 
+ * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
 import net.messages.PlayerConnectingMessage;
@@ -25,16 +46,24 @@ import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 
 /**
- * test
- * @author normenhansen
+ * The Class SolarWarsServer.
  */
 public class SolarWarsServer extends SimpleApplication {
     
+    /** The Constant SERVER_VERSION. */
     public static final int SERVER_VERSION = 10;
+    
+    /** The Constant SERVER_NAME. */
     public static final String SERVER_NAME = "SolarWars Server";
 
+    /** The server app. */
     private static SolarWarsServer serverApp;
 
+    /**
+     * Gets the single instance of SolarWarsServer.
+     *
+     * @return single instance of SolarWarsServer
+     */
     public static SolarWarsServer getInstance() {
         if (serverApp != null) {
             return serverApp;
@@ -42,6 +71,9 @@ public class SolarWarsServer extends SimpleApplication {
         return serverApp = new SolarWarsServer();
     }
 
+    /**
+     * Instantiates a new solar wars server.
+     */
     private SolarWarsServer() {
         super();
         // Add messages to serializer so they can be read, DO THIS FIRST
@@ -54,26 +86,55 @@ public class SolarWarsServer extends SimpleApplication {
         //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
     
+    /** The game server. */
     private Server gameServer;
 
+    /**
+     * Gets the game server.
+     *
+     * @return the game server
+     */
     public Server getGameServer() {
         return gameServer;
     }
     
+    /** The udp port. */
     private int udpPort = NetworkManager.DEFAULT_PORT;
+    
+    /** The tcp port. */
     private int tcpPort = NetworkManager.DEFAULT_PORT;
+    
+    /** The server name. */
     private String serverName = "unnamed";
+    
+    /** The connected players. */
     private HashMap<Player, HostedConnection> connectedPlayers;
+    
+    /** The register listeners. */
     private ArrayList<ServerRegisterListener> registerListeners;
+    
+    /** The joined players. */
     private ArrayList<Player> joinedPlayers;
+    
+    /** The leaving players. */
     private ArrayList<Player> leavingPlayers;
+    
+    /** The is running. */
     private boolean isRunning;
 
+    /**
+     * Start.
+     *
+     * @param serverName the server name
+     */
     public void start(String serverName) {
         this.serverName = serverName;
         start();
     }
     
+    /* (non-Javadoc)
+     * @see com.jme3.app.SimpleApplication#start()
+     */
     @Override
     public void start() {
         super.start(JmeContext.Type.Headless);
@@ -84,6 +145,9 @@ public class SolarWarsServer extends SimpleApplication {
         isRunning = true;
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.SimpleApplication#simpleInitApp()
+     */
     @Override
     public void simpleInitApp() {
         try {
@@ -108,6 +172,9 @@ public class SolarWarsServer extends SimpleApplication {
 
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.SimpleApplication#simpleUpdate(float)
+     */
     @Override
     public void simpleUpdate(float tpf) {
         for (Player p : joinedPlayers) {
@@ -121,10 +188,16 @@ public class SolarWarsServer extends SimpleApplication {
         leavingPlayers.clear();
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.SimpleApplication#simpleRender(com.jme3.renderer.RenderManager)
+     */
     @Override
     public void simpleRender(RenderManager rm) {
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#destroy()
+     */
     @Override
     public void destroy() {
         
@@ -139,45 +212,99 @@ public class SolarWarsServer extends SimpleApplication {
         super.destroy();
     }
 
+    /**
+     * Checks if is running.
+     *
+     * @return true, if is running
+     */
     boolean isRunning() {
         return isRunning;
     }
 
+    /**
+     * Gets the port.
+     *
+     * @return the port
+     */
     public int getPort() {
         return udpPort;
     }
 
+    /**
+     * Sets the port.
+     *
+     * @param port the new port
+     */
     public void setPort(int port) {
         this.udpPort = port;
     }
 
+    /**
+     * Gets the iP address.
+     *
+     * @return the iP address
+     * @throws UnknownHostException the unknown host exception
+     */
     public String getIPAddress()
             throws UnknownHostException {
         return InetAddress.getLocalHost().getHostAddress();
     }
     
+    /**
+     * Adds the server register listener.
+     *
+     * @param rl the rl
+     */
     public void addServerRegisterListener(ServerRegisterListener rl) {
         registerListeners.add(rl);
     }
 
+    /**
+     * Removes the connection listener.
+     *
+     * @param l the l
+     */
     public void removeConnectionListener(ConnectionListener l) {
         gameServer.removeConnectionListener(l);
     }
 
+    /**
+     * Removes the client message listener.
+     *
+     * @param hc the hc
+     * @param classes the classes
+     */
     public void removeClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
         gameServer.removeMessageListener(hc, classes);
     }
 
+    /**
+     * Adds the connecting player.
+     *
+     * @param p the p
+     * @param hc the hc
+     */
     public void addConnectingPlayer(Player p, HostedConnection hc) {
         connectedPlayers.put(p, hc);
         joinedPlayers.add(p);
     }
 
+    /**
+     * Removes the leaving player.
+     *
+     * @param p the p
+     */
     public void removeLeavingPlayer(Player p) {
         
         leavingPlayers.add(p);
     }
 
+    /**
+     * Respond player.
+     *
+     * @param p the p
+     * @param connecting the connecting
+     */
     private void respondPlayer(Player p, boolean connecting) {
         if (connecting) {
             boolean isHost = p.isHost();
@@ -198,11 +325,21 @@ public class SolarWarsServer extends SimpleApplication {
     }
 
     /**
+     * The listener interface for receiving server events.
+     * The class that is interested in processing a server
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addServerListener<code> method. When
+     * the server event occurs, that object's appropriate
+     * method is invoked.
      *
-     * @author Hans
+     * @see ServerEvent
      */
     private class ServerListener implements MessageListener<HostedConnection> {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
+         */
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof StringMessage) {
                 // do something with the message

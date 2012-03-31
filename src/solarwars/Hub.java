@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: Hub.java
  * Type: solarwars.Hub
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
@@ -31,6 +31,11 @@ import logic.Player;
  */
 public class Hub {
 
+    /**
+     * Gets the players.
+     *
+     * @return the players
+     */
     public static ArrayList<Player> getPlayers() {
         ArrayList<Player> players = new ArrayList<Player>();
 
@@ -40,10 +45,13 @@ public class Hub {
 
         return players;
     }
-    /** The player names. */
+    
+    /** The players by id. */
     public static HashMap<Integer, Player> playersByID;
-    /** The players. */
+    
+    /** The players by name. */
     private static HashMap<String, Player> playersByName;
+    
     /** The local player. */
     private static Player localPlayer;
 
@@ -55,6 +63,7 @@ public class Hub {
     public static Player getLocalPlayer() {
         return localPlayer;
     }
+    
     /** The instance. */
     private static Hub instance;
 
@@ -79,7 +88,10 @@ public class Hub {
     }
 
     /**
-     * Initializes the player-HUB.
+     * Initializes the.
+     *
+     * @param localPlayer the local player
+     * @param players the players
      */
     public void initialize(Player localPlayer, ArrayList<Player> players) {
         playersByID = new HashMap<Integer, Player>();

@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: GameGUI.java
  * Type: gui.GameGUI
  * 
- * Documentation created: 15.03.2012 - 20:36:19 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
@@ -42,15 +42,26 @@ public class GameGUI {
 
     /** The game. */
     SolarWarsGame game;
+    
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElemetns;
+    
     /** The width. */
     private float width;
+    
+    /** The action listener. */
     private ActionListener actionListener;
+    
+    /** The focus. */
     private GUIElement focus;
+    
     /** The height. */
     private float height;
+    
+    /** The clickable node. */
     private Node clickableNode;
+    
+    /** The deco node. */
     private Node decoNode;
 
     /**
@@ -71,6 +82,11 @@ public class GameGUI {
         return width;
     }
 
+    /**
+     * Gets the focus element.
+     *
+     * @return the focus element
+     */
     public GUIElement getFocusElement() {
         return focus;
     }
@@ -198,10 +214,19 @@ public class GameGUI {
         }
     }
 
+    /**
+     * Contains gui element.
+     *
+     * @param e the e
+     * @return true, if successful
+     */
     public boolean containsGUIElement(GUIElement e) {
         return guiElemetns.contains(e);
     }
 
+    /**
+     * Clean up gui.
+     */
     public void cleanUpGUI() {
 
         ArrayList<GUIElement> clickable = new ArrayList<GUIElement>();

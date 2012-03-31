@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: MultiplayerState.java
+ * Type: gamestates.lib.MultiplayerState
+ * 
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
 import com.jme3.math.ColorRGBA;
@@ -22,32 +39,59 @@ import net.NetworkManager;
 import solarwars.SolarWarsGame;
 
 /**
- *
- * @author Hans
+ * The Class MultiplayerState.
  */
 public class MultiplayerState extends Gamestate {
 
+    /** The multiplayer label. */
     private Label multiplayerLabel;
+    
+    /** The background panel. */
     private Panel backgroundPanel;
+    
+    /** The line. */
     private Panel line;
+    
+    /** The player name. */
     private TextBox playerName;
+    
+    /** The join server. */
     private Button joinServer;
+    
+    /** The create server. */
     private Button createServer;
+    
+    /** The back. */
     private Button back;
+    
+    /** The serverip. */
     private TextBox serverip;
+    
+    /** The gui. */
     private GameGUI gui;
+    
+    /** The network manager. */
     private NetworkManager networkManager;
 
+    /**
+     * Instantiates a new multiplayer state.
+     */
     public MultiplayerState() {
         super(GamestateManager.MULTIPLAYER_STATE);
 
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#update(float)
+     */
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#loadContent(solarwars.SolarWarsGame)
+     */
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
@@ -177,6 +221,9 @@ public class MultiplayerState extends Gamestate {
         gui.addGUIElement(back);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#unloadContent()
+     */
     @Override
     protected void unloadContent() {
 
@@ -191,6 +238,9 @@ public class MultiplayerState extends Gamestate {
         gui = null;
     }
 
+    /**
+     * Creates the server.
+     */
     private void createServer() {
         GamestateManager gm = GamestateManager.getInstance();
         Gamestate g = gm.getGamestate(GamestateManager.CREATE_SERVER_STATE);
@@ -202,6 +252,9 @@ public class MultiplayerState extends Gamestate {
         GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
     }
 
+    /**
+     * Join server.
+     */
     private void joinServer() {
 
         String ip = serverip.getCaption();

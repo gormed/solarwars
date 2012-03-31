@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: TextBox.java
+ * Type: gui.elements.TextBox
+ * 
+ * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
 import com.jme3.asset.AssetManager;
@@ -25,41 +42,90 @@ import gui.KeyboardListener;
 import solarwars.FontLoader;
 
 /**
- *
- * @author Hans
+ * The Class TextBox.
  */
 public abstract class TextBox extends GUIElement implements ClickableGUI {
 
     /** The font. */
     protected BitmapFont font;
+    
     /** The text. */
     protected BitmapText text;
+    
+    /** The color. */
     protected ColorRGBA color;
+    
     /** The gui. */
     protected GameGUI gui;
+    
+    /** The screen position. */
     protected Vector3f screenPosition;
+    
+    /** The scale. */
     protected Vector3f scale;
+    
+    /** The caption. */
     protected String caption;
+    
+    /** The geometry. */
     protected Geometry geometry;
+    
+    /** The material. */
     protected Material material;
+    
+    /** The box color. */
     protected ColorRGBA boxColor;
+    
+    /** The text listener. */
     protected KeyboardListener textListener;
+    
+    /** The time. */
     private float time;
+    
+    /** The is number box. */
     private boolean isNumberBox = false;
+    
+    /** The numeric mappings added. */
     private static boolean numericMappingsAdded = false;
 
+    /**
+     * Checks if is checks if is number box.
+     *
+     * @return true, if is checks if is number box
+     */
     public boolean isIsNumberBox() {
         return isNumberBox;
     }
 
+    /**
+     * Sets the caption.
+     *
+     * @param caption the new caption
+     */
     public void setCaption(String caption) {
         this.caption = caption;
     }
 
+    /**
+     * Gets the caption.
+     *
+     * @return the caption
+     */
     public String getCaption() {
         return caption;
     }
 
+    /**
+     * Instantiates a new text box.
+     *
+     * @param color the color
+     * @param screenPosition the screen position
+     * @param scale the scale
+     * @param caption the caption
+     * @param boxColor the box color
+     * @param gui the gui
+     * @param numberBox the number box
+     */
     public TextBox(ColorRGBA color, Vector3f screenPosition,
             Vector3f scale, String caption,
             ColorRGBA boxColor, GameGUI gui, boolean numberBox) {
@@ -76,6 +142,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         createListener();
     }
 
+    /**
+     * Creates the listener.
+     */
     private void createListener() {
         if (!isNumberBox) {
             this.textListener = new TextBoxActionListener(
@@ -87,6 +156,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.scene.Node#detachChild(com.jme3.scene.Spatial)
+     */
     @Override
     public int detachChild(Spatial child) {
 
@@ -94,11 +166,17 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         return super.detachChild(child);
     }
 
+    /**
+     * Destroy.
+     */
     private void destroy() {
         solarwars.SolarWarsApplication.getInstance().getInputManager().
                 removeListener(textListener);
     }
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#updateGUI(float)
+     */
     @Override
     public void updateGUI(float tpf) {
         text.setText(caption);
@@ -122,16 +200,34 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#setVisible(boolean)
+     */
     @Override
     public void setVisible(boolean show) {
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
+     */
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
+    /**
+     * On key trigger.
+     *
+     * @param key the key
+     * @param isPressed the is pressed
+     * @param tpf the tpf
+     */
     protected abstract void onKeyTrigger(String key, boolean isPressed, float tpf);
 
+    /**
+     * Creates the text box.
+     *
+     * @param gui the gui
+     */
     private void createTextBox(GameGUI gui) {
         // Init
         AssetManager assetManager = solarwars.SolarWarsApplication.getInstance().getAssetManager();
@@ -169,10 +265,28 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         attachChild(text);
     }
 
+    /**
+     * The listener interface for receiving numberBoxAction events.
+     * The class that is interested in processing a numberBoxAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addNumberBoxActionListener<code> method. When
+     * the numberBoxAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see NumberBoxActionEvent
+     */
     private class NumberBoxActionListener extends KeyboardListener {
 
+        /** The text box. */
         private TextBox textBox;
 
+        /**
+         * Instantiates a new number box action listener.
+         *
+         * @param inputManager the input manager
+         * @param textBox the text box
+         */
         public NumberBoxActionListener(InputManager inputManager, TextBox textBox) {
             this.textBox = textBox;
 
@@ -209,6 +323,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                     KeyInputMap.INPUT_MAPPING_BACKSPACE);
         }
 
+        /* (non-Javadoc)
+         * @see gui.KeyboardListener#onAction(java.lang.String, boolean, float)
+         */
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             GUIElement e = gui.getFocusElement();
@@ -230,15 +347,36 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         }
     }
 
+    /**
+     * The listener interface for receiving textBoxAction events.
+     * The class that is interested in processing a textBoxAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addTextBoxActionListener<code> method. When
+     * the textBoxAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see TextBoxActionEvent
+     */
     private class TextBoxActionListener extends KeyboardListener {
 
+        /** The text box. */
         private TextBox textBox;
 
+        /**
+         * Instantiates a new text box action listener.
+         *
+         * @param inputManager the input manager
+         * @param box the box
+         */
         public TextBoxActionListener(InputManager inputManager, TextBox box) {
             super(inputManager);
             this.textBox = box;
         }
 
+        /* (non-Javadoc)
+         * @see gui.KeyboardListener#onAction(java.lang.String, boolean, float)
+         */
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 

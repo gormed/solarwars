@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: Gameplay.java
  * Type: logic.Gameplay
  * 
- * Documentation created: 15.03.2012 - 20:36:18 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
@@ -36,22 +36,31 @@ public class Gameplay {
 
     /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
+    
     /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
+    
     /** The Constant SHIP_REDIRECT. */
     public static final String SHIP_REDIRECT = "RedirectShip";
+    
     /** The Constant SHIP_ARRIVES. */
     public static final String SHIP_ARRIVES = "ArrivesShip";
+    
     /** The Constant PLANET_CAPTURE. */
     public static final String PLANET_CAPTURE = "CapturePlanet";
+    
     /** The game. */
     private SolarWarsGame game;
+    
     /** The application. */
     private SolarWarsApplication application;
+    
     /** The action lib. */
     private ActionLib actionLib;
+    
     /** The instance. */
     private static Gameplay instance;
+    
     /** The current level. */
     private static Level currentLevel = null;
 
@@ -69,6 +78,8 @@ public class Gameplay {
 
     /**
      * Initializes the.
+     *
+     * @param level the level
      */
     public static void initialize(Level level) {
         if (instance == null) {

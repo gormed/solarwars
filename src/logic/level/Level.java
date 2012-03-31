@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: Level.java
  * Type: logic.level.Level
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic.level;
@@ -62,6 +62,7 @@ public class Level {
     /** The label node. */
     private Node labelNode;
     
+    /** The background. */
     private LevelBackground background;
     
     /** The all ships node. */
@@ -126,6 +127,7 @@ public class Level {
      * @param rootNode the root node
      * @param assetManager the asset manager
      * @param control the control
+     * @param players the players
      * @param seed the seed
      */
     public Level(Node rootNode, AssetManager assetManager, IsoControl control, HashMap<Integer, Player> players, long seed) {
@@ -216,6 +218,8 @@ public class Level {
 
     /**
      * Setup players.
+     *
+     * @param players the players
      */
     public void setupPlayers(HashMap<Integer, Player> players) {
         for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {

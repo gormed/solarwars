@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: Label.java
+ * Type: gui.elements.Label
+ * 
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
 import com.jme3.font.BitmapFont;
@@ -15,23 +32,40 @@ import gui.GameGUI;
 import solarwars.FontLoader;
 
 /**
- *
- * @author Hans
+ * The Class Label.
  */
 public abstract class Label extends GUIElement implements ClickableGUI {
 
     /** The font. */
     protected BitmapFont font;
+    
     /** The text. */
     protected BitmapText text;
     
+    /** The color. */
     protected ColorRGBA color;
+    
     /** The gui. */
     protected GameGUI gui;
+    
+    /** The screen position. */
     protected Vector3f screenPosition;
+    
+    /** The scale. */
     protected Vector3f scale;
+    
+    /** The title. */
     protected String title;
 
+    /**
+     * Instantiates a new label.
+     *
+     * @param title the title
+     * @param position the position
+     * @param scale the scale
+     * @param color the color
+     * @param gui the gui
+     */
     public Label(String title, Vector3f position, Vector3f scale, ColorRGBA color, GameGUI gui) {
         super();//title + "_Button");
         screenPosition = position;
@@ -41,6 +75,11 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         createLabel(gui);
     }
 
+    /**
+     * Creates the label.
+     *
+     * @param gui the gui
+     */
     private void createLabel(GameGUI gui) {
         this.gui = gui;
 
@@ -57,14 +96,23 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         attachChild(text);
     }
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#updateGUI(float)
+     */
     @Override
     public abstract void updateGUI(float tpf);
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#setVisible(boolean)
+     */
     @Override
     public void setVisible(boolean show) {
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
+     */
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
 }

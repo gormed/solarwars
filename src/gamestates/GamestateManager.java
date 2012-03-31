@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: GamestateManager.java
  * Type: gamestates.GamestateManager
  * 
- * Documentation created: 15.03.2012 - 20:36:19 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates;
@@ -28,12 +28,25 @@ import java.util.HashMap;
  */
 public class GamestateManager {
     
+    /** The Constant SINGLEPLAYER_STATE. */
     public static final String SINGLEPLAYER_STATE = "Singleplayer";
+    
+    /** The Constant MULTIPLAYER_STATE. */
     public static final String MULTIPLAYER_STATE = "Multiplayer";
+    
+    /** The Constant MAINMENU_STATE. */
     public static final String MAINMENU_STATE = "Mainmenu";
+    
+    /** The Constant OPTIONS_STATE. */
     public static final String OPTIONS_STATE = "Options";
+    
+    /** The Constant CREATE_SERVER_STATE. */
     public static final String CREATE_SERVER_STATE = "Create Server";
+    
+    /** The Constant SERVER_LOBBY_STATE. */
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
+    
+    /** The Constant MULTIPLAYER_MATCH_STATE. */
     public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
     
 
@@ -121,6 +134,12 @@ public class GamestateManager {
         System.out.println("Gamestate: " + g.getName() + " removed!");
     }
     
+    /**
+     * Gets the gamestate.
+     *
+     * @param name the name
+     * @return the gamestate
+     */
     public Gamestate getGamestate(String name) {
         if (!gamestates.containsKey(name))
             return null;

@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: SolarWarsApplication.java
  * Type: solarwars.SolarWarsApplication
  * 
- * Documentation created: 15.03.2012 - 20:36:19 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
@@ -57,6 +57,7 @@ public class SolarWarsApplication extends Application {
     /** The Constant INPUT_MAPPING_EXIT. */
     public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
     
+    /** The Constant INPUT_MAPPING_PAUSE. */
     public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
     
     /** The Constant INPUT_MAPPING_CAMERA_POS. */
@@ -80,8 +81,14 @@ public class SolarWarsApplication extends Application {
     /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
     
+    /** The instance. */
     private static SolarWarsApplication instance;
     
+    /**
+     * Gets the single instance of SolarWarsApplication.
+     *
+     * @return single instance of SolarWarsApplication
+     */
     public static SolarWarsApplication getInstance() {
         if (instance != null)
             return instance;
@@ -133,6 +140,9 @@ public class SolarWarsApplication extends Application {
     /** The game. */
     private SolarWarsGame game;
     
+    /**
+     * Instantiates a new solar wars application.
+     */
     private SolarWarsApplication() {
         super();
     }
@@ -454,6 +464,9 @@ public class SolarWarsApplication extends Application {
     public void simpleRender(RenderManager rm) {
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#destroy()
+     */
     @Override
     public void destroy() {
         NetworkManager nm = NetworkManager.getInstance();

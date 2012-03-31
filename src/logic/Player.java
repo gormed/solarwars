@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: Player.java
  * Type: logic.Player
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
@@ -36,27 +36,40 @@ public class Player {
 
     /** The name. */
     private String name;
+    
     /** The color. */
     private ColorRGBA color;
+    
     /** The id. */
     private int id;
+    
     /** The ship count. */
     private int shipCount = 0;
+    
     /** The artificial. */
     private AI artificial;
+    
     /** The selected planet. */
     private AbstractPlanet selectedPlanet;
+    
     /** The selected ship group. */
     private ShipGroup selectedShipGroup;
+    
     /** The ship percentage. */
     private float shipPercentage = 0.5f;
+    
     /** The planets. */
     private ArrayList<AbstractPlanet> planets;
+    
     /** The ship groups. */
     private ArrayList<ShipGroup> shipGroups;
     
+    /** The is host. */
     private boolean isHost;
 
+    /**
+     * Instantiates a new player.
+     */
     public Player() {
     }
 
@@ -65,6 +78,7 @@ public class Player {
      *
      * @param name the name
      * @param color the color
+     * @param id the id
      */
     public Player(String name, ColorRGBA color, int id) {
         this.name = name;
@@ -79,6 +93,8 @@ public class Player {
      *
      * @param name the name
      * @param color the color
+     * @param id the id
+     * @param isHost the is host
      */
     public Player(String name, ColorRGBA color, int id, boolean isHost) {
         this.name = name;
@@ -97,6 +113,11 @@ public class Player {
         return color;
     }
 
+    /**
+     * Checks if is host.
+     *
+     * @return true, if is host
+     */
     public boolean isHost() {
         return isHost;
     }

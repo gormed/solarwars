@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: MainmenuState.java
+ * Type: gamestates.lib.MainmenuState
+ * 
+ * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
 import com.jme3.math.ColorRGBA;
@@ -15,32 +32,52 @@ import gui.GameGUI;
 import solarwars.SolarWarsGame;
 
 /**
- *
- * @author Hans
+ * The Class MainmenuState.
  */
 public class MainmenuState extends Gamestate {
 
     /** The gui. */
     private GameGUI gui;
+    
+    /** The singleplayer button. */
     private Button singleplayerButton;
+    
+    /** The multiplayer button. */
     private Button multiplayerButton;
+    
+    /** The solarwars. */
     private Label solarwars;
+    
+    /** The quit button. */
     private Button quitButton;
+    
+    /** The game. */
     private SolarWarsGame game;
     /*
      * 
      */
 
+    /**
+     * Instantiates a new mainmenu state.
+     *
+     * @param game the game
+     */
     public MainmenuState(SolarWarsGame game) {
         super(GamestateManager.MAINMENU_STATE);
         this.game = game;
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#update(float)
+     */
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#loadContent(solarwars.SolarWarsGame)
+     */
     @Override
     protected void loadContent(SolarWarsGame swgame) {
         gui = new GameGUI(swgame);
@@ -128,6 +165,9 @@ public class MainmenuState extends Gamestate {
         gui.addGUIElement(quitButton);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#unloadContent()
+     */
     @Override
     protected void unloadContent() {
         gui.removeGUIElement(singleplayerButton);
@@ -138,11 +178,17 @@ public class MainmenuState extends Gamestate {
         gui = null;
     }
 
+    /**
+     * Start singleplayer.
+     */
     private void startSingleplayer() {
         GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
     }
     
     
+    /**
+     * Start multiplayer.
+     */
     private void startMultiplayer() {
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }

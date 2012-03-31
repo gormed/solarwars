@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: NetworkManager.java
  * Type: net.NetworkManager
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
@@ -46,7 +46,9 @@ import net.messages.PlayerLeavingMessage;
  */
 public class NetworkManager {
 
+    /** The Constant DEFAULT_PORT. */
     public static final int DEFAULT_PORT = 6142;
+    
     /** The instance. */
     private static NetworkManager instance;
 
@@ -62,6 +64,12 @@ public class NetworkManager {
         return instance = new NetworkManager();
     }
 
+    /**
+     * Check ip.
+     *
+     * @param sip the sip
+     * @return true, if successful
+     */
     public static boolean checkIP(String sip) {
         String[] parts = sip.split("\\.");
         if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals("")))
@@ -75,6 +83,12 @@ public class NetworkManager {
         return true;
     }
 
+    /**
+     * Gets the byte inet address.
+     *
+     * @param ip the ip
+     * @return the byte inet address
+     */
     public static byte[] getByteInetAddress(String ip) {
         if (!checkIP(ip)) {
             return null;
@@ -97,50 +111,118 @@ public class NetworkManager {
     private NetworkManager() {
         clientRegisterListeners = new ArrayList<ClientRegisterListener>();
     }
+    
+    /** The udp port. */
     private int udpPort = DEFAULT_PORT;
+    
+    /** The tcp port. */
     private int tcpPort = DEFAULT_PORT;
+    
+    /** The client ip adress. */
     private InetAddress clientIPAdress;
+    
+    /** The server ip adress. */
     private InetAddress serverIPAdress;
+    
+    /** The this client. */
     private Client thisClient;
+    
+    /** The this server. */
     private SolarWarsServer thisServer;
+    
+    /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
 
+    /**
+     * Gets the this client.
+     *
+     * @return the this client
+     */
     public Client getThisClient() {
         return thisClient;
     }
 
+    /**
+     * Gets the client ip adress.
+     *
+     * @return the client ip adress
+     */
     public InetAddress getClientIPAdress() {
         return clientIPAdress;
     }
 
+    /**
+     * Sets the client ip adress.
+     *
+     * @param clientIPAdress the new client ip adress
+     */
     public void setClientIPAdress(InetAddress clientIPAdress) {
         this.clientIPAdress = clientIPAdress;
     }
 
+    /**
+     * Adds the client register listener.
+     *
+     * @param rl the rl
+     */
     public void addClientRegisterListener(ClientRegisterListener rl) {
         clientRegisterListeners.add(rl);
     }
 
+    /**
+     * Removes the client register listener.
+     *
+     * @param rl the rl
+     */
     public void removeClientRegisterListener(ClientRegisterListener rl) {
         clientRegisterListeners.remove(rl);
     }
 
+    /**
+     * Gets the port.
+     *
+     * @return the port
+     */
     public int getPort() {
         return udpPort;
     }
 
+    /**
+     * Sets the port.
+     *
+     * @param port the new port
+     */
     public void setPort(int port) {
         this.udpPort = port;
     }
 
+    /**
+     * Gets the server ip adress.
+     *
+     * @return the server ip adress
+     */
     public InetAddress getServerIPAdress() {
         return serverIPAdress;
     }
 
+    /**
+     * Sets the server ip adress.
+     *
+     * @param serverIPAdress the new server ip adress
+     */
     public void setServerIPAdress(InetAddress serverIPAdress) {
         this.serverIPAdress = serverIPAdress;
     }
 
+    /**
+     * Setup client.
+     *
+     * @param name the name
+     * @param color the color
+     * @param isHost the is host
+     * @return the client
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public Client setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
         if (serverIPAdress == null || udpPort < 1) {
@@ -171,6 +253,13 @@ public class NetworkManager {
         return thisClient;
     }
 
+    /**
+     * Setup server.
+     *
+     * @param serverName the server name
+     * @return the solar wars server
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public SolarWarsServer setupServer(String serverName)
             throws IOException {
         thisServer = SolarWarsServer.getInstance();
@@ -183,6 +272,11 @@ public class NetworkManager {
         return thisServer;
     }
 
+    /**
+     * Close server.
+     *
+     * @param wait the wait
+     */
     public void closeServer(boolean wait) {
         thisClient.close();
         thisClient = null;
@@ -190,6 +284,11 @@ public class NetworkManager {
         thisServer = null;
     }
 
+    /**
+     * Checks if is server running.
+     *
+     * @return true, if is server running
+     */
     public boolean isServerRunning() {
         if (thisServer == null) {
             return false;
@@ -198,11 +297,21 @@ public class NetworkManager {
     }
 
     /**
+     * The listener interface for receiving client events.
+     * The class that is interested in processing a client
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addClientListener<code> method. When
+     * the client event occurs, that object's appropriate
+     * method is invoked.
      *
-     * @author Hans
+     * @see ClientEvent
      */
     private class ClientListener implements MessageListener<Client> {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
+         */
         public void messageReceived(Client source, Message message) {
             if (message instanceof StringMessage) {
                 // do something with the message

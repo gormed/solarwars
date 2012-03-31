@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: KeyboardListener.java
+ * Type: gui.KeyboardListener
+ * 
+ * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
 
 import com.jme3.input.InputManager;
@@ -10,16 +27,32 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 
 /**
+ * The listener interface for receiving keyboard events.
+ * The class that is interested in processing a keyboard
+ * event implements this interface, and the object created
+ * with that class is registered with a component using the
+ * component's <code>addKeyboardListener<code> method. When
+ * the keyboard event occurs, that object's appropriate
+ * method is invoked.
  *
- * @author Hans
+ * @see KeyboardEvent
  */
 public abstract class KeyboardListener implements ActionListener {
 
+    /** The mappings added. */
     private static boolean mappingsAdded = false;
 
+    /**
+     * Instantiates a new keyboard listener.
+     */
     public KeyboardListener() {
     }
 
+    /**
+     * Instantiates a new keyboard listener.
+     *
+     * @param inputManager the input manager
+     */
     public KeyboardListener(InputManager inputManager) {
 
         //deleteMappings(inputManager);
@@ -114,5 +147,8 @@ public abstract class KeyboardListener implements ActionListener {
 
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+     */
     public abstract void onAction(String name, boolean isPressed, float tpf);
 }

@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans.ferchland@gmx.de
+ * 
+ * Project: SolarWars
+ * File: ServerLobbyState.java
+ * Type: gamestates.lib.ServerLobbyState
+ * 
+ * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
 import com.jme3.math.ColorRGBA;
@@ -35,48 +52,107 @@ import solarwars.Hub;
 import solarwars.SolarWarsGame;
 
 /**
- *
- * @author Hans
+ * The Class ServerLobbyState.
  */
 public class ServerLobbyState extends Gamestate implements ClientRegisterListener {
 
+    /** The lobby. */
     private Label lobby;
+    
+    /** The background panel. */
     private Panel backgroundPanel;
+    
+    /** The line. */
     private Panel line;
+    
+    /** The player panel. */
     private Panel playerPanel;
+    
+    /** The leave. */
     private Button leave;
+    
+    /** The ready. */
     private Button ready;
+    
+    /** The server name. */
     private Label serverName;
+    
+    /** The gui. */
     private GameGUI gui;
+    
+    /** The hub. */
     private Hub hub;
+    
+    /** The client player name. */
     private String clientPlayerName;
+    
+    /** The client player color. */
     private ColorRGBA clientPlayerColor;
+    
+    /** The server ip address. */
     private String serverIPAddress;
+    
+    /** The network manager. */
     private NetworkManager networkManager;
+    
+    /** The client. */
     private Client client;
+    
+    /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
+    
+    /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
+    
+    /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
+    
+    /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
+    
+    /** The player connection listener. */
     private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
+    
+    /** The no server found. */
     private boolean noServerFound;
 
+    /**
+     * Sets the client player color.
+     *
+     * @param clientPlayerColor the new client player color
+     */
     public void setClientPlayerColor(ColorRGBA clientPlayerColor) {
         this.clientPlayerColor = clientPlayerColor;
     }
 
+    /**
+     * Sets the server ip address.
+     *
+     * @param serverIPAddress the new server ip address
+     */
     public void setServerIPAddress(String serverIPAddress) {
         this.serverIPAddress = serverIPAddress;
     }
 
+    /**
+     * Sets the client player name.
+     *
+     * @param clientPlayerName the new client player name
+     */
     public void setClientPlayerName(String clientPlayerName) {
         this.clientPlayerName = clientPlayerName;
     }
 
+    /**
+     * Instantiates a new server lobby state.
+     */
     public ServerLobbyState() {
         super(GamestateManager.SERVER_LOBBY_STATE);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#update(float)
+     */
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
@@ -86,6 +162,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         //if (!client.isConnected())
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#loadContent(solarwars.SolarWarsGame)
+     */
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
@@ -202,6 +281,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gui.addGUIElement(ready);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#unloadContent()
+     */
     @Override
     protected void unloadContent() {
         
@@ -222,6 +304,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         this.gui = null;
     }
 
+    /**
+     * Leave server.
+     */
     private void leaveServer() {
         //Client thisClient = networkManager.getThisClient();
         if (client != null && client.isConnected()) {
@@ -229,6 +314,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         }
     }
 
+    /**
+     * Join server.
+     */
     private void joinServer() {
         try {
             InetAddress add = InetAddress.getByAddress(NetworkManager.getByteInetAddress(serverIPAddress));
@@ -251,12 +339,18 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         }
     }
 
+    /**
+     * Disconnect.
+     */
     private void disconnect() {
         networkManager.removeClientRegisterListener(this);
         client = null;
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
+    /* (non-Javadoc)
+     * @see net.ClientRegisterListener#registerClientListener(com.jme3.network.Client)
+     */
     public void registerClientListener(Client client) {
         client.addMessageListener(playerConnectionListener,
                 PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
@@ -264,6 +358,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     }
 
+    /**
+     * Adds the connected player.
+     *
+     * @param p the p
+     */
     private void addConnectedPlayer(Player p) {
 
 //        Label temp = playerLabels.get(p.getId());
@@ -317,6 +416,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 player);
     }
 
+    /**
+     * Removes the leaving player.
+     *
+     * @param p the p
+     */
     private void removeLeavingPlayer(Player p) {
         Label player = playerLabels.get(p.getId());
         if (player != null) {
@@ -325,11 +429,28 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         }
     }
 
+    /**
+     * The listener interface for receiving playerState events.
+     * The class that is interested in processing a playerState
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addPlayerStateListener<code> method. When
+     * the playerState event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PlayerStateEvent
+     */
     private class PlayerStateListener implements ClientStateListener {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.ClientStateListener#clientConnected(com.jme3.network.Client)
+         */
         public void clientConnected(Client c) {
         }
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.ClientStateListener#clientDisconnected(com.jme3.network.Client, com.jme3.network.ClientStateListener.DisconnectInfo)
+         */
         public void clientDisconnected(Client c, DisconnectInfo info) {
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
             if (info != null) {
@@ -341,8 +462,22 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         }
     }
 
+    /**
+     * The listener interface for receiving playerConnection events.
+     * The class that is interested in processing a playerConnection
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addPlayerConnectionListener<code> method. When
+     * the playerConnection event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PlayerConnectionEvent
+     */
     private class PlayerConnectionListener implements MessageListener<Client> {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
+         */
         public void messageReceived(Client source, Message message) {
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;

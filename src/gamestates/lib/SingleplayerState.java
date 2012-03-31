@@ -7,8 +7,8 @@
  * other planets. Its oriented to multiplayer and singleplayer.
  * 
  * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or android 
- * application in any way! If that is done by someone, please report it!
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
  * 
  * Email me: hans.ferchland@gmx.de
  * 
@@ -16,7 +16,7 @@
  * File: SingleplayerState.java
  * Type: gamestates.lib.SingleplayerState
  * 
- * Documentation created: 15.03.2012 - 20:36:20 by Hans Ferchland
+ * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
@@ -44,19 +44,27 @@ public class SingleplayerState extends Gamestate {
 
     /** The application. */
     private solarwars.SolarWarsApplication application;
+    
     /** The game. */
     private solarwars.SolarWarsGame game;
+    
     /** The current level. */
     private Level currentLevel;
+    
     /** The gui. */
     private GameGUI gui;
+    
+    /** The pause. */
     private PauseGUI pause;
+    
     /** The hub. */
     private Hub hub;
+    
+    /** The pause listener. */
     private PauseActionListener pauseListener;
 
     /**
-     * Instantiates a new singelplayer.
+     * Instantiates a new singleplayer state.
      *
      * @param game the game
      */
@@ -154,8 +162,22 @@ public class SingleplayerState extends Gamestate {
         return currentLevel;
     }
 
+    /**
+     * The listener interface for receiving pauseAction events.
+     * The class that is interested in processing a pauseAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addPauseActionListener<code> method. When
+     * the pauseAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PauseActionEvent
+     */
     private class PauseActionListener implements ActionListener {
 
+        /* (non-Javadoc)
+         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+         */
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed) {
                 return;
