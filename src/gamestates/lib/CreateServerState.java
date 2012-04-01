@@ -26,6 +26,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
+import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Gameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
@@ -54,8 +56,10 @@ import net.messages.PlayerConnectingMessage;
 import net.SolarWarsServer;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 import net.messages.StringMessage;
 import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
@@ -89,6 +93,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerHub serverHub;
     /** The solar wars server. */
     private SolarWarsServer solarWarsServer;
+    /** The server as the client */
+    private Client serverClient;
     /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
     /** The player labels. */
@@ -109,6 +115,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
     /** The server connection listener. */
     private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
+    /** indicates that the game is set up and can be started */
+    private boolean gameStarted = false;
 
     /**
      * Sets the host player color.
@@ -145,6 +153,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
+        if (gameStarted) {
+            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        }
     }
 
     /* (non-Javadoc)
@@ -339,6 +350,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     @Override
     protected void unloadContent() {
 
+        serverClient.removeMessageListener(clientMessageListener);
+
+
         playerLabels.clear();
         playerNamePos.clear();
 
@@ -364,7 +378,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             solarWarsServer = networkManager.setupServer(hostPlayerName);
             solarWarsServer.addServerRegisterListener(this);
             networkManager.addClientRegisterListener(this);
-            networkManager.setupClient(hostPlayerName,
+            serverClient = networkManager.setupClient(hostPlayerName,
                     hostPlayerColor, true);
 
             //networkManager.getThisClient().addMessageListener(clientMessageListener, PlayerAcceptedMessage.class);
@@ -381,19 +395,42 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Start server.
      */
     private void startServer() {
-        createLevel();
+        long seed = createLevel();
+        StartGameMessage gameMessage =
+                new StartGameMessage(seed, ServerHub.getPlayers());
+        solarWarsServer.getGameServer().broadcast(
+                Filters.in(solarWarsServer.getGameServer().getConnections()),
+                gameMessage);
     }
 
     /**
      * Creates the level.
      */
-    private void createLevel() {
+    private long createLevel() {
         long seed = System.currentTimeMillis();
 //        logic.level.Level mpLevel = new logic.level.Level(
 //                solarWarsServer.getRootNode(), 
 //                solarWarsServer.getAssetManager(),
 //                null, ServerHub.playersByID, seed);
+        return seed;
+    }
 
+    /**
+     * 
+     * Starts the level and changes the gamestate.
+     * 
+     * @param seed the level-seed
+     * @param players the players connected to the server
+     */
+    private void startLevel(long seed, ArrayList<Player> players) {
+        logic.level.Level mpLevel =
+                new logic.level.Level(
+                SolarWarsApplication.getInstance().getRootNode(),
+                SolarWarsApplication.getInstance().getAssetManager(),
+                SolarWarsApplication.getInstance().getIsoControl(),
+                Hub.playersByID, seed);
+        Gameplay.initialize(mpLevel);
+        gameStarted = true;
     }
 
     /**
@@ -465,7 +502,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     public void registerServerListener(Server gameServer) {
         gameServer.addConnectionListener(serverConnectionListener);
         gameServer.addMessageListener(serverMessageListener,
-                PlayerConnectingMessage.class);
+                PlayerConnectingMessage.class, StartGameMessage.class);
 
     }
 
@@ -475,7 +512,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     public void registerClientListener(Client client) {
         client.addMessageListener(clientMessageListener,
                 PlayerAcceptedMessage.class,
-                PlayerLeavingMessage.class);
+                PlayerLeavingMessage.class,
+                StartGameMessage.class);
     }
 
     /*
@@ -547,7 +585,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 PlayerConnectingMessage pcm = (PlayerConnectingMessage) message;
                 boolean isHost = pcm.isHost();
                 // creates a connecting player on the server
-                Player newPlayer = null;
+                Player newPlayer;
                 if (!isHost) {
                     newPlayer = new Player(
                             pcm.getName(), pcm.getColor(),
@@ -587,12 +625,15 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
         public void messageReceived(Client source, Message message) {
+            System.out.println(
+                    "Client #" + source.getId() + " recieved a "
+                    + message.getClass().getSimpleName());
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
                 Player thisPlayer = pam.getPlayer();
                 boolean isConnecting = pam.isConnecting();
                 ArrayList<Player> players = pam.getPlayers();
-                
+
                 if (isConnecting) {
                     Hub.getInstance().initialize(thisPlayer, players);
                 } else {
@@ -604,7 +645,15 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 Player p = plm.getPlayer();
 
                 Hub.getInstance().removePlayer(p);
+            } else if (message instanceof StartGameMessage) {
+                StartGameMessage sgm = (StartGameMessage) message;
+                long seed = sgm.getSeed();
+                ArrayList<Player> players = sgm.getPlayers();
+
+                //SolarWarsApplication.getInstance().enqueue(null)
+                startLevel(seed, players);
             }
+
         }
     }
 }

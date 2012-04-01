@@ -61,6 +61,16 @@ public class GamestateManager {
     
     /** The next state. */
     private Gamestate nextState;
+    
+    private static boolean lockUpdate = false;
+
+    public static boolean isLocked() {
+        return lockUpdate;
+    }
+
+    static void setLock(boolean lock) {
+        lockUpdate = lock;
+    }
 
     /**
      * Instantiates a new gamestate manager.
@@ -152,7 +162,7 @@ public class GamestateManager {
      * @param tpf the tpf
      */
     public void update(float tpf) {
-        if (currentState != null) {
+        if (currentState != null && !isLocked()) {
             currentState.update(tpf);
         }
     }

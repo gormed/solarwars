@@ -74,6 +74,21 @@ public class Level {
     private IsoControl control;
     /** The hub. */
     private Hub hub;
+    /**
+     * Indicates that the level is fully loaded into scene-graph
+     */
+    private boolean levelLoaded = false;
+
+    /**
+     * 
+     * Retruns the loading state of the level. 
+     * Do not update the level while not loaded properly.
+     * 
+     * @return the state of level loading, true for loaded, false otherwise
+     */
+    public boolean isLevelLoaded() {
+        return levelLoaded;
+    }
 
     /**
      * Gets the level node.
@@ -161,6 +176,10 @@ public class Level {
 
     }
 
+    public void generateLevel() {
+        generateLevel(this.seed);
+    }
+
     /**
      * Generate level.
      *
@@ -168,6 +187,7 @@ public class Level {
      */
     public void generateLevel(long seed) {
 
+        System.out.print("[" + seed + "] Generating level...");
         // create a node for the planet-labels
         this.labelNode = new Node("Planet Labels");
         // attach the labels on the root!
@@ -188,14 +208,15 @@ public class Level {
 
                     planetList.add(p);
                     freePlanetsNode.attachChild(p);
+                    System.out.print(".");
                 }
             }
         }
-
         if (control != null) {
             control.addShootable(levelNode);
         }
 
+        System.out.println("Level generated!");
     }
 
     /**
@@ -215,6 +236,8 @@ public class Level {
             freePlanetsNode.detachChild(randomPlanet);
             playersPlanetsNode.attachChild(randomPlanet);
         }
+        levelLoaded = true;
+        System.out.println("Players setup!");
     }
 
     /**
@@ -318,6 +341,10 @@ public class Level {
      * @param tpf the tpf
      */
     public void updateLevel(float tpf) {
+        if (!levelLoaded) {
+            return;
+        }
+
         for (AbstractPlanet p : planetList) {
             p.updateLabel(tpf);
         }

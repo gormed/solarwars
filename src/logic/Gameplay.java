@@ -96,8 +96,6 @@ public class Gameplay {
         game = SolarWarsGame.getInstance();
         application = game.getApplication();
 
-        final Random r = new Random(System.currentTimeMillis());
-
         // ========================================================
         // PLANET ACTIONS
         // ========================================================

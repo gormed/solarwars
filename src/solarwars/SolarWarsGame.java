@@ -26,6 +26,7 @@ import com.jme3.input.InputManager;
 import gamestates.GamestateManager;
 import gamestates.lib.CreateServerState;
 import gamestates.lib.MainmenuState;
+import gamestates.lib.MultiplayerMatchState;
 import gamestates.lib.MultiplayerState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
@@ -123,12 +124,15 @@ public class SolarWarsGame {
         MultiplayerState mp = new MultiplayerState();
         CreateServerState cs = new CreateServerState();
         ServerLobbyState sls = new ServerLobbyState();
+        MultiplayerMatchState mms = new MultiplayerMatchState();
         gamestateManager.addState(sp);
         gamestateManager.addState(mp);
         gamestateManager.addState(m);
         gamestateManager.addState(cs);
         gamestateManager.addState(sls);
+        gamestateManager.addState(mms);
         gamestateManager.initialize(m);
+        
         gamestateManager.start();
     }
 

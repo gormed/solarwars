@@ -43,12 +43,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Gameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
@@ -96,6 +99,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
     /** The no server found. */
     private boolean noServerFound;
+    /** indicates that the game is set up and can be started */
+    private boolean gameStarted = false;
 
     /**
      * Sets the client player color.
@@ -146,6 +151,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         if (noServerFound) {
             disconnect();
         }
+        if (gameStarted) {
+            GamestateManager.getInstance().
+                    enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        }
+
         //if (!client.isConnected())
     }
 
@@ -327,6 +337,24 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     }
 
     /**
+     * 
+     * Starts the level and changes the gamestate.
+     * 
+     * @param seed the level-seed
+     * @param players the players connected to the server
+     */
+    private void startLevel(long seed, ArrayList<Player> players) {
+        logic.level.Level mpLevel =
+                new logic.level.Level(
+                SolarWarsApplication.getInstance().getRootNode(),
+                SolarWarsApplication.getInstance().getAssetManager(),
+                SolarWarsApplication.getInstance().getIsoControl(),
+                Hub.playersByID, seed);
+        Gameplay.initialize(mpLevel);
+        gameStarted = true;
+    }
+
+    /**
      * Disconnect.
      */
     private void disconnect() {
@@ -340,7 +368,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     public void registerClientListener(Client client) {
         client.addMessageListener(playerConnectionListener,
-                PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
+                PlayerAcceptedMessage.class,
+                PlayerLeavingMessage.class,
+                StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
 
     }
@@ -440,6 +470,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
         public void messageReceived(Client source, Message message) {
+            System.out.println(
+                    "Client #" + source.getId() + " recieved a "
+                    + message.getClass().getSimpleName());
+
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
                 Player thisPlayer = pam.getPlayer();
@@ -451,7 +485,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 } else {
                     Hub.getInstance().addPlayer(thisPlayer);
                 }
-                
+
                 refreshPlayers(players);
 
             } else if (message instanceof PlayerLeavingMessage) {
@@ -460,7 +494,15 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
                 Hub.getInstance().removePlayer(p);
                 removeLeavingPlayer(p);
+            } else if (message instanceof StartGameMessage) {
+                StartGameMessage sgm = (StartGameMessage) message;
+                long seed = sgm.getSeed();
+                ArrayList<Player> players = sgm.getPlayers();
+
+                startLevel(seed, players);
             }
+
+
         }
 
         private void refreshPlayers(ArrayList<Player> players) {

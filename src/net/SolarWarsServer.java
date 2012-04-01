@@ -46,6 +46,7 @@ import java.util.logging.Logger;
 import logic.Player;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 
 /**
  * The Class SolarWarsServer.
@@ -81,6 +82,7 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
+        Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(Player.class);
 
         //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
@@ -324,12 +326,6 @@ public class SolarWarsServer extends SimpleApplication {
                     gameServer.broadcast(Filters.equalTo(connection), otherPlayer);
                 }
             }
-
-
-
-
-
-
         } else {
             HostedConnection hc = connectedPlayers.get(p);
             PlayerLeavingMessage plm = new PlayerLeavingMessage(p);

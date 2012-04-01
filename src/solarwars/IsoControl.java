@@ -211,7 +211,7 @@ public class IsoControl {
                     // results list.
                     shootablesNode.collideWith(ray, results);
                     // 4. Print the results
-                    System.out.println("----- Collisions? " + results.size()
+                    System.out.println("----- 3D Collisions? " + results.size()
                             + "-----");
                     for (int i = 0; i < results.size(); i++) {
                         // For each hit, we know distance, impact point, name of

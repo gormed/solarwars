@@ -21,14 +21,31 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
+import gui.GameGUI;
+import gui.elements.PauseGUI;
+import gui.elements.Percentage;
+import logic.Gameplay;
+import logic.level.Level;
+import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
  * The Class MultiplayerMatchState.
  */
 public class MultiplayerMatchState extends Gamestate {
+
+    private GameGUI gui;
+    private SolarWarsGame game;
+    private PauseActionListener pauseListener;
+    private PauseGUI pause;
+    private Hub hub;
+    private Level currentLevel;
 
     /**
      * Instantiates a new multiplayer match state.
@@ -42,7 +59,8 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        
+        currentLevel.updateLevel(tpf);
+        gui.updateGUIElements(tpf);
     }
 
     /* (non-Javadoc)
@@ -50,7 +68,12 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
-        
+        hub = Hub.getInstance();
+        this.game = game;
+        setupGUI();
+        currentLevel = Gameplay.getCurrentLevel();
+        currentLevel.generateLevel();
+        currentLevel.setupPlayers(Hub.playersByID);
     }
 
     /* (non-Javadoc)
@@ -58,6 +81,55 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-        
+    }
+
+    /**
+     * Setup gui.
+     */
+    private void setupGUI() {
+        gui = new GameGUI(game);
+        gui.addGUIElement(new Percentage(gui));
+        pause = new PauseGUI(game, gui);
+
+        pauseListener = new PauseActionListener();
+
+        game.getApplication().getInputManager().addMapping(
+                SolarWarsApplication.INPUT_MAPPING_PAUSE,
+                new KeyTrigger(KeyInput.KEY_P),
+                new KeyTrigger(KeyInput.KEY_PAUSE),
+                new KeyTrigger(KeyInput.KEY_ESCAPE));
+        game.getApplication().getInputManager().addListener(
+                pauseListener,
+                SolarWarsApplication.INPUT_MAPPING_PAUSE);
+    }
+
+    /**
+     * The listener interface for receiving pauseAction events.
+     * The class that is interested in processing a pauseAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addPauseActionListener<code> method. When
+     * the pauseAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PauseActionEvent
+     */
+    private class PauseActionListener implements ActionListener {
+
+        /* (non-Javadoc)
+         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+         */
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (isPressed) {
+                return;
+            }
+            if (name.equals(SolarWarsApplication.INPUT_MAPPING_PAUSE)) {
+                if (gui.containsGUIElement(pause)) {
+                    pause.unpause();
+                } else {
+                    pause.pause();
+                }
+            }
+        }
     }
 }

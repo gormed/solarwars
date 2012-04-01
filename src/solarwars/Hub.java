@@ -45,13 +45,10 @@ public class Hub {
 
         return players;
     }
-    
     /** The players by id. */
     public static HashMap<Integer, Player> playersByID;
-    
     /** The players by name. */
     private static HashMap<String, Player> playersByName;
-    
     /** The local player. */
     private static Player localPlayer;
 
@@ -63,7 +60,6 @@ public class Hub {
     public static Player getLocalPlayer() {
         return localPlayer;
     }
-    
     /** The instance. */
     private static Hub instance;
 
@@ -97,9 +93,12 @@ public class Hub {
         playersByID = new HashMap<Integer, Player>();
         playersByName = new HashMap<String, Player>();
         this.localPlayer = localPlayer;
+        addPlayer(localPlayer);
         if (players != null) {
             for (Player p : players) {
-                addPlayer(p);
+                if (p.getId() != localPlayer.getId()) {
+                    addPlayer(p);
+                }
             }
         }
     }

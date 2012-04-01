@@ -25,8 +25,6 @@ import net.messages.PlayerConnectingMessage;
 import net.messages.StringMessage;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
-import com.jme3.network.ConnectionListener;
-import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
@@ -40,6 +38,7 @@ import java.util.logging.Logger;
 import logic.Player;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 
 /**
  * The Class NetworkManager.
@@ -233,6 +232,7 @@ public class NetworkManager {
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
+        Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(Player.class);
 
         thisClient = Network.connectToServer(
