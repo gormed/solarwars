@@ -27,6 +27,7 @@ import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -39,6 +40,7 @@ import logic.Player;
 /**
  * The Class ShipGroup.
  */
+@Serializable
 public class ShipGroup extends Node {
 
     /** The SHI p_ id. */
@@ -52,33 +54,27 @@ public class ShipGroup extends Node {
     private static int getContiniousID() {
         return SHIP_ID++;
     }
-    
     /** The ships. */
     private ArrayList<AbstractShip> ships;
-    
     /** The owner. */
     private Player owner;
-    
     /** The transform node. */
     protected Node transformNode;
-    
     /** The order. */
     private AbstractPlanet order;
-    
     /** The position. */
     private Vector3f position;
-    
     /** The geometry. */
     private Geometry geometry;
-    
     /** The id. */
     private int id;
-    
     /** The level. */
     private Level level;
-    
     /** The size. */
     private float size;
+
+    public ShipGroup() {
+    }
 
     /**
      * Instantiates a new ship group.
@@ -153,10 +149,11 @@ public class ShipGroup extends Node {
         minX = maxX - minX;
         minZ = maxZ - minZ;
 
-        if (shipCount > 1)
+        if (shipCount > 1) {
             size = (minX > minZ) ? minX : minZ;
-        else
+        } else {
             size = 0.2f;
+        }
         Sphere s = new Sphere(6, 6,
                 size);
 
@@ -240,7 +237,11 @@ public class ShipGroup extends Node {
     public void removeShip(AbstractShip s) {
         ships.remove(s);
     }
-    
+
+    public int getId() {
+        return id;
+    }
+
     /**
      * Gets the ship count.
      *

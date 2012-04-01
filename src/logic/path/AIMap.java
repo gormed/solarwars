@@ -49,21 +49,21 @@ public class AIMap {
      * @param level the level
      */
     public void generateMap(Level level) {
-        Iterator<AbstractPlanet> it = level.getPlanetIterator();
         ArrayList<AINode> planets = new ArrayList<AINode>();
         
-        while (it.hasNext()) {
-            AbstractPlanet p = it.next();
+        for (Map.Entry<Integer, AbstractPlanet> entry : level.getPlanetSet()) {
+            AbstractPlanet p = entry.getValue();
             AINode n = new AINode(p);
             map.put(p.getId(), n);
             planets.add(n);
         }
+
 
         for (Map.Entry<Integer, AINode> cursor : map.entrySet()) {
             cursor.getValue().connectPlanets(planets);
         }
         planets.clear();
         planets = null;
-        it = null;
+        
     }
 }

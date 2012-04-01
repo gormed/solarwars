@@ -90,6 +90,15 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
+        application.getInputManager().removeListener(pauseListener);
+        pauseListener = null;
+        
+        hub = null;
+        
+        currentLevel.destroy();
+        
+        gui.cleanUpGUI();
+        gui = null;
     }
 
     /* (non-Javadoc)
@@ -123,12 +132,12 @@ public class SingleplayerState extends Gamestate {
 
         pauseListener = new PauseActionListener();
 
-        game.getApplication().getInputManager().addMapping(
+        application.getInputManager().addMapping(
                 SolarWarsApplication.INPUT_MAPPING_PAUSE,
                 new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),
                 new KeyTrigger(KeyInput.KEY_ESCAPE));
-        game.getApplication().getInputManager().addListener(
+        application.getInputManager().addListener(
                 pauseListener,
                 SolarWarsApplication.INPUT_MAPPING_PAUSE);
     }

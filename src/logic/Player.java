@@ -26,7 +26,6 @@ import com.jme3.network.serializing.Serializable;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
 import java.util.ArrayList;
-import solarwars.Hub;
 
 /**
  * The Class Player.
@@ -34,38 +33,18 @@ import solarwars.Hub;
 @Serializable
 public class Player {
 
-    /** The name. */
-    private String name;
-    
-    /** The color. */
-    private ColorRGBA color;
-    
     /** The id. */
     private int id;
-    
-    /** The ship count. */
-    private int shipCount = 0;
-    
     /** The artificial. */
     private AI artificial;
-    
-    /** The selected planet. */
-    private AbstractPlanet selectedPlanet;
-    
-    /** The selected ship group. */
-    private ShipGroup selectedShipGroup;
-    
-    /** The ship percentage. */
-    private float shipPercentage = 0.5f;
-    
     /** The planets. */
     private ArrayList<AbstractPlanet> planets;
-    
     /** The ship groups. */
     private ArrayList<ShipGroup> shipGroups;
-    
     /** The is host. */
     private boolean isHost;
+    /** defines the state of a player */
+    private PlayerState state = new PlayerState();
 
     /**
      * Instantiates a new player.
@@ -81,8 +60,8 @@ public class Player {
      * @param id the id
      */
     public Player(String name, ColorRGBA color, int id) {
-        this.name = name;
-        this.color = color;
+        state.name = name;
+        state.color = color;
         this.id = id;
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
@@ -97,11 +76,19 @@ public class Player {
      * @param isHost the is host
      */
     public Player(String name, ColorRGBA color, int id, boolean isHost) {
-        this.name = name;
-        this.color = color;
+        state.name = name;
+        state.color = color;
         this.id = id;
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
+    }
+
+    public PlayerState getState() {
+        return state;
+    }
+    
+    void applyState(PlayerState newState) {
+        this.state = newState;
     }
 
     /**
@@ -110,7 +97,7 @@ public class Player {
      * @return the color
      */
     public ColorRGBA getColor() {
-        return color;
+        return state.color;
     }
 
     /**
@@ -137,7 +124,7 @@ public class Player {
      * @return the name
      */
     public String getName() {
-        return name;
+        return state.name;
     }
 
     /**
@@ -152,8 +139,8 @@ public class Player {
      * @param p the p
      */
     void selectPlanet(AbstractPlanet p) {
-        selectedPlanet = p;
-        selectedShipGroup = null;
+        state.selectedPlanetId = p.getId();
+        state.selectedShipGroupId = -1;
     }
 
     /**
@@ -162,7 +149,7 @@ public class Player {
      * @return true, if successful
      */
     boolean hasSelectedPlanet() {
-        return selectedPlanet != null;
+        return state.selectedPlanetId > -1;
     }
 
     /**
@@ -171,7 +158,7 @@ public class Player {
      * @return the selected planet
      */
     AbstractPlanet getSelectedPlanet() {
-        return selectedPlanet;
+        return Gameplay.getCurrentLevel().getPlanet(state.selectedPlanetId);
     }
 
     /**
@@ -186,7 +173,7 @@ public class Player {
         if (p < 0.0f) {
             p = 0.0f;
         }
-        shipPercentage = p;
+        state.shipPercentage = p;
     }
 
     /**
@@ -195,7 +182,7 @@ public class Player {
      * @return the ship percentage
      */
     public float getShipPercentage() {
-        return shipPercentage;
+        return state.shipPercentage;
     }
 
     /**
@@ -204,8 +191,8 @@ public class Player {
      * @param g the g
      */
     void selectShipGroup(ShipGroup g) {
-        selectedShipGroup = g;
-        selectedPlanet = null;
+        state.selectedShipGroupId = g.getId();
+        state.selectedPlanetId = -1;
     }
 
     /**
@@ -214,7 +201,7 @@ public class Player {
      * @return true, if successful
      */
     boolean hasSelectedShipGroup() {
-        return selectedShipGroup != null;
+        return state.selectedShipGroupId > -1;
     }
 
     /**
@@ -223,7 +210,7 @@ public class Player {
      * @return the selected ship group
      */
     ShipGroup getSelectedShipGroup() {
-        return selectedShipGroup;
+        return Gameplay.getCurrentLevel().getShipGroup(state.selectedShipGroupId);
     }
 
     /**

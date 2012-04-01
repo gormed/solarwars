@@ -30,6 +30,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
+import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
@@ -62,7 +63,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
     protected Label pauseLabel;
     
     /** The exit game. */
-    protected Button exitGame;
+    protected Button mainMenu;
     
     /** The continue game. */
     protected Button continueGame;
@@ -122,7 +123,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             }
         };
 
-        exitGame = new Button("Exit Game",
+        mainMenu = new Button("Mainmenu",
                 new Vector3f(
                         gui.getWidth() / 2,
                         gui.getHeight() / 2.2f, 0),
@@ -135,16 +136,16 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                game.getApplication().stop();
-
+                //game.getApplication().stop();
+                GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
             }
         };
         
         attachChild(pauseLabel);
-        attachChild(exitGame);
+        attachChild(mainMenu);
         attachChild(continueGame);
         
-        //gui.addGUIElement(exitGame);
+        //gui.addGUIElement(mainMenu);
 
 
     }
@@ -174,7 +175,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
     @Override
     public void updateGUI(float tpf) {
         pauseLabel.updateGUI(tpf);
-        exitGame.updateGUI(tpf);
+        mainMenu.updateGUI(tpf);
     }
 
     /* (non-Javadoc)

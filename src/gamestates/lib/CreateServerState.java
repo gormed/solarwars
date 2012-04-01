@@ -154,6 +154,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
         if (gameStarted) {
+            Server server = solarWarsServer.getGameServer();
+            server.removeMessageListener(serverMessageListener);
+            server.removeConnectionListener(serverConnectionListener);
+            serverClient.removeMessageListener(clientMessageListener);
+            solarWarsServer.enterLevel();
             GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
         }
     }
@@ -408,6 +413,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     private long createLevel() {
         long seed = System.currentTimeMillis();
+        solarWarsServer.prepareLevel(seed);
 //        logic.level.Level mpLevel = new logic.level.Level(
 //                solarWarsServer.getRootNode(), 
 //                solarWarsServer.getAssetManager(),
@@ -417,7 +423,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /**
      * 
-     * Starts the level and changes the gamestate.
+     * Starts the level.
      * 
      * @param seed the level-seed
      * @param players the players connected to the server

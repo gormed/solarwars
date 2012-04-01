@@ -32,13 +32,10 @@ public class ActionLib {
 
     /** The general actions. */
     private HashMap<String, GeneralAction> generalActions;
-    
     /** The planet actions. */
     private HashMap<String, PlanetAction> planetActions;
-    
     /** The ship actions. */
     private HashMap<String, ShipAction> shipActions;
-    
     /** The instance. */
     private static ActionLib instance;
 
@@ -116,7 +113,14 @@ public class ActionLib {
      * @param actionName the action name
      */
     public void invokePlanetAction(Object sender, AbstractPlanet planet, Player p, String actionName) {
-        planetActions.get(actionName).doAction(sender, planet, p);
+        if (sender instanceof MultiplayerGameplay) {
+            planetActions.get(actionName).doAction(sender, planet, p);
+        } else {
+            planetActions.get(actionName).doAction(sender, planet, p);
+            if (MultiplayerGameplay.isInitialized()) {
+                MultiplayerGameplay.getInstance().sendPlanetActionMessage(actionName, planet);
+            }
+        }
     }
 
     /**

@@ -25,16 +25,19 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import com.jme3.network.serializing.Serializable;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import logic.level.Level;
 import logic.ActionLib;
 import logic.Gameplay;
 import logic.Player;
+import solarwars.Hub;
 
 /**
  * The Class AbstractShip.
  */
+@Serializable
 public abstract class AbstractShip extends Node {
 
     /** The SHI p_ id. */
@@ -48,39 +51,31 @@ public abstract class AbstractShip extends Node {
     private static int getContiniousID() {
         return SHIP_ID++;
     }
-    
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.175f;
-    
     /** The asset manager. */
     protected AssetManager assetManager;
-    
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The transform node. */
     protected Node transformNode;
-    
     /** The level. */
     protected Level level;
-    
     /** The id. */
     protected int id;
-    
     /** The position. */
     protected Vector3f position;
-    
     /** The ship group. */
     protected ShipGroup shipGroup;
-    
     /** The owner. */
     protected Player owner;
-    
     /** The order. */
     protected AbstractPlanet order;
+
+    public AbstractShip() {
+    }
 
     /**
      * Instantiates a new abstract ship.
@@ -189,8 +184,10 @@ public abstract class AbstractShip extends Node {
             Vector3f dir = planetLoc.subtract(position);
             if (dir.length() < 0.1f) {
 
-                ActionLib.getInstance().invokePlanetAction(
-                        this, order, owner, Gameplay.PLANET_CAPTURE);
+                if (owner.equals(Hub.getLocalPlayer())) {
+                    ActionLib.getInstance().invokePlanetAction(
+                            this, order, owner, Gameplay.PLANET_CAPTURE);
+                }
 
                 removeFromShipGroup();
                 level.removeShip(owner, this);

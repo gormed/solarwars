@@ -132,6 +132,8 @@ public class Gameplay {
                                 selected);
                         currentLevel.addShipGroup(p, sg);
                         p.createShipGroup(sg);
+                        
+                        
                     }
                 } else if (p.hasSelectedShipGroup()) {
                     ShipGroup sg = p.getSelectedShipGroup();

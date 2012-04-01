@@ -31,9 +31,10 @@ import entities.BasePlanet;
 import entities.ShipGroup;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import logic.Player;
 import solarwars.IsoControl;
 
@@ -61,11 +62,11 @@ public class Level {
     /** The ship nodes. */
     private HashMap<Player, Node> shipNodes;
     /** The planet list. */
-    private ArrayList<AbstractPlanet> planetList;
+    private HashMap<Integer, AbstractPlanet> planetList;
     /** The ship list. */
-    private ArrayList<AbstractShip> shipList;
+    private HashMap<Integer, AbstractShip> shipList;
     /** The ship group list. */
-    private ArrayList<ShipGroup> shipGroupList;
+    private HashMap<Integer, ShipGroup> shipGroupList;
     /** The remove ships list. */
     private ArrayList<AbstractShip> removeShipsList;
     /** The asset manager. */
@@ -150,12 +151,12 @@ public class Level {
         this.control = control;
 
         // Init lists
-        this.planetList = new ArrayList<AbstractPlanet>();
-        this.shipList = new ArrayList<AbstractShip>();
-        this.shipGroupList = new ArrayList<ShipGroup>();
-        this.planetNodes = new HashMap<Player, Node>();
-        this.shipNodes = new HashMap<Player, Node>();
-        this.removeShipsList = new ArrayList<AbstractShip>();
+        this.planetList = new HashMap<Integer, AbstractPlanet>(100);
+        this.shipList = new HashMap<Integer, AbstractShip>(300);
+        this.shipGroupList = new HashMap<Integer, ShipGroup>(50);
+        this.planetNodes = new HashMap<Player, Node>(8);
+        this.shipNodes = new HashMap<Player, Node>(8);
+        this.removeShipsList = new ArrayList<AbstractShip>(100);
 
         // create base-nodes
         this.levelNode = new Node("Level Node");
@@ -206,7 +207,7 @@ public class Level {
                     p.createPlanet();
                     p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
-                    planetList.add(p);
+                    planetList.put(p.getId(), p);
                     freePlanetsNode.attachChild(p);
                     System.out.print(".");
                 }
@@ -249,7 +250,7 @@ public class Level {
     public void addShip(Player p, AbstractShip s) {
         Node shipNode = shipNodes.get(p);
         shipNode.attachChild(s);
-        shipList.add(s);
+        shipList.put(s.getId(), s);
     }
 
     /**
@@ -261,7 +262,7 @@ public class Level {
     public void addShipGroup(Player p, ShipGroup s) {
         Node shipNode = shipNodes.get(p);
         shipNode.attachChild(s);
-        shipGroupList.add(s);
+        shipGroupList.put(s.getId(), s);
     }
 
     /**
@@ -293,8 +294,20 @@ public class Level {
      *
      * @return the planet iterator
      */
-    public Iterator<AbstractPlanet> getPlanetIterator() {
-        return planetList.iterator();
+    public Set<Entry<Integer, AbstractPlanet>> getPlanetSet() {
+        return planetList.entrySet();
+    }
+
+    public AbstractPlanet getPlanet(int id) {
+        return planetList.get(id);
+    }
+
+    public ShipGroup getShipGroup(int id) {
+        return shipGroupList.get(id);
+    }
+
+    public AbstractShip getShip(int id) {
+        return shipList.get(id);
     }
 
     /**
@@ -345,20 +358,54 @@ public class Level {
             return;
         }
 
-        for (AbstractPlanet p : planetList) {
-            p.updateLabel(tpf);
+        for (Map.Entry<Integer, AbstractPlanet> entry : getPlanetSet()) {
+            entry.getValue().updateLabel(tpf);
         }
-        for (ShipGroup sg : shipGroupList) {
-            sg.updateShipGroup(tpf);
+
+        for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
+            entry.getValue().updateShipGroup(tpf);
         }
-        for (AbstractShip s : shipList) {
-            s.updateShip(tpf);
+
+        for (Map.Entry<Integer, AbstractShip> entry : shipList.entrySet()) {
+            entry.getValue().updateShip(tpf);
         }
 
         for (AbstractShip s : removeShipsList) {
-            shipList.remove(s);
+            shipList.remove(s.getId());
         }
 
         removeShipsList.clear();
+    }
+
+    public void destroy() {
+        control.removeShootable(levelNode);
+
+        this.rootNode.detachChild(labelNode);
+        this.rootNode.detachChild(background);
+        this.background = null;
+        this.labelNode = null;
+
+        this.freePlanetsNode.detachAllChildren();
+        this.allShipsNode.detachAllChildren();
+        this.levelNode.detachAllChildren();
+
+        this.levelNode = null;
+        this.freePlanetsNode = null;
+        this.allShipsNode = null;
+
+        // Init lists
+        this.planetList.clear();
+        this.shipList.clear();
+        this.shipGroupList.clear();
+        this.planetNodes.clear();
+        this.shipNodes.clear();
+        this.removeShipsList.clear();
+
+        // Init needed system refs
+        this.rootNode = null;
+        this.assetManager = null;
+        this.hub = null;
+        this.control = null;
+
     }
 }

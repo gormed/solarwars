@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
+import logic.PlayerState;
+import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
@@ -47,7 +49,6 @@ public class NetworkManager {
 
     /** The Constant DEFAULT_PORT. */
     public static final int DEFAULT_PORT = 6142;
-    
     /** The instance. */
     private static NetworkManager instance;
 
@@ -71,8 +72,9 @@ public class NetworkManager {
      */
     public static boolean checkIP(String sip) {
         String[] parts = sip.split("\\.");
-        if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals("")))
+        if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals(""))) {
             return false;
+        }
         for (String s : parts) {
             int i = Integer.parseInt(s);
             if (i < 0 || i > 255) {
@@ -110,25 +112,18 @@ public class NetworkManager {
     private NetworkManager() {
         clientRegisterListeners = new ArrayList<ClientRegisterListener>();
     }
-    
     /** The udp port. */
     private int udpPort = DEFAULT_PORT;
-    
     /** The tcp port. */
     private int tcpPort = DEFAULT_PORT;
-    
     /** The client ip adress. */
     private InetAddress clientIPAdress;
-    
     /** The server ip adress. */
     private InetAddress serverIPAdress;
-    
     /** The this client. */
     private Client thisClient;
-    
     /** The this server. */
     private SolarWarsServer thisServer;
-    
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
 
@@ -233,11 +228,19 @@ public class NetworkManager {
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(StartGameMessage.class);
+        Serializer.registerClass(PlanetActionMessage.class);
+        Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
+        Serializer.registerClass(entities.AbstractPlanet.class);
+        Serializer.registerClass(entities.AbstractShip.class);
+        Serializer.registerClass(entities.BasePlanet.class);
+        Serializer.registerClass(entities.ShipGroup.class);
+        Serializer.registerClass(entities.SimpleShip.class);
+
         thisClient = Network.connectToServer(
-                SolarWarsServer.SERVER_NAME, 
-                SolarWarsServer.SERVER_VERSION, 
+                SolarWarsServer.SERVER_NAME,
+                SolarWarsServer.SERVER_VERSION,
                 serverIPAdress.getHostAddress(), tcpPort, udpPort);
 
         for (ClientRegisterListener rl : clientRegisterListeners) {

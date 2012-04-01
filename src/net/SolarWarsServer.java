@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
+import logic.PlayerState;
+import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
@@ -83,8 +85,15 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(StartGameMessage.class);
+        Serializer.registerClass(PlanetActionMessage.class);
+        Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
+        Serializer.registerClass(entities.AbstractPlanet.class);
+        Serializer.registerClass(entities.AbstractShip.class);
+        Serializer.registerClass(entities.BasePlanet.class);
+        Serializer.registerClass(entities.ShipGroup.class);
+        Serializer.registerClass(entities.SimpleShip.class);
         //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
     /** The game server. */
@@ -114,6 +123,8 @@ public class SolarWarsServer extends SimpleApplication {
     private ArrayList<Player> leavingPlayers;
     /** The is running. */
     private boolean isRunning;
+    private long seed;
+    private GameplayListener gameplayListener = new GameplayListener();
 
     /**
      * Start.
@@ -136,6 +147,14 @@ public class SolarWarsServer extends SimpleApplication {
         leavingPlayers = new ArrayList<Player>();
         registerListeners = new ArrayList<ServerRegisterListener>();
         isRunning = true;
+    }
+
+    public void prepareLevel(long seed) {
+        this.seed = seed;
+    }
+
+    public void enterLevel() {
+        gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class);
     }
 
     /* (non-Javadoc)
@@ -314,15 +333,15 @@ public class SolarWarsServer extends SimpleApplication {
             for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
                 Player player = entrySet.getKey();
                 HostedConnection connection = entrySet.getValue();
-                
+
                 if (player != null && !player.equals(p) && connection != null) {
                     isHost = player.isHost();
                     PlayerAcceptedMessage otherPlayer =
                             new PlayerAcceptedMessage(
-                                    p, 
-                                    ServerHub.getPlayers(), 
-                                    isHost,
-                                    false);
+                            p,
+                            ServerHub.getPlayers(),
+                            isHost,
+                            false);
                     gameServer.broadcast(Filters.equalTo(connection), otherPlayer);
                 }
             }
@@ -359,6 +378,26 @@ public class SolarWarsServer extends SimpleApplication {
                         "Server received '"
                         + stringMessage.getMessage()
                         + "' from client #" + source.getId());
+            }
+        }
+    }
+
+    private class GameplayListener implements MessageListener<HostedConnection> {
+
+        public void messageReceived(HostedConnection source, Message message) {
+            if (message instanceof PlanetActionMessage) {
+                PlanetActionMessage clientMessage = (PlanetActionMessage) message;
+
+                PlanetActionMessage serverMessage =
+                        new PlanetActionMessage(
+                        clientMessage.getClientTime(),
+                        System.currentTimeMillis(),
+                        clientMessage.getActionName(),
+                        clientMessage.getPlayerID(),
+                        clientMessage.getPlayerState(),
+                        clientMessage.getPlanetID());
+
+                gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
             }
         }
     }

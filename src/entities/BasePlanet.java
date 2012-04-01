@@ -24,19 +24,22 @@ package entities;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.network.serializing.Serializable;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
-import java.util.Random;
 import logic.level.Level;
 
 /**
  * The Class BasePlanet.
  */
+@Serializable
 public class BasePlanet extends AbstractPlanet {
+
+    public BasePlanet() {
+    }
 
     /**
      * Instantiates a new base planet.
@@ -62,7 +65,7 @@ public class BasePlanet extends AbstractPlanet {
         TangentBinormalGenerator.generate(s);
         geometry = new Geometry("BasePlanet_" + id, s);
         //geometry.setLocalRotation(new Quaternion(angles));
-        
+
         //Material
         material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

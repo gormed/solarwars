@@ -31,6 +31,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
+import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -42,11 +43,11 @@ import solarwars.IsoCamera;
 /**
  * The Class AbstractPlanet.
  */
+@Serializable
 public abstract class AbstractPlanet extends Node {
 
     /** The Constant SHIP_REFRESH_MULTIPILER. */
     private static final int SHIP_REFRESH_MULTIPILER = 5;
-    
     /** The PLANE t_ id. */
     private static int PLANET_ID = 0;
 
@@ -58,51 +59,39 @@ public abstract class AbstractPlanet extends Node {
     private static int getContiniousID() {
         return PLANET_ID++;
     }
-    
     /** The Constant SPHERE_Z_SAMPLES. */
     public static final int SPHERE_Z_SAMPLES = 20;
-    
     /** The Constant SPHERE_RADIAL_SAMPLES. */
     public static final int SPHERE_RADIAL_SAMPLES = 20;
-    
     /** The asset manager. */
     protected AssetManager assetManager;
-    
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The transform node. */
     protected Node transformNode;
-    
     /** The size. */
     protected float size;
-    
     /** The level. */
     protected Level level;
-    
     /** The id. */
     protected int id;
-    
     /** The position. */
     protected Vector3f position;
-    
     /** The label. */
     protected BitmapText label;
-    
     /** The ship increment. */
     protected float shipIncrement;
-    
     /** The ships. */
     protected int ships = 0;
-    
     /** The time. */
     protected float time;
-    
     /** The owner. */
     protected Player owner;
+
+    public AbstractPlanet() {
+    }
 
     /**
      * Instantiates a new abstract planet.

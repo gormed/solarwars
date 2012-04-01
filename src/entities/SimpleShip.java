@@ -26,6 +26,7 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
@@ -35,7 +36,11 @@ import logic.Player;
 /**
  * The Class SimpleShip.
  */
+@Serializable
 public class SimpleShip extends AbstractShip {
+
+    public SimpleShip() {
+    }
 
     /**
      * Instantiates a new simple ship.
@@ -70,10 +75,10 @@ public class SimpleShip extends AbstractShip {
         geometry.setQueueBucket(Bucket.Translucent);
 
         float angles[] = {
-            (float) -Math.PI / 2, (float) -Math.PI/2, 0
+            (float) -Math.PI / 2, (float) -Math.PI / 2, 0
         };
-        
-        Vector3f offset = new Vector3f(0, 0, -SHIP_SIZE/2);
+
+        Vector3f offset = new Vector3f(0, 0, -SHIP_SIZE / 2);
 
         geometry.setLocalTranslation(offset.x,
                 offset.y, offset.z);
@@ -82,7 +87,7 @@ public class SimpleShip extends AbstractShip {
         //Cross c = new Cross(assetManager);
         //transformNode.attachChild(c);
         transformNode.attachChild(geometry);
-        
+
         transformNode.setLocalTranslation(position);
     }
 }

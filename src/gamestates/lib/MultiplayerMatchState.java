@@ -30,6 +30,7 @@ import gui.GameGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import logic.Gameplay;
+import logic.MultiplayerGameplay;
 import logic.level.Level;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -46,12 +47,14 @@ public class MultiplayerMatchState extends Gamestate {
     private PauseGUI pause;
     private Hub hub;
     private Level currentLevel;
+    private MultiplayerGameplay gameplay;
 
     /**
      * Instantiates a new multiplayer match state.
      */
     public MultiplayerMatchState() {
         super(GamestateManager.MULTIPLAYER_MATCH_STATE);
+                
     }
 
     /* (non-Javadoc)
@@ -59,6 +62,7 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
+        gameplay.update(tpf);
         currentLevel.updateLevel(tpf);
         gui.updateGUIElements(tpf);
     }
@@ -70,6 +74,9 @@ public class MultiplayerMatchState extends Gamestate {
     protected void loadContent(SolarWarsGame game) {
         hub = Hub.getInstance();
         this.game = game;
+        gameplay = MultiplayerGameplay.getInstance();
+
+        game.getApplication().setPauseOnLostFocus(false);
         setupGUI();
         currentLevel = Gameplay.getCurrentLevel();
         currentLevel.generateLevel();
@@ -81,6 +88,15 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
+        game.getApplication().getInputManager().removeListener(pauseListener);
+        pauseListener = null;
+
+        hub = null;
+
+        currentLevel.destroy();
+
+        gui.cleanUpGUI();
+        gui = null;
     }
 
     /**
