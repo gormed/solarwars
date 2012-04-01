@@ -54,7 +54,7 @@ public class AINode {
         this.planet = planet;
         this.owner = planet.getOwner();
         this.size = planet.getSize();
-        this.population = planet.getShips();
+        this.population = planet.getShipCount();
 
     }
 

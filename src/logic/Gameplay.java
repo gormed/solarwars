@@ -24,8 +24,9 @@ package logic;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
+import gui.elements.GameOverGUI;
 import java.util.Random;
-import logic.level.Level;
+import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -36,31 +37,24 @@ public class Gameplay {
 
     /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
-    
     /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
-    
     /** The Constant SHIP_REDIRECT. */
     public static final String SHIP_REDIRECT = "RedirectShip";
-    
     /** The Constant SHIP_ARRIVES. */
     public static final String SHIP_ARRIVES = "ArrivesShip";
-    
     /** The Constant PLANET_CAPTURE. */
     public static final String PLANET_CAPTURE = "CapturePlanet";
-    
+    /** The Constant GAME_OVER. */
+    public static final String GAME_OVER = "GameOver";
     /** The game. */
     private SolarWarsGame game;
-    
     /** The application. */
     private SolarWarsApplication application;
-    
     /** The action lib. */
     private ActionLib actionLib;
-    
     /** The instance. */
     private static Gameplay instance;
-    
     /** The current level. */
     private static Level currentLevel = null;
 
@@ -122,7 +116,7 @@ public class Gameplay {
                     AbstractPlanet sel = p.getSelectedPlanet();
                     if (sel.getOwner() == p && !sel.equals(planet)) {
 
-                        int selected = (int) (sel.getShips() * p.getShipPercentage());
+                        int selected = (int) (sel.getShipCount() * p.getShipPercentage());
                         ShipGroup sg = new ShipGroup(
                                 application.getAssetManager(),
                                 currentLevel,
@@ -132,8 +126,8 @@ public class Gameplay {
                                 selected);
                         currentLevel.addShipGroup(p, sg);
                         p.createShipGroup(sg);
-                        
-                        
+
+
                     }
                 } else if (p.hasSelectedShipGroup()) {
                     ShipGroup sg = p.getSelectedShipGroup();
@@ -150,7 +144,7 @@ public class Gameplay {
                     planet.incrementShips();
                 } else {
                     planet.decrementShips();
-                    if (planet.getShips() == 0) {
+                    if (planet.getShipCount() == 0) {
                         p.capturePlanet(planet);
                     }
                 }
@@ -197,7 +191,45 @@ public class Gameplay {
         // GENERAL ACTIONS
         // ========================================================
 
+        GeneralAction gameOver = new GeneralAction(GAME_OVER) {
 
+            @Override
+            void doAction(Object sender, Player p) {
 
+                if (sender instanceof Player) {
+                    Player winner = (Player) sender;
+                    if (winner.getId() == Hub.getLocalPlayer().getId()) {
+                        localPlayerWins();
+                    } else if (p.getId() == Hub.getLocalPlayer().getId()) {
+                        localPlayerLooses();
+                    } else {
+                        // Display that winner defeated p
+                    }
+                }
+            }
+
+            private void localPlayerWins() {
+                currentLevel.setGameOver(true);
+                GameOverGUI gameOverGUI =
+                        new GameOverGUI(
+                        game,
+                        currentLevel.getGui(),
+                        GameOverGUI.GameOverState.WON);
+
+                gameOverGUI.display();
+            }
+
+            private void localPlayerLooses() {
+                currentLevel.setGameOver(true);
+                GameOverGUI gameOverGUI =
+                        new GameOverGUI(
+                        game,
+                        currentLevel.getGui(),
+                        GameOverGUI.GameOverState.WON);
+                gameOverGUI.display();
+            }
+        };
+
+        actionLib.getGeneralActions().put(GAME_OVER, gameOver);
     }
 }

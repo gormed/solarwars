@@ -31,7 +31,7 @@ import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import logic.Gameplay;
 import logic.MultiplayerGameplay;
-import logic.level.Level;
+import logic.Level;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;

@@ -33,6 +33,11 @@ import java.util.ArrayList;
 @Serializable
 public class Player {
 
+    public static final ColorRGBA[] PLAYER_COLORS = {
+        ColorRGBA.Blue, ColorRGBA.Red,
+        ColorRGBA.Green, ColorRGBA.Orange,
+        ColorRGBA.Yellow, ColorRGBA.Cyan,
+        ColorRGBA.Brown, ColorRGBA.Magenta};
     /** The id. */
     private int id;
     /** The artificial. */
@@ -86,7 +91,7 @@ public class Player {
     public PlayerState getState() {
         return state;
     }
-    
+
     void applyState(PlayerState newState) {
         this.state = newState;
     }
@@ -185,6 +190,24 @@ public class Player {
         return state.shipPercentage;
     }
 
+    public int getShipCount() {
+        int ships = 0;
+
+        for (ShipGroup sg : shipGroups) {
+            ships += sg.getShipCount();
+        }
+
+        for (AbstractPlanet p : planets) {
+            ships += p.getShipCount();
+        }
+
+        return ships;
+    }
+
+    public boolean hasShips() {
+        return (getShipCount() > 0);
+    }
+
     /**
      * Select ship group.
      *
@@ -264,11 +287,19 @@ public class Player {
      * @param planet the planet
      */
     void capturePlanet(AbstractPlanet planet) {
+        Player prevOwner = null;
+
         if (planet.hasOwner()) {
-            planet.getOwner().uncapturePlanet(planet);
+            prevOwner = planet.getOwner();
+            prevOwner.uncapturePlanet(planet);
         }
         planet.setOwner(this);
         planets.add(planet);
+
+        if (prevOwner != null && !prevOwner.hasShips()) {
+            ActionLib.getInstance().
+                    invokeGeneralAction(this, prevOwner, Gameplay.GAME_OVER);
+        }
     }
 
     /**
@@ -278,6 +309,7 @@ public class Player {
      */
     void uncapturePlanet(AbstractPlanet planet) {
         planets.remove(planet);
+
     }
 
     /**

@@ -344,11 +344,12 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param players the players connected to the server
      */
     private void startLevel(long seed, ArrayList<Player> players) {
-        logic.level.Level mpLevel =
-                new logic.level.Level(
+        logic.Level mpLevel =
+                new logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
                 SolarWarsApplication.getInstance().getIsoControl(),
+                gui,
                 Hub.playersByID, seed);
         Gameplay.initialize(mpLevel);
         gameStarted = true;

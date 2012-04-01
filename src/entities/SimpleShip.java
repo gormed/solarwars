@@ -30,7 +30,7 @@ import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
-import logic.level.Level;
+import logic.Level;
 import logic.Player;
 
 /**

@@ -34,7 +34,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Random;
-import logic.level.Level;
+import logic.Level;
 import logic.Player;
 
 /**

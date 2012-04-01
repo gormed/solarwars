@@ -19,7 +19,7 @@
  * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package logic.level;
+package entities;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;

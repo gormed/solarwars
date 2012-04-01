@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import logic.level.Level;
+import logic.Level;
 
 /**
  * The Class AIMap.

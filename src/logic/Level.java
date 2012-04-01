@@ -19,7 +19,7 @@
  * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package logic.level;
+package logic;
 
 import solarwars.Hub;
 import com.jme3.asset.AssetManager;
@@ -35,7 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import logic.Player;
+import entities.LevelBackground;
+import gui.GameGUI;
 import solarwars.IsoControl;
 
 /**
@@ -73,12 +74,37 @@ public class Level {
     private AssetManager assetManager;
     /** The control. */
     private IsoControl control;
-    /** The hub. */
-    private Hub hub;
+    /** The currently used game gui. */
+    private GameGUI gui;
     /**
      * Indicates that the level is fully loaded into scene-graph
      */
     private boolean levelLoaded = false;
+    
+    /** indicates that the game ended */
+    private boolean gameOver = false;
+
+    /**
+     * Retrieve information about the game-end.
+     * @return true if ended, false otherwise
+     */
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    /**
+     * 
+     * Set game over flag.
+     * 
+     * @param gameOver the value to set
+     */
+    void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    GameGUI getGui() {
+        return gui;
+    }
 
     /**
      * 
@@ -116,7 +142,8 @@ public class Level {
      * @param assetManager the asset manager
      * @param control the control
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control) {
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui) {
+        this.gui = gui;
         setup(rootNode, assetManager, control, System.currentTimeMillis());
     }
 
@@ -129,7 +156,8 @@ public class Level {
      * @param players the players
      * @param seed the seed
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control, HashMap<Integer, Player> players, long seed) {
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players, long seed) {
+        this.gui = gui;
         setup(rootNode, assetManager, control, seed);
     }
 
@@ -147,7 +175,6 @@ public class Level {
         // Init needed system refs
         this.rootNode = rootNode;
         this.assetManager = assetManager;
-        this.hub = Hub.getInstance();
         this.control = control;
 
         // Init lists
@@ -332,8 +359,8 @@ public class Level {
             idx = r.nextInt(planetList.size());
             planet = planetList.get(idx);
         }
-
-        planet.setOwner(p);
+        
+        p.capturePlanet(planet);
         planet.setShipCount(100);
         return planet;
     }
@@ -354,7 +381,7 @@ public class Level {
      * @param tpf the tpf
      */
     public void updateLevel(float tpf) {
-        if (!levelLoaded) {
+        if (!levelLoaded || gameOver) {
             return;
         }
 
@@ -404,7 +431,6 @@ public class Level {
         // Init needed system refs
         this.rootNode = null;
         this.assetManager = null;
-        this.hub = null;
         this.control = null;
 
     }

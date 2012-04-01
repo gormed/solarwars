@@ -35,7 +35,7 @@ import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import logic.level.Level;
+import logic.Level;
 import logic.Player;
 import solarwars.FontLoader;
 import solarwars.IsoCamera;
@@ -236,7 +236,7 @@ public abstract class AbstractPlanet extends Node {
      *
      * @return the ships
      */
-    public int getShips() {
+    public int getShipCount() {
         return ships;
     }
 
@@ -291,7 +291,7 @@ public abstract class AbstractPlanet extends Node {
     public void updateLabel(float tpf) {
         refreshFont();
 
-        if (owner != null) {
+        if (owner != null && !level.isGameOver()) {
             time += tpf;
             if (time > SHIP_REFRESH_MULTIPILER * shipIncrement) {
                 time = 0;

@@ -1,24 +1,7 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
- * 
- * 
- * SolarWars is a strategy game in space. You have to eliminate 
- * all enemies to win. You can move ships between planets to capture 
- * other planets. Its oriented to multiplayer and singleplayer.
- * 
- * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or application 
- * in any way! If that is done by someone, please report it!
- * 
- * Email me: hans.ferchland@gmx.de
- * 
- * Project: SolarWars
- * File: PauseGUI.java
- * Type: gui.elements.PauseGUI
- * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
- * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package gui.elements;
 
 import com.jme3.asset.AssetManager;
@@ -34,53 +17,58 @@ import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
+import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
- * The Class PauseGUI.
+ *
+ * @author Hans
  */
-public class PauseGUI extends GUIElement implements ClickableGUI {
+public class GameOverGUI extends GUIElement implements ClickableGUI {
 
-    
+    public enum GameOverState {
+
+        WON,
+        LOST
+    }
     /** The gui. */
     private GameGUI gui;
-    
     /** The font. */
     protected BitmapFont font;
-    
     /** The text. */
     protected BitmapText text;
-    
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The game. */
     protected SolarWarsGame game;
-    
-    /** The pause label. */
-    protected Label pauseLabel;
-    
+    /** The display label. */
+    protected Label gameOverLabel;
     /** The exit game. */
-    protected Button mainMenu;
-    
+    protected Button mainMenuLabel;
     /** The continue game. */
-    protected Button continueGame;
+    protected Button exitGameLabel;
 
     /**
-     * Instantiates a new pause gui.
+     * Instantiates a new display gui.
      *
      * @param swgame the swgame
      * @param gui the gui
      */
-    public PauseGUI(SolarWarsGame swgame, final GameGUI gui) {
+    public GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
         this.game = swgame;
         this.gui = gui;
         createPanel();
 
-        pauseLabel = new Label("PAUSE", new Vector3f(gui.getWidth() / 2,
+        String label;
+        if (state == GameOverState.WON) {
+            label = "Game won!";
+        } else {
+            label = "Game lost!";
+        }
+
+        gameOverLabel = new Label(label, new Vector3f(gui.getWidth() / 2,
                 7 * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
 
             private float time;
@@ -102,32 +90,31 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-        
-        continueGame = new Button(
-                "Continue Game",
+
+        exitGameLabel = new Button(
+                "Exit Game",
                 new Vector3f(
-                        gui.getWidth() / 2, 
-                        gui.getHeight() / 1.8f, 0),
-                Vector3f.UNIT_XYZ, 
+                gui.getWidth() / 2,
+                gui.getHeight() / 2.2f, 0),
+                Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange,
                 ColorRGBA.DarkGray,
                 gui) {
 
             @Override
             public void updateGUI(float tpf) {
-                
             }
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                unpause();
+                SolarWarsApplication.getInstance().stop();
             }
         };
 
-        mainMenu = new Button("Mainmenu",
+        mainMenuLabel = new Button("Mainmenu",
                 new Vector3f(
-                        gui.getWidth() / 2,
-                        gui.getHeight() / 2.2f, 0),
+                gui.getWidth() / 2,
+                gui.getHeight() / 1.8f, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.DarkGray, gui) {
 
@@ -141,12 +128,12 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
                 GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
             }
         };
-        
-        attachChild(pauseLabel);
-        attachChild(mainMenu);
-        attachChild(continueGame);
-        
-        //gui.addGUIElement(mainMenu);
+
+        attachChild(gameOverLabel);
+        attachChild(mainMenuLabel);
+        attachChild(exitGameLabel);
+
+        //gui.addGUIElement(mainMenuLabel);
 
 
     }
@@ -158,7 +145,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
         AssetManager assetManager = game.getApplication().getAssetManager();
 
         Box b = new Box(gui.getWidth() / 4, gui.getHeight() / 5, 1);
-        geometry = new Geometry("PausePanel", b);
+        geometry = new Geometry("GameOverPanel", b);
 
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", new ColorRGBA(0f, 0f, 0.8f, 1f));
@@ -175,8 +162,8 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void updateGUI(float tpf) {
-        pauseLabel.updateGUI(tpf);
-        mainMenu.updateGUI(tpf);
+        gameOverLabel.updateGUI(tpf);
+        mainMenuLabel.updateGUI(tpf);
     }
 
     /* (non-Javadoc)
@@ -184,19 +171,24 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void setVisible(boolean show) {
+        if (show) {
+            display();
+        } else {
+            hide();
+        }
     }
-    
+
     /**
      * Pause.
      */
-    public void pause() {
+    public void display() {
         gui.addGUIElement(this);
     }
-    
+
     /**
      * Unpause.
      */
-    public void unpause() {
+    public void hide() {
         gui.removeGUIElement(this);
     }
 

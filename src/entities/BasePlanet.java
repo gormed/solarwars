@@ -30,7 +30,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
-import logic.level.Level;
+import logic.Level;
 
 /**
  * The Class BasePlanet.

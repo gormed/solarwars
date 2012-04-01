@@ -11,6 +11,7 @@ import entities.AbstractPlanet;
 import java.util.LinkedList;
 import java.util.Queue;
 import net.NetworkManager;
+import net.messages.GeneralActionMessage;
 import net.messages.PlanetActionMessage;
 import solarwars.Hub;
 
@@ -58,6 +59,21 @@ public class MultiplayerGameplay {
         client.send(planetActionMessage);
     }
 
+    private void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
+        if (client == null) {
+            return;
+        }
+
+        GeneralActionMessage generalActionMessage = new GeneralActionMessage(
+                actionName,
+                sender.getId(),
+                sender.getState(),
+                reciever.getId(),
+                reciever.getState());
+
+        client.send(generalActionMessage);
+    }
+
     public void update(float tpf) {
         while (!recievedMessages.isEmpty()) {
             Message m = recievedMessages.poll();
@@ -75,6 +91,10 @@ public class MultiplayerGameplay {
                         planet,
                         p,
                         serverMessage.getActionName());
+            } else if (m instanceof GeneralActionMessage) {
+                GeneralActionMessage serverMessage = (GeneralActionMessage) m;
+
+                
             }
         }
     }
@@ -85,10 +105,7 @@ public class MultiplayerGameplay {
             System.out.println(
                     "Client #" + source.getId() + " recieved a "
                     + message.getClass().getSimpleName());
-            if (message instanceof PlanetActionMessage) {
-                PlanetActionMessage serverMessage = (PlanetActionMessage) message;
-                recievedMessages.add(serverMessage);
-            }
+            recievedMessages.add(message);
         }
     }
 }

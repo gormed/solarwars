@@ -30,7 +30,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
-import gui.elements.TextBox;
 import java.util.ArrayList;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
