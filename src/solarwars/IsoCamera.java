@@ -58,49 +58,34 @@ public class IsoCamera implements AnalogListener, ActionListener {
         }
         return instance = new IsoCamera();
     }
-    
     /** The Constant CAMERA_HEIGHT. */
     public static final float CAMERA_HEIGHT = 14;
-    
     /** The Constant CAMERA_ANGLE. */
     public static final float CAMERA_ANGLE = (float) Math.PI / 2;//8f * (((float) Math.PI) / 18f) ;
-    
     /** The cam. */
     protected Camera cam;
-    
     /** The cam light. */
     protected PointLight camLight;
-    
     /** The root node. */
     protected Node rootNode;
-    
     /** The initial up vec. */
     protected Vector3f initialUpVec;
-    
     /** The drag speed. */
     protected float dragSpeed = 3f;
-    
     /** The move speed. */
     protected float moveSpeed = 3f;
-    
     /** The motion allowed. */
     protected MotionAllowedListener motionAllowed = null;
-    
     /** The enabled. */
     protected boolean enabled = true;
-    
     /** The last click state. */
     protected boolean lastClickState;
-    
     /** The current click state. */
     protected boolean currentClickState;
-    
     /** The is dragged. */
     protected boolean isDragged;
-    
     /** The initial drag pos. */
     protected Vector2f initialDragPos;
-    
     /** The input manager. */
     protected InputManager inputManager;
 
@@ -124,13 +109,18 @@ public class IsoCamera implements AnalogListener, ActionListener {
         initialUpVec = cam.getUp().clone();
         cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, -0.5f));
         cam.setRotation(new Quaternion(rot));
-
+        
         camLight = new PointLight();
         camLight.setPosition(cam.getLocation());
         camLight.setColor(ColorRGBA.White);
         rootNode.addLight(camLight);
-
-
+        
+        
+    }
+    
+    public void destroy() {        
+        rootNode.removeLight(camLight);        
+        this.rootNode = null;
     }
 
     /**
@@ -221,7 +211,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
      */
     public void registerWithInput(InputManager inputManager) {
         this.inputManager = inputManager;
-
+        
         String[] mappings = new String[]{
             "ISOCAM_Left",
             "ISOCAM_Right",
@@ -244,7 +234,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         inputManager.addMapping("ISOCAM_Backward", new KeyTrigger(KeyInput.KEY_S));
         inputManager.addMapping("ISOCAM_Up", new KeyTrigger(KeyInput.KEY_Q));
         inputManager.addMapping("ISOCAM_Down", new KeyTrigger(KeyInput.KEY_Z));
-
+        
         inputManager.addListener(this, mappings);
         //inputManager.setCursorVisible(dragToMove);
 
@@ -301,16 +291,16 @@ public class IsoCamera implements AnalogListener, ActionListener {
         float h = cam.getFrustumTop();
         float w = cam.getFrustumRight();
         float aspect = w / h;
-
+        
         float near = cam.getFrustumNear();
-
+        
         float fovY = FastMath.atan(h / near)
                 / (FastMath.DEG_TO_RAD * .5f);
         fovY += value * 0.1f;
-
+        
         h = FastMath.tan(fovY * FastMath.DEG_TO_RAD * .5f) * near;
         w = h * aspect;
-
+        
         cam.setFrustumTop(h);
         cam.setFrustumBottom(-h);
         cam.setFrustumLeft(-w);
@@ -325,13 +315,13 @@ public class IsoCamera implements AnalogListener, ActionListener {
     protected void riseCamera(float value) {
         Vector3f vel = new Vector3f(0, value * moveSpeed, 0);
         Vector3f pos = cam.getLocation().clone();
-
+        
         if (motionAllowed != null) {
             motionAllowed.checkMotionAllowed(pos, vel);
         } else {
             pos.addLocal(vel);
         }
-
+        
         cam.setLocation(pos);
         camLight.setPosition(cam.getLocation());
     }
@@ -345,7 +335,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     protected void moveCamera(float value, boolean sideways) {
         Vector3f vel = new Vector3f();
         Vector3f pos = cam.getLocation().clone();
-
+        
         if (sideways) {
             cam.getLeft(vel);
         } else {
@@ -353,13 +343,13 @@ public class IsoCamera implements AnalogListener, ActionListener {
             //cam.getDirection(vel);
         }
         vel.multLocal(value * moveSpeed);
-
+        
         if (motionAllowed != null) {
             motionAllowed.checkMotionAllowed(pos, vel);
         } else {
             pos.addLocal(vel);
         }
-
+        
         cam.setLocation(pos);
         camLight.setPosition(cam.getLocation());
     }
@@ -373,20 +363,20 @@ public class IsoCamera implements AnalogListener, ActionListener {
     void dragCamera(float value, Vector2f to) {
         Vector3f vel = new Vector3f();
         Vector3f pos = cam.getLocation().clone();
-
+        
         Vector2f dir = to.subtract(initialDragPos);
-
+        
         dir.normalizeLocal();
-
+        
         vel = new Vector3f(dir.x, 0, -dir.y);
         vel.multLocal(value * dragSpeed);
-
+        
         if (motionAllowed != null) {
             motionAllowed.checkMotionAllowed(pos, vel);
         } else {
             pos.addLocal(vel);
         }
-
+        
         cam.setLocation(pos);
         camLight.setPosition(cam.getLocation());
     }
@@ -398,7 +388,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         if (!enabled) {
             return;
         }
-
+        
         if (name.equals("ISOCAM_Forward")) {
             moveCamera(value, false);
         } else if (name.equals("ISOCAM_Backward")) {

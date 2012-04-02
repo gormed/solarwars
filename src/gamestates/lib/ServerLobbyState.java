@@ -101,6 +101,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private boolean noServerFound;
     /** indicates that the game is set up and can be started */
     private boolean gameStarted = false;
+    private final SolarWarsApplication application;
 
     /**
      * Sets the client player color.
@@ -140,6 +141,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     public ServerLobbyState() {
         super(GamestateManager.SERVER_LOBBY_STATE);
+        this.application = SolarWarsApplication.getInstance();
     }
 
     /* (non-Javadoc)
@@ -152,6 +154,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             disconnect();
         }
         if (gameStarted) {
+
             GamestateManager.getInstance().
                     enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
         }
@@ -183,8 +186,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         // TODO: Sorround with try catch
         joinServer();
-        if (noServerFound)
+        if (noServerFound) {
             return;
+        }
 
         lobby = new Label(
                 "LOBBY",
@@ -364,7 +368,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param seed the level-seed
      * @param players the players connected to the server
      */
-    private void startLevel(long seed, ArrayList<Player> players) {
+    private void startClientLevel(long seed, ArrayList<Player> players) {
+        application.attachIsoCameraControl();
         logic.Level mpLevel =
                 new logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
@@ -529,7 +534,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 long seed = sgm.getSeed();
                 ArrayList<Player> players = sgm.getPlayers();
 
-                startLevel(seed, players);
+                startClientLevel(seed, players);
             }
 
 

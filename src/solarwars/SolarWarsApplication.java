@@ -56,90 +56,67 @@ public class SolarWarsApplication extends Application {
 
     /** The Constant INPUT_MAPPING_EXIT. */
     public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
-    
     /** The Constant INPUT_MAPPING_PAUSE. */
     public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
-    
     /** The Constant INPUT_MAPPING_CAMERA_POS. */
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
-    
     /** The Constant INPUT_MAPPING_MEMORY. */
     public static final String INPUT_MAPPING_MEMORY = "SOLARWARS_Memory";
-    
     /** The Constant INPUT_MAPPING_HIDE_STATS. */
     public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
-    
     /** The Constant INPUT_MAPPING_LEFT_CLICK. */
     public static final String INPUT_MAPPING_LEFT_CLICK = "SOLARWARS_LeftClick";
-    
     /** The Constant INPUT_MAPPING_RIGHT_CLICK. */
     public static final String INPUT_MAPPING_RIGHT_CLICK = "SOLARWARS_RightClick";
-    
     /** The Constant INPUT_MAPPING_WHEEL_UP. */
     public static final String INPUT_MAPPING_WHEEL_UP = "SOLARWARS_WheelUp";
-    
     /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
-    
     /** The instance. */
     private static SolarWarsApplication instance;
-    
+
     /**
      * Gets the single instance of SolarWarsApplication.
      *
      * @return single instance of SolarWarsApplication
      */
     public static SolarWarsApplication getInstance() {
-        if (instance != null)
+        if (instance != null) {
             return instance;
+        }
         return instance = new SolarWarsApplication();
     }
-    
     /** The root node. */
     protected Node rootNode = new Node("Root Node");
-    
     /** The gui node. */
     protected Node guiNode = new Node("Gui Node");
-    
     /** The second counter. */
     protected float secondCounter = 0.0f;
-    
     /** The frame counter. */
     protected int frameCounter = 0;
-    
     /** The fps text. */
     protected BitmapText fpsText;
-    
     /** The gui font. */
     protected BitmapFont guiFont;
-    
     /** The stats view. */
     protected StatsView statsView;
-    
     /** The iso cam. */
     protected IsoCamera isoCam;
-    
     /** The last screen pos. */
     protected Vector2f lastScreenPos;
-    
     /** The iso control. */
     protected IsoControl isoControl;
-    
     /** The show settings. */
     protected boolean showSettings = true;
-    
     /** The show fps. */
     private boolean showFps = true;
-    
     /** The action listener. */
     private AppActionListener actionListener = new AppActionListener();
-    
     /** The post processor. */
     private FilterPostProcessor postProcessor;
-    
     /** The game. */
     private SolarWarsGame game;
-    
+
     /**
      * Instantiates a new solar wars application.
      */
@@ -345,44 +322,21 @@ public class SolarWarsApplication extends Application {
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
 
-        // Init controls
-        isoControl = new IsoControl(assetManager, rootNode, cam, inputManager);
 
-        // Setup Controls of the cam for debug
-        if (inputManager != null) {
-            isoCam = IsoCamera.getInstance();
-            isoCam.initialize(cam, rootNode);
-            isoCam.setMoveSpeed(5f);
-            isoCam.registerWithInput(inputManager);
-            lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
-
-            // Map C, M, F5 and ESC
-//            if (context.getType() == Type.Display) {
-//                inputManager.addMapping(INPUT_MAPPING_EXIT, new KeyTrigger(KeyInput.KEY_ESCAPE));
-//            }
-
-            inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
-            inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
-            inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F5));
-            inputManager.addListener(actionListener, INPUT_MAPPING_EXIT,
-                    INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
-
-            // Map left-button click
-            inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
-                    new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK,
-                    new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-            inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN,
-                    new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-            inputManager.addMapping(INPUT_MAPPING_WHEEL_UP,
-                    new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-
-
-            inputManager.addListener(isoControl.getActionListener(),
-                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK,
-                    INPUT_MAPPING_WHEEL_DOWN, INPUT_MAPPING_WHEEL_UP);
-
-        }
+        // Map interface clicking for ingame and GUI and Debugging
+        inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
+                new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK,
+                new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN,
+                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
+        inputManager.addMapping(INPUT_MAPPING_WHEEL_UP,
+                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
+        inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
+        inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
+        inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F5));
+        inputManager.addListener(actionListener, INPUT_MAPPING_EXIT,
+                INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
 
         // SETUP GAME CONTENT
 
@@ -394,6 +348,31 @@ public class SolarWarsApplication extends Application {
         game = SolarWarsGame.getInstance();
         game.initialize(this);
         game.start();
+    }
+
+    public void attachIsoCameraControl() {
+        if (inputManager != null) {
+            // Init controls
+            isoControl = new IsoControl(assetManager, rootNode, cam, inputManager);
+
+            isoCam = IsoCamera.getInstance();
+            isoCam.initialize(cam, rootNode);
+            isoCam.setMoveSpeed(5f);
+            isoCam.registerWithInput(inputManager);
+            lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
+
+            inputManager.addListener(isoControl.getActionListener(),
+                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK,
+                    INPUT_MAPPING_WHEEL_DOWN, INPUT_MAPPING_WHEEL_UP);
+
+        }
+    }
+
+    public void detachIsoCameraControl() {
+        if (inputManager != null) {
+            isoCam.destroy();
+            inputManager.removeListener(isoControl.getActionListener());
+        }
     }
 
     /* (non-Javadoc)
@@ -444,15 +423,9 @@ public class SolarWarsApplication extends Application {
     public void simpleUpdate(float tpf) {
 
         game.update(tpf);
-
-
-        if (isoCam.isDragged()) {
-
+        if (isoCam != null && isoCam.isDragged()) {
             Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
             isoCam.dragCamera(tpf, currentSceenPos);
-            //inputManager.setCursorVisible(!value);
-
-            //lastScreenPos = currentSceenPos;
         }
     }
 
@@ -470,10 +443,9 @@ public class SolarWarsApplication extends Application {
     @Override
     public void destroy() {
         NetworkManager nm = NetworkManager.getInstance();
-        if ( nm != null && nm.isServerRunning()) {
+        if (nm != null && nm.isServerRunning()) {
             NetworkManager.getInstance().closeAllConnections(false);
         }
         super.destroy();
     }
-        
 }

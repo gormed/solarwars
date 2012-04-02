@@ -74,6 +74,7 @@ public class SingleplayerState extends Gamestate {
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
         hub = Hub.getInstance();
+        application.attachIsoCameraControl();
         setupSingleplayer();
         setupGUI();
         currentLevel = new Level(
@@ -84,7 +85,6 @@ public class SingleplayerState extends Gamestate {
         Gameplay.initialize(currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
         currentLevel.setupPlayers(Hub.playersByID);
-        
     }
 
     /* (non-Javadoc)
@@ -94,13 +94,14 @@ public class SingleplayerState extends Gamestate {
     protected void unloadContent() {
         application.getInputManager().removeListener(pauseListener);
         pauseListener = null;
-        
+
         hub = null;
-        
+
         currentLevel.destroy();
-        
+
         gui.cleanUpGUI();
         gui = null;
+        application.detachIsoCameraControl();
     }
 
     /* (non-Javadoc)

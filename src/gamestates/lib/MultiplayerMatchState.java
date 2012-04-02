@@ -49,12 +49,14 @@ public class MultiplayerMatchState extends Gamestate {
     private Hub hub;
     private Level currentLevel;
     private MultiplayerGameplay gameplay;
+    private final SolarWarsApplication application;
 
     /**
      * Instantiates a new multiplayer match state.
      */
     public MultiplayerMatchState() {
         super(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        this.application = SolarWarsApplication.getInstance();
 
     }
 
@@ -75,9 +77,8 @@ public class MultiplayerMatchState extends Gamestate {
     protected void loadContent(SolarWarsGame game) {
         hub = Hub.getInstance();
         this.game = game;
-        gameplay = MultiplayerGameplay.getInstance();
-
-        game.getApplication().setPauseOnLostFocus(false);
+        application.setPauseOnLostFocus(false);
+        gameplay = MultiplayerGameplay.getInstance();        
         setupGUI();
         currentLevel = Gameplay.getCurrentLevel();
         currentLevel.generateLevel();
@@ -91,7 +92,7 @@ public class MultiplayerMatchState extends Gamestate {
     protected void unloadContent() {
         NetworkManager.getInstance().closeAllConnections(false);
 
-        game.getApplication().getInputManager().removeListener(pauseListener);
+        application.getInputManager().removeListener(pauseListener);
         pauseListener = null;
 
         hub = null;
@@ -103,6 +104,7 @@ public class MultiplayerMatchState extends Gamestate {
 
         gameplay.destroy();
         gameplay = null;
+        application.detachIsoCameraControl();
     }
 
     /**
@@ -115,7 +117,7 @@ public class MultiplayerMatchState extends Gamestate {
 
         pauseListener = new PauseActionListener();
 
-        game.getApplication().getInputManager().addMapping(
+        application.getInputManager().addMapping(
                 SolarWarsApplication.INPUT_MAPPING_PAUSE,
                 new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),

@@ -117,6 +117,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
     /** indicates that the game is set up and can be started */
     private boolean gameStarted = false;
+    private final SolarWarsApplication application;
 
     /**
      * Sets the host player color.
@@ -145,6 +146,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     public CreateServerState() {
         super(GamestateManager.CREATE_SERVER_STATE);
+        this.application = SolarWarsApplication.getInstance();
     }
 
     /* (non-Javadoc)
@@ -435,6 +437,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param players the players connected to the server
      */
     private void startClientLevel(long seed, ArrayList<Player> players) {
+
+        application.attachIsoCameraControl();
         logic.Level mpLevel =
                 new logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
