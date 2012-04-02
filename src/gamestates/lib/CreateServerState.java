@@ -168,7 +168,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        gameStarted = false;
         gui = new GameGUI(game);
+        game.getApplication().setPauseOnLostFocus(false);
         networkManager = NetworkManager.getInstance();
         serverHub = ServerHub.getInstance();
         playerNamePos = new HashMap<Integer, Vector3f>();
@@ -230,7 +232,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                cancelServer();
+                if (!isPressed) {
+                    cancelServer();
+                }
             }
         };
 
@@ -245,7 +249,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                startServer();
+                if (!isPressed) {
+                    startServer();
+                }
             }
         };
 
@@ -357,7 +363,6 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         serverClient.removeMessageListener(clientMessageListener);
 
-
         playerLabels.clear();
         playerNamePos.clear();
 
@@ -429,7 +434,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param seed the level-seed
      * @param players the players connected to the server
      */
-    private void startLevel(long seed, ArrayList<Player> players) {
+    private void startClientLevel(long seed, ArrayList<Player> players) {
         logic.Level mpLevel =
                 new logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
@@ -448,7 +453,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         System.out.println("Closing server...");
         //solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
         networkManager.removeClientRegisterListener(this);
-        networkManager.closeServer(false);
+        networkManager.closeAllConnections(false);
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
@@ -659,7 +664,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 ArrayList<Player> players = sgm.getPlayers();
 
                 //SolarWarsApplication.getInstance().enqueue(null)
-                startLevel(seed, players);
+                if (!gameStarted) {
+                    startClientLevel(seed, players);
+                }
             }
 
         }

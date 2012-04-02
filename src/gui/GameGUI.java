@@ -41,25 +41,18 @@ public class GameGUI {
 
     /** The game. */
     SolarWarsGame game;
-    
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElemetns;
-    
     /** The width. */
     private float width;
-    
     /** The action listener. */
     private ActionListener actionListener;
-    
     /** The focus. */
     private GUIElement focus;
-    
     /** The height. */
     private float height;
-    
     /** The clickable node. */
     private Node clickableNode;
-    
     /** The deco node. */
     private Node decoNode;
 
@@ -147,16 +140,26 @@ public class GameGUI {
                         Node n = closest.getGeometry().getParent();
 
                         if (n instanceof ClickableGUI) {
-                            ClickableGUI g = (ClickableGUI) n;
-                            setFocus(g);
-                            g.onClick(click2d, isPressed, tpf);
+                            
+                            clickableHit(n, click2d, isPressed, tpf);
                         } else if (n.getParent() instanceof ClickableGUI) {
-                            ClickableGUI g = (ClickableGUI) n.getParent();
-                            setFocus(g);
-                            g.onClick(click2d, isPressed, tpf);
+                            clickableHit(n.getParent(), click2d, isPressed, tpf);
                         }
                     }
                 } else {
+                }
+            }
+
+            private void clickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
+
+                if (n instanceof GUIElement) {
+                    GUIElement element = (GUIElement) n;
+
+                    if (element.isVisible()) {
+                        ClickableGUI g = (ClickableGUI) n;
+                        setFocus(g);
+                        g.onClick(click2d, isPressed, tpf);
+                    }
                 }
             }
 

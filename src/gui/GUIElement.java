@@ -28,6 +28,8 @@ import com.jme3.scene.Node;
  */
 public abstract class GUIElement extends Node {
 
+    private boolean visible = true;
+    
     /**
      * Updates the gui.
      *
@@ -36,9 +38,19 @@ public abstract class GUIElement extends Node {
     public abstract void updateGUI(float tpf);
     
     /**
-     * Sets the visible.
+     * Sets the GUIElements visibility.
      *
-     * @param show the new visible
+     * @param show the new visible value
      */
-    public abstract void setVisible(boolean show);
+    public void setVisible(boolean show) {
+        visible = show;
+    }
+    
+    /**
+     * Retrieves the visibility of the GUIElement
+     * @return 
+     */
+    public boolean isVisible() {
+        return visible;
+    }
 }

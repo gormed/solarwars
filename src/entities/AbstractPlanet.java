@@ -38,27 +38,16 @@ import com.jme3.scene.Node;
 import logic.Level;
 import logic.Player;
 import solarwars.FontLoader;
+import solarwars.Hub;
 import solarwars.IsoCamera;
 
 /**
  * The Class AbstractPlanet.
  */
-@Serializable
 public abstract class AbstractPlanet extends Node {
 
     /** The Constant SHIP_REFRESH_MULTIPILER. */
     private static final int SHIP_REFRESH_MULTIPILER = 5;
-    /** The PLANE t_ id. */
-    private static int PLANET_ID = 0;
-
-    /**
-     * Gets the continious id.
-     *
-     * @return the continious id
-     */
-    private static int getContiniousID() {
-        return PLANET_ID++;
-    }
     /** The Constant SPHERE_Z_SAMPLES. */
     public static final int SPHERE_Z_SAMPLES = 20;
     /** The Constant SPHERE_RADIAL_SAMPLES. */
@@ -90,9 +79,6 @@ public abstract class AbstractPlanet extends Node {
     /** The owner. */
     protected Player owner;
 
-    public AbstractPlanet() {
-    }
-
     /**
      * Instantiates a new abstract planet.
      *
@@ -102,7 +88,7 @@ public abstract class AbstractPlanet extends Node {
      * @param size the size
      */
     public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
-        this.id = getContiniousID();
+        this.id = Level.getContiniousPlanetID();
         this.size = size;
         this.level = level;
         this.position = position;
@@ -253,7 +239,9 @@ public abstract class AbstractPlanet extends Node {
      * Decrement ships.
      */
     public void decrementShips() {
-        ships--;
+        if (ships > 0) {
+            ships--;
+        }
     }
 
     /**
@@ -289,6 +277,11 @@ public abstract class AbstractPlanet extends Node {
      * @param tpf the tpf
      */
     public void updateLabel(float tpf) {
+
+        label.setCullHint(
+                (owner != null && !owner.equals(Hub.getLocalPlayer())) ? 
+                CullHint.Always : CullHint.Never);
+        
         refreshFont();
 
         if (owner != null && !level.isGameOver()) {

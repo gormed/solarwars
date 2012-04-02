@@ -25,7 +25,6 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
-import com.jme3.network.serializing.Serializable;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import logic.Level;
@@ -37,20 +36,9 @@ import solarwars.Hub;
 /**
  * The Class AbstractShip.
  */
-@Serializable
 public abstract class AbstractShip extends Node {
 
-    /** The SHI p_ id. */
-    private static int SHIP_ID = 0;
 
-    /**
-     * Gets the continious id.
-     *
-     * @return the continious id
-     */
-    private static int getContiniousID() {
-        return SHIP_ID++;
-    }
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.175f;
     /** The asset manager. */
@@ -74,9 +62,6 @@ public abstract class AbstractShip extends Node {
     /** The order. */
     protected AbstractPlanet order;
 
-    public AbstractShip() {
-    }
-
     /**
      * Instantiates a new abstract ship.
      *
@@ -89,7 +74,7 @@ public abstract class AbstractShip extends Node {
     public AbstractShip(AssetManager assetManager, Level level, Vector3f position, Player p, ShipGroup g) {
         super();
 
-        this.id = getContiniousID();
+        this.id = Level.getContiniousPlanetID();
         this.owner = p;
         this.assetManager = assetManager;
         this.level = level;

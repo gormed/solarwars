@@ -165,6 +165,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
+        game.getApplication().setPauseOnLostFocus(false);
         hub = Hub.getInstance();
 
         networkManager = NetworkManager.getInstance();
@@ -180,7 +181,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     0));
         }
 
+        // TODO: Sorround with try catch
         joinServer();
+        if (noServerFound)
+            return;
 
         lobby = new Label(
                 "LOBBY",
@@ -229,7 +233,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                leaveServer();
+                if (!isPressed) {
+                    leaveServer();
+                }
             }
         };
 
@@ -288,6 +294,15 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         playerNamePos.clear();
         gui.cleanUpGUI();
 
+        if (client != null) {
+            client.removeMessageListener(
+                    playerConnectionListener,
+                    PlayerAcceptedMessage.class,
+                    PlayerLeavingMessage.class,
+                    StartGameMessage.class);
+            client.removeClientStateListener(playerStateListener);
+        }
+
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
@@ -307,6 +322,12 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private void leaveServer() {
         //Client thisClient = networkManager.getThisClient();
         if (client != null && client.isConnected()) {
+            client.removeMessageListener(
+                    playerConnectionListener,
+                    PlayerAcceptedMessage.class,
+                    PlayerLeavingMessage.class,
+                    StartGameMessage.class);
+            client.removeClientStateListener(playerStateListener);
             client.close();
         }
     }
@@ -359,9 +380,15 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * Disconnect.
      */
     private void disconnect() {
-        networkManager.removeClientRegisterListener(this);
-        client = null;
-        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+        try {
+            networkManager.removeClientRegisterListener(this);
+
+        } catch (Exception e) {
+            System.err.println(e.toString() + " - " + e.getMessage());
+        } finally {
+
+            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+        }
     }
 
     /* (non-Javadoc)
@@ -447,6 +474,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
             if (info != null) {
                 System.out.println(info.reason);
+            } else {
+                System.out.println("client closed");
             }
             if (c.equals(client)) {
                 disconnect();

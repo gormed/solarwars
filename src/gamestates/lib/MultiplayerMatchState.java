@@ -32,6 +32,7 @@ import gui.elements.Percentage;
 import logic.Gameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
+import net.NetworkManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -54,7 +55,7 @@ public class MultiplayerMatchState extends Gamestate {
      */
     public MultiplayerMatchState() {
         super(GamestateManager.MULTIPLAYER_MATCH_STATE);
-                
+
     }
 
     /* (non-Javadoc)
@@ -88,6 +89,8 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
+        NetworkManager.getInstance().closeAllConnections(false);
+
         game.getApplication().getInputManager().removeListener(pauseListener);
         pauseListener = null;
 
@@ -97,6 +100,9 @@ public class MultiplayerMatchState extends Gamestate {
 
         gui.cleanUpGUI();
         gui = null;
+
+        gameplay.destroy();
+        gameplay = null;
     }
 
     /**
@@ -140,11 +146,7 @@ public class MultiplayerMatchState extends Gamestate {
                 return;
             }
             if (name.equals(SolarWarsApplication.INPUT_MAPPING_PAUSE)) {
-                if (gui.containsGUIElement(pause)) {
-                    pause.unpause();
-                } else {
-                    pause.pause();
-                }
+                pause.togglePause();
             }
         }
     }

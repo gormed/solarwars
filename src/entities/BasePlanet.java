@@ -35,11 +35,7 @@ import logic.Level;
 /**
  * The Class BasePlanet.
  */
-@Serializable
 public class BasePlanet extends AbstractPlanet {
-
-    public BasePlanet() {
-    }
 
     /**
      * Instantiates a new base planet.

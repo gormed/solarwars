@@ -4,20 +4,13 @@
  */
 package gui.elements;
 
-import com.jme3.asset.AssetManager;
-import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapText;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Box;
 import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
-import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
@@ -33,14 +26,6 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     }
     /** The gui. */
     private GameGUI gui;
-    /** The font. */
-    protected BitmapFont font;
-    /** The text. */
-    protected BitmapText text;
-    /** The geometry. */
-    protected Geometry geometry;
-    /** The material. */
-    protected Material material;
     /** The game. */
     protected SolarWarsGame game;
     /** The display label. */
@@ -48,7 +33,8 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     /** The exit game. */
     protected Button mainMenuLabel;
     /** The continue game. */
-    protected Button exitGameLabel;
+    protected Button watchGameLabel;
+    protected Panel background;
 
     /**
      * Instantiates a new display gui.
@@ -59,7 +45,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     public GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
         this.game = swgame;
         this.gui = gui;
-        createPanel();
+
 
         String label;
         if (state == GameOverState.WON) {
@@ -68,8 +54,15 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             label = "Game lost!";
         }
 
+        background = new Panel(
+                "GameOverPanel",
+                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
+                new Vector2f(gui.getWidth() / 4, gui.getHeight() / 5),
+                ColorRGBA.Blue);
+
+
         gameOverLabel = new Label(label, new Vector3f(gui.getWidth() / 2,
-                7 * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
+                6.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
 
             private float time;
 
@@ -91,11 +84,11 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             }
         };
 
-        exitGameLabel = new Button(
-                "Exit Game",
+        watchGameLabel = new Button(
+                "Watch Game",
                 new Vector3f(
                 gui.getWidth() / 2,
-                gui.getHeight() / 2.2f, 0),
+                gui.getHeight() / 2.0f, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange,
                 ColorRGBA.DarkGray,
@@ -107,14 +100,16 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                SolarWarsApplication.getInstance().stop();
+                if (!isPressed) {
+                    hide();
+                }
             }
         };
 
         mainMenuLabel = new Button("Mainmenu",
                 new Vector3f(
                 gui.getWidth() / 2,
-                gui.getHeight() / 1.8f, 0),
+                gui.getHeight() / 2.4f, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.DarkGray, gui) {
 
@@ -125,36 +120,21 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 //game.getApplication().stop();
-                GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                if (!isPressed) {
+                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                }
             }
         };
 
-        attachChild(gameOverLabel);
-        attachChild(mainMenuLabel);
-        attachChild(exitGameLabel);
+        gui.addGUIElement(background);
+        gui.addGUIElement(gameOverLabel);
+        gui.addGUIElement(mainMenuLabel);
+        gui.addGUIElement(watchGameLabel);
 
+        setVisible(false);
         //gui.addGUIElement(mainMenuLabel);
 
 
-    }
-
-    /**
-     * Creates the panel.
-     */
-    private void createPanel() {
-        AssetManager assetManager = game.getApplication().getAssetManager();
-
-        Box b = new Box(gui.getWidth() / 4, gui.getHeight() / 5, 1);
-        geometry = new Geometry("GameOverPanel", b);
-
-        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setColor("Color", new ColorRGBA(0f, 0f, 0.8f, 1f));
-        geometry.setMaterial(material);
-        geometry.setLocalTranslation(
-                gui.getWidth() / 2,
-                gui.getHeight() / 1.9f,
-                0);
-        attachChild(geometry);
     }
 
     /* (non-Javadoc)
@@ -171,25 +151,25 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void setVisible(boolean show) {
-        if (show) {
-            display();
-        } else {
-            hide();
-        }
+        super.setVisible(show);
+        background.setVisible(show);
+        gameOverLabel.setVisible(show);
+        mainMenuLabel.setVisible(show);
+        watchGameLabel.setVisible(show);
     }
 
     /**
      * Pause.
      */
     public void display() {
-        gui.addGUIElement(this);
+        setVisible(true);
     }
 
     /**
      * Unpause.
      */
     public void hide() {
-        gui.removeGUIElement(this);
+        setVisible(false);
     }
 
     /* (non-Javadoc)

@@ -81,9 +81,10 @@ public class SingleplayerState extends Gamestate {
                 application.getAssetManager(),
                 application.getIsoControl(),
                 gui);
+        Gameplay.initialize(currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
         currentLevel.setupPlayers(Hub.playersByID);
-        Gameplay.initialize(currentLevel);
+        
     }
 
     /* (non-Javadoc)
@@ -188,11 +189,7 @@ public class SingleplayerState extends Gamestate {
                 return;
             }
             if (name.equals(SolarWarsApplication.INPUT_MAPPING_PAUSE)) {
-                if (gui.containsGUIElement(pause)) {
-                    pause.unpause();
-                } else {
-                    pause.pause();
-                }
+                pause.togglePause();
             }
         }
     }

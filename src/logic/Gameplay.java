@@ -25,6 +25,7 @@ import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
 import gui.elements.GameOverGUI;
+import java.util.Map;
 import java.util.Random;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -78,8 +79,9 @@ public class Gameplay {
     public static void initialize(Level level) {
         if (instance == null) {
             instance = new Gameplay();
-            currentLevel = level;
         }
+        currentLevel = level;
+        currentLevel.resetEntityIDs();
     }
 
     /**
@@ -144,7 +146,7 @@ public class Gameplay {
                     planet.incrementShips();
                 } else {
                     planet.decrementShips();
-                    if (planet.getShipCount() == 0) {
+                    if (planet.getShipCount() <= 0) {
                         p.capturePlanet(planet);
                     }
                 }
@@ -194,39 +196,60 @@ public class Gameplay {
         GeneralAction gameOver = new GeneralAction(GAME_OVER) {
 
             @Override
-            void doAction(Object sender, Player p) {
+            void doAction(Object sender, Player a, Player b) {
 
-                if (sender instanceof Player) {
-                    Player winner = (Player) sender;
-                    if (winner.getId() == Hub.getLocalPlayer().getId()) {
-                        localPlayerWins();
-                    } else if (p.getId() == Hub.getLocalPlayer().getId()) {
-                        localPlayerLooses();
-                    } else {
-                        // Display that winner defeated p
-                    }
+                Player victorious = a;
+                Player defeated = b;
+
+                if (victorious.getId() == Hub.getLocalPlayer().getId()) {
+                    localPlayerWins();
+                } else if (defeated.getId() == Hub.getLocalPlayer().getId()) {
+                    localPlayerLooses();
+                } else {
+                    // Display that a defeated b
                 }
             }
 
             private void localPlayerWins() {
-                currentLevel.setGameOver(true);
-                GameOverGUI gameOverGUI =
-                        new GameOverGUI(
-                        game,
-                        currentLevel.getGui(),
-                        GameOverGUI.GameOverState.WON);
+                if (lastPlayer()) {
+                    currentLevel.setGameOver(true);
+                    GameOverGUI gameOverGUI =
+                            new GameOverGUI(
+                            game,
+                            currentLevel.getGui(),
+                            GameOverGUI.GameOverState.WON);
 
-                gameOverGUI.display();
+                    gameOverGUI.display();
+                } else {
+                    //Display: "You defeated..."
+                }
+
             }
 
             private void localPlayerLooses() {
-                currentLevel.setGameOver(true);
+                if (lastPlayer()) {
+                    currentLevel.setGameOver(true);
+                }
+
                 GameOverGUI gameOverGUI =
                         new GameOverGUI(
                         game,
                         currentLevel.getGui(),
-                        GameOverGUI.GameOverState.WON);
+                        GameOverGUI.GameOverState.LOST);
                 gameOverGUI.display();
+            }
+
+            private boolean lastPlayer() {
+                int lostPlayerCount = 0;
+                for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+                    Player p = entry.getValue();
+                    if (p != null) {
+                        if (p.hasLost()) {
+                            lostPlayerCount++;
+                        }
+                    }
+                }
+                return Hub.playersByID.size() - 1 == lostPlayerCount;
             }
         };
 

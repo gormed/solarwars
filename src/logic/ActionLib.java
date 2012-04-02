@@ -100,8 +100,15 @@ public class ActionLib {
      * @param p the p
      * @param actionName the action name
      */
-    public void invokeGeneralAction(Object sender, Player p, String actionName) {
-        generalActions.get(actionName).doAction(sender, p);
+    public void invokeGeneralAction(Object sender, Player a, Player b, String actionName) {
+        if (sender instanceof MultiplayerGameplay) {
+            generalActions.get(actionName).doAction(sender, a, b);
+        } else {
+            generalActions.get(actionName).doAction(sender, a, b);
+            if (MultiplayerGameplay.isInitialized()) {
+                MultiplayerGameplay.getInstance().sendGeneralActionMessage(actionName, a, b);
+            }
+        }
     }
 
     /**

@@ -37,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import logic.PlayerState;
+import net.messages.GeneralActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
@@ -229,14 +230,15 @@ public class NetworkManager {
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(PlanetActionMessage.class);
+        Serializer.registerClass(GeneralActionMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
-        Serializer.registerClass(entities.AbstractPlanet.class);
-        Serializer.registerClass(entities.AbstractShip.class);
-        Serializer.registerClass(entities.BasePlanet.class);
-        Serializer.registerClass(entities.ShipGroup.class);
-        Serializer.registerClass(entities.SimpleShip.class);
+//        Serializer.registerClass(entities.AbstractPlanet.class);
+//        Serializer.registerClass(entities.AbstractShip.class);
+//        Serializer.registerClass(entities.BasePlanet.class);
+//        Serializer.registerClass(entities.ShipGroup.class);
+//        Serializer.registerClass(entities.SimpleShip.class);
 
         thisClient = Network.connectToServer(
                 SolarWarsServer.SERVER_NAME,
@@ -280,11 +282,16 @@ public class NetworkManager {
      *
      * @param wait the wait
      */
-    public void closeServer(boolean wait) {
-        thisClient.close();
-        thisClient = null;
-        thisServer.stop(wait);
-        thisServer = null;
+    public void closeAllConnections(boolean wait) {
+        if (thisClient != null) {
+            thisClient.close();
+            thisClient = null;
+        }
+        if (thisServer != null) {
+            thisServer.stop(wait);
+            thisServer = null;
+
+        }
     }
 
     /**

@@ -21,15 +21,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
-import com.jme3.asset.AssetManager;
-import com.jme3.font.BitmapFont;
-import com.jme3.font.BitmapText;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Box;
 import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
@@ -41,31 +35,15 @@ import solarwars.SolarWarsGame;
  */
 public class PauseGUI extends GUIElement implements ClickableGUI {
 
-    
     /** The gui. */
     private GameGUI gui;
-    
-    /** The font. */
-    protected BitmapFont font;
-    
-    /** The text. */
-    protected BitmapText text;
-    
-    /** The geometry. */
-    protected Geometry geometry;
-    
-    /** The material. */
-    protected Material material;
-    
+    protected Panel background;
     /** The game. */
     protected SolarWarsGame game;
-    
     /** The pause label. */
     protected Label pauseLabel;
-    
     /** The exit game. */
     protected Button mainMenu;
-    
     /** The continue game. */
     protected Button continueGame;
 
@@ -78,10 +56,19 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
     public PauseGUI(SolarWarsGame swgame, final GameGUI gui) {
         this.game = swgame;
         this.gui = gui;
-        createPanel();
 
-        pauseLabel = new Label("PAUSE", new Vector3f(gui.getWidth() / 2,
-                7 * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
+        background = new Panel(
+                "PausePanel",
+                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, -1),
+                new Vector2f(gui.getWidth() / 4, gui.getHeight() / 5),
+                ColorRGBA.Blue);
+
+        pauseLabel = new Label("PAUSE",
+                new Vector3f(gui.getWidth() / 2,
+                6.5f * gui.getHeight() / 10,
+                0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.White, gui) {
 
             private float time;
 
@@ -102,32 +89,33 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-        
+
         continueGame = new Button(
                 "Continue Game",
                 new Vector3f(
-                        gui.getWidth() / 2, 
-                        gui.getHeight() / 1.8f, 0),
-                Vector3f.UNIT_XYZ, 
+                gui.getWidth() / 2,
+                gui.getHeight() / 2.0f, 0),
+                Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange,
                 ColorRGBA.DarkGray,
                 gui) {
 
             @Override
             public void updateGUI(float tpf) {
-                
             }
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                unpause();
+                if (!isPressed) {
+                    unpause();
+                }
             }
         };
 
         mainMenu = new Button("Mainmenu",
                 new Vector3f(
-                        gui.getWidth() / 2,
-                        gui.getHeight() / 2.2f, 0),
+                gui.getWidth() / 2,
+                gui.getHeight() / 2.4f, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.DarkGray, gui) {
 
@@ -138,36 +126,20 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 //game.getApplication().stop();
-                GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                if (!isPressed) {
+                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                }
             }
         };
-        
-        attachChild(pauseLabel);
-        attachChild(mainMenu);
-        attachChild(continueGame);
-        
+
+
+        gui.addGUIElement(background);
+        gui.addGUIElement(pauseLabel);
+        gui.addGUIElement(mainMenu);
+        gui.addGUIElement(continueGame);
         //gui.addGUIElement(mainMenu);
 
-
-    }
-
-    /**
-     * Creates the panel.
-     */
-    private void createPanel() {
-        AssetManager assetManager = game.getApplication().getAssetManager();
-
-        Box b = new Box(gui.getWidth() / 4, gui.getHeight() / 5, 1);
-        geometry = new Geometry("PausePanel", b);
-
-        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setColor("Color", new ColorRGBA(0f, 0f, 0.8f, 1f));
-        geometry.setMaterial(material);
-        geometry.setLocalTranslation(
-                gui.getWidth() / 2,
-                gui.getHeight() / 1.9f,
-                0);
-        attachChild(geometry);
+        setVisible(false);
     }
 
     /* (non-Javadoc)
@@ -184,20 +156,33 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void setVisible(boolean show) {
+        super.setVisible(show);
+        background.setVisible(show);
+        pauseLabel.setVisible(show);
+        mainMenu.setVisible(show);
+        continueGame.setVisible(show);
     }
-    
+
     /**
      * Pause.
      */
     public void pause() {
-        gui.addGUIElement(this);
+        setVisible(true);
     }
-    
+
     /**
      * Unpause.
      */
     public void unpause() {
-        gui.removeGUIElement(this);
+        setVisible(false);
+    }
+
+    public void togglePause() {
+        if (isVisible()) {
+            unpause();
+        } else {
+            pause();
+        }
     }
 
     /* (non-Javadoc)

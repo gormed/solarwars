@@ -40,20 +40,9 @@ import logic.Player;
 /**
  * The Class ShipGroup.
  */
-@Serializable
 public class ShipGroup extends Node {
 
-    /** The SHI p_ id. */
-    private static int SHIP_ID = 0;
 
-    /**
-     * Gets the continious id.
-     *
-     * @return the continious id
-     */
-    private static int getContiniousID() {
-        return SHIP_ID++;
-    }
     /** The ships. */
     private ArrayList<AbstractShip> ships;
     /** The owner. */
@@ -73,9 +62,6 @@ public class ShipGroup extends Node {
     /** The size. */
     private float size;
 
-    public ShipGroup() {
-    }
-
     /**
      * Instantiates a new ship group.
      *
@@ -93,7 +79,7 @@ public class ShipGroup extends Node {
         this.ships = new ArrayList<AbstractShip>();
         this.transformNode = new Node("ShipGroup Transform Node " + id);
         this.attachChild(transformNode);
-        id = getContiniousID();
+        id = Level.getContiniousShipGroupID();
         createShips(assetManager, creator, target, shipCount);
 
     }
@@ -238,6 +224,10 @@ public class ShipGroup extends Node {
         ships.remove(s);
     }
 
+    /**
+     * Gets the ship groups id
+     * @return
+     */
     public int getId() {
         return id;
     }

@@ -79,6 +79,7 @@ public class ChatGUI extends GUIElement {
      */
     @Override
     public void setVisible(boolean show) {
+        super.setVisible(show);
         textArea.setVisible(show);
     }
     

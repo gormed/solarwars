@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import logic.PlayerState;
+import net.messages.GeneralActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
@@ -86,14 +87,15 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerAcceptedMessage.class);
         Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(PlanetActionMessage.class);
+        Serializer.registerClass(GeneralActionMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
-        Serializer.registerClass(entities.AbstractPlanet.class);
-        Serializer.registerClass(entities.AbstractShip.class);
-        Serializer.registerClass(entities.BasePlanet.class);
-        Serializer.registerClass(entities.ShipGroup.class);
-        Serializer.registerClass(entities.SimpleShip.class);
+//        Serializer.registerClass(entities.AbstractPlanet.class);
+//        Serializer.registerClass(entities.AbstractShip.class);
+//        Serializer.registerClass(entities.BasePlanet.class);
+//        Serializer.registerClass(entities.ShipGroup.class);
+//        Serializer.registerClass(entities.SimpleShip.class);
         //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
     /** The game server. */
@@ -154,7 +156,7 @@ public class SolarWarsServer extends SimpleApplication {
     }
 
     public void enterLevel() {
-        gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class);
+        gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
     }
 
     /* (non-Javadoc)
@@ -396,6 +398,18 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getPlayerID(),
                         clientMessage.getPlayerState(),
                         clientMessage.getPlanetID());
+
+                gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
+            } else if (message instanceof GeneralActionMessage) {
+                GeneralActionMessage clientMessage = (GeneralActionMessage) message;
+
+                GeneralActionMessage serverMessage =
+                        new GeneralActionMessage(
+                                clientMessage.getActionName(),
+                                clientMessage.getSender(),
+                                clientMessage.getSenderState(),
+                                clientMessage.getReciever(),
+                                clientMessage.getRecieverState());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
             }

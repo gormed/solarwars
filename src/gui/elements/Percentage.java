@@ -79,6 +79,7 @@ public class Percentage extends Label {
      */
     @Override
     public void setVisible(boolean show) {
+        super.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 

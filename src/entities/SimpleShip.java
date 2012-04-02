@@ -36,11 +36,7 @@ import logic.Player;
 /**
  * The Class SimpleShip.
  */
-@Serializable
 public class SimpleShip extends AbstractShip {
-
-    public SimpleShip() {
-    }
 
     /**
      * Instantiates a new simple ship.

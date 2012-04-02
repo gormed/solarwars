@@ -32,12 +32,25 @@ import java.util.ArrayList;
  */
 @Serializable
 public class Player {
-
+    
     public static final ColorRGBA[] PLAYER_COLORS = {
         ColorRGBA.Blue, ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.Orange,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         ColorRGBA.Brown, ColorRGBA.Magenta};
+
+    /**
+     * Invokes Game over action if player has lost game.
+     * @param victorious
+     * @param defeated 
+     */
+    private static void reportPlayerLost(Player victorious, Player defeated) {
+        if (defeated != null && !defeated.hasShips()) {
+            defeated.setLost();
+            ActionLib.getInstance().
+                    invokeGeneralAction(null, victorious, defeated, Gameplay.GAME_OVER);
+        }
+    }
     /** The id. */
     private int id;
     /** The artificial. */
@@ -87,11 +100,11 @@ public class Player {
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
     }
-
+    
     public PlayerState getState() {
         return state;
     }
-
+    
     void applyState(PlayerState newState) {
         this.state = newState;
     }
@@ -112,6 +125,20 @@ public class Player {
      */
     public boolean isHost() {
         return isHost;
+    }
+
+    /**
+     * 
+     * Returns if the player is defeated and out of game.
+     * 
+     * @return true if player lost, false if still playing.
+     */
+    public boolean hasLost() {
+        return state.lost;
+    }
+    
+    void setLost() {
+        state.lost = true;
     }
 
     /**
@@ -189,21 +216,21 @@ public class Player {
     public float getShipPercentage() {
         return state.shipPercentage;
     }
-
+    
     public int getShipCount() {
         int ships = 0;
-
+        
         for (ShipGroup sg : shipGroups) {
             ships += sg.getShipCount();
         }
-
+        
         for (AbstractPlanet p : planets) {
             ships += p.getShipCount();
         }
-
+        
         return ships;
     }
-
+    
     public boolean hasShips() {
         return (getShipCount() > 0);
     }
@@ -288,18 +315,15 @@ public class Player {
      */
     void capturePlanet(AbstractPlanet planet) {
         Player prevOwner = null;
-
+        
         if (planet.hasOwner()) {
             prevOwner = planet.getOwner();
             prevOwner.uncapturePlanet(planet);
         }
         planet.setOwner(this);
         planets.add(planet);
-
-        if (prevOwner != null && !prevOwner.hasShips()) {
-            ActionLib.getInstance().
-                    invokeGeneralAction(this, prevOwner, Gameplay.GAME_OVER);
-        }
+        
+        reportPlayerLost(this, prevOwner);
     }
 
     /**
@@ -309,7 +333,7 @@ public class Player {
      */
     void uncapturePlanet(AbstractPlanet planet) {
         planets.remove(planet);
-
+        
     }
 
     /**

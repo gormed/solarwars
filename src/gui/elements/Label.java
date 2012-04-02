@@ -107,6 +107,7 @@ public abstract class Label extends GUIElement implements ClickableGUI {
      */
     @Override
     public void setVisible(boolean show) {
+        super.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 

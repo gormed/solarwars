@@ -50,8 +50,7 @@ public abstract class GeneralAction {
     /**
      * Do action.
      *
-     * @param sender the sender
-     * @param p the p
+     * 
      */
-    abstract void doAction(Object sender, Player p);
+    abstract void doAction(Object sender, Player a, Player b);
 }

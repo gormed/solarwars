@@ -44,6 +44,48 @@ import solarwars.IsoControl;
  */
 public class Level {
 
+    /** The PLANE t_ id. */
+    private static int PLANET_ID = 0;
+
+    /**
+     * Gets the continious id.
+     *
+     * @return the continious id
+     */
+    public static int getContiniousPlanetID() {
+        return PLANET_ID++;
+    }
+    
+    /** The SHI p_ id. */
+    private static int SHIP_ID = 0;
+
+    /**
+     * Gets the continious id.
+     *
+     * @return the continious id
+     */
+    public static int getContiniousShipID() {
+        return SHIP_ID++;
+    }
+    
+        /** The SHI p_ id. */
+    private static int SHIP_GROUP_ID = 0;
+
+    /**
+     * Gets the continious id.
+     *
+     * @return the continious id
+     */
+    public static int getContiniousShipGroupID() {
+        return SHIP_GROUP_ID++;
+    }
+    
+    void resetEntityIDs() {
+        SHIP_ID = 0;
+        SHIP_GROUP_ID = 0;
+        PLANET_ID = 0;
+    }
+    
     /** The seed. */
     private long seed = 0;
     /** The root node. */
@@ -80,7 +122,6 @@ public class Level {
      * Indicates that the level is fully loaded into scene-graph
      */
     private boolean levelLoaded = false;
-    
     /** indicates that the game ended */
     private boolean gameOver = false;
 
@@ -359,7 +400,7 @@ public class Level {
             idx = r.nextInt(planetList.size());
             planet = planetList.get(idx);
         }
-        
+
         p.capturePlanet(planet);
         planet.setShipCount(100);
         return planet;
@@ -432,6 +473,8 @@ public class Level {
         this.rootNode = null;
         this.assetManager = null;
         this.control = null;
-
+        this.gui.cleanUpGUI();
+        this.gui = null;
     }
+
 }

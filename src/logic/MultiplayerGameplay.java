@@ -25,7 +25,10 @@ public class MultiplayerGameplay {
 
     private MultiplayerGameplay() {
         client = NetworkManager.getInstance().getThisClient();
-        client.addMessageListener(gameplayListener, PlanetActionMessage.class);
+        client.addMessageListener(
+                gameplayListener,
+                PlanetActionMessage.class,
+                GeneralActionMessage.class);
     }
 
     public static MultiplayerGameplay getInstance() {
@@ -59,7 +62,7 @@ public class MultiplayerGameplay {
         client.send(planetActionMessage);
     }
 
-    private void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
+    public void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
         if (client == null) {
             return;
         }
@@ -75,7 +78,7 @@ public class MultiplayerGameplay {
     }
 
     public void update(float tpf) {
-        while (!recievedMessages.isEmpty()) {
+        while (recievedMessages != null && !recievedMessages.isEmpty()) {
             Message m = recievedMessages.poll();
 
             if (m instanceof PlanetActionMessage) {
@@ -94,9 +97,25 @@ public class MultiplayerGameplay {
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
 
-                
+
             }
         }
+    }
+
+    public void destroy() {
+        recievedMessages.clear();
+        recievedMessages = null;
+        
+        if (client != null) {
+            client.removeMessageListener(
+                    gameplayListener,
+                    PlanetActionMessage.class,
+                    GeneralActionMessage.class);
+        }
+        gameplayListener = null;
+        
+        instance = null;
+        
     }
 
     private class ClientGameplayListener implements MessageListener<Client> {

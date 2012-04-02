@@ -35,4 +35,6 @@ public class PlayerState {
     public String name;
     /** The color. */
     public ColorRGBA color;
+    
+    public boolean lost;
 }

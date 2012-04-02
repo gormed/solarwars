@@ -104,6 +104,7 @@ public abstract class Button extends Label {
      */
     @Override
     public void setVisible(boolean show) {
+        super.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
