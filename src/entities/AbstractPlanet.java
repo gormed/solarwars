@@ -22,6 +22,10 @@
 package entities;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.effect.Particle;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterPointShape;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
@@ -31,7 +35,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
-import com.jme3.network.serializing.Serializable;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -74,10 +77,71 @@ public abstract class AbstractPlanet extends Node {
     protected float shipIncrement;
     /** The ships. */
     protected int ships = 0;
-    /** The time. */
-    protected float time;
+    /** The shipGainTime. */
+    protected float shipGainTime;
+    protected float particleEffectTime;
     /** The owner. */
     protected Player owner;
+
+    ParticleEmitter getEmitter() {
+        return impact;
+    }
+    //private static AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
+    private ParticleEmitter impact;
+    private Particle[] particles;
+    private int particleCount = 15;
+
+    private void createEmitter() {
+        if (impact == null) {
+            impact = new ParticleEmitter("ShipImpactEffect ", ParticleMesh.Type.Triangle, 15);
+            Material impact_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+            impact_mat.setTexture("Texture", assetManager.loadTexture("Textures/Effects/blob.png"));
+            impact.setMaterial(impact_mat);
+            impact.setImagesX(1);
+            impact.setImagesY(1);
+            impact.setRotateSpeed(1);
+            impact.setLowLife(0.3f);
+            impact.setHighLife(1.1f);
+            impact.setStartSize(0.1f);
+            impact.setEndSize(0.2f);
+            impact.setSelectRandomImage(true);
+
+            impact.setGravity(0, 0, 0);
+            impact.getParticleInfluencer().setVelocityVariation(.10f);
+
+            impact.setEnabled(false);
+
+            level.addParticleEmitter(impact);
+        }
+    }
+
+    void emitParticles(ColorRGBA start, ColorRGBA end, Vector3f pos, Vector3f dir) {
+        impact.setEnabled(true);
+
+//        int oldest = 0;
+//        for (int i = 0; i < impact.getParticles().length - 1; i++) {
+//            Particle q = impact.getParticles()[i + 1];
+//            if (q.life > impact.getParticles()[oldest].life) {
+//                oldest = i;
+//            }
+//        }
+//
+//        //for (int i = 0; i < particles/4; i++) {
+//        impact.killParticle(oldest);
+//        //}
+
+        impact.setParticlesPerSec(200);
+        impact.getParticleInfluencer().setInitialVelocity(dir.normalizeLocal().negateLocal().mult(0.23f));
+
+        impact.setStartColor(start);
+        impact.setEndColor(end);
+
+        impact.setShape(new EmitterPointShape(pos));
+
+        impact.emitAllParticles();
+        
+        impact.setParticlesPerSec(0);
+    }
 
     /**
      * Instantiates a new abstract planet.
@@ -95,6 +159,7 @@ public abstract class AbstractPlanet extends Node {
         this.transformNode = new Node("Planet Transform Node " + id);
         this.transformNode.setLocalTranslation(position);
         this.assetManager = assetManager;
+        this.createEmitter();
         this.owner = null;
         createLabel();
 
@@ -271,26 +336,57 @@ public abstract class AbstractPlanet extends Node {
         }
     }
 
+    private void updateLabel(float tpf) {
+
+        boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()));
+        label.setCullHint(visible ? CullHint.Never : CullHint.Always);
+        if (visible) {
+            refreshFont();
+            label.setText(ships + "");
+        }
+
+        shipGainTime += tpf;
+        if (owner != null && !level.isGameOver()) {
+
+            if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
+                shipGainTime = 0;
+                ships += 1;
+            }
+        }
+
+    }
+
+    private void updateParticleEffect(float tpf) {
+
+//        particles = impact.getParticles();
+//
+//
+//        if (particles.length > 0) {
+//            particleEffectTime += tpf;
+////            for (int i = 0; i < particles.length; i++) {
+////                if (particles[i].life <= 0.01f) {
+////                    impact.killParticle(i);
+////                }
+////            }
+//            if (particleEffectTime > 1000) {
+//                impact.killAllParticles();
+//                particleEffectTime = 0;
+//            }
+//        } else {
+//            impact.setParticlesPerSec(0);
+//        }
+
+
+    }
+
     /**
      * Updates the label.
      *
      * @param tpf the tpf
      */
-    public void updateLabel(float tpf) {
+    public void updatePlanet(float tpf) {
 
-        label.setCullHint(
-                (owner != null && !owner.equals(Hub.getLocalPlayer())) ? 
-                CullHint.Always : CullHint.Never);
-        
-        refreshFont();
-
-        if (owner != null && !level.isGameOver()) {
-            time += tpf;
-            if (time > SHIP_REFRESH_MULTIPILER * shipIncrement) {
-                time = 0;
-                ships += 1;
-            }
-        }
-        label.setText(ships + "");
+        updateLabel(tpf);
+        updateParticleEffect(tpf);
     }
 }

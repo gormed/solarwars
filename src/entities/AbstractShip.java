@@ -23,6 +23,7 @@ package entities;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -37,7 +38,6 @@ import solarwars.Hub;
  * The Class AbstractShip.
  */
 public abstract class AbstractShip extends Node {
-
 
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.175f;
@@ -73,7 +73,6 @@ public abstract class AbstractShip extends Node {
      */
     public AbstractShip(AssetManager assetManager, Level level, Vector3f position, Player p, ShipGroup g) {
         super();
-
         this.id = Level.getContiniousPlanetID();
         this.owner = p;
         this.assetManager = assetManager;
@@ -167,12 +166,30 @@ public abstract class AbstractShip extends Node {
         if (order != null) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
-            if (dir.length() < 0.1f) {
+            if (dir.length() < 0.15f) {
 
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
                             this, order, owner, Gameplay.PLANET_CAPTURE);
                 }
+//                ShipImpactEffect effect = new ShipImpactEffect();
+//                effect.setupEmitter();
+//                ParticleManager.getInstance().addEffect(effect);
+                Vector3f impactPos = order.position.clone();
+                Vector3f offset = dir.clone();
+                offset.normalizeLocal().negateLocal().multLocal(order.getSize() + 0.05f);
+                impactPos.addLocal(offset);
+
+                order.emitParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
+                //order.emitParticles(this.owner.getColor(), this.owner.getColor(), impactPos, dir);
+
+
+//                if (order.owner == null) {
+//                    emitParticles(ColorRGBA.White, this.owner.getColor(), impactPos, dir);
+//                } else {
+//                    emitParticles(order.getOwner().getColor(), this.owner.getColor(), impactPos, dir);
+//                }
+
 
                 removeFromShipGroup();
                 level.removeShip(owner, this);
@@ -183,6 +200,7 @@ public abstract class AbstractShip extends Node {
                 dir.multLocal(tpf);
                 position.addLocal(dir);
                 transformNode.setLocalTranslation(position);
+
             }
         }
     }

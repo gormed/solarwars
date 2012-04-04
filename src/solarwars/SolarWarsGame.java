@@ -91,8 +91,7 @@ public class SolarWarsGame {
     private FontLoader fontLoader;
     
     /** The action lib. */
-    private ActionLib actionLib;
-    
+    private ActionLib actionLib;    
 
     /**
      * Initializes the.

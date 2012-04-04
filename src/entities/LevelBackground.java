@@ -70,7 +70,7 @@ public class LevelBackground extends Node {
         geometry = new Geometry("BackgroundGeometry", q);
 
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Enviorment/starmap_1.jpg"));
+        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Enviorment/stars.png"));
 
 
         geometry.setMaterial(material);

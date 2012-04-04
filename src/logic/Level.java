@@ -23,6 +23,7 @@ package logic;
 
 import solarwars.Hub;
 import com.jme3.asset.AssetManager;
+import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import entities.AbstractPlanet;
@@ -55,7 +56,6 @@ public class Level {
     public static int getContiniousPlanetID() {
         return PLANET_ID++;
     }
-    
     /** The SHI p_ id. */
     private static int SHIP_ID = 0;
 
@@ -67,8 +67,7 @@ public class Level {
     public static int getContiniousShipID() {
         return SHIP_ID++;
     }
-    
-        /** The SHI p_ id. */
+    /** The SHI p_ id. */
     private static int SHIP_GROUP_ID = 0;
 
     /**
@@ -79,13 +78,12 @@ public class Level {
     public static int getContiniousShipGroupID() {
         return SHIP_GROUP_ID++;
     }
-    
+
     void resetEntityIDs() {
         SHIP_ID = 0;
         SHIP_GROUP_ID = 0;
         PLANET_ID = 0;
     }
-    
     /** The seed. */
     private long seed = 0;
     /** The root node. */
@@ -100,6 +98,8 @@ public class Level {
     private Node labelNode;
     /** The background. */
     private LevelBackground background;
+    /** The particle node for particle emitters of the planets */
+    private Node particleEmitters;
     /** The all ships node. */
     private Node allShipsNode;
     /** The ship nodes. */
@@ -232,6 +232,8 @@ public class Level {
         this.levelNode.attachChild(freePlanetsNode);
         this.allShipsNode = new Node("Level All Ships");
         this.levelNode.attachChild(allShipsNode);
+        this.particleEmitters = new Node("Particle Emitters Node");
+        this.levelNode.attachChild(particleEmitters);
 
         // create a ship node for each player
 
@@ -354,7 +356,15 @@ public class Level {
     public void removeShipGroup(Player p, ShipGroup s) {
         Node shipNode = shipNodes.get(p);
         shipNode.detachChild(s);
-        shipGroupList.remove(s);
+        shipGroupList.remove(s.getId());
+    }
+
+    public void addParticleEmitter(ParticleEmitter emitter) {
+        particleEmitters.attachChild(emitter);
+    }
+
+    public void removeParticleEmitter(ParticleEmitter emitter) {
+        particleEmitters.detachChild(emitter);
     }
 
     /**
@@ -427,7 +437,7 @@ public class Level {
         }
 
         for (Map.Entry<Integer, AbstractPlanet> entry : getPlanetSet()) {
-            entry.getValue().updateLabel(tpf);
+            entry.getValue().updatePlanet(tpf);
         }
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
@@ -439,6 +449,7 @@ public class Level {
         }
 
         for (AbstractShip s : removeShipsList) {
+            //s.destroyParticleEmitter();
             shipList.remove(s.getId());
         }
 
@@ -453,6 +464,7 @@ public class Level {
         this.background = null;
         this.labelNode = null;
 
+        this.particleEmitters.detachAllChildren();
         this.freePlanetsNode.detachAllChildren();
         this.allShipsNode.detachAllChildren();
         this.levelNode.detachAllChildren();
@@ -476,5 +488,4 @@ public class Level {
         this.gui.cleanUpGUI();
         this.gui = null;
     }
-
 }
