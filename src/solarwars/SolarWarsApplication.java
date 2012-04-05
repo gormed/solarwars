@@ -37,9 +37,11 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
@@ -74,6 +76,7 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
     /** The instance. */
     private static SolarWarsApplication instance;
+    //private static AppSettings settings;
 
     /**
      * Gets the single instance of SolarWarsApplication.
@@ -114,6 +117,8 @@ public class SolarWarsApplication extends Application {
     private AppActionListener actionListener = new AppActionListener();
     /** The post processor. */
     private FilterPostProcessor postProcessor;
+    private BloomFilter bloomFilter =
+            new BloomFilter(BloomFilter.GlowMode.Objects);
     /** The game. */
     private SolarWarsGame game;
 
@@ -158,6 +163,14 @@ public class SolarWarsApplication extends Application {
      */
     public IsoControl getIsoControl() {
         return isoControl;
+    }
+
+    public FilterPostProcessor getPostProcessor() {
+        return postProcessor;
+    }
+
+    public ViewPort getCameraViewPort() {
+        return viewPort;
     }
 
     /**
@@ -284,11 +297,39 @@ public class SolarWarsApplication extends Application {
         getInstance().start();
     }
 
+    private void initSettings() {
+        if (settings == null) {
+            settings = new AppSettings(false);
+
+//            settings.setBitsPerPixel(24);
+//            settings.setWidth(1024);
+//
+//            settings.setHeight(768);
+            settings.put("Width", 1024);
+            settings.put("Height", 768);
+            settings.put("BitsPerPixel", 24);
+            settings.put("Frequency", 60);
+            settings.put("DepthBits", 24);
+            settings.put("StencilBits", 0);
+            settings.put("Samples", 4);
+            settings.put("Fullscreen", false);
+            settings.put("Title", "SolarWars_");
+            settings.put("Renderer", AppSettings.LWJGL_OPENGL2);
+            settings.put("AudioRenderer", AppSettings.LWJGL_OPENAL);
+            settings.put("DisableJoysticks", true);
+            settings.put("UseInput", true);
+            settings.put("VSync", false);
+            settings.put("FrameRate", 100);
+            settings.put("SettingsDialogImage", "/Interface/solarwars_v2.png");
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.jme3.app.Application#start()
      */
     @Override
     public void start() {
+        initSettings();
         // set some default settings in-case
         // settings dialog is not shown
         boolean loadSettings = false;
@@ -319,6 +360,15 @@ public class SolarWarsApplication extends Application {
         guiNode.setCullHint(CullHint.Never);
         loadFPSText();
         loadStatsView();
+
+
+        postProcessor = new FilterPostProcessor(assetManager);
+        //bloomFilter.setDownSamplingFactor(.02f);
+//        bloomFilter.setBloomIntensity(2.0f);
+//        postProcessor.addFilter(bloomFilter);
+//        viewPort.addProcessor(postProcessor);
+
+
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
 
@@ -334,7 +384,7 @@ public class SolarWarsApplication extends Application {
                 new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
         inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
-        inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F5));
+        inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
         inputManager.addListener(actionListener, INPUT_MAPPING_EXIT,
                 INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
 

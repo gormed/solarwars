@@ -270,10 +270,13 @@ public class Level {
         this.seed = seed;
         Random r = new Random(seed);
 
-        for (int i = 0; i < 12; i++) {
-            for (int j = 0; j < 12; j++) {
+        for (int i = -5; i <= 5; i++) {
+            for (int j = -4; j <= 4; j++) {
                 if (r.nextBoolean()) {
-                    p = new BasePlanet(assetManager, this, new Vector3f(-6 + i, 0, -6 + j), generateSize(r));
+                    p = new BasePlanet(
+                            assetManager, this, 
+                            new Vector3f(i, 0, j), 
+                            generateSize(r));
                     p.createPlanet();
                     p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
@@ -423,7 +426,11 @@ public class Level {
      * @return the float
      */
     private float generateSize(Random r) {
-        return (0.6f + r.nextFloat()) / 4;
+        float[] random = { 
+            0.2f, 0.225f, 0.25f, 0.275f, 0.3f, 
+            0.325f, 0.35f, 0.375f, 0.4f };
+        return random[r.nextInt(random.length)];
+        //return (0.6f + r.nextFloat()) / 4;
     }
 
     /**

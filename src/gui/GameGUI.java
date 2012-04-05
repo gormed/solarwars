@@ -42,7 +42,7 @@ public class GameGUI {
     /** The game. */
     SolarWarsGame game;
     /** The gui elemetns. */
-    private ArrayList<GUIElement> guiElemetns;
+    private ArrayList<GUIElement> guiElements;
     /** The width. */
     private float width;
     /** The action listener. */
@@ -92,7 +92,7 @@ public class GameGUI {
         this.game = game;
         this.width = game.getApplication().getCamera().getWidth();
         this.height = game.getApplication().getCamera().getHeight();
-        this.guiElemetns = new ArrayList<GUIElement>();
+        this.guiElements = new ArrayList<GUIElement>();
 
         this.clickableNode = new Node("ClickableGUI");
         this.decoNode = new Node("DecoNode");
@@ -182,12 +182,14 @@ public class GameGUI {
      * @param guiElement the gui element
      */
     public void addGUIElement(GUIElement guiElement) {
+        if (guiElements.contains(guiElement))
+            return;
         if (guiElement instanceof ClickableGUI) {
             clickableNode.attachChild(guiElement);
         } else {
             decoNode.attachChild(guiElement);
         }
-        guiElemetns.add(guiElement);
+        guiElements.add(guiElement);
     }
 
     /**
@@ -201,7 +203,7 @@ public class GameGUI {
         } else {
             decoNode.detachChild(guiElement);
         }
-        guiElemetns.remove(guiElement);
+        guiElements.remove(guiElement);
 
     }
 
@@ -211,7 +213,7 @@ public class GameGUI {
      * @param tpf the tpf
      */
     public void updateGUIElements(float tpf) {
-        for (GUIElement e : guiElemetns) {
+        for (GUIElement e : guiElements) {
             e.updateGUI(tpf);
         }
     }
@@ -223,7 +225,7 @@ public class GameGUI {
      * @return true, if successful
      */
     public boolean containsGUIElement(GUIElement e) {
-        return guiElemetns.contains(e);
+        return guiElements.contains(e);
     }
 
     /**
@@ -234,7 +236,7 @@ public class GameGUI {
         ArrayList<GUIElement> clickable = new ArrayList<GUIElement>();
         ArrayList<GUIElement> elements = new ArrayList<GUIElement>();
 
-        for (GUIElement guiElement : guiElemetns) {
+        for (GUIElement guiElement : guiElements) {
             if (guiElement instanceof ClickableGUI) {
                 clickable.add(guiElement);
                 //clickableNode.detachChild(guiElement);
@@ -253,6 +255,6 @@ public class GameGUI {
 
         elements.clear();
         clickable.clear();
-        guiElemetns.clear();
+        guiElements.clear();
     }
 }

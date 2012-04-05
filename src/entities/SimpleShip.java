@@ -24,14 +24,16 @@ package entities;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import logic.Level;
 import logic.Player;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class SimpleShip.
@@ -57,13 +59,23 @@ public class SimpleShip extends AbstractShip {
     @Override
     public void createShip() {
         Quad q = new Quad(SHIP_SIZE, SHIP_SIZE);
-        geometry = new Geometry("SimpleShip " + id, q);
 
+        geometry = new Geometry("SimpleShip " + id, q);
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setTexture("ColorMap", assetManager.loadTexture("Textures/Ships/ship.png"));
         material.setColor("Color", this.owner.getColor());
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-
+//        if (material == null) {
+//            material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+//            material.setTexture("ColorMap", assetManager.loadTexture("Textures/Ships/ship.png"));
+//            material.setColor("Color", owner.getColor());
+//            material.setColor("GlowColor", owner.getColor());
+//            material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+//            //fpp = new FilterPostProcessor(assetManager);
+//        }
+//
+//        material.setColor("Color", owner.getColor());
+//        material.setColor("GlowColor", owner.getColor());
 
         geometry.setMaterial(material);
 

@@ -40,7 +40,7 @@ import solarwars.Hub;
 public abstract class AbstractShip extends Node {
 
     /** The SHI p_ size. */
-    protected static float SHIP_SIZE = 0.175f;
+    protected static float SHIP_SIZE = 0.2f;
     /** The asset manager. */
     protected AssetManager assetManager;
     /** The geometry. */
@@ -166,7 +166,16 @@ public abstract class AbstractShip extends Node {
         if (order != null) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
-            if (dir.length() < 0.15f) {
+
+            Vector3f impactPos = order.position.clone();
+            Vector3f offset = dir.clone();
+            offset.normalizeLocal().negateLocal().multLocal(order.getSize() + 0.05f);
+            impactPos.addLocal(offset);
+
+            Vector3f impact = impactPos.clone();
+            impact.subtractLocal(position);
+
+            if (impact.length() < 0.1f) {
 
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
@@ -175,10 +184,7 @@ public abstract class AbstractShip extends Node {
 //                ShipImpactEffect effect = new ShipImpactEffect();
 //                effect.setupEmitter();
 //                ParticleManager.getInstance().addEffect(effect);
-                Vector3f impactPos = order.position.clone();
-                Vector3f offset = dir.clone();
-                offset.normalizeLocal().negateLocal().multLocal(order.getSize() + 0.05f);
-                impactPos.addLocal(offset);
+
 
                 order.emitParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
                 //order.emitParticles(this.owner.getColor(), this.owner.getColor(), impactPos, dir);

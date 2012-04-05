@@ -133,7 +133,9 @@ public class Gameplay {
                     }
                 } else if (p.hasSelectedShipGroup()) {
                     ShipGroup sg = p.getSelectedShipGroup();
-                    sg.moveToPlanet(planet);
+                    if (sg != null) {
+                        sg.moveToPlanet(planet);
+                    }
                 }
             }
         };

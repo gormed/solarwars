@@ -59,7 +59,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         return instance = new IsoCamera();
     }
     /** The Constant CAMERA_HEIGHT. */
-    public static final float CAMERA_HEIGHT = 14;
+    public static final float CAMERA_HEIGHT = 12;
     /** The Constant CAMERA_ANGLE. */
     public static final float CAMERA_ANGLE = (float) Math.PI / 2;//8f * (((float) Math.PI) / 18f) ;
     /** The cam. */
@@ -107,7 +107,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
         float[] rot = {CAMERA_ANGLE, 0, 0};
         this.cam = cam;
         initialUpVec = cam.getUp().clone();
-        cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, -0.5f));
+        cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, 0));
         cam.setRotation(new Quaternion(rot));
         
         camLight = new PointLight();

@@ -126,15 +126,6 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             }
         };
 
-        gui.addGUIElement(background);
-        gui.addGUIElement(gameOverLabel);
-        gui.addGUIElement(mainMenuLabel);
-        gui.addGUIElement(watchGameLabel);
-
-        setVisible(false);
-        //gui.addGUIElement(mainMenuLabel);
-
-
     }
 
     /* (non-Javadoc)
@@ -162,14 +153,24 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      * Pause.
      */
     public void display() {
-        setVisible(true);
+        if (gui != null) {
+            gui.addGUIElement(background);
+            gui.addGUIElement(gameOverLabel);
+            gui.addGUIElement(mainMenuLabel);
+            gui.addGUIElement(watchGameLabel);
+        }
     }
 
     /**
      * Unpause.
      */
     public void hide() {
-        setVisible(false);
+        if (gui != null) {
+            gui.removeGUIElement(background);
+            gui.removeGUIElement(gameOverLabel);
+            gui.removeGUIElement(mainMenuLabel);
+            gui.removeGUIElement(watchGameLabel);
+        }
     }
 
     /* (non-Javadoc)
