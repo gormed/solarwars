@@ -24,17 +24,14 @@ package gamestates.lib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.network.Client;
-import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
+import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
-import java.io.IOException;
-import java.net.InetAddress;
 import net.NetworkManager;
 import solarwars.SolarWarsGame;
 
@@ -45,31 +42,22 @@ public class MultiplayerState extends Gamestate {
 
     /** The multiplayer label. */
     private Label multiplayerLabel;
-    
     /** The background panel. */
     private Panel backgroundPanel;
-    
     /** The line. */
     private Panel line;
-    
     /** The player name. */
     private TextBox playerName;
-    
     /** The join server. */
     private Button joinServer;
-    
     /** The create server. */
     private Button createServer;
-    
     /** The back. */
     private Button back;
-    
     /** The serverip. */
     private TextBox serverip;
-    
     /** The gui. */
     private GameGUI gui;
-    
     /** The network manager. */
     private NetworkManager networkManager;
 
@@ -100,7 +88,7 @@ public class MultiplayerState extends Gamestate {
                 ColorRGBA.Blue,
                 new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                "NAME",
+                Ergonomics.getInstance().getName(),
                 ColorRGBA.White,
                 gui, false) {
 
@@ -110,6 +98,7 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+                Ergonomics.getInstance().setName(caption);
             }
         };
 
@@ -132,7 +121,7 @@ public class MultiplayerState extends Gamestate {
         serverip = new TextBox(
                 ColorRGBA.Blue,
                 new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, "127.0.0.1",
+                Vector3f.UNIT_XYZ, Ergonomics.getInstance().getIpAddress(),
                 ColorRGBA.White, gui, true) {
 
             @Override
@@ -141,6 +130,7 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+                Ergonomics.getInstance().setIpAddress(caption);
             }
         };
 
@@ -227,14 +217,7 @@ public class MultiplayerState extends Gamestate {
     @Override
     protected void unloadContent() {
 
-        gui.removeGUIElement(backgroundPanel);
-        gui.removeGUIElement(line);
-        gui.removeGUIElement(multiplayerLabel);
-        gui.removeGUIElement(playerName);
-        gui.removeGUIElement(joinServer);
-        gui.removeGUIElement(createServer);
-        gui.removeGUIElement(serverip);
-        gui.removeGUIElement(back);
+        gui.cleanUpGUI();
         gui = null;
     }
 
@@ -269,7 +252,7 @@ public class MultiplayerState extends Gamestate {
                 serverLobbyState.setClientPlayerName(playerName.getCaption());
                 serverLobbyState.setClientPlayerColor(ColorRGBA.Red);
                 serverLobbyState.setServerIPAddress(ip);
-                
+
                 gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
             }
         } else {

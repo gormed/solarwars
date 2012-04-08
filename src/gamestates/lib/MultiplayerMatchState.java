@@ -24,11 +24,19 @@ package gamestates.lib;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.network.Client;
+import com.jme3.network.ClientStateListener;
+import com.jme3.network.ClientStateListener.DisconnectInfo;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
+import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Logger;
 import logic.Gameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
@@ -49,7 +57,10 @@ public class MultiplayerMatchState extends Gamestate {
     private Hub hub;
     private Level currentLevel;
     private MultiplayerGameplay gameplay;
+    private Client client;
     private final SolarWarsApplication application;
+    private PlayerStateListener playerStateListener = new PlayerStateListener();
+    private boolean lostConnection;
 
     /**
      * Instantiates a new multiplayer match state.
@@ -65,9 +76,13 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        gameplay.update(tpf);
-        currentLevel.updateLevel(tpf);
-        gui.updateGUIElements(tpf);
+        if (!lostConnection) {
+            gameplay.update(tpf);
+            gui.updateGUIElements(tpf);
+            currentLevel.updateLevel(tpf);
+        } else if (lostConnection && !currentLevel.isGameOver()) {
+            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+        }
     }
 
     /* (non-Javadoc)
@@ -75,10 +90,13 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        lostConnection = false;
         hub = Hub.getInstance();
         this.game = game;
         application.setPauseOnLostFocus(false);
-        gameplay = MultiplayerGameplay.getInstance();        
+        client = NetworkManager.getInstance().getThisClient();
+        client.addClientStateListener(playerStateListener);
+        gameplay = MultiplayerGameplay.getInstance();
         setupGUI();
         currentLevel = Gameplay.getCurrentLevel();
         currentLevel.generateLevel();
@@ -90,8 +108,19 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-        NetworkManager.getInstance().closeAllConnections(false);
+        lostConnection = false;
 
+        Future fut = application.enqueue(new Callable() {
+
+            public Object call()
+                    throws Exception {
+
+                return NetworkManager.getInstance().closeAllConnections(true);
+            }
+        });
+
+
+        GameOverGUI.getInstance().hide();
         application.getInputManager().removeListener(pauseListener);
         pauseListener = null;
 
@@ -102,9 +131,13 @@ public class MultiplayerMatchState extends Gamestate {
         gui.cleanUpGUI();
         gui = null;
 
+        if (client != null) {
+            client.removeClientStateListener(playerStateListener);
+        }
         gameplay.destroy();
         gameplay = null;
         application.detachIsoCameraControl();
+
     }
 
     /**
@@ -125,6 +158,44 @@ public class MultiplayerMatchState extends Gamestate {
         game.getApplication().getInputManager().addListener(
                 pauseListener,
                 SolarWarsApplication.INPUT_MAPPING_PAUSE);
+    }
+
+    /**
+     * The listener interface for receiving playerState events.
+     * The class that is interested in processing a playerState
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addPlayerStateListener<code> method. When
+     * the playerState event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PlayerStateEvent
+     */
+    private class PlayerStateListener implements ClientStateListener {
+
+        /* (non-Javadoc)
+         * @see com.jme3.network.ClientStateListener#clientConnected(com.jme3.network.Client)
+         */
+        public void clientConnected(Client c) {
+        }
+
+        /* (non-Javadoc)
+         * @see com.jme3.network.ClientStateListener#clientDisconnected(com.jme3.network.Client, com.jme3.network.ClientStateListener.DisconnectInfo)
+         */
+        public void clientDisconnected(Client c, DisconnectInfo info) {
+            System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
+
+            if (info != null) {
+                System.out.println(info.reason);
+                lostConnection = true;
+            } else {
+                System.out.println("client closed");
+                lostConnection = true;
+            }
+//                if (c.equals(client)) {
+//                    noServerFound = true;
+//                }
+        }
     }
 
     /**

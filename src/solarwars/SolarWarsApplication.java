@@ -403,7 +403,7 @@ public class SolarWarsApplication extends Application {
     public void attachIsoCameraControl() {
         if (inputManager != null) {
             // Init controls
-            isoControl = new IsoControl(assetManager, rootNode, cam, inputManager);
+            isoControl = IsoControl.getInstance();
 
             isoCam = IsoCamera.getInstance();
             isoCam.initialize(cam, rootNode);
@@ -419,7 +419,7 @@ public class SolarWarsApplication extends Application {
     }
 
     public void detachIsoCameraControl() {
-        if (inputManager != null) {
+        if (inputManager != null && isoCam != null) {
             isoCam.destroy();
             inputManager.removeListener(isoControl.getActionListener());
         }

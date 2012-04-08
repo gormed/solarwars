@@ -43,6 +43,8 @@ public class GameGUI {
     SolarWarsGame game;
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElements;
+    volatile private ArrayList<GUIElement> addGUIElements;
+    volatile private ArrayList<GUIElement> removeGUIElements;
     /** The width. */
     private float width;
     /** The action listener. */
@@ -93,6 +95,8 @@ public class GameGUI {
         this.width = game.getApplication().getCamera().getWidth();
         this.height = game.getApplication().getCamera().getHeight();
         this.guiElements = new ArrayList<GUIElement>();
+        this.addGUIElements = new ArrayList<GUIElement>();
+        this.removeGUIElements = new ArrayList<GUIElement>();
 
         this.clickableNode = new Node("ClickableGUI");
         this.decoNode = new Node("DecoNode");
@@ -140,7 +144,7 @@ public class GameGUI {
                         Node n = closest.getGeometry().getParent();
 
                         if (n instanceof ClickableGUI) {
-                            
+
                             clickableHit(n, click2d, isPressed, tpf);
                         } else if (n.getParent() instanceof ClickableGUI) {
                             clickableHit(n.getParent(), click2d, isPressed, tpf);
@@ -182,8 +186,53 @@ public class GameGUI {
      * @param guiElement the gui element
      */
     public void addGUIElement(GUIElement guiElement) {
-        if (guiElements.contains(guiElement))
+        saveAddGUIElement(guiElement);
+        //addGUIElements.add(guiElement);
+    }
+
+    /**
+     * Removes the gui element.
+     *
+     * @param guiElement the gui element
+     */
+    public void removeGUIElement(GUIElement guiElement) {
+        saveRemoveGUIElement(guiElement);
+        //removeGUIElements.add(guiElement);
+
+    }
+
+    /**
+     * Updates the gui elements.
+     *
+     * @param tpf the tpf
+     */
+    public void updateGUIElements(float tpf) {
+//        for (GUIElement element : addGUIElements) {
+//            saveAddGUIElement(element);
+//        }
+//        addGUIElements.clear();
+
+        ArrayList<GUIElement> clone = new ArrayList<GUIElement>(guiElements);
+        
+        for (GUIElement e : clone) {
+            e.updateGUI(tpf);
+        }
+
+//        for (GUIElement element : removeGUIElements) {
+//            saveRemoveGUIElement(element);
+//        }
+//        removeGUIElements.clear();
+    }
+
+    /**
+     * Adds the gui element.
+     *
+     * @param guiElement the gui element
+     */
+    private void saveAddGUIElement(GUIElement guiElement) {
+        if (guiElements.contains(guiElement)) {
             return;
+        }
         if (guiElement instanceof ClickableGUI) {
             clickableNode.attachChild(guiElement);
         } else {
@@ -197,7 +246,7 @@ public class GameGUI {
      *
      * @param guiElement the gui element
      */
-    public void removeGUIElement(GUIElement guiElement) {
+    private void saveRemoveGUIElement(GUIElement guiElement) {
         if (guiElement instanceof ClickableGUI) {
             clickableNode.detachChild(guiElement);
         } else {
@@ -205,17 +254,6 @@ public class GameGUI {
         }
         guiElements.remove(guiElement);
 
-    }
-
-    /**
-     * Updates the gui elements.
-     *
-     * @param tpf the tpf
-     */
-    public void updateGUIElements(float tpf) {
-        for (GUIElement e : guiElements) {
-            e.updateGUI(tpf);
-        }
     }
 
     /**

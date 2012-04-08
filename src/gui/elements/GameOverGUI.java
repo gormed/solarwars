@@ -11,6 +11,7 @@ import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
+import logic.Gameplay;
 import solarwars.SolarWarsGame;
 
 /**
@@ -35,6 +36,19 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     /** The continue game. */
     protected Button watchGameLabel;
     protected Panel background;
+    private boolean watchGame = false;
+    private static GameOverGUI instance;
+
+    public static GameOverGUI getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        return instance =
+                new GameOverGUI(
+                SolarWarsGame.getInstance(),
+                Gameplay.getCurrentLevel().getGui(),
+                GameOverState.WON);
+    }
 
     /**
      * Instantiates a new display gui.
@@ -42,7 +56,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      * @param swgame the swgame
      * @param gui the gui
      */
-    public GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
+    private GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
         this.game = swgame;
         this.gui = gui;
 
@@ -102,6 +116,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
                     hide();
+                    watchGame = true;
                 }
             }
         };
@@ -126,6 +141,22 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             }
         };
 
+    }
+
+    public void setGameOverState(GameOverState state) {
+        String label;
+        if (state == GameOverState.WON) {
+            label = "Game won!";
+        } else {
+            label = "Game lost!";
+        }
+
+        gameOverLabel.setCaption(label);
+
+    }
+
+    public boolean isWatchGame() {
+        return watchGame;
     }
 
     /* (non-Javadoc)
@@ -158,6 +189,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             gui.addGUIElement(gameOverLabel);
             gui.addGUIElement(mainMenuLabel);
             gui.addGUIElement(watchGameLabel);
+            setVisible(true);
         }
     }
 
@@ -170,6 +202,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
             gui.removeGUIElement(gameOverLabel);
             gui.removeGUIElement(mainMenuLabel);
             gui.removeGUIElement(watchGameLabel);
+            setVisible(false);
         }
     }
 

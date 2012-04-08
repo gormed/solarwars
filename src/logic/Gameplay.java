@@ -202,56 +202,15 @@ public class Gameplay {
 
                 Player victorious = a;
                 Player defeated = b;
-
+                
+                victorious.setDefeatedPlayer(defeated.getId());
+                defeated.setLost();
+                
                 if (victorious.getId() == Hub.getLocalPlayer().getId()) {
-                    localPlayerWins();
                 } else if (defeated.getId() == Hub.getLocalPlayer().getId()) {
-                    localPlayerLooses();
                 } else {
                     // Display that a defeated b
                 }
-            }
-
-            private void localPlayerWins() {
-                if (lastPlayer()) {
-                    currentLevel.setGameOver(true);
-                    GameOverGUI gameOverGUI =
-                            new GameOverGUI(
-                            game,
-                            currentLevel.getGui(),
-                            GameOverGUI.GameOverState.WON);
-
-                    gameOverGUI.display();
-                } else {
-                    //Display: "You defeated..."
-                }
-
-            }
-
-            private void localPlayerLooses() {
-                if (lastPlayer()) {
-                    currentLevel.setGameOver(true);
-                }
-
-                GameOverGUI gameOverGUI =
-                        new GameOverGUI(
-                        game,
-                        currentLevel.getGui(),
-                        GameOverGUI.GameOverState.LOST);
-                gameOverGUI.display();
-            }
-
-            private boolean lastPlayer() {
-                int lostPlayerCount = 0;
-                for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-                    Player p = entry.getValue();
-                    if (p != null) {
-                        if (p.hasLost()) {
-                            lostPlayerCount++;
-                        }
-                    }
-                }
-                return Hub.playersByID.size() - 1 == lostPlayerCount;
             }
         };
 

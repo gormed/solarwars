@@ -191,15 +191,15 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void simpleUpdate(float tpf) {
-        for (Player p : joinedPlayers) {
-            respondPlayer(p, true);
-        }
-        joinedPlayers.clear();
-
-        for (Player p : leavingPlayers) {
-            respondPlayer(p, false);
-        }
-        leavingPlayers.clear();
+//        for (Player p : joinedPlayers) {
+//            respondPlayer(p, true);
+//        }
+//        joinedPlayers.clear();
+//
+//        for (Player p : leavingPlayers) {
+//            respondPlayer(p, false);
+//        }
+//        leavingPlayers.clear();
     }
 
     /* (non-Javadoc)
@@ -207,6 +207,12 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void simpleRender(RenderManager rm) {
+    }
+
+    @Override
+    public void stop(boolean waitFor) {
+        System.out.println("Closing server...");
+        super.stop(waitFor);
     }
 
     /* (non-Javadoc)
@@ -220,10 +226,17 @@ public class SolarWarsServer extends SimpleApplication {
         leavingPlayers.clear();
         registerListeners.clear();
 
+        for (HostedConnection connection : gameServer.getConnections()) {
+            connection.close("Shutting down...");
+        }
+        
+        while (gameServer.hasConnections()) {}
         gameServer.close();
+        gameServer = null;
+        serverApp = null;
         isRunning = false;
-        System.out.println("...Server closed!");
         super.destroy();
+        System.out.println("...Server closed!");
     }
 
     /**
@@ -300,7 +313,8 @@ public class SolarWarsServer extends SimpleApplication {
      */
     public void addConnectingPlayer(Player p, HostedConnection hc) {
         connectedPlayers.put(p, hc);
-        joinedPlayers.add(p);
+        respondPlayer(p, true);
+        //joinedPlayers.add(p);
     }
 
     /**
@@ -309,8 +323,8 @@ public class SolarWarsServer extends SimpleApplication {
      * @param p the p
      */
     public void removeLeavingPlayer(Player p) {
-
-        leavingPlayers.add(p);
+        respondPlayer(p, false);
+        //leavingPlayers.add(p);
     }
 
     /**
@@ -319,7 +333,9 @@ public class SolarWarsServer extends SimpleApplication {
      * @param p the p
      * @param connecting the connecting
      */
-    private void respondPlayer(Player p, boolean connecting) {
+    public void respondPlayer(Player p, boolean connecting) {
+        if (!connectedPlayers.containsKey(p))
+            return;
         if (connecting) {
             boolean isHost = p.isHost();
             HostedConnection hc = connectedPlayers.get(p);
@@ -330,7 +346,7 @@ public class SolarWarsServer extends SimpleApplication {
 
             gameServer.broadcast(Filters.equalTo(hc), joiningPlayer);
 
-            Collection<HostedConnection> connections = gameServer.getConnections();
+            //Collection<HostedConnection> connections = gameServer.getConnections();
 
             for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
                 Player player = entrySet.getKey();

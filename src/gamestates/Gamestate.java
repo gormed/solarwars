@@ -53,18 +53,14 @@ public abstract class Gamestate {
      * Enter.
      */
     void enter() {
-        GamestateManager.setLock(true);
         loadContent(SolarWarsGame.getInstance());
-        GamestateManager.setLock(false);
     }
 
     /**
      * Leave.
      */
     void leave() {
-        GamestateManager.setLock(true);
         unloadContent();
-        GamestateManager.setLock(false);
     }
 
     /**

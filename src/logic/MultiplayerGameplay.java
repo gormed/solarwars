@@ -48,7 +48,7 @@ public class MultiplayerGameplay {
     private Queue<Message> recievedMessages = new LinkedList<Message>();
 
     public void sendPlanetActionMessage(String actionName, AbstractPlanet planet) {
-        if (client == null) {
+        if (client == null || !client.isConnected()) {
             return;
         }
 
@@ -63,7 +63,7 @@ public class MultiplayerGameplay {
     }
 
     public void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
-        if (client == null) {
+        if (client == null || !client.isConnected()) {
             return;
         }
 

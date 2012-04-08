@@ -33,6 +33,7 @@ import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
+import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;
@@ -44,6 +45,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Gameplay;
@@ -101,8 +104,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private HashMap<Integer, Label> playerLabels;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
+    private HashMap<Integer, Player> refreshedPlayers;
     /** The max player number. */
-    private int maxPlayerNumber = 0;
+    private int maxPlayerNumber = Ergonomics.getInstance().getPlayers();
     /** The host player name. */
     private String hostPlayerName;
     /** The host player color. */
@@ -118,6 +122,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /** indicates that the game is set up and can be started */
     private boolean gameStarted = false;
     private final SolarWarsApplication application;
+    private long clientSeed;
+    private boolean playersChanged;
 
     /**
      * Sets the host player color.
@@ -161,8 +167,29 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             server.removeConnectionListener(serverConnectionListener);
             serverClient.removeMessageListener(clientMessageListener);
             solarWarsServer.enterLevel();
+            startGame();
             GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        } else {
+            refreshPlayers(refreshedPlayers);
         }
+//        if (!leavingPlayers.isEmpty()) {
+//            for (Player p : leavingPlayers) {
+//                removeLeavingPlayer(p);
+//            }
+//        }
+//        leavingPlayers.clear();
+    }
+
+    private void startGame() {
+        application.attachIsoCameraControl();
+        logic.Level mpLevel =
+                new logic.Level(
+                SolarWarsApplication.getInstance().getRootNode(),
+                SolarWarsApplication.getInstance().getAssetManager(),
+                SolarWarsApplication.getInstance().getIsoControl(),
+                gui,
+                Hub.playersByID, clientSeed);
+        Gameplay.initialize(mpLevel);
     }
 
     /* (non-Javadoc)
@@ -178,6 +205,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
         playerLabelIdx = new HashMap<Player, Integer>();
+        // = new ArrayList<Player>();
+        refreshedPlayers = new HashMap<Integer, Player>();
 
 
         for (int i = 0; i < 8; i++) {
@@ -310,7 +339,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 ColorRGBA.Blue,
                 new Vector3f(3 * gui.getWidth() / 4, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                "2",
+                Ergonomics.getInstance().getPlayers() + "",
                 ColorRGBA.White,
                 gui, true) {
 
@@ -332,6 +361,18 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                     maxPlayerNumber = players;
                 }
 
+                int playerNumber = 2;
+                try {
+                    if (caption.equals("")) {
+                        playerNumber = 8;
+                    } else {
+                        playerNumber = Integer.parseInt(caption);
+                    }
+                } catch (Exception e) {
+                    caption = playerNumber + "";
+                } finally {
+                    Ergonomics.getInstance().setPlayers(playerNumber);
+                }
             }
         };
 
@@ -408,9 +449,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Start server.
      */
     private void startServer() {
-        long seed = createLevel();
+        long serverSeed = createLevel();
         StartGameMessage gameMessage =
-                new StartGameMessage(seed, ServerHub.getPlayers());
+                new StartGameMessage(serverSeed, ServerHub.getPlayers());
         solarWarsServer.getGameServer().broadcast(
                 Filters.in(solarWarsServer.getGameServer().getConnections()),
                 gameMessage);
@@ -420,13 +461,13 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Creates the level.
      */
     private long createLevel() {
-        long seed = System.currentTimeMillis();
-        solarWarsServer.prepareLevel(seed);
+        long serverSeed = System.currentTimeMillis();
+        solarWarsServer.prepareLevel(serverSeed);
 //        logic.level.Level mpLevel = new logic.level.Level(
 //                solarWarsServer.getRootNode(), 
 //                solarWarsServer.getAssetManager(),
 //                null, ServerHub.playersByID, seed);
-        return seed;
+        return serverSeed;
     }
 
     /**
@@ -436,17 +477,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param seed the level-seed
      * @param players the players connected to the server
      */
-    private void startClientLevel(long seed, ArrayList<Player> players) {
+    private void startClient(long seed) {
 
-        application.attachIsoCameraControl();
-        logic.Level mpLevel =
-                new logic.Level(
-                SolarWarsApplication.getInstance().getRootNode(),
-                SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getIsoControl(),
-                gui,
-                Hub.playersByID, seed);
-        Gameplay.initialize(mpLevel);
+        this.clientSeed = seed;
         gameStarted = true;
     }
 
@@ -454,10 +487,18 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Cancel server.
      */
     private void cancelServer() {
-        System.out.println("Closing server...");
+
         //solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
         networkManager.removeClientRegisterListener(this);
-        networkManager.closeAllConnections(false);
+        Future fut = application.enqueue(new Callable() {
+
+            public Object call()
+                    throws Exception {
+
+                return networkManager.closeAllConnections(true);
+            }
+        });
+        
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
@@ -505,11 +546,13 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param p the p
      */
     private void removeLeavingPlayer(Player p) {
-        int id = playerLabelIdx.get(p);
-        Label player = playerLabels.get(id);
-        if (player != null) {
-            playerLabels.remove(id);
-            gui.removeGUIElement(player);
+        if (playerLabelIdx.containsKey(p)) {
+            int id = playerLabelIdx.get(p);
+            Label player = playerLabels.get(id);
+            if (player != null) {
+                playerLabels.remove(id);
+                gui.removeGUIElement(player);
+            }
         }
     }
 
@@ -536,16 +579,21 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /*
      * Refreshes the player labels
      */
-    private void refreshPlayers(ArrayList<Player> players) {
+    private void refreshPlayers(HashMap<Integer, Player> players) {
+        if (playerLabels == null || gui == null || !playersChanged) {
+            return;
+        }
+        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
 
         playerLabels.clear();
 
-        for (Player p : players) {
-            addConnectedPlayer(p);
+        for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
+            addConnectedPlayer(entry.getValue());
         }
+        playersChanged = false;
     }
 
     /**
@@ -565,8 +613,12 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
          * @see com.jme3.network.ConnectionListener#connectionAdded(com.jme3.network.Server, com.jme3.network.HostedConnection)
          */
         public void connectionAdded(Server server, HostedConnection conn) {
-            StringMessage s = new StringMessage("Welcome client #" + conn.getId() + "!");
-            solarWarsServer.getGameServer().broadcast(s);
+            if (server.getConnections().size() > maxPlayerNumber) {
+                conn.close("Server is full!");
+            } else {
+                StringMessage s = new StringMessage("Welcome client #" + conn.getId() + "!");
+                solarWarsServer.getGameServer().broadcast(s);
+            }
         }
 
         /* (non-Javadoc)
@@ -574,9 +626,13 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
          */
         public void connectionRemoved(Server server, HostedConnection conn) {
             Player discPlayer = conn.getAttribute("PlayerObject");
-            solarWarsServer.removeLeavingPlayer(discPlayer);
-            removeLeavingPlayer(discPlayer);
-            serverHub.removePlayer(discPlayer);
+            if (discPlayer != null) {
+                solarWarsServer.removeLeavingPlayer(discPlayer);
+                //leavingPlayers.add(discPlayer);
+                serverHub.removePlayer(discPlayer);
+                refreshedPlayers = new HashMap<Integer, Player>(ServerHub.playersByID);
+                playersChanged = true;
+            }
         }
     }
 
@@ -605,7 +661,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 Player newPlayer;
                 if (!isHost) {
                     newPlayer = new Player(
-                            pcm.getName(), Player.PLAYER_COLORS[source.getId()],
+                            pcm.getName(),
+                            Player.getUnusedColor(ServerHub.getPlayers(), source.getId()),
+                            //Player.PLAYER_COLORS[source.getId()],
                             source.getId());
                     //ServerHub.getContiniousPlayerID());
                 } else {
@@ -620,7 +678,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 source.setAttribute("PlayerID", newPlayer.getId());
                 source.setAttribute("PlayerName", newPlayer.getName());
 
-                refreshPlayers(ServerHub.getPlayers());
+                refreshedPlayers = new HashMap<Integer, Player>(ServerHub.playersByID);
+                playersChanged = true;
+                //refreshPlayers(ServerHub.getPlayers());
             }
         }
     }
@@ -669,7 +729,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
                 //SolarWarsApplication.getInstance().enqueue(null)
                 if (!gameStarted) {
-                    startClientLevel(seed, players);
+                    startClient(seed);
                 }
             }
 

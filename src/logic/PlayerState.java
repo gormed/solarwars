@@ -37,4 +37,6 @@ public class PlayerState {
     public ColorRGBA color;
     
     public boolean lost;
+    
+    public int defeatedPlayerID = -1;
 }

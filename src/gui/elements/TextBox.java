@@ -343,8 +343,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                 } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() < 15) {
                     caption += name;
                 }
-                onKeyTrigger(name, isPressed, tpf);
+                
             }
+            onKeyTrigger(name, isPressed, tpf);
         }
     }
 
@@ -396,6 +397,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                     caption += name;
                 }
             }
+            onKeyTrigger(name, isPressed, tpf);
         }
     }
 }

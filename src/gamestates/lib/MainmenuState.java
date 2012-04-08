@@ -170,11 +170,8 @@ public class MainmenuState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-        gui.removeGUIElement(singleplayerButton);
-        gui.removeGUIElement(multiplayerButton);
-        gui.removeGUIElement(quitButton);
-        gui.removeGUIElement(solarwars);
-
+        gui.cleanUpGUI();
+        
         gui = null;
     }
 

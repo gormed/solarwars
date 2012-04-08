@@ -110,6 +110,14 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         super.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
+    
+    public void setCaption(String caption) {
+        this.text.setText(caption);
+    }
+    
+    public String getCaption() {
+        return this.text.getText();
+    }
 
     /* (non-Javadoc)
      * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)

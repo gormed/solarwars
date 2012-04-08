@@ -49,9 +49,16 @@ import logic.Gameplay;
  */
 public class IsoControl {
 
+    private static IsoControl instance;
+
+    public static IsoControl getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        return instance = new IsoControl(SolarWarsApplication.getInstance());
+    }
     /** The root node. */
     private Node rootNode;
-    
     /** The shootables node. */
     private Node shootablesNode;
 
@@ -63,25 +70,16 @@ public class IsoControl {
     public Node getShootablesNode() {
         return shootablesNode;
     }
-    
     /** The marker node. */
     private Node markerNode;
-    
     /** The last node. */
     private Node lastNode;
-    
-    /** The marker. */
-    private ParticleEmitter marker;
-    
     /** The geometry. */
     private Geometry geometry;
-    
     /** The cam. */
     private Camera cam;
-    
     /** The action listener. */
     private ActionListener actionListener;
-    
     /** The action lib. */
     private ActionLib actionLib;
 
@@ -102,10 +100,12 @@ public class IsoControl {
      * @param cam the cam
      * @param inputManager the input manager
      */
-    public IsoControl(AssetManager assetManager, Node rootNode, Camera cam,
-            InputManager inputManager) {
-        this.rootNode = rootNode;
-        this.cam = cam;
+    private IsoControl(SolarWarsApplication application) {
+        AssetManager assetManager = application.getAssetManager();
+        InputManager inputManager = application.getInputManager();
+
+        this.rootNode = application.getRootNode();
+        this.cam = application.getCamera();
         this.actionLib = ActionLib.getInstance();
 
         markerNode = new Node("Marker Transform");
@@ -247,13 +247,13 @@ public class IsoControl {
 
                                 repositMarker(p);
 
-                            } else if (action == 2) {
+                            } else if (action == 2 && !Hub.getLocalPlayer().hasLost()) {
                                 actionLib.invokePlanetAction(null, p,
                                         Hub.getLocalPlayer(),
                                         Gameplay.PLANET_ATTACK);
                             }
                         } else if (n instanceof ShipGroup) {
-                            if (action == 1) {
+                            if (action == 1 && !Hub.getLocalPlayer().hasLost()) {
                                 sg = (ShipGroup) n;
                                 repositMarker(sg);
                                 actionLib.invokeShipAction(null, sg,
@@ -271,7 +271,7 @@ public class IsoControl {
                     }
                 }
 
-                if (action == 3 || action == 4) {
+                if ((action == 3 || action == 4) && !Hub.getLocalPlayer().hasLost()) {
                     float percentage = Hub.getLocalPlayer().getShipPercentage();
                     if (action == 3) {
                         percentage += 0.025f;

@@ -27,49 +27,41 @@ import java.util.HashMap;
  * The Class GamestateManager.
  */
 public class GamestateManager {
-    
+
     /** The Constant SINGLEPLAYER_STATE. */
     public static final String SINGLEPLAYER_STATE = "Singleplayer";
-    
     /** The Constant MULTIPLAYER_STATE. */
     public static final String MULTIPLAYER_STATE = "Multiplayer";
-    
     /** The Constant MAINMENU_STATE. */
     public static final String MAINMENU_STATE = "Mainmenu";
-    
     /** The Constant OPTIONS_STATE. */
     public static final String OPTIONS_STATE = "Options";
-    
     /** The Constant CREATE_SERVER_STATE. */
     public static final String CREATE_SERVER_STATE = "Create Server";
-    
     /** The Constant SERVER_LOBBY_STATE. */
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
-    
     /** The Constant MULTIPLAYER_MATCH_STATE. */
     public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
-    
-
     /** The instance. */
     private static GamestateManager instance;
-    
     /** The gamestates. */
     private HashMap<String, Gamestate> gamestates;
-    
     /** The current state. */
     private Gamestate currentState;
-    
     /** The next state. */
     private Gamestate nextState;
-    
-    private static boolean lockUpdate = false;
+    private static volatile boolean lockUpdate = false;
 
-    public static boolean isLocked() {
+    public static synchronized boolean isLocked() {
         return lockUpdate;
     }
 
-    static void setLock(boolean lock) {
-        lockUpdate = lock;
+    static synchronized void lock() {
+        lockUpdate = true;
+    }
+
+    static synchronized void unlock() {
+        lockUpdate = false;
     }
 
     /**
@@ -113,15 +105,19 @@ public class GamestateManager {
      *
      * @param nextState the next state
      */
-    public void enterState(String nextState) {
+    public synchronized void enterState(String nextState) {
+        lock();
         if (gamestates.containsKey(nextState)) {
             this.nextState = gamestates.get(nextState);
+            
             this.currentState.leave();
             this.currentState = null;
             this.nextState.enter();
+            
             this.currentState = this.nextState;
             System.out.println("Gamestate: " + nextState + " enterd!");
         }
+        unlock();
     }
 
     /**
@@ -143,7 +139,7 @@ public class GamestateManager {
         gamestates.remove(g.getName());
         System.out.println("Gamestate: " + g.getName() + " removed!");
     }
-    
+
     /**
      * Gets the gamestate.
      *
@@ -151,8 +147,9 @@ public class GamestateManager {
      * @return the gamestate
      */
     public Gamestate getGamestate(String name) {
-        if (!gamestates.containsKey(name))
+        if (!gamestates.containsKey(name)) {
             return null;
+        }
         return gamestates.get(name);
     }
 

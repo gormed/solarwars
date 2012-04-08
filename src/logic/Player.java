@@ -25,19 +25,38 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
+import gui.elements.GameOverGUI;
 import java.util.ArrayList;
+import java.util.Map;
+import solarwars.Hub;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class Player.
  */
 @Serializable
 public class Player {
-    
+
     public static final ColorRGBA[] PLAYER_COLORS = {
         ColorRGBA.Blue, ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.Orange,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         ColorRGBA.Brown, ColorRGBA.Magenta};
+
+    public static ColorRGBA getUnusedColor(ArrayList<Player> players, int start) {
+        ColorRGBA color = ColorRGBA.randomColor();
+        for (int i = start; i < PLAYER_COLORS.length; i++) {
+            color = PLAYER_COLORS[i];
+            for (Player p : players) {
+                if (p.getColor().equals(color)) {
+                    continue;
+                }
+            }
+            break;
+        }
+
+        return color;
+    }
 
     /**
      * Invokes Game over action if player has lost game.
@@ -46,9 +65,48 @@ public class Player {
      */
     private static void reportPlayerLost(Player victorious, Player defeated) {
         if (defeated != null && !defeated.hasShips()) {
-            defeated.setLost();
+
             ActionLib.getInstance().
                     invokeGeneralAction(null, victorious, defeated, Gameplay.GAME_OVER);
+        }
+    }
+
+    private static boolean lastPlayer() {
+        int lostPlayerCount = 0;
+        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+            Player p = entry.getValue();
+            if (p != null) {
+                if (p.hasLost()) {
+                    lostPlayerCount++;
+                }
+            }
+        }
+        return Hub.playersByID.size() - 1 == lostPlayerCount;
+    }
+
+    static void localPlayerWins() {
+        if (lastPlayer()) {
+            Gameplay.getCurrentLevel().setGameOver(true);
+            GameOverGUI gameOverGUI = GameOverGUI.getInstance();
+            gameOverGUI.setGameOverState(GameOverGUI.GameOverState.WON);
+
+            gameOverGUI.display();
+        } else {
+            //Display: "You defeated..."
+        }
+
+    }
+
+    static void localPlayerLooses() {
+        if (lastPlayer()) {
+            Gameplay.getCurrentLevel().setGameOver(true);
+        }
+
+        GameOverGUI gameOverGUI = GameOverGUI.getInstance();
+        if (!gameOverGUI.isWatchGame()) {
+            gameOverGUI.setGameOverState(GameOverGUI.GameOverState.LOST);
+
+            gameOverGUI.display();
         }
     }
     /** The id. */
@@ -100,11 +158,11 @@ public class Player {
         planets = new ArrayList<AbstractPlanet>();
         shipGroups = new ArrayList<ShipGroup>();
     }
-    
+
     public PlayerState getState() {
         return state;
     }
-    
+
     void applyState(PlayerState newState) {
         this.state = newState;
     }
@@ -136,9 +194,17 @@ public class Player {
     public boolean hasLost() {
         return state.lost;
     }
-    
+
     void setLost() {
         state.lost = true;
+    }
+
+    public int getDefeatedPlayer() {
+        return state.defeatedPlayerID;
+    }
+
+    void setDefeatedPlayer(int id) {
+        state.defeatedPlayerID = id;
     }
 
     /**
@@ -216,21 +282,21 @@ public class Player {
     public float getShipPercentage() {
         return state.shipPercentage;
     }
-    
+
     public int getShipCount() {
         int ships = 0;
-        
+
         for (ShipGroup sg : shipGroups) {
             ships += sg.getShipCount();
         }
-        
+
         for (AbstractPlanet p : planets) {
             ships += p.getShipCount();
         }
-        
+
         return ships;
     }
-    
+
     public boolean hasShips() {
         return (getShipCount() > 0);
     }
@@ -315,14 +381,14 @@ public class Player {
      */
     void capturePlanet(AbstractPlanet planet) {
         Player prevOwner = null;
-        
+
         if (planet.hasOwner()) {
             prevOwner = planet.getOwner();
             prevOwner.uncapturePlanet(planet);
         }
         planet.setOwner(this);
         planets.add(planet);
-        
+
         reportPlayerLost(this, prevOwner);
     }
 
@@ -333,7 +399,7 @@ public class Player {
      */
     void uncapturePlanet(AbstractPlanet planet) {
         planets.remove(planet);
-        
+
     }
 
     /**

@@ -127,6 +127,7 @@ public class NetworkManager {
     private SolarWarsServer thisServer;
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
+    private ClientListener clientListener = new ClientListener();
 
     /**
      * Gets the this client.
@@ -244,7 +245,7 @@ public class NetworkManager {
                 SolarWarsServer.SERVER_NAME,
                 SolarWarsServer.SERVER_VERSION,
                 serverIPAdress.getHostAddress(), tcpPort, udpPort);
-
+        thisClient.addMessageListener(clientListener);
         for (ClientRegisterListener rl : clientRegisterListeners) {
             rl.registerClientListener(thisClient);
         }
@@ -282,16 +283,15 @@ public class NetworkManager {
      *
      * @param wait the wait
      */
-    public void closeAllConnections(boolean wait) {
-        if (thisClient != null) {
+    public SolarWarsServer closeAllConnections(boolean wait) {
+        if (thisClient != null && thisClient.isConnected()) {
             thisClient.close();
-            thisClient = null;
         }
-        if (thisServer != null) {
+        thisClient = null;
+        if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
             thisServer.stop(wait);
-            thisServer = null;
-
         }
+        return thisServer;
     }
 
     /**

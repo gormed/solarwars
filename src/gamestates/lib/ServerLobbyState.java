@@ -93,6 +93,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private HashMap<Integer, Label> playerLabels;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
+    private HashMap<Integer, Player> refreshedPlayers;
+    private boolean playersChanged;
     /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
     /** The player connection listener. */
@@ -102,6 +104,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     /** indicates that the game is set up and can be started */
     private boolean gameStarted = false;
     private final SolarWarsApplication application;
+    private long clientSeed;
 
     /**
      * Sets the client player color.
@@ -152,14 +155,30 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gui.updateGUIElements(tpf);
         if (noServerFound) {
             disconnect();
+            GamestateManager.getInstance().
+                    enterState(GamestateManager.MULTIPLAYER_STATE);
         }
         if (gameStarted) {
-
+            startGame();
             GamestateManager.getInstance().
                     enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        } else {
+            refreshPlayers(refreshedPlayers);
         }
 
         //if (!client.isConnected())
+    }
+
+    private void startGame() {
+        application.attachIsoCameraControl();
+        logic.Level mpLevel =
+                new logic.Level(
+                SolarWarsApplication.getInstance().getRootNode(),
+                SolarWarsApplication.getInstance().getAssetManager(),
+                SolarWarsApplication.getInstance().getIsoControl(),
+                gui,
+                Hub.playersByID, clientSeed);
+        Gameplay.initialize(mpLevel);
     }
 
     /* (non-Javadoc)
@@ -167,6 +186,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        gameStarted = false;
+        noServerFound = false;
+        playersChanged = false;
         gui = new GameGUI(game);
         game.getApplication().setPauseOnLostFocus(false);
         hub = Hub.getInstance();
@@ -176,6 +198,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
         playerLabelIdx = new HashMap<Player, Integer>();
+        refreshedPlayers = new HashMap<Integer, Player>();
 
         for (int i = 0; i < 8; i++) {
             playerNamePos.put(i, new Vector3f(
@@ -294,6 +317,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     @Override
     protected void unloadContent() {
 
+        gameStarted = false;
+        noServerFound = false;
+        playersChanged = false;
+
         playerLabels.clear();
         playerNamePos.clear();
         gui.cleanUpGUI();
@@ -326,14 +353,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private void leaveServer() {
         //Client thisClient = networkManager.getThisClient();
         if (client != null && client.isConnected()) {
-            client.removeMessageListener(
-                    playerConnectionListener,
-                    PlayerAcceptedMessage.class,
-                    PlayerLeavingMessage.class,
-                    StartGameMessage.class);
-            client.removeClientStateListener(playerStateListener);
             client.close();
         }
+        disconnect();
+        noServerFound = true;
     }
 
     /**
@@ -368,16 +391,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param seed the level-seed
      * @param players the players connected to the server
      */
-    private void startClientLevel(long seed, ArrayList<Player> players) {
-        application.attachIsoCameraControl();
-        logic.Level mpLevel =
-                new logic.Level(
-                SolarWarsApplication.getInstance().getRootNode(),
-                SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getIsoControl(),
-                gui,
-                Hub.playersByID, seed);
-        Gameplay.initialize(mpLevel);
+    private void startClient(long seed) {
+        this.clientSeed = seed;
         gameStarted = true;
     }
 
@@ -385,15 +400,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * Disconnect.
      */
     private void disconnect() {
-        try {
-            networkManager.removeClientRegisterListener(this);
-
-        } catch (Exception e) {
-            System.err.println(e.toString() + " - " + e.getMessage());
-        } finally {
-
-            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
-        }
+        networkManager.removeClientRegisterListener(this);
     }
 
     /* (non-Javadoc)
@@ -406,6 +413,23 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
 
+    }
+
+    private void refreshPlayers(HashMap<Integer, Player> players) {
+        if (playerLabels == null || gui == null || !playersChanged) {
+            return;
+        }
+        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
+        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
+            gui.removeGUIElement(entry.getValue());
+        }
+
+        playerLabels.clear();
+
+        for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
+            addConnectedPlayer(entry.getValue());
+        }
+        playersChanged = false;
     }
 
     /**
@@ -477,14 +501,17 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
          */
         public void clientDisconnected(Client c, DisconnectInfo info) {
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
+
             if (info != null) {
                 System.out.println(info.reason);
+                noServerFound = true;
             } else {
                 System.out.println("client closed");
+                noServerFound = true;
             }
-            if (c.equals(client)) {
-                disconnect();
-            }
+//                if (c.equals(client)) {
+//                    noServerFound = true;
+//                }
         }
     }
 
@@ -509,6 +536,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     "Client #" + source.getId() + " recieved a "
                     + message.getClass().getSimpleName());
 
+            // PLAYER ACCEPTED
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
                 Player thisPlayer = pam.getPlayer();
@@ -521,35 +549,28 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     Hub.getInstance().addPlayer(thisPlayer);
                 }
 
-                refreshPlayers(players);
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
+                //refreshPlayers(players);
 
+                // PLAYER LEAVING
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
 
                 Hub.getInstance().removePlayer(p);
-                removeLeavingPlayer(p);
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
+                // START GAME
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
                 ArrayList<Player> players = sgm.getPlayers();
 
-                startClientLevel(seed, players);
+                startClient(seed);
             }
 
 
-        }
-
-        private void refreshPlayers(ArrayList<Player> players) {
-            for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-                gui.removeGUIElement(entry.getValue());
-            }
-
-            playerLabels.clear();
-
-            for (Player p : players) {
-                addConnectedPlayer(p);
-            }
         }
     }
 }
