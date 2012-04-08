@@ -31,6 +31,7 @@ import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
 import com.jme3.font.Rectangle;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
@@ -182,6 +183,12 @@ public abstract class AbstractPlanet extends Node {
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);
         label.setCullHint(CullHint.Never);
+        
+//        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+//        mat.setColor("GlowColor", ColorRGBA.Orange);
+//        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+//        
+//        label.setMaterial(mat);
 
         // algins position of the font
         refreshFont();
@@ -248,6 +255,7 @@ public abstract class AbstractPlanet extends Node {
         owner = p;
         material.setColor("Specular", owner.getColor());
         material.setColor("Diffuse", ColorRGBA.White);
+        material.setColor("GlowColor", owner.getColor());
     }
 
     /**

@@ -448,7 +448,7 @@ public class Level {
 
         if (Hub.getLocalPlayer().hasLost()) {
             Player.localPlayerLooses();
-        } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1) {
+        } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1 || Player.lastPlayer()) {
             Player.localPlayerWins();
             Hub.getLocalPlayer().setDefeatedPlayer(-1);
         }

@@ -24,9 +24,6 @@ package logic;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
-import gui.elements.GameOverGUI;
-import java.util.Map;
-import java.util.Random;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -183,6 +180,7 @@ public class Gameplay {
                     if (shipGroup.getShipCount() < 1) {
                         currentLevel.removeShipGroup(p, shipGroup);
                         p.destroyShipGroup(shipGroup);
+                        Player.reportPlayerLost(null, p);
                     }
                 }
             }
@@ -202,15 +200,17 @@ public class Gameplay {
 
                 Player victorious = a;
                 Player defeated = b;
-                
-                victorious.setDefeatedPlayer(defeated.getId());
+
                 defeated.setLost();
-                
-                if (victorious.getId() == Hub.getLocalPlayer().getId()) {
-                } else if (defeated.getId() == Hub.getLocalPlayer().getId()) {
-                } else {
-                    // Display that a defeated b
+                if (victorious != null) {
+                    victorious.setDefeatedPlayer(defeated.getId());
                 }
+                
+//                if (victorious.getId() == Hub.getLocalPlayer().getId()) {
+//                } else if (defeated.getId() == Hub.getLocalPlayer().getId()) {
+//                } else {
+//                    // Display that a defeated b
+//                }
             }
         };
 

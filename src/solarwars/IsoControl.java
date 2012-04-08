@@ -24,7 +24,6 @@ package solarwars;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.effect.ParticleEmitter;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
@@ -264,9 +263,9 @@ public class IsoControl {
 
                     } else {
                         // No hits? Then remove the mark.
-                        if (lastNode != null) {
-                            lastNode.detachChild(markerNode);
-                        }
+//                        if (lastNode != null) {
+//                            lastNode.detachChild(markerNode);
+//                        }
                         // rootNode.detachChild(markerNode);
                     }
                 }

@@ -26,14 +26,11 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import logic.Level;
 import logic.Player;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class SimpleShip.
@@ -64,6 +61,7 @@ public class SimpleShip extends AbstractShip {
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setTexture("ColorMap", assetManager.loadTexture("Textures/Ships/ship.png"));
         material.setColor("Color", this.owner.getColor());
+        material.setColor("GlowColor", owner.getColor());
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 //        if (material == null) {
 //            material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

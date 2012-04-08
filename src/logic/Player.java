@@ -29,7 +29,6 @@ import gui.elements.GameOverGUI;
 import java.util.ArrayList;
 import java.util.Map;
 import solarwars.Hub;
-import solarwars.SolarWarsGame;
 
 /**
  * The Class Player.
@@ -63,7 +62,7 @@ public class Player {
      * @param victorious
      * @param defeated 
      */
-    private static void reportPlayerLost(Player victorious, Player defeated) {
+    static void reportPlayerLost(Player victorious, Player defeated) {
         if (defeated != null && !defeated.hasShips()) {
 
             ActionLib.getInstance().
@@ -71,7 +70,7 @@ public class Player {
         }
     }
 
-    private static boolean lastPlayer() {
+    static boolean lastPlayer() {
         int lostPlayerCount = 0;
         for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
             Player p = entry.getValue();
@@ -92,7 +91,7 @@ public class Player {
 
             gameOverGUI.display();
         } else {
-            //Display: "You defeated..."
+            //TODO: Display: "You defeated..."
         }
 
     }
@@ -109,6 +108,7 @@ public class Player {
             gameOverGUI.display();
         }
     }
+    
     /** The id. */
     private int id;
     /** The artificial. */
@@ -293,9 +293,25 @@ public class Player {
         for (AbstractPlanet p : planets) {
             ships += p.getShipCount();
         }
+        
+        if (ships == 0 && planets.size() > 0)
+            return 1;
 
         return ships;
     }
+
+//    public boolean canSurvive() {
+//        int ships = getShipCount();
+//
+//        for (Map.Entry<Integer, AbstractPlanet> entry : Gameplay.getCurrentLevel().getPlanetSet()) {
+//            AbstractPlanet planet = entry.getValue();
+//
+//            if (planet != null && planet.getShipCount() < ships) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public boolean hasShips() {
         return (getShipCount() > 0);

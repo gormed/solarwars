@@ -363,10 +363,10 @@ public class SolarWarsApplication extends Application {
 
 
         postProcessor = new FilterPostProcessor(assetManager);
-        //bloomFilter.setDownSamplingFactor(.02f);
-//        bloomFilter.setBloomIntensity(2.0f);
-//        postProcessor.addFilter(bloomFilter);
-//        viewPort.addProcessor(postProcessor);
+        bloomFilter.setDownSamplingFactor(2);
+        bloomFilter.setBloomIntensity(0.75f);
+        postProcessor.addFilter(bloomFilter);
+        viewPort.addProcessor(postProcessor);
 
 
         viewPort.attachScene(rootNode);

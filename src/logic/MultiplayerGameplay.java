@@ -66,14 +66,23 @@ public class MultiplayerGameplay {
         if (client == null || !client.isConnected()) {
             return;
         }
+        GeneralActionMessage generalActionMessage;
+        if (sender == null) {
+            generalActionMessage = new GeneralActionMessage(
+                    actionName,
+                    -1,
+                    null,
+                    reciever.getId(),
+                    reciever.getState());
+        } else {
 
-        GeneralActionMessage generalActionMessage = new GeneralActionMessage(
-                actionName,
-                sender.getId(),
-                sender.getState(),
-                reciever.getId(),
-                reciever.getState());
-
+            generalActionMessage = new GeneralActionMessage(
+                    actionName,
+                    sender.getId(),
+                    sender.getState(),
+                    reciever.getId(),
+                    reciever.getState());
+        }
         client.send(generalActionMessage);
     }
 
@@ -105,7 +114,7 @@ public class MultiplayerGameplay {
     public void destroy() {
         recievedMessages.clear();
         recievedMessages = null;
-        
+
         if (client != null) {
             client.removeMessageListener(
                     gameplayListener,
@@ -113,9 +122,9 @@ public class MultiplayerGameplay {
                     GeneralActionMessage.class);
         }
         gameplayListener = null;
-        
+
         instance = null;
-        
+
     }
 
     private class ClientGameplayListener implements MessageListener<Client> {

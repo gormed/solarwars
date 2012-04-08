@@ -119,7 +119,6 @@ public class MultiplayerMatchState extends Gamestate {
             }
         });
 
-
         GameOverGUI.getInstance().hide();
         application.getInputManager().removeListener(pauseListener);
         pauseListener = null;
