@@ -1,0 +1,45 @@
+//======================================================
+//
+//		SOLARWARS_ Milestones File
+//		
+//		Autor: Hans Ferchland
+//		Date: 11.04.2012
+//		Version: 1.0
+//
+//======================================================
+
+* Beta	0.1
+	# create simple AI
+	# new ships
+		- doubled attack (destroys two instead of one unit)
+			-> extra planets for that!
+		- half attack and faster
+	# balance ship speed
+	# balance ship generation speed
+	# get applet working
+* Alpha 0.9
+* Alpha 0.8
+* Alpha 0.7
+* Alpha 0.6
+* Alpha 0.5
+* Alpha 0.4
+	# add new level background
+		- generates from templates randomly (by level seed)
+* Alpha 0.3
+	# add new button, panel pics and so on
+	# add sounds
+		- ship arrives
+		- capture planet
+		- background sound (some loops in different/random orders)
+		- whatever
+* Alpha 0.2
+	# change level build
+		- solar system like build
+		- big planets in the middle and smaller ones going from that as center
+		- rotation (slow) ??
+	# change start planet choosing for players
+		- can choose from a given set?
+	# change player names if doubles
+	# add capture planet animation
+* Alpha 0.1
+	# current rev
