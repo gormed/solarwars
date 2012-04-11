@@ -28,6 +28,7 @@ import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
+import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
 /**
@@ -107,6 +108,8 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     unpause();
                 }
             }
@@ -127,6 +130,8 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 //game.getApplication().stop();
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
                 }
             }

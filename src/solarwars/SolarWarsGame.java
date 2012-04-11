@@ -91,7 +91,9 @@ public class SolarWarsGame {
     private FontLoader fontLoader;
     
     /** The action lib. */
-    private ActionLib actionLib;    
+    private ActionLib actionLib;   
+    
+    private AudioManager audioManager;
 
     /**
      * Initializes the.
@@ -102,6 +104,8 @@ public class SolarWarsGame {
         application = app;
         assetManager = app.getAssetManager();
         isoControl = app.getIsoControl();
+        audioManager = AudioManager.getInstance();
+        audioManager.initialize();
         gamestateManager = GamestateManager.getInstance();
         networkManager = NetworkManager.getInstance();
         

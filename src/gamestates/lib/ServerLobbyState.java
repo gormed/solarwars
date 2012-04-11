@@ -50,6 +50,7 @@ import net.NetworkManager;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
+import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -210,6 +211,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         // TODO: Sorround with try catch
         joinServer();
         if (noServerFound) {
+            AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
             return;
         }
 
@@ -261,6 +263,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     leaveServer();
                 }
             }
@@ -277,6 +281,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                if (!isPressed) {
+
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
+                }
             }
         };
 

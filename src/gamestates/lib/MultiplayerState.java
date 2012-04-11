@@ -33,6 +33,7 @@ import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
 import net.NetworkManager;
+import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
 /**
@@ -113,6 +114,8 @@ public class MultiplayerState extends Gamestate {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     joinServer();
                 }
             }
@@ -145,7 +148,11 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
+                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                }
             }
         };
 
@@ -160,6 +167,8 @@ public class MultiplayerState extends Gamestate {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     createServer();
                 }
             }

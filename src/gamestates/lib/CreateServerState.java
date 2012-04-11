@@ -61,6 +61,7 @@ import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
 import net.messages.StringMessage;
+import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -264,6 +265,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     cancelServer();
                 }
             }
@@ -281,6 +284,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     startServer();
                 }
             }

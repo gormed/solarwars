@@ -34,13 +34,12 @@ import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 import logic.Gameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
 import net.NetworkManager;
+import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
@@ -101,6 +100,9 @@ public class MultiplayerMatchState extends Gamestate {
         currentLevel = Gameplay.getCurrentLevel();
         currentLevel.generateLevel();
         currentLevel.setupPlayers(Hub.playersByID);
+
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_LOAD);
     }
 
     /* (non-Javadoc)

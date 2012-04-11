@@ -24,7 +24,7 @@ package logic;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
-import solarwars.Hub;
+import solarwars.AudioManager;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -149,6 +149,8 @@ public class Gameplay {
                         p.capturePlanet(planet);
                     }
                 }
+                AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_BEEP);
             }
         };
 

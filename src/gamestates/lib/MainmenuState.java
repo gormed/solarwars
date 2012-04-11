@@ -29,6 +29,7 @@ import gamestates.GamestateManager;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.GameGUI;
+import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
 /**
@@ -38,19 +39,14 @@ public class MainmenuState extends Gamestate {
 
     /** The gui. */
     private GameGUI gui;
-    
     /** The singleplayer button. */
     private Button singleplayerButton;
-    
     /** The multiplayer button. */
     private Button multiplayerButton;
-    
     /** The solarwars. */
     private Label solarwars;
-    
     /** The quit button. */
     private Button quitButton;
-    
     /** The game. */
     private SolarWarsGame game;
     /*
@@ -117,6 +113,8 @@ public class MainmenuState extends Gamestate {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     startSingleplayer();
                 }
             }
@@ -136,6 +134,8 @@ public class MainmenuState extends Gamestate {
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     startMultiplayer();
                 }
             }
@@ -171,7 +171,7 @@ public class MainmenuState extends Gamestate {
     @Override
     protected void unloadContent() {
         gui.cleanUpGUI();
-        
+
         gui = null;
     }
 
@@ -181,8 +181,7 @@ public class MainmenuState extends Gamestate {
     private void startSingleplayer() {
         GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
     }
-    
-    
+
     /**
      * Start multiplayer.
      */

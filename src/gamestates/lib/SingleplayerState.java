@@ -34,6 +34,7 @@ import logic.Gameplay;
 import logic.Player;
 import logic.Level;
 import net.ServerHub;
+import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
@@ -85,6 +86,8 @@ public class SingleplayerState extends Gamestate {
         Gameplay.initialize(currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
         currentLevel.setupPlayers(Hub.playersByID);
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_LOAD);
     }
 
     /* (non-Javadoc)
