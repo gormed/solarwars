@@ -180,22 +180,10 @@ public abstract class AbstractShip extends Node {
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
                             this, order, owner, Gameplay.PLANET_CAPTURE);
+                    
                 }
-//                ShipImpactEffect effect = new ShipImpactEffect();
-//                effect.setupEmitter();
-//                ParticleManager.getInstance().addEffect(effect);
 
-
-                order.emitParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
-                //order.emitParticles(this.owner.getColor(), this.owner.getColor(), impactPos, dir);
-
-
-//                if (order.owner == null) {
-//                    emitParticles(ColorRGBA.White, this.owner.getColor(), impactPos, dir);
-//                } else {
-//                    emitParticles(order.getOwner().getColor(), this.owner.getColor(), impactPos, dir);
-//                }
-
+                order.emitImpactParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
 
                 removeFromShipGroup();
                 level.removeShip(owner, this);

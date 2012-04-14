@@ -31,7 +31,6 @@ import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
 import com.jme3.font.Rectangle;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
@@ -80,19 +79,12 @@ public abstract class AbstractPlanet extends Node {
     protected int ships = 0;
     /** The shipGainTime. */
     protected float shipGainTime;
-    protected float particleEffectTime;
     /** The owner. */
     protected Player owner;
-
-    ParticleEmitter getEmitter() {
-        return impact;
-    }
-    //private static AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
     private ParticleEmitter impact;
-    private Particle[] particles;
-    private int particleCount = 15;
+    private ParticleEmitter capture;
 
-    private void createEmitter() {
+    private void createImpactEmitter() {
         if (impact == null) {
             impact = new ParticleEmitter("ShipImpactEffect ", ParticleMesh.Type.Triangle, 15);
             Material impact_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
@@ -116,23 +108,16 @@ public abstract class AbstractPlanet extends Node {
         }
     }
 
-    void emitParticles(ColorRGBA start, ColorRGBA end, Vector3f pos, Vector3f dir) {
+    void emitImpactParticles(ColorRGBA start, ColorRGBA end, Vector3f pos, Vector3f dir) {
+
+        impact.setLowLife(0.3f);
+        impact.setHighLife(1.1f);
+        impact.getParticleInfluencer().setVelocityVariation(.10f);
+        impact.getParticleInfluencer().setInitialVelocity(dir.normalizeLocal().negateLocal().mult(0.23f));
+
         impact.setEnabled(true);
 
-//        int oldest = 0;
-//        for (int i = 0; i < impact.getParticles().length - 1; i++) {
-//            Particle q = impact.getParticles()[i + 1];
-//            if (q.life > impact.getParticles()[oldest].life) {
-//                oldest = i;
-//            }
-//        }
-//
-//        //for (int i = 0; i < particles/4; i++) {
-//        impact.killParticle(oldest);
-//        //}
-
         impact.setParticlesPerSec(200);
-        impact.getParticleInfluencer().setInitialVelocity(dir.normalizeLocal().negateLocal().mult(0.23f));
 
         impact.setStartColor(start);
         impact.setEndColor(end);
@@ -140,8 +125,60 @@ public abstract class AbstractPlanet extends Node {
         impact.setShape(new EmitterPointShape(pos));
 
         impact.emitAllParticles();
-        
+
         impact.setParticlesPerSec(0);
+    }
+
+    private void createCaptureEmitter() {
+        if (capture == null) {
+            capture = new ParticleEmitter(
+                    "PlanetCaptureEffect ", 
+                    ParticleMesh.Type.Triangle, 
+                    5);
+            Material capture_mat = 
+                    new Material(
+                            assetManager, 
+                            "Common/MatDefs/Misc/Particle.j3md");
+            capture_mat.setTexture(
+                    "Texture", 
+                    assetManager.loadTexture("Textures/Effects/shockwave.png"));
+            capture.setMaterial(capture_mat);
+            capture.setImagesX(1);
+            capture.setImagesY(1);
+            capture.setRotateSpeed(1);
+            capture.setLowLife(0.6f);
+            capture.setHighLife(0.8f);
+            capture.setStartSize(getSize()-0.1f);
+            capture.setEndSize(2*getSize() + 0.1f);
+            capture.setSelectRandomImage(true);
+
+            capture.setGravity(0, 0, 0);
+//            capture.getParticleInfluencer().
+//                    setVelocityVariation(.90f);
+            capture.getParticleInfluencer().
+                    setInitialVelocity(new Vector3f(0, 0, 0));
+
+            capture.setEnabled(false);
+
+            level.addParticleEmitter(capture);
+        }
+    }
+
+    public void emitCaptureParticles() {
+
+        capture.killAllParticles();
+        capture.setEnabled(true);
+
+        capture.setParticlesPerSec(500);
+
+        capture.setStartColor(owner.getColor());
+        capture.setEndColor(ColorRGBA.BlackNoAlpha);
+
+        capture.setShape(new EmitterPointShape(position));
+
+        capture.emitAllParticles();
+
+        capture.setParticlesPerSec(0);
     }
 
     /**
@@ -160,7 +197,8 @@ public abstract class AbstractPlanet extends Node {
         this.transformNode = new Node("Planet Transform Node " + id);
         this.transformNode.setLocalTranslation(position);
         this.assetManager = assetManager;
-        this.createEmitter();
+        this.createImpactEmitter();
+        this.createCaptureEmitter();
         this.owner = null;
         createLabel();
 
@@ -183,7 +221,7 @@ public abstract class AbstractPlanet extends Node {
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);
         label.setCullHint(CullHint.Never);
-        
+
 //        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 //        mat.setColor("GlowColor", ColorRGBA.Orange);
 //        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
@@ -364,29 +402,6 @@ public abstract class AbstractPlanet extends Node {
 
     }
 
-    private void updateParticleEffect(float tpf) {
-
-//        particles = impact.getParticles();
-//
-//
-//        if (particles.length > 0) {
-//            particleEffectTime += tpf;
-////            for (int i = 0; i < particles.length; i++) {
-////                if (particles[i].life <= 0.01f) {
-////                    impact.killParticle(i);
-////                }
-////            }
-//            if (particleEffectTime > 1000) {
-//                impact.killAllParticles();
-//                particleEffectTime = 0;
-//            }
-//        } else {
-//            impact.setParticlesPerSec(0);
-//        }
-
-
-    }
-
     /**
      * Updates the label.
      *
@@ -395,6 +410,5 @@ public abstract class AbstractPlanet extends Node {
     public void updatePlanet(float tpf) {
 
         updateLabel(tpf);
-        updateParticleEffect(tpf);
     }
 }

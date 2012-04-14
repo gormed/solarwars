@@ -147,10 +147,13 @@ public class Gameplay {
                     planet.decrementShips();
                     if (planet.getShipCount() <= 0) {
                         p.capturePlanet(planet);
+                        planet.emitCaptureParticles();
+                        AudioManager.getInstance().
+                                playSoundInstance(AudioManager.SOUND_CAPTURE);
                     }
                 }
                 AudioManager.getInstance().
-                playSoundInstance(AudioManager.SOUND_BEEP);
+                    playSoundInstance(AudioManager.SOUND_BEEP);
             }
         };
 

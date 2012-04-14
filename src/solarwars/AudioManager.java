@@ -23,6 +23,8 @@ public class AudioManager {
     public static final String SOUND_HELI = "/Sounds/heli.ogg";
     public static final String SOUND_LOAD = "/Sounds/load.ogg";
     public static final String SOUND_ROCKET = "/Sounds/rocket.ogg";
+    public static final String SOUND_CAPTURE = "/Sounds/capture.ogg";
+    
     private static AudioManager instance;
     private SolarWarsApplication application;
     private HashMap<String, AudioNode> audioNodes;
@@ -57,12 +59,19 @@ public class AudioManager {
                 assetManager, SOUND_EXPLOSION, false);
         AudioNode heli = new AudioNode(
                 assetManager, SOUND_HELI, false);
+        heli.setLooping(true);
+        heli.setVolume(0.25f);
+        
         AudioNode load = new AudioNode(
                 assetManager, SOUND_LOAD, false);
         load.setVolume(0.25f);
         AudioNode rocket = new AudioNode(
                 assetManager, SOUND_ROCKET, false);
-
+        
+        AudioNode capture = new AudioNode(
+                assetManager, SOUND_CAPTURE, false);
+        capture.setVolume(0.3f);
+        
         audioNodes.put(SOUND_BEEP, beep);
         audioNodes.put(SOUND_CLICK, click);
         audioNodes.put(SOUND_CYBER, cyber);
@@ -71,6 +80,7 @@ public class AudioManager {
         audioNodes.put(SOUND_HELI, heli);
         audioNodes.put(SOUND_LOAD, load);
         audioNodes.put(SOUND_ROCKET, rocket);
+        audioNodes.put(SOUND_CAPTURE, capture);
 
         for (Map.Entry<String, AudioNode> entry : audioNodes.entrySet()) {
             if (entry.getValue() != null) {
@@ -78,6 +88,10 @@ public class AudioManager {
                 entry.getValue().setDirectional(false);
             }
         }
+    }
+    
+    public AudioNode getAudioNode(String name) {
+        return audioNodes.get(name);
     }
 
     public boolean playSound(String sound) {

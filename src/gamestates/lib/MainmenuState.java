@@ -29,6 +29,7 @@ import gamestates.GamestateManager;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.GameGUI;
+import gui.elements.BeatBox;
 import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
@@ -49,6 +50,8 @@ public class MainmenuState extends Gamestate {
     private Button quitButton;
     /** The game. */
     private SolarWarsGame game;
+    
+    private BeatBox beatBox;
     /*
      * 
      */
@@ -163,6 +166,10 @@ public class MainmenuState extends Gamestate {
         gui.addGUIElement(singleplayerButton);
         gui.addGUIElement(multiplayerButton);
         gui.addGUIElement(quitButton);
+        
+        beatBox = new BeatBox();
+        beatBox.setupSounds();
+        beatBox.play();
     }
 
     /* (non-Javadoc)
@@ -173,6 +180,8 @@ public class MainmenuState extends Gamestate {
         gui.cleanUpGUI();
 
         gui = null;
+        
+        beatBox.stop();
     }
 
     /**
