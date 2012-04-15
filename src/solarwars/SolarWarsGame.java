@@ -103,7 +103,7 @@ public class SolarWarsGame {
     public void initialize(SolarWarsApplication app) {
         application = app;
         assetManager = app.getAssetManager();
-        isoControl = app.getIsoControl();
+        isoControl = IsoControl.getInstance();
         audioManager = AudioManager.getInstance();
         audioManager.initialize();
         gamestateManager = GamestateManager.getInstance();
@@ -174,5 +174,7 @@ public class SolarWarsGame {
      */
     void update(float tpf) {
         gamestateManager.update(tpf);
+        if (application.isoCam != null)
+            isoControl.updateSelection(tpf);
     }
 }

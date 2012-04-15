@@ -371,6 +371,11 @@ public abstract class AbstractPlanet extends Node {
         return position;
     }
 
+    public Node getTransformNode() {
+        return transformNode;
+    }
+    
+
     /**
      * Calculate increment.
      */

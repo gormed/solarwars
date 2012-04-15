@@ -6,6 +6,8 @@ package logic;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -23,6 +25,7 @@ public class PlayerState {
         this.name = name;
         this.color = color;
     }
+    
     /** The selected planet. */
     public int selectedPlanetId;
     /** The selected ship group. */
@@ -39,4 +42,6 @@ public class PlayerState {
     public boolean lost;
     
     public int defeatedPlayerID = -1;
+    
+    public ArrayList<Integer> multiSelectedPlanets = new ArrayList<Integer>();
 }

@@ -182,6 +182,7 @@ public class MainmenuState extends Gamestate {
         gui = null;
         
         beatBox.stop();
+        beatBox = null;
     }
 
     /**

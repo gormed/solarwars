@@ -23,6 +23,7 @@ package gui.elements;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -78,8 +79,9 @@ public class Panel extends GUIElement {
         geometry = new Geometry(name + "_Geometry", b);
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", color);
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         geometry.setMaterial(material);
-
+        
         geometry.setLocalTranslation(screenPosition);
         attachChild(geometry);
     }
@@ -99,4 +101,5 @@ public class Panel extends GUIElement {
         super.setVisible(show);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
+    
 }

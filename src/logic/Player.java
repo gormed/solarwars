@@ -230,6 +230,36 @@ public class Player {
      */
     public void updatePlayer() {
     }
+    
+    void clearMultiSelect() {
+        state.multiSelectedPlanets.clear();
+    }
+    
+    void multiSelectPlanets(ArrayList<AbstractPlanet> planets) {
+        ArrayList<Integer> planetIDs = new ArrayList<Integer>();
+        for (AbstractPlanet p : planets) {
+            planetIDs.add(p.getId());
+        }
+        state.multiSelectedPlanets = planetIDs;
+    }
+    
+    /**
+     * Checks for multi selected planets.
+     *
+     * @return true, if successful
+     */
+    boolean hasMultiSelectedPlanets() {
+        return state.multiSelectedPlanets != null && !state.multiSelectedPlanets.isEmpty();
+    }
+    
+    ArrayList<AbstractPlanet> getMultiSelectPlanets() {
+        ArrayList<AbstractPlanet> aps = new ArrayList<AbstractPlanet>();
+        
+        for (Integer i : state.multiSelectedPlanets) {
+            aps.add(Gameplay.getCurrentLevel().getPlanet(i));
+        }
+        return aps;
+    }
 
     /**
      * Select planet.

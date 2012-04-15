@@ -421,6 +421,8 @@ public class SolarWarsApplication extends Application {
     public void detachIsoCameraControl() {
         if (inputManager != null && isoCam != null) {
             isoCam.destroy();
+            isoCam = null;
+            isoControl.cleanUp();
             inputManager.removeListener(isoControl.getActionListener());
         }
     }

@@ -24,7 +24,9 @@ package logic;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
+import java.util.ArrayList;
 import solarwars.AudioManager;
+import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -35,6 +37,7 @@ public class Gameplay {
 
     /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
+    public static final String PLANET_MULTI_SELECT = "MultiSelectPlanet";
     /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
     /** The Constant SHIP_REDIRECT. */
@@ -98,7 +101,7 @@ public class Gameplay {
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
                 if (planet.getOwner() == p) {
-
+                    p.clearMultiSelect();
                     p.selectPlanet(planet);
 
                 } else if (planet.getOwner() != null) {
@@ -107,32 +110,68 @@ public class Gameplay {
             }
         };
 
-        PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
+        PlanetAction multiSelectPlanet = new PlanetAction(PLANET_MULTI_SELECT) {
 
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
-                if (p.hasSelectedPlanet()) {
-                    AbstractPlanet sel = p.getSelectedPlanet();
-                    if (sel.getOwner() == p && !sel.equals(planet)) {
 
-                        int selected = (int) (sel.getShipCount() * p.getShipPercentage());
-                        ShipGroup sg = new ShipGroup(
-                                application.getAssetManager(),
-                                currentLevel,
-                                p,
-                                sel,
-                                planet,
-                                selected);
-                        currentLevel.addShipGroup(p, sg);
-                        p.createShipGroup(sg);
+                if (sender instanceof IsoControl) {
+                    IsoControl control = (IsoControl) sender;
+                    ArrayList<AbstractPlanet> selection = control.getSelectedPlanets();
+                    p.multiSelectPlanets(selection);
+                }
 
+//                if (planet.getOwner() == p) {
+//
+//                    p.selectPlanet(planet);
+//
+//                } else if (planet.getOwner() != null) {
+//                } else {
+//                }
+            }
+        };
 
-                    }
+        PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
+
+            @Override
+            public void doAction(Object sender, AbstractPlanet target, Player p) {
+                if (p.hasMultiSelectedPlanets()) {
+                    multiAttackPlanet(p.getMultiSelectPlanets(), target, p);
+                }
+                else if (p.hasSelectedPlanet()) {
+                    singleAttackPlanet(p.getSelectedPlanet(), target, p);
                 } else if (p.hasSelectedShipGroup()) {
-                    ShipGroup sg = p.getSelectedShipGroup();
-                    if (sg != null) {
-                        sg.moveToPlanet(planet);
-                    }
+                    singelAttackShipGroup(p.getSelectedShipGroup(), target);
+                }
+            }
+
+            private void multiAttackPlanet(ArrayList<AbstractPlanet> planets, AbstractPlanet target, Player p) {
+                for (AbstractPlanet planet : planets) {
+                    singleAttackPlanet(planet, target, p);
+                }
+            }
+
+            private void singelAttackShipGroup(ShipGroup shipGroup, AbstractPlanet target) {
+                if (shipGroup != null) {
+                    shipGroup.moveToPlanet(target);
+                }
+            }
+
+            private void singleAttackPlanet(AbstractPlanet selction, AbstractPlanet target, Player p) {
+                if (selction.getOwner() == p && !selction.equals(target)) {
+
+                    int selected = (int) (selction.getShipCount() * p.getShipPercentage());
+                    ShipGroup sg = new ShipGroup(
+                            application.getAssetManager(),
+                            currentLevel,
+                            p,
+                            selction,
+                            target,
+                            selected);
+                    currentLevel.addShipGroup(p, sg);
+                    p.createShipGroup(sg);
+
+
                 }
             }
         };
@@ -153,11 +192,12 @@ public class Gameplay {
                     }
                 }
                 AudioManager.getInstance().
-                    playSoundInstance(AudioManager.SOUND_BEEP);
+                        playSoundInstance(AudioManager.SOUND_BEEP);
             }
         };
 
         actionLib.getPlanetActions().put(PLANET_SELECT, selectPlanet);
+        actionLib.getPlanetActions().put(PLANET_MULTI_SELECT, multiSelectPlanet);
         actionLib.getPlanetActions().put(PLANET_ATTACK, attackPlanet);
         actionLib.getPlanetActions().put(PLANET_CAPTURE, capturePlanet);
 
@@ -210,7 +250,7 @@ public class Gameplay {
                 if (victorious != null) {
                     victorious.setDefeatedPlayer(defeated.getId());
                 }
-                
+
 //                if (victorious.getId() == Hub.getLocalPlayer().getId()) {
 //                } else if (defeated.getId() == Hub.getLocalPlayer().getId()) {
 //                } else {

@@ -51,14 +51,16 @@ public class MultiplayerGameplay {
         if (client == null || !client.isConnected()) {
             return;
         }
-
+        int id = -1;
+        if (planet != null)
+            id = planet.getId();
         PlanetActionMessage planetActionMessage =
                 new PlanetActionMessage(
                 System.currentTimeMillis(),
                 actionName,
                 Hub.getLocalPlayer().getId(),
                 Hub.getLocalPlayer().getState(),
-                planet.getId());
+                id);
         client.send(planetActionMessage);
     }
 

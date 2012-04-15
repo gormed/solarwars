@@ -41,5 +41,8 @@
 		- can choose from a given set?
 	# change player names if doubles
 	# add capture planet animation
+	# add multi planet select
+	# add multi ship group select
+	# add move all to one planet
 * Alpha 0.1
 	# current rev

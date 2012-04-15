@@ -166,6 +166,10 @@ public class ShipGroup extends Node {
         transformNode.attachChild(geometry);
     }
 
+    public Node getTransformNode() {
+        return transformNode;
+    }
+
     /**
      * Gets the random position.
      *
