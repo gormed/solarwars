@@ -30,6 +30,7 @@ import gamestates.GamestateManager;
 import gui.GameGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
+import gui.elements.TabScores;
 import logic.Gameplay;
 import logic.Player;
 import logic.Level;
@@ -53,6 +54,8 @@ public class SingleplayerState extends Gamestate {
     private GameGUI gui;
     /** The pause. */
     private PauseGUI pause;
+    
+    private TabScores tabScores;
     /** The hub. */
     private Hub hub;
     /** The pause listener. */
@@ -75,8 +78,8 @@ public class SingleplayerState extends Gamestate {
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
         hub = Hub.getInstance();
-        application.attachIsoCameraControl();
         setupSingleplayer();
+        application.attachIsoCameraControl();
         setupGUI();
         currentLevel = new Level(
                 application.getRootNode(),
@@ -101,7 +104,8 @@ public class SingleplayerState extends Gamestate {
         hub = null;
 
         currentLevel.destroy();
-
+        tabScores.destroy();
+        tabScores = null;
         gui.cleanUpGUI();
         gui = null;
         application.detachIsoCameraControl();
@@ -146,6 +150,13 @@ public class SingleplayerState extends Gamestate {
         application.getInputManager().addListener(
                 pauseListener,
                 SolarWarsApplication.INPUT_MAPPING_PAUSE);
+        
+        tabScores = new TabScores(gui);
+        //tabScores.setVisible(false);
+        application.getInputManager().
+                addListener(
+                tabScores.getActionListener(), 
+                SolarWarsApplication.INPUT_MAPPING_TABSCORE);
     }
 
     /**

@@ -35,14 +35,19 @@ import gui.GameGUI;
  */
 public abstract class Button extends Label {
 
+    private static final ColorRGBA BUTTON_COLOR =
+            new ColorRGBA(0.0f, 0.0f, 1.0f, 0.75f);
+    private static final ColorRGBA BUTTON_FRAME_COLOR =
+            new ColorRGBA(1f, 1f, 1f, 0.75f);
+    private static final ColorRGBA BUTTON_FONT_COLOR = ColorRGBA.White.clone();
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The button color. */
     protected ColorRGBA buttonColor;
+    
+    protected Panel frame;
 
     /**
      * Instantiates a new button.
@@ -55,8 +60,8 @@ public abstract class Button extends Label {
      * @param gui the gui
      */
     public Button(String title, Vector3f position, Vector3f scale, ColorRGBA textColor, ColorRGBA buttonColor, GameGUI gui) {
-        super(title, position, scale, textColor, gui);
-        this.buttonColor = buttonColor;
+        super(title, position, scale, BUTTON_FONT_COLOR, gui);
+        this.buttonColor = BUTTON_COLOR;
         createButton();
     }
 
@@ -68,8 +73,8 @@ public abstract class Button extends Label {
 
         float[] size = new float[2];
 
-        size[0] = text.getLineWidth() / 1.5f;
-        size[1] = text.getLineHeight() / 1.5f;
+        size[0] = text.getLineWidth() / 1.65f;
+        size[1] = text.getLineHeight() / 1.7f;
 
         Box b = new Box(size[0], size[1], 1);
         geometry = new Geometry(title + "_Button", b);
@@ -80,8 +85,15 @@ public abstract class Button extends Label {
 
         geometry.setLocalTranslation(screenPosition);
         geometry.setLocalScale(scale);
+        
+        frame = new Panel(
+                "Button_Frame", 
+                screenPosition, 
+                new Vector2f(size[0]+4, size[1]+4), 
+                BUTTON_FRAME_COLOR);
 
         detachChild(text);
+        attachChild(frame);
         attachChild(geometry);
         attachChild(text);
     }
@@ -104,6 +116,8 @@ public abstract class Button extends Label {
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);
+        frame.setVisible(show);
+        
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }

@@ -44,8 +44,8 @@ public class BasePlanet extends AbstractPlanet {
      * @param position the position
      * @param size the size
      */
-    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
-        super(assetManager, level, position, size);
+    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, float size, int sizeID) {
+        super(assetManager, level, position, size, sizeID);
     }
 
     /* (non-Javadoc)

@@ -329,6 +329,10 @@ public class Player {
 
         return ships;
     }
+    
+    public int getPlanetCount() {
+        return planets.size();
+    }
 
 //    public boolean canSurvive() {
 //        int ships = getShipCount();

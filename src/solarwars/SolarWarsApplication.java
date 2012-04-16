@@ -60,6 +60,8 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
     /** The Constant INPUT_MAPPING_PAUSE. */
     public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
+    /** The Constant INPUT_MAPPING_TABSCORE. */
+    public static final String INPUT_MAPPING_TABSCORE = "SOLARWARS_tabScore";
     /** The Constant INPUT_MAPPING_CAMERA_POS. */
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
     /** The Constant INPUT_MAPPING_MEMORY. */
@@ -385,11 +387,16 @@ public class SolarWarsApplication extends Application {
         inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
         inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
         inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
-        inputManager.addListener(actionListener, INPUT_MAPPING_EXIT,
-                INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
+        inputManager.addMapping(INPUT_MAPPING_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
+        
+        inputManager.addListener(actionListener, 
+                INPUT_MAPPING_EXIT,
+                INPUT_MAPPING_CAMERA_POS, 
+                INPUT_MAPPING_MEMORY, 
+                INPUT_MAPPING_HIDE_STATS);
 
         // SETUP GAME CONTENT
-        
+
         setDisplayStatView(false);
         setDisplayFps(false);
 
@@ -419,6 +426,7 @@ public class SolarWarsApplication extends Application {
                     INPUT_MAPPING_WHEEL_DOWN, INPUT_MAPPING_WHEEL_UP);
 
         }
+        isoCam.reset();
     }
 
     public void detachIsoCameraControl() {

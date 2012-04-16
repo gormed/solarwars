@@ -40,7 +40,7 @@ public class Hub {
         ArrayList<Player> players = new ArrayList<Player>();
 
         for (Map.Entry<String, Player> cursor : playersByName.entrySet()) {
-            players.add(cursor.getValue().getId(), cursor.getValue());
+            players.add(cursor.getValue());
         }
 
         return players;

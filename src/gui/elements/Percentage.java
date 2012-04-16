@@ -32,6 +32,10 @@ import solarwars.Hub;
  */
 public class Percentage extends Label {
 
+    
+    private final Panel background;
+    private final Panel backgroundFrame;
+    private final Label frame;
     /**
      * Instantiates a new percentage.
      *
@@ -44,8 +48,44 @@ public class Percentage extends Label {
                     9.5f * gui.getHeight()/10, 
                     0), 
                 new Vector3f(0.75f, 0.75f, 1), 
-                ColorRGBA.Orange, gui);
+                new ColorRGBA(1,0.5f,0,0.7f), gui);
         
+        frame = new Label(title, screenPosition, scale.clone().multLocal(1.025f), new ColorRGBA(0,0,0,0.5f), gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+                setCaption(text.getText());
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                
+            }
+        };
+        background = new Panel("Percentage_Back", 
+                new Vector3f(
+                    gui.getWidth()/2, 
+                    1.1f * gui.getHeight(), 
+                    0), 
+                new Vector2f(
+                        gui.getWidth()/7, 
+                        gui.getHeight()/5), 
+                new ColorRGBA(0, 0, 1, 0.2f));
+        backgroundFrame = new Panel("Percentage_Back", 
+                new Vector3f(
+                    gui.getWidth()/2, 
+                    1.1f * gui.getHeight(), 
+                    0), 
+                new Vector2f(
+                        (gui.getWidth()/7) + 4, 
+                        (gui.getHeight()/5) + 4), 
+                new ColorRGBA(0, 0, 1, 0.2f));
+        detachChild(text);
+        
+        attachChild(background);
+        attachChild(backgroundFrame);
+        attachChild(frame);
+        attachChild(text);
 //        font = FontLoader.getInstance().getFont("SolarWarsFont32");
 //        text = new BitmapText(font, false);
 //        text.setText();
@@ -71,6 +111,9 @@ public class Percentage extends Label {
      */
     @Override
     public void updateGUI(float tpf) {
+        background.updateGUI(tpf);
+        backgroundFrame.updateGUI(tpf);
+        frame.updateGUI(tpf);
         text.setText("Percentage: " + (int) (Hub.getLocalPlayer().getShipPercentage() * 100) + "%");
     }
 
@@ -80,6 +123,9 @@ public class Percentage extends Label {
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);
+        background.setVisible(show);
+        backgroundFrame.setVisible(show);
+        frame.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 

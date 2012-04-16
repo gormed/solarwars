@@ -119,6 +119,13 @@ public class IsoCamera implements AnalogListener, ActionListener {
 
     }
 
+    public void reset() {
+        float[] rot = {CAMERA_ANGLE, 0, 0};
+        CAMERA_HEIGHT = Level.getLevelSize(Hub.playersByID.size());
+        cam.setLocation(new Vector3f(0, CAMERA_HEIGHT, 0));
+        cam.setRotation(new Quaternion(rot));
+    }
+
     public void destroy() {
         rootNode.removeLight(camLight);
         this.rootNode = null;

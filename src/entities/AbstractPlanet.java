@@ -65,6 +65,8 @@ public abstract class AbstractPlanet extends Node {
     protected Node transformNode;
     /** The size. */
     protected float size;
+    
+    protected int sizeID;
     /** The level. */
     protected Level level;
     /** The id. */
@@ -189,9 +191,10 @@ public abstract class AbstractPlanet extends Node {
      * @param position the position
      * @param size the size
      */
-    public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, float size) {
+    public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, float size, int sizeID) {
         this.id = Level.getContiniousPlanetID();
         this.size = size;
+        this.sizeID = sizeID;
         this.level = level;
         this.position = position;
         this.transformNode = new Node("Planet Transform Node " + id);
@@ -291,6 +294,7 @@ public abstract class AbstractPlanet extends Node {
      */
     public void setOwner(Player p) {
         owner = p;
+        label.setColor(ColorRGBA.Black.clone());
         material.setColor("Specular", owner.getColor());
         material.setColor("Diffuse", ColorRGBA.White);
         material.setColor("GlowColor", owner.getColor());
@@ -317,6 +321,10 @@ public abstract class AbstractPlanet extends Node {
      */
     public float getSize() {
         return size;
+    }
+    
+    public int getSizeID() {
+        return sizeID;
     }
 
     /**

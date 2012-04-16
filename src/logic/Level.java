@@ -62,16 +62,19 @@ public class Level {
         "EIGHT PLAYER"
     };
     private static float[] PLAYERS_CAMERA_HEIGHT = {
+        8,
         10,
-        12,
+        10,
         12,
         13,
         14,
-        14,
         15,
-        15,
-        15
+        16,
+        16
     };
+    private static float[] PLANET_SIZES = {
+        0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
+        0.325f, 0.35f, 0.375f, 0.4f};
 
     /**
      * Gets the camera height for a given player count
@@ -289,13 +292,13 @@ public class Level {
 
     public void generateLevel() {
         LevelGenerator g = new LevelGenerator(this);
-        g.generate(seed);
+        g.generateClassic(seed);
     }
 
     public void generateLevel(long seed) {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
-        g.generate(this.seed);
+        g.generateClassic(this.seed);
     }
 
     /**
@@ -424,17 +427,9 @@ public class Level {
         return planet;
     }
 
-    /**
-     * Generate size.
-     *
-     * @param r the r
-     * @return the float
-     */
-    private float generateSize(Random r) {
-        float[] random = {
-            0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
-            0.325f, 0.35f, 0.375f, 0.4f};
-        return random[r.nextInt(random.length)];
+    private int generateSize(Random r) {
+
+        return r.nextInt(PLANET_SIZES.length);
         //return (0.6f + r.nextFloat()) / 4;
     }
 
@@ -478,6 +473,7 @@ public class Level {
     }
 
     public void destroy() {
+        GameOverGUI.getInstance().hide();
         control.removeShootable(levelNode);
 
         this.rootNode.detachChild(labelNode);
@@ -511,8 +507,10 @@ public class Level {
     }
 
     class LevelGenerator {
-        public static final float PLANET_SPACE = 1.0f;
 
+        public static final float PLANET_SPACE_HORIZ = 1.0f;
+        public static final float PLANET_SPACE_VERT = 0.5f;
+        public final int[] SUBPLANETS = {0, 1, 2, 3, 4, 4, 6, 8, 8};
         private Level level;
         /* linksunten, linksoben, rechtsoben, rechtsunten */
         private Vector3f[] corners = {
@@ -570,10 +568,11 @@ public class Level {
             for (int i = -5; i <= 5; i++) {
                 for (int j = -4; j <= 4; j++) {
                     if (r.nextBoolean()) {
+                        int size = generateSize(r);
                         p = new BasePlanet(
                                 assetManager, level,
                                 new Vector3f(i, 0, j),
-                                generateSize(r));
+                                PLANET_SIZES[size], size);
                         p.createPlanet();
                         p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
@@ -597,10 +596,68 @@ public class Level {
             level.labelNode = new Node("Planet Labels");
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
-            level.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.background =
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
             level.rootNode.attachChild(background);
 
-            AbstractPlanet p;
+
+            level.seed = seed;
+            Random r = new Random(seed);
+            int playerCount = Hub.playersByID.size();
+
+            int leftBottomX = Math.round(corners[0].x);
+            int leftBottomZ = Math.round(corners[0].z);
+            int topRightX = Math.round(corners[2].x);
+            int topRightZ = Math.round(corners[2].z);
+
+            int bigPlanetCount = playerCount;
+            int semiBigPlanetCount = playerCount + 2 + r.nextInt(playerCount);
+            int planetCount = 10 + r.nextInt(playerCount * 10);
+
+            for (int i = 0; i < bigPlanetCount; i++) {
+                float x = 
+                        r.nextFloat() * (leftBottomX - PLANET_SPACE_HORIZ) + 
+                        r.nextFloat() * (topRightX + PLANET_SPACE_HORIZ);
+                float z = 
+                        r.nextFloat() * (topRightZ - PLANET_SPACE_VERT) + 
+                        r.nextFloat() * (leftBottomZ + PLANET_SPACE_VERT);
+                float dist = 0.5f * r.nextInt(SUBPLANETS[PLANET_SIZES.length-1]);
+                int size = PLANET_SIZES.length-1;
+
+                int ships = getRandomShipCount(r, size);
+                AbstractPlanet p = createPlanet(size, x, z, ships);
+                createSubPlanets(p, r, dist);
+
+            }
+
+//            for (float x = leftBottomX - PLANET_SPACE_HORIZ;
+//                    x >= topRightX + PLANET_SPACE_HORIZ; x--) {
+//                for (float z = topRightZ - PLANET_SPACE_VERT;
+//                        z >= leftBottomZ + PLANET_SPACE_VERT; z--) {
+//                    if (r.nextBoolean()) {
+//                        createPlanet(r, x, z);
+//                        System.out.print(".");
+//                    }
+//                }
+//            }
+            if (control != null) {
+                control.addShootable(levelNode);
+            }
+
+            System.out.println("Level generated!");
+        }
+        
+        public void generateClassic(long seed) {
+            System.out.print("[" + seed + "] Generating level...");
+            // create a node for the planet-labels
+            level.labelNode = new Node("Planet Labels");
+            // attach the labels on the root!
+            level.rootNode.attachChild(labelNode);
+            level.background =
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.rootNode.attachChild(background);
+
+
             level.seed = seed;
             Random r = new Random(seed);
 
@@ -608,19 +665,14 @@ public class Level {
             int leftBottomZ = Math.round(corners[0].z);
             int topRightX = Math.round(corners[2].x);
             int topRightZ = Math.round(corners[2].z);
-            
-            for (float x = leftBottomX-PLANET_SPACE; x >= topRightX+PLANET_SPACE; x--) {
-                for (float z = topRightZ-PLANET_SPACE; z >= leftBottomZ+PLANET_SPACE; z--) {
-                    if (r.nextBoolean()) {
-                        p = new BasePlanet(
-                                assetManager, level,
-                                new Vector3f(x, 0, z),
-                                generateSize(r));
-                        p.createPlanet();
-                        p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
-                        planetList.put(p.getId(), p);
-                        freePlanetsNode.attachChild(p);
+
+            for (float x = leftBottomX - PLANET_SPACE_HORIZ;
+                    x >= topRightX + PLANET_SPACE_HORIZ; x--) {
+                for (float z = topRightZ - PLANET_SPACE_VERT;
+                        z >= leftBottomZ + PLANET_SPACE_VERT; z--) {
+                    if (r.nextFloat() > 0.65f) {
+                        createPlanet(r, x, z);
                         System.out.print(".");
                     }
                 }
@@ -630,6 +682,81 @@ public class Level {
             }
 
             System.out.println("Level generated!");
+        }
+
+        private void createSubPlanets(AbstractPlanet basePlanet, Random r, float maxDist) {
+            int planetCount = 1 + r.nextInt(basePlanet.getSizeID());
+            maxDist = planetCount * 0.8f;
+            float avgTurns = (float) Math.PI * 2 / planetCount;
+            float turns = 0;
+
+            float avgDist = maxDist / planetCount;
+            float dist = 0;
+
+            Vector2f center = new Vector2f(
+                    basePlanet.getPosition().x,
+                    basePlanet.getPosition().z);
+
+            for (int i = 0; i < planetCount; i++) {
+                int size = r.nextInt(basePlanet.getSizeID()-2);
+                if (size < 1) {
+                    size = 1;
+                }
+                int ships = getRandomShipCount(r, size);
+                
+                float randTurn = r.nextFloat() * (float) Math.PI * 2;
+                Vector2f pos = getRotatedPosition(
+                        center,
+                        dist += avgDist,
+                        turns += avgTurns);
+                createPlanet(size, pos.x, pos.y, ships);
+            }
+        }
+
+        private Vector2f getRotatedPosition(Vector2f center, float dist, float rotated) {
+            Vector2f pos = new Vector2f(1, 0);
+            pos.multLocal(dist);
+            pos.rotateAroundOrigin(rotated, true);
+//            pos.x = pos.x * (float) Math.cos(rotated) - pos.y * (float) Math.sin(rotated);
+//            pos.y = pos.y * (float) Math.cos(rotated) + pos.x * (float) Math.sin(rotated);
+            return pos;
+        }
+
+        private int getRandomShipCount(Random r, int size) {
+            return 5 + r.nextInt(5)
+                    + (int) (PLANET_SIZES[size] * (r.nextFloat() * 100.0f));
+        }
+
+        private AbstractPlanet createPlanet(int size, float x, float z, int shipCount) {
+            AbstractPlanet p = new BasePlanet(
+                    assetManager, level,
+                    new Vector3f(x, 0, z),
+                    PLANET_SIZES[size],
+                    size);
+
+            p.createPlanet();
+            p.setShipCount(shipCount);
+
+            planetList.put(p.getId(), p);
+            freePlanetsNode.attachChild(p);
+            return p;
+        }
+
+        private AbstractPlanet createPlanet(Random r, float x, float z) {
+            int size = generateSize(r);
+            AbstractPlanet p = new BasePlanet(
+                    assetManager, level,
+                    new Vector3f(x, 0, z),
+                    PLANET_SIZES[size],
+                    size);
+            p.createPlanet();
+            p.setShipCount(
+                    5 + r.nextInt(5)
+                    + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
+
+            planetList.put(p.getId(), p);
+            freePlanetsNode.attachChild(p);
+            return p;
         }
     }
 }

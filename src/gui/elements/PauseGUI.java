@@ -62,7 +62,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
                 "PausePanel",
                 new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, -1),
                 new Vector2f(gui.getWidth() / 4, gui.getHeight() / 5),
-                ColorRGBA.Blue);
+                new ColorRGBA(0, 0, 1, 0.7f));
 
         pauseLabel = new Label("PAUSE",
                 new Vector3f(gui.getWidth() / 2,
