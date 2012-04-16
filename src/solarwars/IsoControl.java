@@ -244,7 +244,7 @@ public class IsoControl {
                             new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
                     Ray ray = new Ray(click3d, dir);
 
-                    if (action == 1) {
+                    if (action == 1 && startXZPlanePos != null && lastXZPlanePos != null) {
 //                        rootNode.detachChild(startDrag);
                         float width = Math.abs(lastXZPlanePos.x - startXZPlanePos.x);
                         float height = Math.abs(lastXZPlanePos.z - startXZPlanePos.z);
@@ -525,6 +525,15 @@ public class IsoControl {
         if (bottomDrag != null) {
             gui.removeGUIElement(bottomDrag);
         }
+        if (markerNode != null) {
+            markerNode.updateMarker(tpf);
+        }
+        if (markerNodes != null && !markerNodes.isEmpty()) {
+            for (MarkerNode marker : markerNodes) {
+                marker.updateMarker(tpf);
+            }
+        }
+
         if (!dragging || startScreenPos == null) {
 //            if (startDrag != null) {
 //                rootNode.detachChild(startDrag);
@@ -568,8 +577,8 @@ public class IsoControl {
                 startScreenPos.y + (height) * 0.5f,
                 0),
                 new Vector2f(
-                        Math.abs(width / 2), 
-                        Math.abs(height / 2)),
+                Math.abs(width / 2),
+                Math.abs(height / 2)),
                 center);
 
         leftDrag = new Panel(
@@ -682,8 +691,18 @@ public class IsoControl {
     }
 
     private class MarkerNode extends Node {
+        public static final int SELECTION_ANIMATION_SPEED = 2;
 
+        private float scale;
+        private float fadeScale;
+        private float running;
+        private Material material;
         private Geometry geometry;
+        private ColorRGBA start = ColorRGBA.Orange.clone();
+        private ColorRGBA end = ColorRGBA.White.clone();
+        private ColorRGBA currentFadeColor = start.clone();
+        private boolean fadeDir = true;
+        private float tick = 0f;
 
         public MarkerNode() {
             super("Marker Transform");
@@ -691,12 +710,13 @@ public class IsoControl {
             Quad q = new Quad(1, 1);
 
             geometry = new Geometry("MarkerGeometry", q);
-            Material material = new Material(assetManager,
+            material = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
             material.setTexture("ColorMap",
                     assetManager.loadTexture("Textures/gui/marker.png"));
-            material.setColor("Color", ColorRGBA.Orange);
-            material.setColor("GlowColor", ColorRGBA.Orange);
+            material.setColor("Color", start);
+            currentFadeColor = start;
+            material.setColor("GlowColor", ColorRGBA.White);
 
             material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
@@ -717,9 +737,68 @@ public class IsoControl {
 
         }
 
+        public void updateMarker(float tpf) {
+            running += tpf;
+            if (running > 2*Math.PI)
+                running = 0;
+            // size
+            fadeScale = 0.05f * (float) Math.sin((double) running * SELECTION_ANIMATION_SPEED) + scale + 0.02f;
+            geometry.setLocalScale(fadeScale);
+            geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+//            if (fadeScale > scale + 0.1f) {
+//
+//                // size
+//                fadeScale = 0.1f * (float) Math.sin((double) running);
+//                geometry.setLocalScale(fadeScale);
+//                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+//            } else if (fadeScale < scale - 0.1f) {
+//                // size
+//                fadeScale += 0.001f;
+//                geometry.setLocalScale(fadeScale);
+//                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+//            }
+            if (tick > 0.005f) {
+                if (fadeDir) {
+
+                    // color
+                    currentFadeColor = currentFadeColor.add(
+                            new ColorRGBA(0.01f, 0.01f, 0.01f, 0));
+                    material.setColor("Color", currentFadeColor);
+                    if (currentFadeColor.r >= 1f && currentFadeColor.g >= 1f && currentFadeColor.b >= 1) {
+                        fadeDir = false;
+                    }
+                } else {
+                    // color
+                    if (currentFadeColor.g > start.g) {
+                        currentFadeColor.g -= 0.01f;
+                    }
+                    if (currentFadeColor.b > start.b) {
+                        currentFadeColor.b -= 0.01f;
+                    }
+                    material.setColor("Color", currentFadeColor);
+                    if (currentFadeColor.g <= 0.5 && currentFadeColor.b <= 0) {
+                        currentFadeColor = start.clone();
+                        fadeDir = true;
+                    }
+                }
+                //currentFadeColor = start.
+
+                tick = 0;
+            }
+
+            tick += tpf;
+
+        }
+
         public void setScale(float s) {
-            geometry.setLocalScale(s);
-            geometry.setLocalTranslation(-s / 2, 0, -s / 2);
+            scale = s;
+            material.setColor("Color", start);
+            currentFadeColor = start.clone();
+            fadeScale = 0;
+            tick = 0;
+            fadeDir = true;
+            geometry.setLocalScale(scale);
+            geometry.setLocalTranslation(-scale / 2, 0, -scale / 2);
         }
     }
 }

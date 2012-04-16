@@ -24,7 +24,10 @@ package logic;
 import solarwars.Hub;
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
@@ -40,12 +43,47 @@ import entities.LevelBackground;
 import gui.GameGUI;
 import gui.elements.GameOverGUI;
 import solarwars.IsoControl;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class Level.
  */
 public class Level {
 
+    public static final String[] LEVEL_SIZE_NAME = {
+        "NONE",
+        "ONE PLAYER",
+        "TWO PLAYER",
+        "THREE PLAYER",
+        "FOUR PLAYER",
+        "FIVE PLAYER",
+        "SIX PLAYER",
+        "SEVEN PLAYER",
+        "EIGHT PLAYER"
+    };
+    private static float[] PLAYERS_CAMERA_HEIGHT = {
+        10,
+        12,
+        12,
+        13,
+        14,
+        14,
+        15,
+        15,
+        15
+    };
+
+    /**
+     * Gets the camera height for a given player count
+     * @param players
+     * @return 
+     */
+    public static float getLevelSize(int players) {
+        if (players > 1 && players < 9) {
+            return PLAYERS_CAMERA_HEIGHT[players];
+        }
+        return PLAYERS_CAMERA_HEIGHT[0];
+    }
     /** The PLANE t_ id. */
     private static int PLANET_ID = 0;
 
@@ -250,49 +288,14 @@ public class Level {
     }
 
     public void generateLevel() {
-        generateLevel(this.seed);
+        LevelGenerator g = new LevelGenerator(this);
+        g.generate(seed);
     }
 
-    /**
-     * Generate level.
-     *
-     * @param seed the seed
-     */
     public void generateLevel(long seed) {
-
-        System.out.print("[" + seed + "] Generating level...");
-        // create a node for the planet-labels
-        this.labelNode = new Node("Planet Labels");
-        // attach the labels on the root!
-        this.rootNode.attachChild(labelNode);
-        this.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
-        this.rootNode.attachChild(background);
-
-        AbstractPlanet p;
         this.seed = seed;
-        Random r = new Random(seed);
-
-        for (int i = -5; i <= 5; i++) {
-            for (int j = -4; j <= 4; j++) {
-                if (r.nextBoolean()) {
-                    p = new BasePlanet(
-                            assetManager, this,
-                            new Vector3f(i, 0, j),
-                            generateSize(r));
-                    p.createPlanet();
-                    p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
-
-                    planetList.put(p.getId(), p);
-                    freePlanetsNode.attachChild(p);
-                    System.out.print(".");
-                }
-            }
-        }
-        if (control != null) {
-            control.addShootable(levelNode);
-        }
-
-        System.out.println("Level generated!");
+        LevelGenerator g = new LevelGenerator(this);
+        g.generate(this.seed);
     }
 
     /**
@@ -505,5 +508,128 @@ public class Level {
         this.control = null;
         this.gui.cleanUpGUI();
         this.gui = null;
+    }
+
+    class LevelGenerator {
+        public static final float PLANET_SPACE = 1.0f;
+
+        private Level level;
+        /* linksunten, linksoben, rechtsoben, rechtsunten */
+        private Vector3f[] corners = {
+            Vector3f.ZERO, Vector3f.ZERO,
+            Vector3f.ZERO, Vector3f.ZERO};
+
+        public LevelGenerator(Level hull) {
+            level = hull;
+            getCorners();
+        }
+
+        private void getCorners() {
+
+            Vector2f leftBottom = new Vector2f(0, 0);
+            Vector2f leftTop = new Vector2f(0, gui.getHeight());
+            Vector2f rightTop = new Vector2f(gui.getWidth(), gui.getHeight());
+            Vector2f rightBottom = new Vector2f(gui.getWidth(), 0);
+
+            corners[0] = getWorldCoordsOnXZPlane(leftBottom, 0);
+            corners[1] = getWorldCoordsOnXZPlane(leftTop, 0);
+            corners[2] = getWorldCoordsOnXZPlane(rightTop, 0);
+            corners[3] = getWorldCoordsOnXZPlane(rightBottom, 0);
+        }
+
+        private Vector3f getWorldCoordsOnXZPlane(Vector2f screenCoords, float planeHeight) {
+            Camera cam = SolarWarsApplication.getInstance().getCamera();
+
+            Vector2f click2d = screenCoords;
+            Vector3f click3d = cam.getWorldCoordinates(
+                    new Vector2f(click2d.x, click2d.y), 0f).clone();
+            Vector3f dir = cam.getWorldCoordinates(
+                    new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+            Ray ray = new Ray(click3d, dir);
+
+            float t = (planeHeight - ray.getOrigin().y) / ray.getDirection().y;
+            Vector3f XZPlanePos =
+                    ray.getDirection().clone().
+                    mult(t).addLocal(ray.getOrigin().clone());
+            return XZPlanePos;
+        }
+
+        public void generateOld(long seed) {
+            System.out.print("[" + seed + "] Generating level...");
+            // create a node for the planet-labels
+            level.labelNode = new Node("Planet Labels");
+            // attach the labels on the root!
+            level.rootNode.attachChild(labelNode);
+            level.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.rootNode.attachChild(background);
+
+            AbstractPlanet p;
+            level.seed = seed;
+            Random r = new Random(seed);
+
+            for (int i = -5; i <= 5; i++) {
+                for (int j = -4; j <= 4; j++) {
+                    if (r.nextBoolean()) {
+                        p = new BasePlanet(
+                                assetManager, level,
+                                new Vector3f(i, 0, j),
+                                generateSize(r));
+                        p.createPlanet();
+                        p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
+
+                        planetList.put(p.getId(), p);
+                        freePlanetsNode.attachChild(p);
+                        System.out.print(".");
+                    }
+                }
+            }
+            if (control != null) {
+                control.addShootable(levelNode);
+            }
+
+            System.out.println("Level generated!");
+
+        }
+
+        public void generate(long seed) {
+            System.out.print("[" + seed + "] Generating level...");
+            // create a node for the planet-labels
+            level.labelNode = new Node("Planet Labels");
+            // attach the labels on the root!
+            level.rootNode.attachChild(labelNode);
+            level.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.rootNode.attachChild(background);
+
+            AbstractPlanet p;
+            level.seed = seed;
+            Random r = new Random(seed);
+
+            int leftBottomX = Math.round(corners[0].x);
+            int leftBottomZ = Math.round(corners[0].z);
+            int topRightX = Math.round(corners[2].x);
+            int topRightZ = Math.round(corners[2].z);
+            
+            for (float x = leftBottomX-PLANET_SPACE; x >= topRightX+PLANET_SPACE; x--) {
+                for (float z = topRightZ-PLANET_SPACE; z >= leftBottomZ+PLANET_SPACE; z--) {
+                    if (r.nextBoolean()) {
+                        p = new BasePlanet(
+                                assetManager, level,
+                                new Vector3f(x, 0, z),
+                                generateSize(r));
+                        p.createPlanet();
+                        p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
+
+                        planetList.put(p.getId(), p);
+                        freePlanetsNode.attachChild(p);
+                        System.out.print(".");
+                    }
+                }
+            }
+            if (control != null) {
+                control.addShootable(levelNode);
+            }
+
+            System.out.println("Level generated!");
+        }
     }
 }

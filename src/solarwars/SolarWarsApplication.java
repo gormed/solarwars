@@ -389,6 +389,9 @@ public class SolarWarsApplication extends Application {
                 INPUT_MAPPING_CAMERA_POS, INPUT_MAPPING_MEMORY, INPUT_MAPPING_HIDE_STATS);
 
         // SETUP GAME CONTENT
+        
+        setDisplayStatView(false);
+        setDisplayFps(false);
 
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
