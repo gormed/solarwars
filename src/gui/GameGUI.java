@@ -146,8 +146,14 @@ public class GameGUI {
                         if (n instanceof ClickableGUI) {
 
                             clickableHit(n, click2d, isPressed, tpf);
-                        } else if (n.getParent() instanceof ClickableGUI) {
-                            clickableHit(n.getParent(), click2d, isPressed, tpf);
+                        }
+
+                        Node parent = null;
+                        parent = n.getParent();
+                        while (parent != null) {
+
+                            clickableHit(parent, click2d, isPressed, tpf);
+                            parent = parent.getParent();
                         }
                     }
                 } else {
@@ -159,17 +165,14 @@ public class GameGUI {
                 if (n instanceof GUIElement) {
                     GUIElement element = (GUIElement) n;
 
-                    if (element.isVisible()) {
+                    if (element.isVisible() && n instanceof ClickableGUI) {
                         ClickableGUI g = (ClickableGUI) n;
-                        setFocus(g);
+                        if (g.canGainFocus()) {
+                            setFocus(g);
+
+                        }
                         g.onClick(click2d, isPressed, tpf);
                     }
-                }
-            }
-
-            private void setFocus(ClickableGUI g) {
-                if (g instanceof GUIElement) {
-                    focus = (GUIElement) g;
                 }
             }
             //}
@@ -201,6 +204,14 @@ public class GameGUI {
 
     }
 
+    public void setFocus(ClickableGUI g) {
+        if (g instanceof GUIElement) {
+            focus = (GUIElement) g;
+        } else if (g == null) {
+            focus = null;
+        }
+    }
+
     /**
      * Updates the gui elements.
      *
@@ -213,7 +224,7 @@ public class GameGUI {
 //        addGUIElements.clear();
 
         ArrayList<GUIElement> clone = new ArrayList<GUIElement>(guiElements);
-        
+
         for (GUIElement e : clone) {
             e.updateGUI(tpf);
         }

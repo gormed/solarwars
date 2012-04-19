@@ -30,7 +30,7 @@ import gamestates.GamestateManager;
 import gui.GameGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
-import gui.elements.TabScores;
+import gui.elements.ScoresGUI;
 import logic.Gameplay;
 import logic.Player;
 import logic.Level;
@@ -55,7 +55,7 @@ public class SingleplayerState extends Gamestate {
     /** The pause. */
     private PauseGUI pause;
     
-    private TabScores tabScores;
+    private ScoresGUI tabScores;
     /** The hub. */
     private Hub hub;
     /** The pause listener. */
@@ -151,7 +151,7 @@ public class SingleplayerState extends Gamestate {
                 pauseListener,
                 SolarWarsApplication.INPUT_MAPPING_PAUSE);
         
-        tabScores = new TabScores(gui);
+        tabScores = new ScoresGUI(gui);
         //tabScores.setVisible(false);
         application.getInputManager().
                 addListener(

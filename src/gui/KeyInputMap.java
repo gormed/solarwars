@@ -149,4 +149,12 @@ public class KeyInputMap {
     /** The Constant INPUT_MAPPING_POINT. */
     public static final String INPUT_MAPPING_POINT = ".";
     
+    /** The Constant INPUT_MAPPING_POINT. */
+    public static final String INPUT_MAPPING_ENTER = "Enter";
+    
+    /** The Constant INPUT_MAPPING_POINT. */
+    public static final String INPUT_MAPPING_STRG = "Strg";
+    /** The Constant INPUT_MAPPING_POINT. */
+    public static final String INPUT_MAPPING_SHIFT = "Shift";
+    
 }

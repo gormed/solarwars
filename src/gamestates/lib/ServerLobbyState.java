@@ -169,7 +169,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         //if (!client.isConnected())
     }
-
+    
     private void startGame() {
         application.attachIsoCameraControl();
         logic.Level mpLevel =
@@ -193,14 +193,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gui = new GameGUI(game);
         game.getApplication().setPauseOnLostFocus(false);
         hub = Hub.getInstance();
-
+        
         networkManager = NetworkManager.getInstance();
-
+        
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
         playerLabelIdx = new HashMap<Player, Integer>();
         refreshedPlayers = new HashMap<Integer, Player>();
-
+        
         for (int i = 0; i < 8; i++) {
             playerNamePos.put(i, new Vector3f(
                     gui.getWidth() / 3,
@@ -214,19 +214,19 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
             return;
         }
-
+        
         lobby = new Label(
                 "LOBBY",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
                 new Vector3f(2, 2, 1),
                 ColorRGBA.White, gui) {
-
+            
             private float time;
-
+            
             @Override
             public void updateGUI(float tpf) {
                 time += tpf;
-
+                
                 if (time < 0.2f) {
                     text.setText(title + "_");
                 } else if (time < 0.4f) {
@@ -235,31 +235,31 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     time = 0;
                 }
             }
-
+            
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-
+        
         backgroundPanel = new Panel(
                 "BackgroundPanel",
                 new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
                 new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
                 ColorRGBA.Blue);
-
+        
         line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
                 ColorRGBA.White);
-
+        
         leave = new Button("Leave",
                 new Vector3f(gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.White, gui) {
-
+            
             @Override
             public void updateGUI(float tpf) {
             }
-
+            
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
@@ -269,48 +269,48 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 }
             }
         };
-
+        
         ready = new Button("Ready",
                 new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.White, gui) {
-
+            
             @Override
             public void updateGUI(float tpf) {
             }
-
+            
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 if (!isPressed) {
-
+                    
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
                 }
             }
         };
-
+        
         serverName = new Label(client.getGameName() + " ver." + client.getVersion() + " - " + networkManager.getServerIPAdress().getHostName(),
                 new Vector3f(gui.getWidth() / 2, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange, gui) {
-
+            
             @Override
             public void updateGUI(float tpf) {
             }
-
+            
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-
+        
         playerPanel = new Panel(
                 "BackgroundPanel",
                 new Vector3f(gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
                 ColorRGBA.White);
-
-
-
+        
+        
+        
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
         gui.addGUIElement(lobby);
@@ -318,6 +318,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gui.addGUIElement(serverName);
         gui.addGUIElement(playerPanel);
         gui.addGUIElement(ready);
+        networkManager.getChatModule().initialize(gui, networkManager);
     }
 
     /* (non-Javadoc)
@@ -325,15 +326,15 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     protected void unloadContent() {
-
+        
         gameStarted = false;
         noServerFound = false;
         playersChanged = false;
-
+        
         playerLabels.clear();
         playerNamePos.clear();
         gui.cleanUpGUI();
-
+        
         if (client != null) {
             client.removeMessageListener(
                     playerConnectionListener,
@@ -342,11 +343,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     StartGameMessage.class);
             client.removeClientStateListener(playerStateListener);
         }
-
+        
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-
+        
         this.hub = null;
         this.networkManager = null;
         this.noServerFound = false;
@@ -378,6 +379,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
             networkManager.addClientRegisterListener(this);
             client = networkManager.setupClient(clientPlayerName, clientPlayerColor, false);
+            
         } catch (UnknownHostException ex) {
             System.err.println("Unkown host! Please verify the IP.");
             System.err.println(ex.getMessage());
@@ -385,7 +387,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         } catch (IOException ex) {
             if (ex instanceof ConnectException) {
                 System.err.println("Server " + serverIPAddress + " refused connection. Reason: " + ex.getMessage());
-
+                
             } else {
                 Logger.getLogger(MultiplayerState.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -421,9 +423,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 PlayerLeavingMessage.class,
                 StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
-
+        
     }
-
+    
     private void refreshPlayers(HashMap<Integer, Player> players) {
         if (playerLabels == null || gui == null || !playersChanged) {
             return;
@@ -432,9 +434,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-
+        
         playerLabels.clear();
-
+        
         for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
             addConnectedPlayer(entry.getValue());
         }
@@ -447,26 +449,26 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param p the p
      */
     private void addConnectedPlayer(Player p) {
-
+        
         int id = playerLabels.size();
-
+        
         playerLabelIdx.put(p, id);
-
+        
         Label player = new Label(p.getName(),
                 playerNamePos.get(id),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Blue,
                 gui) {
-
+            
             @Override
             public void updateGUI(float tpf) {
             }
-
+            
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-
+        
         gui.addGUIElement(player);
         playerLabels.put(
                 id,
@@ -510,7 +512,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
          */
         public void clientDisconnected(Client c, DisconnectInfo info) {
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
-
+            
             if (info != null) {
                 System.out.println(info.reason);
                 noServerFound = true;
@@ -551,13 +553,13 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 Player thisPlayer = pam.getPlayer();
                 boolean isConnecting = pam.isConnecting();
                 ArrayList<Player> players = pam.getPlayers();
-
+                
                 if (isConnecting) {
                     Hub.getInstance().initialize(thisPlayer, players);
                 } else {
                     Hub.getInstance().addPlayer(thisPlayer);
                 }
-
+                
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;
                 //refreshPlayers(players);
@@ -566,7 +568,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
-
+                
                 Hub.getInstance().removePlayer(p);
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;
@@ -575,11 +577,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
                 ArrayList<Player> players = sgm.getPlayers();
-
+                
                 startClient(seed);
             }
-
-
+            
+            
         }
     }
 }

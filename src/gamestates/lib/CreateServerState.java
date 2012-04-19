@@ -31,11 +31,14 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
+import com.jme3.scene.Node;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.Ergonomics;
 import gui.GameGUI;
+import gui.elements.Anchor;
 import gui.elements.Button;
+import gui.elements.ChatGUI;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
@@ -93,6 +96,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private TextBox playerCount;
     /** The gui. */
     private GameGUI gui;
+    private ChatGUI chatGUI;
     /** The server hub. */
     private ServerHub serverHub;
     /** The solar wars server. */
@@ -103,6 +107,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private HashMap<Integer, Vector3f> playerNamePos;
     /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
+    private Anchor playerLabelsNode;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
     private HashMap<Integer, Player> refreshedPlayers;
@@ -200,11 +205,13 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     protected void loadContent(SolarWarsGame game) {
         gameStarted = false;
         gui = new GameGUI(game);
+
         game.getApplication().setPauseOnLostFocus(false);
         networkManager = NetworkManager.getInstance();
         serverHub = ServerHub.getInstance();
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
+        playerLabelsNode = new Anchor();
         playerLabelIdx = new HashMap<Player, Integer>();
         // = new ArrayList<Player>();
         refreshedPlayers = new HashMap<Integer, Player>();
@@ -306,25 +313,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-        // =========================================
-        // SETUP SERVER
-        // =========================================
-        setupServer();
 
-        address = new Label(networkManager.getServerIPAdress().getHostAddress(),
-                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.White,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
 
         maxPlayers = new Label("Max Players",
                 new Vector3f(gui.getWidth() / 4, 7f * gui.getHeight() / 10, 0),
@@ -387,20 +376,46 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
                 ColorRGBA.White);
 
+        // =========================================
+        // SETUP SERVER
+        // =========================================
+        setupServer();
+
+        address = new Label(networkManager.getServerIPAdress().getHostAddress(),
+                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.White,
+                gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+        };
+
         //addConnectedPlayer(Hub.getHostPlayer());
 
+        //chatGUI = new ChatGUI(gui);
+        //chatGUI.setVisible(true);
 
 
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
         gui.addGUIElement(createServerLabel);
         gui.addGUIElement(cancel);
-        gui.addGUIElement(maxPlayers);
         gui.addGUIElement(playerCount);
         gui.addGUIElement(playerPanel);
+        gui.addGUIElement(playerLabelsNode);
         gui.addGUIElement(yourIP);
         gui.addGUIElement(address);
         gui.addGUIElement(start);
+        gui.addGUIElement(maxPlayers);
+        networkManager.getChatModule().initialize(gui, networkManager);
+        //gui.addGUIElement(chatGUI);
+
     }
 
     /* (non-Javadoc)
@@ -439,7 +454,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             networkManager.addClientRegisterListener(this);
             serverClient = networkManager.setupClient(hostPlayerName,
                     hostPlayerColor, true);
-
+            
             //networkManager.getThisClient().addMessageListener(clientMessageListener, PlayerAcceptedMessage.class);
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
@@ -503,7 +518,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 return networkManager.closeAllConnections(true);
             }
         });
-        
+
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
@@ -539,7 +554,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-        gui.addGUIElement(player);
+        playerLabelsNode.addElement(player);
         playerLabels.put(
                 id,
                 player);
@@ -556,7 +571,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             Label player = playerLabels.get(id);
             if (player != null) {
                 playerLabels.remove(id);
-                gui.removeGUIElement(player);
+                playerLabelsNode.removeElement(player);
             }
         }
     }

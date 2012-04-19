@@ -35,13 +35,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Gameplay;
 import logic.Player;
 import logic.PlayerState;
+import net.messages.ChatMessage;
 import net.messages.GeneralActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
+import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class NetworkManager.
@@ -125,6 +129,7 @@ public class NetworkManager {
     private Client thisClient;
     /** The this server. */
     private SolarWarsServer thisServer;
+    private ChatModule chatModule;
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
     private ClientListener clientListener = new ClientListener();
@@ -136,6 +141,19 @@ public class NetworkManager {
      */
     public Client getThisClient() {
         return thisClient;
+    }
+
+    /**
+     * Gets the chat module from the network manager. 
+     * Chat module controls the visibilty of the chat 
+     * gui and recieves messages from network.
+     * Only is valid in a network session!
+     * Is generally needed to move the ghat gui to the next GameGUI ingame.
+     * 
+     * @return chat module from the current session
+     */
+    public ChatModule getChatModule() {
+        return chatModule;
     }
 
     /**
@@ -225,7 +243,11 @@ public class NetworkManager {
             return null;
         }
 
+        this.chatModule = new ChatModule(
+                SolarWarsApplication.getInstance().getInputManager());
+
         Serializer.registerClass(StringMessage.class);
+        Serializer.registerClass(ChatMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
@@ -245,7 +267,7 @@ public class NetworkManager {
                 SolarWarsServer.SERVER_NAME,
                 SolarWarsServer.SERVER_VERSION,
                 serverIPAdress.getHostAddress(), tcpPort, udpPort);
-        thisClient.addMessageListener(clientListener);
+        thisClient.addMessageListener(clientListener, StringMessage.class, ChatMessage.class);
         for (ClientRegisterListener rl : clientRegisterListeners) {
             rl.registerClientListener(thisClient);
         }
@@ -327,6 +349,13 @@ public class NetworkManager {
                 // do something with the message
                 StringMessage stringMessage = (StringMessage) message;
                 System.out.println("Client #" + source.getId() + " received: '" + stringMessage.getMessage() + "'");
+            } else if (message instanceof ChatMessage) {
+                ChatMessage chatMessage = (ChatMessage) message;
+                if (chatModule != null) {
+                    chatModule.playerSays(
+                            Hub.getInstance().getPlayer(chatMessage.getPlayerID()), 
+                            chatMessage.getMessage());
+                }
             }
         }
     }

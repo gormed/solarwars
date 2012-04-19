@@ -25,6 +25,7 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import gui.elements.TextBox;
 
 /**
  * The listener interface for receiving keyboard events.
@@ -41,6 +42,13 @@ public abstract class KeyboardListener implements ActionListener {
 
     /** The mappings added. */
     private static boolean mappingsAdded = false;
+    protected InputManager inputManager;
+    /** The text box. */
+    protected TextBox textBox;
+
+    public InputManager getInputManager() {
+        return inputManager;
+    }
 
     /**
      * Instantiates a new keyboard listener.
@@ -53,8 +61,9 @@ public abstract class KeyboardListener implements ActionListener {
      *
      * @param inputManager the input manager
      */
-    public KeyboardListener(InputManager inputManager) {
-
+    public KeyboardListener(InputManager inputManager, TextBox textBox) {
+        this.textBox = textBox;
+        this.inputManager = inputManager;
         //deleteMappings(inputManager);
         if (!mappingsAdded) {
             inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));

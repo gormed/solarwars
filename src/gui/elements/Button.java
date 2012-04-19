@@ -98,6 +98,12 @@ public abstract class Button extends Label {
         attachChild(text);
     }
 
+    @Override
+    public boolean canGainFocus() {
+        return true;
+    }
+    
+
     /* (non-Javadoc)
      * @see gui.elements.Label#updateGUI(float)
      */

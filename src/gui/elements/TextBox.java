@@ -26,13 +26,14 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import gui.ClickableGUI;
 import gui.GUIElement;
@@ -48,43 +49,30 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
     /** The font. */
     protected BitmapFont font;
-    
     /** The text. */
     protected BitmapText text;
-    
     /** The color. */
     protected ColorRGBA color;
-    
     /** The gui. */
     protected GameGUI gui;
-    
     /** The screen position. */
     protected Vector3f screenPosition;
-    
     /** The scale. */
     protected Vector3f scale;
-    
     /** The caption. */
     protected String caption;
-    
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The box color. */
     protected ColorRGBA boxColor;
-    
     /** The text listener. */
-    protected KeyboardListener textListener;
-    
+    protected ActionListener textListener;
     /** The time. */
     private float time;
-    
     /** The is number box. */
     private boolean isNumberBox = false;
-    
     /** The numeric mappings added. */
     private static boolean numericMappingsAdded = false;
 
@@ -142,6 +130,21 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         createListener();
     }
 
+    public TextBox(ColorRGBA color, Vector3f screenPosition,
+            Vector3f scale, String caption,
+            ColorRGBA boxColor, GameGUI gui) {
+        super();
+        this.name = caption;
+        this.color = color;
+        this.screenPosition = screenPosition;
+        this.scale = scale;
+        this.caption = caption;
+        this.boxColor = boxColor;
+        this.gui = gui;
+        createTextBox(gui);
+
+    }
+
     /**
      * Creates the listener.
      */
@@ -159,12 +162,12 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see com.jme3.scene.Node#detachChild(com.jme3.scene.Spatial)
      */
-    @Override
-    public int detachChild(Spatial child) {
-
-        destroy();
-        return super.detachChild(child);
-    }
+//    @Override
+//    public int detachChild(Spatial child) {
+//
+//        destroy();
+//        return super.detachChild(child);
+//    }
 
     /**
      * Destroy.
@@ -224,6 +227,11 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      */
     protected abstract void onKeyTrigger(String key, boolean isPressed, float tpf);
 
+    @Override
+    public boolean canGainFocus() {
+        return true;
+    }
+
     /**
      * Creates the text box.
      *
@@ -257,6 +265,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", boxColor);
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         geometry.setMaterial(material);
 
         geometry.setLocalTranslation(screenPosition);
@@ -278,9 +287,6 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      * @see NumberBoxActionEvent
      */
     private class NumberBoxActionListener extends KeyboardListener {
-
-        /** The text box. */
-        private TextBox textBox;
 
         /**
          * Instantiates a new number box action listener.
@@ -308,7 +314,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                 inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
                 numericMappingsAdded = true;
             }
-            
+
             inputManager.addListener(this,
                     KeyInputMap.INPUT_MAPPING_0,
                     KeyInputMap.INPUT_MAPPING_1,
@@ -343,7 +349,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                 } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() < 15) {
                     caption += name;
                 }
-                
+
             }
             onKeyTrigger(name, isPressed, tpf);
         }
@@ -362,9 +368,6 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      */
     private class TextBoxActionListener extends KeyboardListener {
 
-        /** The text box. */
-        private TextBox textBox;
-
         /**
          * Instantiates a new text box action listener.
          *
@@ -372,8 +375,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
          * @param box the box
          */
         public TextBoxActionListener(InputManager inputManager, TextBox box) {
-            super(inputManager);
-            this.textBox = box;
+            super(inputManager, box);
         }
 
         /* (non-Javadoc)
@@ -393,7 +395,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             if (!isPressed && activeTextBox.equals(textBox)) {
                 if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
                     caption = caption.substring(0, caption.length() - 1);
-                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() < 19) {
+                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)) {
                     caption += name;
                 }
             }

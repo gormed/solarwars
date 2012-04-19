@@ -267,6 +267,7 @@ public class Player {
      * @param p the p
      */
     void selectPlanet(AbstractPlanet p) {
+        state.multiSelectedPlanets.clear();
         state.selectedPlanetId = p.getId();
         state.selectedShipGroupId = -1;
     }
@@ -357,6 +358,7 @@ public class Player {
      * @param g the g
      */
     void selectShipGroup(ShipGroup g) {
+        state.multiSelectedPlanets.clear();
         state.selectedShipGroupId = g.getId();
         state.selectedPlanetId = -1;
     }

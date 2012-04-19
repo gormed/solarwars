@@ -240,8 +240,8 @@ public class IsoCamera implements AnalogListener, ActionListener {
         inputManager.addMapping("ISOCAM_Right", new KeyTrigger(KeyInput.KEY_D));
         inputManager.addMapping("ISOCAM_Forward", new KeyTrigger(KeyInput.KEY_W));
         inputManager.addMapping("ISOCAM_Backward", new KeyTrigger(KeyInput.KEY_S));
-        inputManager.addMapping("ISOCAM_Up", new KeyTrigger(KeyInput.KEY_Q));
-        inputManager.addMapping("ISOCAM_Down", new KeyTrigger(KeyInput.KEY_Z));
+        //inputManager.addMapping("ISOCAM_Up", new KeyTrigger(KeyInput.KEY_Q));
+        //inputManager.addMapping("ISOCAM_Down", new KeyTrigger(KeyInput.KEY_Z));
 
         inputManager.addListener(this, mappings);
         //inputManager.setCursorVisible(dragToMove);

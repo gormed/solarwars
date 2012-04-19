@@ -101,5 +101,16 @@ public class Panel extends GUIElement {
         super.setVisible(show);
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
-    
+
+    public ColorRGBA getColor() {
+        return color;
+    }
+
+    public Vector3f getScreenPosition() {
+        return screenPosition;
+    }
+
+    public Vector2f getSize() {
+        return size;
+    }
 }

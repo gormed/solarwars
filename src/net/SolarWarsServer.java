@@ -38,13 +38,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Player;
 import logic.PlayerState;
+import net.messages.ChatMessage;
 import net.messages.GeneralActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
@@ -57,7 +57,7 @@ import net.messages.StartGameMessage;
 public class SolarWarsServer extends SimpleApplication {
 
     /** The Constant SERVER_VERSION. */
-    public static final int SERVER_VERSION = 10;
+    public static final int SERVER_VERSION = 15;
     /** The Constant SERVER_NAME. */
     public static final String SERVER_NAME = "SolarWars Server";
     /** The server app. */
@@ -82,6 +82,7 @@ public class SolarWarsServer extends SimpleApplication {
         super();
         // Add messages to serializer so they can be read, DO THIS FIRST
         Serializer.registerClass(StringMessage.class);
+        Serializer.registerClass(ChatMessage.class);
         Serializer.registerClass(PlayerConnectingMessage.class);
         Serializer.registerClass(PlayerLeavingMessage.class);
         Serializer.registerClass(PlayerAcceptedMessage.class);
@@ -171,7 +172,7 @@ public class SolarWarsServer extends SimpleApplication {
                     SERVER_VERSION,
                     tcpPort, udpPort);
             gameServer.start();
-            gameServer.addMessageListener(new ServerListener(), StringMessage.class);
+            gameServer.addMessageListener(new ServerListener(), StringMessage.class, ChatMessage.class);
             for (ServerRegisterListener rl : registerListeners) {
                 rl.registerServerListener(gameServer);
             }
@@ -229,8 +230,9 @@ public class SolarWarsServer extends SimpleApplication {
         for (HostedConnection connection : gameServer.getConnections()) {
             connection.close("Shutting down...");
         }
-        
-        while (gameServer.hasConnections()) {}
+
+        while (gameServer.hasConnections()) {
+        }
         gameServer.close();
         gameServer = null;
         serverApp = null;
@@ -334,8 +336,9 @@ public class SolarWarsServer extends SimpleApplication {
      * @param connecting the connecting
      */
     public void respondPlayer(Player p, boolean connecting) {
-        if (!connectedPlayers.containsKey(p))
+        if (!connectedPlayers.containsKey(p)) {
             return;
+        }
         if (connecting) {
             boolean isHost = p.isHost();
             HostedConnection hc = connectedPlayers.get(p);
@@ -396,6 +399,12 @@ public class SolarWarsServer extends SimpleApplication {
                         "Server received '"
                         + stringMessage.getMessage()
                         + "' from client #" + source.getId());
+            } else if (message instanceof ChatMessage) {
+                ChatMessage chatMessage = (ChatMessage) message;
+                
+                ChatMessage aPlayerSays = new ChatMessage(chatMessage.getPlayerID(), chatMessage.getMessage());
+                
+                gameServer.broadcast(Filters.notEqualTo(source), aPlayerSays);
             }
         }
     }
@@ -421,11 +430,11 @@ public class SolarWarsServer extends SimpleApplication {
 
                 GeneralActionMessage serverMessage =
                         new GeneralActionMessage(
-                                clientMessage.getActionName(),
-                                clientMessage.getSender(),
-                                clientMessage.getSenderState(),
-                                clientMessage.getReciever(),
-                                clientMessage.getRecieverState());
+                        clientMessage.getActionName(),
+                        clientMessage.getSender(),
+                        clientMessage.getSenderState(),
+                        clientMessage.getReciever(),
+                        clientMessage.getRecieverState());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
             }

@@ -33,6 +33,7 @@ import gui.GameGUI;
 import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
+import gui.elements.ScoresGUI;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import logic.Gameplay;
@@ -50,6 +51,7 @@ import solarwars.SolarWarsGame;
 public class MultiplayerMatchState extends Gamestate {
 
     private GameGUI gui;
+    private ScoresGUI tabScores;
     private SolarWarsGame game;
     private PauseActionListener pauseListener;
     private PauseGUI pause;
@@ -112,6 +114,8 @@ public class MultiplayerMatchState extends Gamestate {
     protected void unloadContent() {
         lostConnection = false;
 
+        NetworkManager.getInstance().getChatModule().destroy();
+        
         Future fut = application.enqueue(new Callable() {
 
             public Object call()
@@ -128,7 +132,8 @@ public class MultiplayerMatchState extends Gamestate {
         hub = null;
 
         currentLevel.destroy();
-
+        tabScores.destroy();
+        tabScores = null;
         gui.cleanUpGUI();
         gui = null;
 
@@ -139,6 +144,7 @@ public class MultiplayerMatchState extends Gamestate {
         gameplay = null;
         application.detachIsoCameraControl();
 
+        
     }
 
     /**
@@ -159,6 +165,13 @@ public class MultiplayerMatchState extends Gamestate {
         game.getApplication().getInputManager().addListener(
                 pauseListener,
                 SolarWarsApplication.INPUT_MAPPING_PAUSE);
+        tabScores = new ScoresGUI(gui);
+        //tabScores.setVisible(false);
+        application.getInputManager().
+                addListener(
+                tabScores.getActionListener(),
+                SolarWarsApplication.INPUT_MAPPING_TABSCORE);
+        NetworkManager.getInstance().getChatModule().changeGUI(gui);
     }
 
     /**

@@ -199,4 +199,8 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      */
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
     }
+
+    public boolean canGainFocus() {
+        return false;
+    }
 }

@@ -21,6 +21,10 @@ import solarwars.SolarWarsGame;
  */
 public class GameOverGUI extends GUIElement implements ClickableGUI {
 
+    public boolean canGainFocus() {
+        return false;
+    }
+
     public enum GameOverState {
 
         WON,

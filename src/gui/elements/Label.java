@@ -124,4 +124,8 @@ public abstract class Label extends GUIElement implements ClickableGUI {
      */
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
+    public boolean canGainFocus() {
+        return false;
+    }
+    
 }

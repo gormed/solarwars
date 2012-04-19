@@ -99,6 +99,9 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+                if (caption.length() > 20) {
+                    caption = caption.substring(0, caption.length() - 1);
+                }
                 Ergonomics.getInstance().setName(caption);
             }
         };

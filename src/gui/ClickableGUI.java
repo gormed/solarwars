@@ -36,4 +36,6 @@ public interface ClickableGUI {
      * @param tpf the tpf
      */
     public void onClick(Vector2f cursor, boolean isPressed, float tpf);
+    
+    public boolean canGainFocus();
 }

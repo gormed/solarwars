@@ -62,6 +62,8 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
     /** The Constant INPUT_MAPPING_TABSCORE. */
     public static final String INPUT_MAPPING_TABSCORE = "SOLARWARS_tabScore";
+    /** The Constant INPUT_MAPPING_CHAT. */
+    public static final String INPUT_MAPPING_CHAT = "SOLARWARS_chat";
     /** The Constant INPUT_MAPPING_CAMERA_POS. */
     public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
     /** The Constant INPUT_MAPPING_MEMORY. */
@@ -388,11 +390,11 @@ public class SolarWarsApplication extends Application {
         inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
         inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
         inputManager.addMapping(INPUT_MAPPING_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
-        
-        inputManager.addListener(actionListener, 
+
+        inputManager.addListener(actionListener,
                 INPUT_MAPPING_EXIT,
-                INPUT_MAPPING_CAMERA_POS, 
-                INPUT_MAPPING_MEMORY, 
+                INPUT_MAPPING_CAMERA_POS,
+                INPUT_MAPPING_MEMORY,
                 INPUT_MAPPING_HIDE_STATS);
 
         // SETUP GAME CONTENT
