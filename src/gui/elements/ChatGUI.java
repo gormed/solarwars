@@ -60,6 +60,11 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     private int maxMessagesDisplayed = 12;
     private ArrayList<TextLine> textLines;
     private ChatInput chatInput;
+    private float fadeMax;
+    private float fadeCurrent = 0;
+    public static final int FADE_SPEED = 3500;
+    private boolean fadeing = false;
+    private boolean fadeDirection = true;
 
     /**
      * Instantiates a new chat gui.
@@ -69,10 +74,8 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     public ChatGUI(GameGUI gui, ChatModule chatModule) {
         this.gui = gui;
         this.chatModule = chatModule;
-        this.setLocalTranslation(
-                0.5f * gui.getWidth(),
-                0.5f * gui.getHeight(),
-                0);
+
+
 
         background = new Panel("ChatBackground",
                 new Vector3f(
@@ -83,7 +86,11 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
                 gui.getWidth() / 4,
                 gui.getHeight() / 2.9f),
                 COLOR_CHAT_BACKGROUND);
-
+        fadeMax = (5 * gui.getWidth() / 4) - 10;
+        this.setLocalTranslation(
+                fadeMax,
+                0.5f * gui.getHeight(),
+                0);
         chatInput = new ChatInput(
                 new Vector3f(0, 35 - background.getSize().y, 0),
                 Vector3f.UNIT_XYZ,
@@ -138,6 +145,28 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void updateGUI(float tpf) {
+
+        if (fadeing) {
+            if (fadeDirection) {
+                fadeCurrent -= tpf * FADE_SPEED;
+                this.setLocalTranslation(fadeCurrent, 0.5f * gui.getHeight(), 0);
+                if (fadeCurrent <= 3 * gui.getWidth() / 4) {
+                    fadeing = false;
+                    this.setLocalTranslation(3 * gui.getWidth() / 4, 0.5f * gui.getHeight(), 0);
+                }
+
+            } else {
+                fadeCurrent += tpf * FADE_SPEED;
+                this.setLocalTranslation(fadeCurrent, 0.5f * gui.getHeight(), 0);
+                if (fadeCurrent >= fadeMax) {
+                    fadeing = false;
+                    this.setLocalTranslation(fadeMax, 0.5f * gui.getHeight(), 0);
+                }
+            }
+        } else {
+            //this.setLocalTranslation(0, 0, 0);
+        }
+
         textArea.updateGUI(tpf);
         background.updateGUI(tpf);
         chatInput.updateGUI(tpf);
@@ -160,6 +189,17 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         }
     }
 
+    public void startFadeIn() {
+        setVisible(true);
+        fadeing = true;
+        fadeDirection = true;
+    }
+
+    public void startFadeOut() {
+        fadeing = true;
+        fadeDirection = false;
+    }
+
     /* (non-Javadoc)
      * @see gui.GUIElement#setVisible(boolean)
      */
@@ -175,16 +215,21 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
     }
 
+    public void peek() {
+        
+        startFadeIn();        
+        gui.setFocus(null);
+    }
+
     public void show() {
-        setVisible(true);
-//        
-//        chatInput.inputManager.addListener(chatInput.textListener);
+        //setVisible(true);
+        startFadeIn();
         gui.setFocus(chatInput);
     }
 
     public void hide() {
-        setVisible(false);
-//        chatInput.inputManager.removeListener(chatInput.textListener);
+        //setVisible(false);
+        startFadeOut();
         gui.setFocus(null);
     }
 
