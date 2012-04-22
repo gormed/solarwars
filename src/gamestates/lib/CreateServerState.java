@@ -31,7 +31,6 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
-import com.jme3.scene.Node;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.Ergonomics;

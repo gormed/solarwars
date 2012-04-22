@@ -42,6 +42,7 @@ public class GamestateManager {
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
     /** The Constant MULTIPLAYER_MATCH_STATE. */
     public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
+    public static final String TUTORIAL_STATE = "Tutorial";
     /** The instance. */
     private static GamestateManager instance;
     /** The gamestates. */

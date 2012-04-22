@@ -1,0 +1,24 @@
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes.dex : \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\BuildConfig.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\MainActivity.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\R$attr.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\R$layout.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\R$string.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\bin\classes\com\mobile\solarwars\R.class \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-jogg.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-android.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-plugins.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-niftygui.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\nifty-default-controls.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-core.jar \
+H:\Projekte\Java\libs\android_2.2 sdk\android-sdk-windows\tools\support\annotations.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\j-ogg-vorbisd.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\nifty-style-black.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\j-ogg-oggd.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\eventbus.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\assets.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-bullet.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\jME3-terrain.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\xmlpull-xpp3.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\SolarWars.jar \
+H:\Projekte\Java\jMonkey Projects\SolarWars\mobile\libs\nifty.jar \

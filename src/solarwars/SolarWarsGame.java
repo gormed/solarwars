@@ -30,6 +30,7 @@ import gamestates.lib.MultiplayerMatchState;
 import gamestates.lib.MultiplayerState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
+import gamestates.lib.TutorialState;
 import logic.ActionLib;
 import logic.Gameplay;
 import net.NetworkManager;
@@ -128,12 +129,14 @@ public class SolarWarsGame {
         CreateServerState cs = new CreateServerState();
         ServerLobbyState sls = new ServerLobbyState();
         MultiplayerMatchState mms = new MultiplayerMatchState();
+        TutorialState ts = new TutorialState();
         gamestateManager.addState(sp);
         gamestateManager.addState(mp);
         gamestateManager.addState(m);
         gamestateManager.addState(cs);
         gamestateManager.addState(sls);
         gamestateManager.addState(mms);
+        gamestateManager.addState(ts);
         gamestateManager.initialize(m);
         
         gamestateManager.start();

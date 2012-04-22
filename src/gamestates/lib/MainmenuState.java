@@ -50,11 +50,11 @@ public class MainmenuState extends Gamestate {
     private Button quitButton;
     /** The game. */
     private SolarWarsGame game;
-    
     private BeatBox beatBox;
     /*
      * 
      */
+    private Button tutorialButton;
 
     /**
      * Instantiates a new mainmenu state.
@@ -147,9 +147,30 @@ public class MainmenuState extends Gamestate {
             public void updateGUI(float tpf) {
             }
         };
+        
+        tutorialButton = new Button("Tutorial",
+                new Vector3f(gui.getWidth() / 2,
+                5 * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray, gui) {
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
+                    GamestateManager.getInstance().enterState(GamestateManager.TUTORIAL_STATE);
+                }
+            }
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+        };
 
         quitButton = new Button("Quit Game", new Vector3f(gui.getWidth() / 2,
-                5 * gui.getHeight() / 10, 0),
+                4 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Cyan, ColorRGBA.DarkGray, gui) {
 
             @Override
@@ -165,8 +186,9 @@ public class MainmenuState extends Gamestate {
         gui.addGUIElement(solarwars);
         gui.addGUIElement(singleplayerButton);
         gui.addGUIElement(multiplayerButton);
+        gui.addGUIElement(tutorialButton);
         gui.addGUIElement(quitButton);
-        
+
         beatBox = new BeatBox();
         beatBox.setupSounds();
         beatBox.play();
@@ -180,7 +202,7 @@ public class MainmenuState extends Gamestate {
         gui.cleanUpGUI();
 
         gui = null;
-        
+
         beatBox.stop();
         beatBox = null;
     }
