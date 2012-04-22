@@ -125,6 +125,7 @@ public class NetworkManager {
     private InetAddress clientIPAdress;
     /** The server ip adress. */
     private InetAddress serverIPAdress;
+    private boolean isMultiplayerGame = false;
     /** The this client. */
     private Client thisClient;
     /** The this server. */
@@ -273,12 +274,17 @@ public class NetworkManager {
         }
 
         thisClient.start();
+        isMultiplayerGame = true;
+        try {
+            StringMessage s = new StringMessage(name + " joins the server!");
+            PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
+            thisClient.send(s);
+            thisClient.send(pcm);
+            return thisClient;
+        } catch (Exception e) {
+            return null;
+        }
 
-        StringMessage s = new StringMessage(name + " joins the server!");
-        PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
-        thisClient.send(s);
-        thisClient.send(pcm);
-        return thisClient;
     }
 
     /**
@@ -292,6 +298,8 @@ public class NetworkManager {
             throws IOException {
         thisServer = SolarWarsServer.getInstance();
         thisServer.start(serverName);
+
+        isMultiplayerGame = true;
         try {
             serverIPAdress = InetAddress.getLocalHost();
         } catch (UnknownHostException ex) {
@@ -313,6 +321,8 @@ public class NetworkManager {
         if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
             thisServer.stop(wait);
         }
+        
+        isMultiplayerGame = false;
         return thisServer;
     }
 
@@ -326,6 +336,10 @@ public class NetworkManager {
             return false;
         }
         return thisServer.isRunning();
+    }
+
+    public boolean isMultiplayerGame() {
+        return isMultiplayerGame;
     }
 
     /**
@@ -353,7 +367,7 @@ public class NetworkManager {
                 ChatMessage chatMessage = (ChatMessage) message;
                 if (chatModule != null) {
                     chatModule.playerSays(
-                            Hub.getInstance().getPlayer(chatMessage.getPlayerID()), 
+                            Hub.getInstance().getPlayer(chatMessage.getPlayerID()),
                             chatMessage.getMessage());
                 }
             }

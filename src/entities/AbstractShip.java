@@ -143,6 +143,7 @@ public abstract class AbstractShip extends Node {
      * @param p the p
      */
     public void moveToPlanet(AbstractPlanet p) {
+
         order = p;
         Vector3f planetLoc = p.getPosition();
         Vector3f dir = planetLoc.subtract(position);
@@ -163,7 +164,7 @@ public abstract class AbstractShip extends Node {
      * @param tpf the tpf
      */
     public void updateShip(float tpf) {
-        if (order != null) {
+        if (order != null && !Gameplay.getCurrentLevel().isGameOver()) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
 
@@ -180,7 +181,7 @@ public abstract class AbstractShip extends Node {
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
                             this, order, owner, Gameplay.PLANET_CAPTURE);
-                    
+
                 }
 
                 order.emitImpactParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);

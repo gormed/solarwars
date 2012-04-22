@@ -46,9 +46,10 @@ import solarwars.SolarWarsApplication;
  */
 public class ChatGUI extends GUIElement implements ClickableGUI {
 
-    public static final ColorRGBA COLOR_CHAT_BACKGROUND = new ColorRGBA(0, 0, 1, 0.75f);
-    public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(0, 0, 1, 0.6f);
-    public static final ColorRGBA COLOR_CHAT_TEXTFIELD = new ColorRGBA(1, 1, 1, 0.5f);
+    public static final ColorRGBA COLOR_CHAT_BACKGROUND = new ColorRGBA(0, 0, 1, 0.6f);
+    public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(0, 0, 1, 0.5f);
+    public static final ColorRGBA COLOR_CHAT_TEXTFIELD = new ColorRGBA(1, 1, 1, 0.4f);
+    public static final float PEEK_TIME = 5;
     /** The gui. */
     private GameGUI gui;
     private ChatModule chatModule;
@@ -62,9 +63,11 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     private ChatInput chatInput;
     private float fadeMax;
     private float fadeCurrent = 0;
+    private float peekFade = 0;
     public static final int FADE_SPEED = 3500;
     private boolean fadeing = false;
     private boolean fadeDirection = true;
+    private boolean peek = false;
 
     /**
      * Instantiates a new chat gui.
@@ -135,6 +138,10 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         chatLog.add(p.getName() + ": " + message);
     }
 
+    public void serverSays(String message) {
+        chatLog.add(message);
+    }
+
     private void localPlayerSays(String message) {
         chatLog.add(Hub.getLocalPlayer().getName() + ": " + message);
         chatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
@@ -146,6 +153,15 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     @Override
     public void updateGUI(float tpf) {
 
+        if (peek) {
+            peekFade += tpf;
+
+            if (peekFade > PEEK_TIME) {
+                peekFade = 0;
+                hide();
+            }
+
+        }
         if (fadeing) {
             if (fadeDirection) {
                 fadeCurrent -= tpf * FADE_SPEED;
@@ -153,6 +169,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
                 if (fadeCurrent <= 3 * gui.getWidth() / 4) {
                     fadeing = false;
                     this.setLocalTranslation(3 * gui.getWidth() / 4, 0.5f * gui.getHeight(), 0);
+
                 }
 
             } else {
@@ -161,10 +178,19 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
                 if (fadeCurrent >= fadeMax) {
                     fadeing = false;
                     this.setLocalTranslation(fadeMax, 0.5f * gui.getHeight(), 0);
+                    setVisible(true);
                 }
             }
         } else {
-            //this.setLocalTranslation(0, 0, 0);
+            if (fadeDirection) {
+                //if (fadeCurrent <= 3 * gui.getWidth() / 4) {
+                this.setLocalTranslation(3 * gui.getWidth() / 4, 0.5f * gui.getHeight(), 0);
+                //}
+            } else {
+                //if (fadeCurrent >= fadeMax) {
+                this.setLocalTranslation(fadeMax, 0.5f * gui.getHeight(), 0);
+                //}
+            }
         }
 
         textArea.updateGUI(tpf);
@@ -196,6 +222,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     }
 
     public void startFadeOut() {
+        //setVisible(true);
         fadeing = true;
         fadeDirection = false;
     }
@@ -216,21 +243,34 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     }
 
     public void peek() {
-        
-        startFadeIn();        
+        startFadeIn();
+        textArea.setVisible(false);
+        chatInput.setVisible(false);
+        background.setVisible(false);
+
         gui.setFocus(null);
+        peek = true;
     }
 
     public void show() {
-        //setVisible(true);
         startFadeIn();
         gui.setFocus(chatInput);
+        peek = false;
     }
 
     public void hide() {
         //setVisible(false);
         startFadeOut();
         gui.setFocus(null);
+        peek = false;
+    }
+
+    public boolean isFadeDirection() {
+        return fadeDirection;
+    }
+
+    public boolean isFadeing() {
+        return fadeing;
     }
 
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {

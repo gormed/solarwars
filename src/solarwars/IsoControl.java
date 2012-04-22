@@ -31,7 +31,6 @@ import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
-import com.jme3.math.Transform;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -41,12 +40,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Quad;
 import entities.AbstractPlanet;
-import entities.Cross;
 import entities.ShipGroup;
 import gui.GameGUI;
 import gui.elements.Panel;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -420,11 +416,12 @@ public class IsoControl {
                 if ((action == 3 || action == 4) && !Hub.getLocalPlayer().hasLost()) {
                     float percentage = Hub.getLocalPlayer().getShipPercentage();
                     if (action == 3) {
-                        percentage += 0.025f;
+                        percentage += 0.05f;
                     } else {
-                        percentage -= 0.025f;
+                        percentage -= 0.05f;
                     }
                     Hub.getLocalPlayer().setShipPercentage(percentage);
+                    
                 }
             }
         };

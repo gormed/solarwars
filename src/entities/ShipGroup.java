@@ -33,6 +33,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Random;
+import logic.Gameplay;
 import logic.Level;
 import logic.Player;
 
@@ -40,7 +41,6 @@ import logic.Player;
  * The Class ShipGroup.
  */
 public class ShipGroup extends Node {
-
 
     /** The ships. */
     private ArrayList<AbstractShip> ships;
@@ -193,10 +193,12 @@ public class ShipGroup extends Node {
      * @param p the p
      */
     public void moveToPlanet(AbstractPlanet p) {
-        order = p;
-        for (AbstractShip s : ships) {
-            s.moveToPlanet(p);
-        }
+        //if (!owner.hasLost() && !Gameplay.getCurrentLevel().isGameOver()) {
+            order = p;
+            for (AbstractShip s : ships) {
+                s.moveToPlanet(p);
+            }
+        //}
     }
 
     /**
@@ -205,7 +207,7 @@ public class ShipGroup extends Node {
      * @param tpf the tpf
      */
     public void updateShipGroup(float tpf) {
-        if (order != null) {
+        if (order != null && !Gameplay.getCurrentLevel().isGameOver()) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
             if (dir.length() < 0.001f) {

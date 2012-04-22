@@ -569,6 +569,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
                 
+                NetworkManager.getInstance().getChatModule().playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;

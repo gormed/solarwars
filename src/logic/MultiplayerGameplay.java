@@ -8,6 +8,7 @@ import com.jme3.network.Client;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import entities.AbstractPlanet;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import net.NetworkManager;
@@ -52,15 +53,19 @@ public class MultiplayerGameplay {
             return;
         }
         int id = -1;
-        if (planet != null)
+        int ships = 0;
+        if (planet != null) {
             id = planet.getId();
+            ships = planet.getShipCount();
+        }
         PlanetActionMessage planetActionMessage =
                 new PlanetActionMessage(
                 System.currentTimeMillis(),
                 actionName,
                 Hub.getLocalPlayer().getId(),
                 Hub.getLocalPlayer().getState(),
-                id);
+                id,
+                ships);
         client.send(planetActionMessage);
     }
 
@@ -100,6 +105,13 @@ public class MultiplayerGameplay {
                 AbstractPlanet planet =
                         Gameplay.getCurrentLevel().
                         getPlanet(serverMessage.getPlanetID());
+                if (planet != null) {
+                    long sendTime = serverMessage.getClientTime();
+                    long serverTime = serverMessage.getServerTime();
+                    long currentTime = System.currentTimeMillis();
+                    long delay = currentTime - sendTime;
+                    planet.setShipCount(serverMessage.getPlanetShips(), delay);
+                }
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
                         planet,

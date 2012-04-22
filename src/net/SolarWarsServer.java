@@ -56,6 +56,12 @@ import net.messages.StartGameMessage;
  */
 public class SolarWarsServer extends SimpleApplication {
 
+    public enum ServerState {
+
+        INIT,
+        LOBBY,
+        INGAME
+    }
     /** The Constant SERVER_VERSION. */
     public static final int SERVER_VERSION = 15;
     /** The Constant SERVER_NAME. */
@@ -92,12 +98,6 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
-//        Serializer.registerClass(entities.AbstractPlanet.class);
-//        Serializer.registerClass(entities.AbstractShip.class);
-//        Serializer.registerClass(entities.BasePlanet.class);
-//        Serializer.registerClass(entities.ShipGroup.class);
-//        Serializer.registerClass(entities.SimpleShip.class);
-        //this.createServer = (CreateServerState) GamestateManager.getInstance().getGamestate(GamestateManager.CREATE_SERVER_STATE);
     }
     /** The game server. */
     private Server gameServer;
@@ -128,6 +128,7 @@ public class SolarWarsServer extends SimpleApplication {
     private boolean isRunning;
     private long seed;
     private GameplayListener gameplayListener = new GameplayListener();
+    private ServerState serverState = ServerState.INIT;
 
     /**
      * Start.
@@ -157,6 +158,7 @@ public class SolarWarsServer extends SimpleApplication {
     }
 
     public void enterLevel() {
+        serverState = ServerState.INGAME;
         gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
     }
 
@@ -176,7 +178,7 @@ public class SolarWarsServer extends SimpleApplication {
             for (ServerRegisterListener rl : registerListeners) {
                 rl.registerServerListener(gameServer);
             }
-
+            serverState = ServerState.LOBBY;
             //NetworkManager.getInstance().registerServerListeners();
             //addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             //gameServer.addConnectionListener(connections);
@@ -248,6 +250,14 @@ public class SolarWarsServer extends SimpleApplication {
      */
     boolean isRunning() {
         return isRunning;
+    }
+
+    /**
+     * Gets the current state, if not in lobby, nobody can join.
+     * @return the current server state, INIT, LOBBY or INGAME
+     */
+    public ServerState getServerState() {
+        return serverState;
     }
 
     /**
@@ -401,9 +411,9 @@ public class SolarWarsServer extends SimpleApplication {
                         + "' from client #" + source.getId());
             } else if (message instanceof ChatMessage) {
                 ChatMessage chatMessage = (ChatMessage) message;
-                
+
                 ChatMessage aPlayerSays = new ChatMessage(chatMessage.getPlayerID(), chatMessage.getMessage());
-                
+
                 gameServer.broadcast(Filters.notEqualTo(source), aPlayerSays);
             }
         }
@@ -422,7 +432,8 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getActionName(),
                         clientMessage.getPlayerID(),
                         clientMessage.getPlayerState(),
-                        clientMessage.getPlanetID());
+                        clientMessage.getPlanetID(),
+                        clientMessage.getPlanetShips());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
             } else if (message instanceof GeneralActionMessage) {

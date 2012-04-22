@@ -22,7 +22,6 @@
 package entities;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.effect.Particle;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterPointShape;
@@ -65,7 +64,6 @@ public abstract class AbstractPlanet extends Node {
     protected Node transformNode;
     /** The size. */
     protected float size;
-    
     protected int sizeID;
     /** The level. */
     protected Level level;
@@ -134,15 +132,15 @@ public abstract class AbstractPlanet extends Node {
     private void createCaptureEmitter() {
         if (capture == null) {
             capture = new ParticleEmitter(
-                    "PlanetCaptureEffect ", 
-                    ParticleMesh.Type.Triangle, 
+                    "PlanetCaptureEffect ",
+                    ParticleMesh.Type.Triangle,
                     5);
-            Material capture_mat = 
+            Material capture_mat =
                     new Material(
-                            assetManager, 
-                            "Common/MatDefs/Misc/Particle.j3md");
+                    assetManager,
+                    "Common/MatDefs/Misc/Particle.j3md");
             capture_mat.setTexture(
-                    "Texture", 
+                    "Texture",
                     assetManager.loadTexture("Textures/Effects/shockwave.png"));
             capture.setMaterial(capture_mat);
             capture.setImagesX(1);
@@ -150,8 +148,8 @@ public abstract class AbstractPlanet extends Node {
             capture.setRotateSpeed(1);
             capture.setLowLife(0.6f);
             capture.setHighLife(0.8f);
-            capture.setStartSize(getSize()-0.1f);
-            capture.setEndSize(2*getSize() + 0.1f);
+            capture.setStartSize(getSize() - 0.1f);
+            capture.setEndSize(2 * getSize() + 0.1f);
             capture.setSelectRandomImage(true);
 
             capture.setGravity(0, 0, 0);
@@ -322,7 +320,7 @@ public abstract class AbstractPlanet extends Node {
     public float getSize() {
         return size;
     }
-    
+
     public int getSizeID() {
         return sizeID;
     }
@@ -354,6 +352,22 @@ public abstract class AbstractPlanet extends Node {
         ships = c;
     }
 
+    public void setShipCount(int c, long delay) {
+        //ships = c;
+        if (owner != null && !level.isGameOver()) {
+            float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
+            float gap = delay / 10f;
+
+            while (gap > 0) {
+                ships += 1;
+                gap -= peek;
+            }
+
+        }
+        if (ships > c)
+            ships = c;
+    }
+
     /**
      * Decrement ships.
      */
@@ -382,7 +396,6 @@ public abstract class AbstractPlanet extends Node {
     public Node getTransformNode() {
         return transformNode;
     }
-    
 
     /**
      * Calculate increment.

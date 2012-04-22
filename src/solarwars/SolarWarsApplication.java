@@ -129,8 +129,9 @@ public class SolarWarsApplication extends Application {
     /**
      * Instantiates a new solar wars application.
      */
-    private SolarWarsApplication() {
+    public SolarWarsApplication() {
         super();
+        assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
     }
 
     /**
@@ -298,10 +299,11 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
+        getInstance().initSettings();
         getInstance().start();
     }
 
-    private void initSettings() {
+    public void initSettings() {
         if (settings == null) {
             settings = new AppSettings(false);
 
@@ -333,7 +335,7 @@ public class SolarWarsApplication extends Application {
      */
     @Override
     public void start() {
-        initSettings();
+        //initSettings();
         // set some default settings in-case
         // settings dialog is not shown
         boolean loadSettings = false;

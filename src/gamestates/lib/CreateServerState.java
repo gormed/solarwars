@@ -73,6 +73,8 @@ import solarwars.SolarWarsGame;
  */
 public class CreateServerState extends Gamestate implements ServerRegisterListener, ClientRegisterListener {
 
+    public static final String SERVER_FULL_MSG = "Server is full!";
+    public static final String SERVER_NOT_IN_LOBBY_MSG = "Server is locked! The game is probably running...";
     /** The create server label. */
     private Label createServerLabel;
     /** The your ip. */
@@ -169,7 +171,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         if (gameStarted) {
             Server server = solarWarsServer.getGameServer();
             server.removeMessageListener(serverMessageListener);
-            server.removeConnectionListener(serverConnectionListener);
+            //server.removeConnectionListener(serverConnectionListener);
             serverClient.removeMessageListener(clientMessageListener);
             solarWarsServer.enterLevel();
             startGame();
@@ -423,7 +425,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     @Override
     protected void unloadContent() {
 
-        serverClient.removeMessageListener(clientMessageListener);
+        if (serverClient != null) {
+            serverClient.removeMessageListener(clientMessageListener);
+        }
 
         playerLabels.clear();
         playerNamePos.clear();
@@ -453,7 +457,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             networkManager.addClientRegisterListener(this);
             serverClient = networkManager.setupClient(hostPlayerName,
                     hostPlayerColor, true);
-            
+
             //networkManager.getThisClient().addMessageListener(clientMessageListener, PlayerAcceptedMessage.class);
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
@@ -632,8 +636,10 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
          * @see com.jme3.network.ConnectionListener#connectionAdded(com.jme3.network.Server, com.jme3.network.HostedConnection)
          */
         public void connectionAdded(Server server, HostedConnection conn) {
-            if (server.getConnections().size() > maxPlayerNumber) {
-                conn.close("Server is full!");
+            if (!solarWarsServer.getServerState().equals(SolarWarsServer.ServerState.LOBBY)) {
+                conn.close(SERVER_NOT_IN_LOBBY_MSG);
+            } else if (server.getConnections().size() > maxPlayerNumber) {
+                conn.close(SERVER_FULL_MSG);
             } else {
                 StringMessage s = new StringMessage("Welcome client #" + conn.getId() + "!");
                 solarWarsServer.getGameServer().broadcast(s);
@@ -646,6 +652,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         public void connectionRemoved(Server server, HostedConnection conn) {
             Player discPlayer = conn.getAttribute("PlayerObject");
             if (discPlayer != null) {
+                
                 solarWarsServer.removeLeavingPlayer(discPlayer);
                 //leavingPlayers.add(discPlayer);
                 serverHub.removePlayer(discPlayer);
@@ -739,7 +746,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
-
+                NetworkManager.getInstance().getChatModule().playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;

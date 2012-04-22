@@ -25,6 +25,7 @@ import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.ShipGroup;
 import java.util.ArrayList;
+import net.NetworkManager;
 import solarwars.AudioManager;
 import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
@@ -114,7 +115,8 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
-
+                if (p.hasLost() || currentLevel.isGameOver())
+                    return;
                 if (sender instanceof IsoControl) {
                     IsoControl control = (IsoControl) sender;
                     ArrayList<AbstractPlanet> selection = control.getSelectedPlanets();
@@ -135,6 +137,8 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet target, Player p) {
+                if (p.hasLost() || currentLevel.isGameOver())
+                    return;
                 if (p.hasMultiSelectedPlanets()) {
                     multiAttackPlanet(p.getMultiSelectPlanets(), target, p);
                 }
@@ -180,6 +184,8 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
+                if (p.hasLost() || currentLevel.isGameOver())
+                    return;
                 if (planet.getOwner() == p) {
                     planet.incrementShips();
                 } else {
@@ -209,6 +215,8 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, ShipGroup shipGroup, Player p) {
+                if (p.hasLost() || currentLevel.isGameOver())
+                    return;
                 if (shipGroup.getOwner() == p) {
                     p.selectShipGroup(shipGroup);
                 }
@@ -249,6 +257,10 @@ public class Gameplay {
                 defeated.setLost();
                 if (victorious != null) {
                     victorious.setDefeatedPlayer(defeated.getId());
+                    if (NetworkManager.getInstance().isMultiplayerGame()) {
+                        NetworkManager.getInstance().getChatModule().
+                                playerDefeats(victorious, defeated);
+                    }
                 }
 
 //                if (victorious.getId() == Hub.getLocalPlayer().getId()) {

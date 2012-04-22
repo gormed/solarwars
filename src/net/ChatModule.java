@@ -37,7 +37,7 @@ public class ChatModule implements ActionListener {
         this.gameGUI = gameGUI;
         inputManager.addMapping(SolarWarsApplication.INPUT_MAPPING_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
         inputManager.addListener(this, SolarWarsApplication.INPUT_MAPPING_CHAT);
-
+        chatGUI.setVisible(false);
         gameGUI.addGUIElement(chatGUI);
         chatGUI.hide();
     }
@@ -49,6 +49,27 @@ public class ChatModule implements ActionListener {
 
     public void playerSays(Player p, String message) {
         chatGUI.playerSays(p, message);
+        if (!chatGUI.isFadeDirection()) {
+            chatGUI.peek();
+        }
+    }
+
+    public void playerLeaves(Player p) {
+        chatGUI.serverSays(
+                p.getName() + " leaves the game...");
+        if (!chatGUI.isFadeDirection()) {
+            chatGUI.peek();
+        }
+    }
+
+    public void playerDefeats(Player victorious, Player defeated) {
+        chatGUI.serverSays(
+                victorious.getName()
+                + " defeats "
+                + defeated.getName() + "!");
+        if (!chatGUI.isFadeDirection()) {
+            chatGUI.peek();
+        }
     }
 
     public void localPlayerSendChatMessage(int id, String message) {
