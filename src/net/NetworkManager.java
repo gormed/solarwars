@@ -35,11 +35,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logic.Gameplay;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
 import net.messages.GeneralActionMessage;
+import net.messages.LevelActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
@@ -255,6 +255,7 @@ public class NetworkManager {
         Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(PlanetActionMessage.class);
         Serializer.registerClass(GeneralActionMessage.class);
+        Serializer.registerClass(LevelActionMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 

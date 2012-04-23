@@ -1,0 +1,27 @@
+//======================================================
+//
+//		SOLARWARS_ Changelog File
+//		
+//		Autor: Hans Ferchland
+//		Date: 23.04.2012
+//		Version: Alpha 0.3 r51
+//
+//======================================================
+
+	# changed level build
+	# changed start planet choosing for players
+	# added capture planet animation
+	# added multi planet select
+	# added new button, panel pics and so on
+	# added sounds
+		- click, error, loaded
+		- ship arrives
+		- capture planet
+		- background sound (some loops in different/random orders)
+	# added scores table
+	# added chat for lobby and ingame
+	# added tutorial screen
+	# fixed percentage label
+	# fixed bug where players could join after game started
+	# added prediction for a planets ship count in mp
+	# 

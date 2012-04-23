@@ -3,8 +3,8 @@
 //		SOLARWARS_ Milestones File
 //		
 //		Autor: Hans Ferchland
-//		Date: 11.04.2012
-//		Version: 1.0
+//		Date: 23.04.2012
+//		Version: 1.1
 //
 //======================================================
 
@@ -25,6 +25,8 @@
 * Alpha 0.4
 	# add new level background
 		- generates from templates randomly (by level seed)
+	# add multi ship group select
+	# add move all to one planet
 * Alpha 0.3
 	# add new button, panel pics and so on
 	# add sounds
@@ -42,7 +44,6 @@
 	# change player names if doubles
 	# add capture planet animation
 	# add multi planet select
-	# add multi ship group select
-	# add move all to one planet
+
 * Alpha 0.1
 	# current rev

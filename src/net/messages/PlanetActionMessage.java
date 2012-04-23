@@ -21,7 +21,7 @@ public class PlanetActionMessage extends AbstractMessage {
     private String actionName;
     private int playerID;
     private int planetID;
-    private int planetShips;
+    //private int planetShips;
     private PlayerState playerState;
 
     public String getActionName() {
@@ -48,29 +48,29 @@ public class PlanetActionMessage extends AbstractMessage {
         return playerState;
     }
 
-    public int getPlanetShips() {
-        return planetShips;
-    }
+//    public int getPlanetShips() {
+//        return planetShips;
+//    }
 
     public PlanetActionMessage() {
     }
 
-    public PlanetActionMessage(long clientTime, String actionName, int playerID, PlayerState state, int planetID, int planetShips) {
+    public PlanetActionMessage(long clientTime, String actionName, int playerID, PlayerState state, int planetID) {
         this.clientTime = clientTime;
         this.actionName = actionName;
         this.playerID = playerID;
         this.planetID = planetID;
         this.playerState = state;
-        this.planetShips = planetShips;
+//        this.planetShips = planetShips;
     }
 
-    public PlanetActionMessage(long clientTime, long serverTime, String actionName, int playerID, PlayerState state, int planetID, int planetShips) {
+    public PlanetActionMessage(long clientTime, long serverTime, String actionName, int playerID, PlayerState state, int planetID) {
         this.clientTime = clientTime;
         this.serverTime = serverTime;
         this.actionName = actionName;
         this.playerID = playerID;
         this.planetID = planetID;
         this.playerState = state;
-        this.planetShips = planetShips;
+//        this.planetShips = planetShips;
     }
 }

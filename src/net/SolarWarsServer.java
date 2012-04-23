@@ -34,18 +34,21 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
+import entities.AbstractPlanet;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.Gameplay;
+import logic.Level;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
 import net.messages.GeneralActionMessage;
+import net.messages.LevelActionMessage;
 import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
@@ -95,6 +98,7 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(StartGameMessage.class);
         Serializer.registerClass(PlanetActionMessage.class);
         Serializer.registerClass(GeneralActionMessage.class);
+        Serializer.registerClass(LevelActionMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
@@ -129,6 +133,7 @@ public class SolarWarsServer extends SimpleApplication {
     private long seed;
     private GameplayListener gameplayListener = new GameplayListener();
     private ServerState serverState = ServerState.INIT;
+    private float levelSync = 0;
 
     /**
      * Start.
@@ -161,6 +166,24 @@ public class SolarWarsServer extends SimpleApplication {
         serverState = ServerState.INGAME;
         gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
     }
+    
+    public void syncronizeLevel(float tpf) {
+        if (serverState != ServerState.INGAME)
+            return;
+        levelSync += tpf;
+        if (levelSync > 2) {
+            HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(100);
+            Level l = Gameplay.getCurrentLevel();
+            for (Map.Entry<Integer, AbstractPlanet> entry : l.getPlanetSet()) {
+                hashMap.put(entry.getKey(), entry.getValue().getShipCount());
+            }
+            LevelActionMessage message = 
+                    new LevelActionMessage(
+                            hashMap, seed, System.currentTimeMillis());
+            this.gameServer.broadcast(message);
+            levelSync = 0;
+        }
+    }
 
     /* (non-Javadoc)
      * @see com.jme3.app.SimpleApplication#simpleInitApp()
@@ -184,7 +207,7 @@ public class SolarWarsServer extends SimpleApplication {
             //gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
-            Logger.getLogger(SolarWarsServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SolarWarsServer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
     }
@@ -194,6 +217,7 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void simpleUpdate(float tpf) {
+        syncronizeLevel(tpf);
 //        for (Player p : joinedPlayers) {
 //            respondPlayer(p, true);
 //        }
@@ -432,8 +456,7 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getActionName(),
                         clientMessage.getPlayerID(),
                         clientMessage.getPlayerState(),
-                        clientMessage.getPlanetID(),
-                        clientMessage.getPlanetShips());
+                        clientMessage.getPlanetID());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
             } else if (message instanceof GeneralActionMessage) {

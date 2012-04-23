@@ -8,11 +8,12 @@ import com.jme3.network.Client;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import entities.AbstractPlanet;
-import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import net.NetworkManager;
 import net.messages.GeneralActionMessage;
+import net.messages.LevelActionMessage;
 import net.messages.PlanetActionMessage;
 import solarwars.Hub;
 
@@ -29,7 +30,8 @@ public class MultiplayerGameplay {
         client.addMessageListener(
                 gameplayListener,
                 PlanetActionMessage.class,
-                GeneralActionMessage.class);
+                GeneralActionMessage.class,
+                LevelActionMessage.class);
     }
 
     public static MultiplayerGameplay getInstance() {
@@ -64,8 +66,7 @@ public class MultiplayerGameplay {
                 actionName,
                 Hub.getLocalPlayer().getId(),
                 Hub.getLocalPlayer().getState(),
-                id,
-                ships);
+                id);
         client.send(planetActionMessage);
     }
 
@@ -110,7 +111,7 @@ public class MultiplayerGameplay {
                     long serverTime = serverMessage.getServerTime();
                     long currentTime = System.currentTimeMillis();
                     long delay = currentTime - sendTime;
-                    planet.setShipCount(serverMessage.getPlanetShips(), delay);
+                    //planet.setShipCount(serverMessage.getPlanetShips(), delay);
                 }
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
@@ -121,6 +122,14 @@ public class MultiplayerGameplay {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
 
 
+            } else if (m instanceof LevelActionMessage) {
+                LevelActionMessage actionMessage = (LevelActionMessage) m;
+                
+                for (Map.Entry<Integer, Integer> entry : actionMessage.getPlanetShipCount().entrySet()) {
+                    int id = entry.getKey();
+                    int shipCount = entry.getValue();
+                    Gameplay.getCurrentLevel().getPlanet(id).setShipCount(shipCount);
+                }
             }
         }
     }
@@ -143,6 +152,7 @@ public class MultiplayerGameplay {
 
     private class ClientGameplayListener implements MessageListener<Client> {
 
+        @Override
         public void messageReceived(Client source, Message message) {
             System.out.println(
                     "Client #" + source.getId() + " recieved a "
