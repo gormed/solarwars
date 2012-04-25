@@ -469,6 +469,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             }
         };
         
+        player.setFontColor(p.getColor());
         gui.addGUIElement(player);
         playerLabels.put(
                 id,

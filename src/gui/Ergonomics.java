@@ -23,7 +23,8 @@ public final class Ergonomics {
     
     private String ipAddress = "127.0.0.1";
     private String name = "Player";
-    private int players = 2;
+    private int players = 8;
+    private String seed = "42";
 
     public String getIpAddress() {
         return ipAddress;
@@ -47,6 +48,14 @@ public final class Ergonomics {
 
     public void setPlayers(int players) {
         this.players = players;
+    }
+
+    public String getSeed() {
+        return seed;
+    }
+
+    public void setSeed(String seed) {
+        this.seed = seed;
     }
     
 }

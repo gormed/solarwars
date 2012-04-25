@@ -37,7 +37,6 @@ import gui.KeyboardListener;
 import java.util.ArrayList;
 import logic.Player;
 import net.ChatModule;
-import net.NetworkManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
@@ -47,7 +46,7 @@ import solarwars.SolarWarsApplication;
 public class ChatGUI extends GUIElement implements ClickableGUI {
 
     public static final ColorRGBA COLOR_CHAT_BACKGROUND = new ColorRGBA(0, 0, 1, 0.6f);
-    public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(0, 0, 1, 0.5f);
+    public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(1, 0.5f, 0, 0.5f);
     public static final ColorRGBA COLOR_CHAT_TEXTFIELD = new ColorRGBA(1, 1, 1, 0.4f);
     public static final float PEEK_TIME = 5;
     /** The gui. */

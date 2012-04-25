@@ -59,6 +59,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     protected Vector3f screenPosition;
     /** The scale. */
     protected Vector3f scale;
+    protected Vector2f size;
     /** The caption. */
     protected String caption;
     /** The geometry. */
@@ -131,6 +132,24 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     }
 
     public TextBox(ColorRGBA color, Vector3f screenPosition,
+            Vector3f scale, Vector2f size, String caption,
+            ColorRGBA boxColor, GameGUI gui, boolean numberBox) {
+        super();
+        this.name = caption;
+        this.color = color;
+        this.screenPosition = screenPosition;
+        this.scale = scale;
+        this.caption = caption;
+        this.boxColor = boxColor;
+        this.gui = gui;
+        this.size = size;
+        createTextBox(gui);
+        this.isNumberBox = numberBox;
+        createListener();
+
+    }
+
+    public TextBox(ColorRGBA color, Vector3f screenPosition,
             Vector3f scale, String caption,
             ColorRGBA boxColor, GameGUI gui) {
         super();
@@ -168,7 +187,6 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 //        destroy();
 //        return super.detachChild(child);
 //    }
-
     /**
      * Destroy.
      */
@@ -255,12 +273,14 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
         // Create Box
 
-        float[] size = new float[2];
+        if (size == null) {
+            size = new Vector2f();
+            size.x = gui.getWidth() / 5;
+            size.y = text.getLineHeight() / 1.5f;
+        }
 
-        size[0] = gui.getWidth() / 5;
-        size[1] = text.getLineHeight() / 1.5f;
 
-        Box b = new Box(size[0], size[1], 1);
+        Box b = new Box(size.x, size.y, 1);
         geometry = new Geometry(caption + "_TextBox", b);
 
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -299,17 +319,19 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
             //deleteMappings(inputManager);
             if (!numericMappingsAdded) {
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT, new KeyTrigger(KeyInput.KEY_PERIOD));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0), new KeyTrigger(KeyInput.KEY_NUMPAD0));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1), new KeyTrigger(KeyInput.KEY_NUMPAD1));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2), new KeyTrigger(KeyInput.KEY_NUMPAD2));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3), new KeyTrigger(KeyInput.KEY_NUMPAD3));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4), new KeyTrigger(KeyInput.KEY_NUMPAD4));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5), new KeyTrigger(KeyInput.KEY_NUMPAD5));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6), new KeyTrigger(KeyInput.KEY_NUMPAD6));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7), new KeyTrigger(KeyInput.KEY_NUMPAD7));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8), new KeyTrigger(KeyInput.KEY_NUMPAD8));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9), new KeyTrigger(KeyInput.KEY_NUMPAD9));
+                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT,
+                        new KeyTrigger(KeyInput.KEY_PERIOD),
+                        new KeyTrigger(KeyInput.KEY_NUMPADCOMMA));
 
                 inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
                 numericMappingsAdded = true;
@@ -351,7 +373,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                 }
 
             }
-            onKeyTrigger(name, isPressed, tpf);
+            if (activeTextBox.equals(textBox)) {
+                onKeyTrigger(name, isPressed, tpf);
+            }
         }
     }
 
@@ -399,7 +423,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
                     caption += name;
                 }
             }
-            onKeyTrigger(name, isPressed, tpf);
+            if (activeTextBox.equals(textBox)) {
+                onKeyTrigger(name, isPressed, tpf);
+            }
         }
     }
 }

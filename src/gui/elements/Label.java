@@ -115,6 +115,10 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         this.text.setText(caption);
     }
     
+    public void setFontColor(ColorRGBA color) {
+        this.text.setColor(color);
+    }
+    
     public String getCaption() {
         return this.text.getText();
     }

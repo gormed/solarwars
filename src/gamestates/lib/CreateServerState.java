@@ -78,26 +78,27 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /** The create server label. */
     private Label createServerLabel;
     /** The your ip. */
-    private Label yourIP;
+    private Label yourIPLabel;
     /** The address. */
-    private Label address;
+    private Label addressLabel;
     /** The background panel. */
     private Panel backgroundPanel;
     /** The line. */
-    private Panel line;
+    private Panel linePanel;
     /** The player panel. */
     private Panel playerPanel;
     /** The cancel. */
-    private Button cancel;
+    private Button cancelButton;
     /** The start. */
-    private Button start;
+    private Button startButton;
     /** The max players. */
-    private Label maxPlayers;
+    private Label maxPlayersLabel;
     /** The player count. */
-    private TextBox playerCount;
+    private TextBox playerCountBox;
+    private Label seedLabel;
+    private TextBox levelSeedBox;
     /** The gui. */
     private GameGUI gui;
-    private ChatGUI chatGUI;
     /** The server hub. */
     private ServerHub serverHub;
     /** The solar wars server. */
@@ -131,6 +132,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private final SolarWarsApplication application;
     private long clientSeed;
     private boolean playersChanged;
+    private String seedString = Ergonomics.getInstance().getSeed();
+    private long serverSeed = 42;
 
     /**
      * Sets the host player color.
@@ -257,11 +260,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
                 ColorRGBA.Blue);
 
-        line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
+        linePanel = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
                 ColorRGBA.White);
 
-        cancel = new Button("Cancel",
+        cancelButton = new Button("Cancel",
                 new Vector3f(gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.White, gui) {
@@ -280,7 +283,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-        start = new Button("Start",
+        startButton = new Button("Start",
                 new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, ColorRGBA.Orange,
                 ColorRGBA.White, gui) {
@@ -299,7 +302,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-        yourIP = new Label("Your IP:",
+        yourIPLabel = new Label("Your IP:",
                 new Vector3f(gui.getWidth() / 2, 1.75f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.White,
@@ -314,10 +317,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-
-
-        maxPlayers = new Label("Max Players",
-                new Vector3f(gui.getWidth() / 4, 7f * gui.getHeight() / 10, 0),
+        seedLabel = new Label("Seed",
+                new Vector3f(gui.getWidth() / 8, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange, gui) {
 
@@ -330,10 +331,54 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             }
         };
 
-        playerCount = new TextBox(
+        levelSeedBox = new TextBox(
                 ColorRGBA.Blue,
-                new Vector3f(3 * gui.getWidth() / 4, 7f * gui.getHeight() / 10, 0),
+                new Vector3f(4.0f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ, new Vector2f(gui.getWidth() / 6, 30),
+                Ergonomics.getInstance().getSeed(),
+                ColorRGBA.White,
+                gui, false) {
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+
+            @Override
+            protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+                char[] chars = caption.toCharArray();
+                try {
+                    serverSeed = 0;
+                    for (Character c : chars) {
+                        serverSeed += c.hashCode();
+                    }
+                } catch (Exception e) {
+                    caption = serverSeed + "";
+                }
+
+                Ergonomics.getInstance().setSeed(caption);
+            }
+        };
+
+        maxPlayersLabel = new Label("Players",
+                new Vector3f(
+                        7 * gui.getWidth() / 10, 
+                        7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
+                ColorRGBA.Orange, gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+            }
+        };
+
+        playerCountBox = new TextBox(
+                ColorRGBA.Blue,
+                new Vector3f(8.5f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ, new Vector2f(40, 30),
                 Ergonomics.getInstance().getPlayers() + "",
                 ColorRGBA.White,
                 gui, true) {
@@ -382,7 +427,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         // =========================================
         setupServer();
 
-        address = new Label(networkManager.getServerIPAdress().getHostAddress(),
+        addressLabel = new Label(networkManager.getServerIPAdress().getHostAddress(),
                 new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.White,
@@ -404,16 +449,18 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
 
         gui.addGUIElement(backgroundPanel);
-        gui.addGUIElement(line);
+        gui.addGUIElement(linePanel);
         gui.addGUIElement(createServerLabel);
-        gui.addGUIElement(cancel);
-        gui.addGUIElement(playerCount);
+        gui.addGUIElement(cancelButton);
+        gui.addGUIElement(playerCountBox);
         gui.addGUIElement(playerPanel);
         gui.addGUIElement(playerLabelsNode);
-        gui.addGUIElement(yourIP);
-        gui.addGUIElement(address);
-        gui.addGUIElement(start);
-        gui.addGUIElement(maxPlayers);
+        gui.addGUIElement(yourIPLabel);
+        gui.addGUIElement(addressLabel);
+        gui.addGUIElement(startButton);
+        gui.addGUIElement(seedLabel);
+        gui.addGUIElement(levelSeedBox);
+        gui.addGUIElement(maxPlayersLabel);
         networkManager.getChatModule().initialize(gui, networkManager);
         //gui.addGUIElement(chatGUI);
 
@@ -472,7 +519,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Start server.
      */
     private void startServer() {
-        long serverSeed = createLevel();
+        createLevel(serverSeed);
         StartGameMessage gameMessage =
                 new StartGameMessage(serverSeed, ServerHub.getPlayers());
         solarWarsServer.getGameServer().broadcast(
@@ -483,14 +530,10 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /**
      * Creates the level.
      */
-    private long createLevel() {
-        long serverSeed = System.currentTimeMillis();
-        solarWarsServer.prepareLevel(serverSeed);
-//        logic.level.Level mpLevel = new logic.level.Level(
-//                solarWarsServer.getRootNode(), 
-//                solarWarsServer.getAssetManager(),
-//                null, ServerHub.playersByID, seed);
-        return serverSeed;
+    private void createLevel(long seed) {
+        if (seed == 0)
+            seed = System.currentTimeMillis();
+        solarWarsServer.prepareLevel(seed);
     }
 
     /**
@@ -515,6 +558,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         networkManager.removeClientRegisterListener(this);
         Future fut = application.enqueue(new Callable() {
 
+            @Override
             public Object call()
                     throws Exception {
 
@@ -556,7 +600,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-
+        player.setFontColor(p.getColor());
         playerLabelsNode.addElement(player);
         playerLabels.put(
                 id,
@@ -582,6 +626,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /* (non-Javadoc)
      * @see net.ServerRegisterListener#registerServerListener(com.jme3.network.Server)
      */
+    @Override
     public void registerServerListener(Server gameServer) {
         gameServer.addConnectionListener(serverConnectionListener);
         gameServer.addMessageListener(serverMessageListener,
@@ -592,6 +637,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /* (non-Javadoc)
      * @see net.ClientRegisterListener#registerClientListener(com.jme3.network.Client)
      */
+    @Override
     public void registerClientListener(Client client) {
         client.addMessageListener(clientMessageListener,
                 PlayerAcceptedMessage.class,
@@ -635,6 +681,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         /* (non-Javadoc)
          * @see com.jme3.network.ConnectionListener#connectionAdded(com.jme3.network.Server, com.jme3.network.HostedConnection)
          */
+        @Override
         public void connectionAdded(Server server, HostedConnection conn) {
             if (!solarWarsServer.getServerState().equals(SolarWarsServer.ServerState.LOBBY)) {
                 conn.close(SERVER_NOT_IN_LOBBY_MSG);
@@ -649,10 +696,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         /* (non-Javadoc)
          * @see com.jme3.network.ConnectionListener#connectionRemoved(com.jme3.network.Server, com.jme3.network.HostedConnection)
          */
+        @Override
         public void connectionRemoved(Server server, HostedConnection conn) {
             Player discPlayer = conn.getAttribute("PlayerObject");
             if (discPlayer != null) {
-                
+
                 solarWarsServer.removeLeavingPlayer(discPlayer);
                 //leavingPlayers.add(discPlayer);
                 serverHub.removePlayer(discPlayer);
@@ -678,6 +726,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
+        @Override
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlayerConnectingMessage) {
 
@@ -727,6 +776,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
+        @Override
         public void messageReceived(Client source, Message message) {
             System.out.println(
                     "Client #" + source.getId() + " recieved a "
