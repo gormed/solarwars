@@ -85,10 +85,10 @@ public class SingleplayerState extends Gamestate {
                 application.getRootNode(),
                 application.getAssetManager(),
                 application.getIsoControl(),
-                gui);
+                gui, Hub.playersByID);
         Gameplay.initialize(currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
-        currentLevel.setupPlayers(Hub.playersByID);
+        //currentLevel.setupPlayers(Hub.playersByID);
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
     }

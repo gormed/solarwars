@@ -64,7 +64,7 @@ public class Level {
     private static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
         10,
-        10,
+        16,
         12,
         13,
         14,
@@ -160,6 +160,7 @@ public class Level {
     private IsoControl control;
     /** The currently used game gui. */
     private GameGUI gui;
+    private HashMap<Integer, Player> playersByID;
     /**
      * Indicates that the level is fully loaded into scene-graph
      */
@@ -226,8 +227,9 @@ public class Level {
      * @param assetManager the asset manager
      * @param control the control
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui) {
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players) {
         this.gui = gui;
+        this.playersByID = players;
         setup(rootNode, assetManager, control, System.currentTimeMillis());
     }
 
@@ -242,6 +244,7 @@ public class Level {
      */
     public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players, long seed) {
         this.gui = gui;
+        this.playersByID = players;
         setup(rootNode, assetManager, control, seed);
     }
 
@@ -299,27 +302,6 @@ public class Level {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
         g.generateClassic(this.seed);
-    }
-
-    /**
-     * Setup players.
-     *
-     * @param players the players
-     */
-    public void setupPlayers(HashMap<Integer, Player> players) {
-        for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
-            Player p = entrySet.getValue();
-            Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
-            planetNodes.put(p, playersPlanetsNode);
-            levelNode.attachChild(playersPlanetsNode);
-
-            AbstractPlanet randomPlanet = getRandomPlanet(p);
-
-            freePlanetsNode.detachChild(randomPlanet);
-            playersPlanetsNode.attachChild(randomPlanet);
-        }
-        levelLoaded = true;
-        System.out.println("Players setup!");
     }
 
     /**
@@ -414,7 +396,7 @@ public class Level {
 
         while (!found) {
             // TODO: change level generation
-            if (planet.getOwner() == null && planet.getSize() > PLANET_SIZES[PLANET_SIZES.length-2]) {
+            if (planet.getOwner() == null && planet.getSize() > PLANET_SIZES[PLANET_SIZES.length - 2]) {
                 found = true;
                 break;
             }
@@ -615,14 +597,14 @@ public class Level {
             int planetCount = 10 + r.nextInt(playerCount * 10);
 
             for (int i = 0; i < bigPlanetCount; i++) {
-                float x = 
-                        r.nextFloat() * (leftBottomX - PLANET_SPACE_HORIZ) + 
-                        r.nextFloat() * (topRightX + PLANET_SPACE_HORIZ);
-                float z = 
-                        r.nextFloat() * (topRightZ - PLANET_SPACE_VERT) + 
-                        r.nextFloat() * (leftBottomZ + PLANET_SPACE_VERT);
-                float dist = 0.5f * r.nextInt(SUBPLANETS[PLANET_SIZES.length-1]);
-                int size = PLANET_SIZES.length-1;
+                float x =
+                        r.nextFloat() * (leftBottomX - PLANET_SPACE_HORIZ)
+                        + r.nextFloat() * (topRightX + PLANET_SPACE_HORIZ);
+                float z =
+                        r.nextFloat() * (topRightZ - PLANET_SPACE_VERT)
+                        + r.nextFloat() * (leftBottomZ + PLANET_SPACE_VERT);
+                float dist = 0.5f * r.nextInt(SUBPLANETS[PLANET_SIZES.length - 1]);
+                int size = PLANET_SIZES.length - 1;
 
                 int ships = getRandomShipCount(r, size);
                 AbstractPlanet p = createPlanet(size, x, z, ships);
@@ -646,7 +628,7 @@ public class Level {
 
             System.out.println("Level generated!");
         }
-        
+
         public void generateClassic(long seed) {
             System.out.print("[" + seed + "] Generating level...");
             // create a node for the planet-labels
@@ -681,6 +663,8 @@ public class Level {
                 control.addShootable(levelNode);
             }
 
+            setupPlayers(level.playersByID);
+            
             System.out.println("Level generated!");
         }
 
@@ -698,12 +682,12 @@ public class Level {
                     basePlanet.getPosition().z);
 
             for (int i = 0; i < planetCount; i++) {
-                int size = r.nextInt(basePlanet.getSizeID()-2);
+                int size = r.nextInt(basePlanet.getSizeID() - 2);
                 if (size < 1) {
                     size = 1;
                 }
                 int ships = getRandomShipCount(r, size);
-                
+
                 float randTurn = r.nextFloat() * (float) Math.PI * 2;
                 Vector2f pos = getRotatedPosition(
                         center,
@@ -757,6 +741,27 @@ public class Level {
             planetList.put(p.getId(), p);
             freePlanetsNode.attachChild(p);
             return p;
+        }
+
+        /**
+         * Setup players.
+         *
+         * @param players the players
+         */
+        public void setupPlayers(HashMap<Integer, Player> players) {
+            for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
+                Player p = entrySet.getValue();
+                Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
+                planetNodes.put(p, playersPlanetsNode);
+                levelNode.attachChild(playersPlanetsNode);
+
+                AbstractPlanet randomPlanet = getRandomPlanet(p);
+
+                freePlanetsNode.detachChild(randomPlanet);
+                playersPlanetsNode.attachChild(randomPlanet);
+            }
+            levelLoaded = true;
+            System.out.println("Players setup!");
         }
     }
 }

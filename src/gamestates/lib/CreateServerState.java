@@ -654,7 +654,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         if (playerLabels == null || gui == null || !playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<>(players);
+        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             playerLabelsNode.removeElement(entry.getValue());
         }

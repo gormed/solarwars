@@ -101,7 +101,7 @@ public class MultiplayerMatchState extends Gamestate {
         setupGUI();
         currentLevel = Gameplay.getCurrentLevel();
         currentLevel.generateLevel();
-        currentLevel.setupPlayers(Hub.playersByID);
+        //currentLevel.setupPlayers(Hub.playersByID);
 
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);

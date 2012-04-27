@@ -418,6 +418,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     /* (non-Javadoc)
      * @see net.ClientRegisterListener#registerClientListener(com.jme3.network.Client)
      */
+    @Override
     public void registerClientListener(Client client) {
         client.addMessageListener(playerConnectionListener,
                 PlayerAcceptedMessage.class,
@@ -431,7 +432,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         if (playerLabels == null || gui == null || !playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<>(players);
+        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
