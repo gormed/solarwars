@@ -216,7 +216,7 @@ public abstract class AbstractPlanet extends Node {
         BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont32");
         label = new BitmapText(f, false);
         label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
-        label.setQueueBucket(Bucket.Transparent);
+        //label.setQueueBucket(Bucket.Transparent);
         label.setSize(0.3f);
         label.setColor(ColorRGBA.Orange);
         label.setText(shipIncrement + "");
@@ -294,7 +294,7 @@ public abstract class AbstractPlanet extends Node {
         owner = p;
         label.setColor(ColorRGBA.Black.clone());
         material.setColor("Specular", owner.getColor());
-        material.setColor("Diffuse", ColorRGBA.White);
+        material.setColor("Diffuse", ColorRGBA.LightGray);
         material.setColor("GlowColor", owner.getColor());
     }
 

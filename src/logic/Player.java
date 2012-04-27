@@ -38,9 +38,9 @@ public class Player {
 
     public static final ColorRGBA[] PLAYER_COLORS = {
         ColorRGBA.Blue, ColorRGBA.Red,
-        ColorRGBA.Green, ColorRGBA.Orange,
+        ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
-        ColorRGBA.Brown, ColorRGBA.Magenta};
+        new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};
 
     public static ColorRGBA getUnusedColor(ArrayList<Player> players, int start) {
         ColorRGBA color = ColorRGBA.randomColor();

@@ -37,7 +37,6 @@ import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Anchor;
 import gui.elements.Button;
-import gui.elements.ChatGUI;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
@@ -478,13 +477,16 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         playerLabels.clear();
         playerNamePos.clear();
+        playerLabelIdx.clear();
 
         gui.cleanUpGUI();
 
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-
+        this.playerLabelIdx = null;
+        this.playerLabels = null;
+        this.playerNamePos = null;
         gui = null;
     }
 
@@ -652,11 +654,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         if (playerLabels == null || gui == null || !playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
+        HashMap<Integer, Player> clone = new HashMap<>(players);
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-            gui.removeGUIElement(entry.getValue());
+            playerLabelsNode.removeElement(entry.getValue());
         }
-
+        
         playerLabels.clear();
 
         for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
@@ -703,8 +705,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
                 solarWarsServer.removeLeavingPlayer(discPlayer);
                 //leavingPlayers.add(discPlayer);
-                serverHub.removePlayer(discPlayer);
-                refreshedPlayers = new HashMap<Integer, Player>(ServerHub.playersByID);
+                ServerHub.getInstance().removePlayer(discPlayer);
+                refreshedPlayers = ServerHub.playersByID;
                 playersChanged = true;
             }
         }
@@ -753,7 +755,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 source.setAttribute("PlayerID", newPlayer.getId());
                 source.setAttribute("PlayerName", newPlayer.getName());
 
-                refreshedPlayers = new HashMap<Integer, Player>(ServerHub.playersByID);
+                refreshedPlayers = ServerHub.playersByID;
                 playersChanged = true;
                 //refreshPlayers(ServerHub.getPlayers());
             }

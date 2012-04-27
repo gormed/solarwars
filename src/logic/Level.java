@@ -413,8 +413,8 @@ public class Level {
         AbstractPlanet planet = planetList.get(idx);
 
         while (!found) {
-
-            if (planet.getOwner() == null && planet.getSize() > 0.35f) {
+            // TODO: change level generation
+            if (planet.getOwner() == null && planet.getSize() > PLANET_SIZES[PLANET_SIZES.length-2]) {
                 found = true;
                 break;
             }

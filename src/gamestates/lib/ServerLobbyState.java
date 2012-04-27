@@ -333,6 +333,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         
         playerLabels.clear();
         playerNamePos.clear();
+        playerLabelIdx.clear();
         gui.cleanUpGUI();
         
         if (client != null) {
@@ -430,7 +431,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         if (playerLabels == null || gui == null || !playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
+        HashMap<Integer, Player> clone = new HashMap<>(players);
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
