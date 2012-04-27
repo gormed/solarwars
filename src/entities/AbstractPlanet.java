@@ -34,7 +34,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import logic.Level;
@@ -49,7 +48,7 @@ import solarwars.IsoCamera;
 public abstract class AbstractPlanet extends Node {
 
     /** The Constant SHIP_REFRESH_MULTIPILER. */
-    private static final int SHIP_REFRESH_MULTIPILER = 5;
+    private static final int SHIP_REFRESH_MULTIPILER = 1;
     /** The Constant SPHERE_Z_SAMPLES. */
     public static final int SPHERE_Z_SAMPLES = 20;
     /** The Constant SPHERE_RADIAL_SAMPLES. */
@@ -352,21 +351,21 @@ public abstract class AbstractPlanet extends Node {
         ships = c;
     }
 
-    public void setShipCount(int c, long delay) {
-        //ships = c;
-        if (owner != null && !level.isGameOver()) {
-            float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
-            float gap = delay / 10f;
-
-            while (gap > 0) {
-                ships += 1;
-                gap -= peek;
-            }
-
-        }
-        if (ships > c)
-            ships = c;
-    }
+//    public void setShipCount(int c, long delay) {
+//        //ships = c;
+//        if (owner != null && !level.isGameOver()) {
+//            float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
+//            float gap = delay / 10f;
+//
+//            while (gap > 0) {
+//                ships += 1;
+//                gap -= peek;
+//            }
+//
+//        }
+//        if (ships > c)
+//            ships = c;
+//    }
 
     /**
      * Decrement ships.
@@ -401,16 +400,20 @@ public abstract class AbstractPlanet extends Node {
      * Calculate increment.
      */
     protected void calculateIncrement() {
-        float seed = (4 * size) - 0.6f;
-        shipIncrement = (1 - (seed)) + 0.09f;
-        if (shipIncrement > 1) {
-            shipIncrement = 1;
-        }
+//        float seed = (4 * size) - 0.6f;
+//        shipIncrement = (1 - (seed)) + 0.09f;
+//        if (shipIncrement > 1) {
+//            shipIncrement = 1;
+//        }
+        shipIncrement = Level.PLANET_INCREMENT_TIME[sizeID];
     }
 
     private void updateLabel(float tpf) {
 
-        boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()));
+        boolean visible = (
+                owner == null || 
+                owner.equals(Hub.getLocalPlayer()) || 
+                Hub.getLocalPlayer().hasLost());
         label.setCullHint(visible ? CullHint.Never : CullHint.Always);
         if (visible) {
             refreshFont();

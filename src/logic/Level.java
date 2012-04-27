@@ -61,10 +61,10 @@ public class Level {
         "SEVEN PLAYER",
         "EIGHT PLAYER"
     };
-    private static float[] PLAYERS_CAMERA_HEIGHT = {
+    public static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
         10,
-        16,
+        10,
         12,
         13,
         14,
@@ -72,7 +72,10 @@ public class Level {
         16,
         16
     };
-    private static float[] PLANET_SIZES = {
+    public static float[] PLANET_INCREMENT_TIME = {
+        2f, 1.5f, 1.2f, 1.0f, 0.9f,
+        0.8f, 0.7f, 0.6f, 0.50f};
+    public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
         0.325f, 0.35f, 0.375f, 0.4f};
 
@@ -381,34 +384,6 @@ public class Level {
         return shipList.get(id);
     }
 
-    /**
-     * Gets the random planet.
-     *
-     * @param p the p
-     * @return the random planet
-     */
-    private AbstractPlanet getRandomPlanet(Player p) {
-        Random r = new Random(seed);
-        boolean found = false;
-
-        int idx = r.nextInt(planetList.size());
-        AbstractPlanet planet = planetList.get(idx);
-
-        while (!found) {
-            // TODO: change level generation
-            if (planet.getOwner() == null && planet.getSize() > PLANET_SIZES[PLANET_SIZES.length - 2]) {
-                found = true;
-                break;
-            }
-            idx = r.nextInt(planetList.size());
-            planet = planetList.get(idx);
-        }
-
-        p.capturePlanet(planet);
-        planet.setShipCount(100);
-        return planet;
-    }
-
     private int generateSize(Random r) {
 
         return r.nextInt(PLANET_SIZES.length);
@@ -663,8 +638,8 @@ public class Level {
                 control.addShootable(levelNode);
             }
 
-            setupPlayers(level.playersByID);
-            
+            setupPlayers(level.playersByID, r);
+
             System.out.println("Level generated!");
         }
 
@@ -748,20 +723,47 @@ public class Level {
          *
          * @param players the players
          */
-        public void setupPlayers(HashMap<Integer, Player> players) {
+        public void setupPlayers(HashMap<Integer, Player> players, Random r) {
             for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
                 Player p = entrySet.getValue();
                 Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
                 planetNodes.put(p, playersPlanetsNode);
                 levelNode.attachChild(playersPlanetsNode);
 
-                AbstractPlanet randomPlanet = getRandomPlanet(p);
+                AbstractPlanet randomPlanet = getRandomPlanet(p, r);
 
                 freePlanetsNode.detachChild(randomPlanet);
                 playersPlanetsNode.attachChild(randomPlanet);
             }
             levelLoaded = true;
             System.out.println("Players setup!");
+        }
+
+        /**
+         * Gets the random planet.
+         *
+         * @param p the p
+         * @return the random planet
+         */
+        private AbstractPlanet getRandomPlanet(Player p, Random r) {
+            boolean found = false;
+
+            int idx = r.nextInt(planetList.size());
+            AbstractPlanet planet = planetList.get(idx);
+
+            while (!found) {
+                // TODO: change level generation
+                if (planet.getOwner() == null && planet.getSize() >= PLANET_SIZES[PLANET_SIZES.length - 2]) {
+                    found = true;
+                    break;
+                }
+                idx = r.nextInt(planetList.size());
+                planet = planetList.get(idx);
+            }
+
+            p.capturePlanet(planet);
+            planet.setShipCount(100);
+            return planet;
         }
     }
 }
