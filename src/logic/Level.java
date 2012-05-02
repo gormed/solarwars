@@ -50,6 +50,8 @@ import solarwars.SolarWarsApplication;
  */
 public class Level {
 
+    public static final int PLAYER_START_SHIP_COUNT = 100;
+    
     public static final String[] LEVEL_SIZE_NAME = {
         "NONE",
         "ONE PLAYER",
@@ -77,7 +79,7 @@ public class Level {
         0.8f, 0.7f, 0.6f, 0.50f};
     public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
-        0.325f, 0.35f, 0.375f, 0.4f};
+        0.325f, 0.35f, 0.375f, 0.4f, 0.45f};
 
     /**
      * Gets the camera height for a given player count
@@ -528,8 +530,7 @@ public class Level {
                         int size = generateSize(r);
                         p = new BasePlanet(
                                 assetManager, level,
-                                new Vector3f(i, 0, j),
-                                PLANET_SIZES[size], size);
+                                new Vector3f(i, 0, j), size);
                         p.createPlanet();
                         p.setShipCount(5 + r.nextInt(5) + (int) (p.getSize() * (r.nextFloat() * 100.0f)));
 
@@ -690,7 +691,6 @@ public class Level {
             AbstractPlanet p = new BasePlanet(
                     assetManager, level,
                     new Vector3f(x, 0, z),
-                    PLANET_SIZES[size],
                     size);
 
             p.createPlanet();
@@ -706,7 +706,6 @@ public class Level {
             AbstractPlanet p = new BasePlanet(
                     assetManager, level,
                     new Vector3f(x, 0, z),
-                    PLANET_SIZES[size],
                     size);
             p.createPlanet();
             p.setShipCount(
@@ -716,6 +715,50 @@ public class Level {
             planetList.put(p.getId(), p);
             freePlanetsNode.attachChild(p);
             return p;
+        }
+
+        /**
+         * Creates a planet at given position for a given player
+         * @param r the random generator
+         * @param owner the desired owner of the planet
+         * @param x coord on the xz plane
+         * @param z coord on the xz plane
+         * @return new generated planet for the player
+         */
+        private AbstractPlanet createPlayerPlanet(Random r, Player owner, float x, float z) {
+            
+            // set size to maximum
+            int size = PLANET_SIZES.length - 1;
+            // create BasePlanet for player on given position
+            AbstractPlanet p = new BasePlanet(
+                    assetManager, level,
+                    new Vector3f(x, 0, z),
+                    size);
+            // init planet geometry
+            p.createPlanet();
+            // set ships
+            p.setShipCount(PLAYER_START_SHIP_COUNT);
+            // set owner
+            p.setOwner(owner);
+            // create nodes for the player and add the planet
+            setupPlayer(owner, p, r);
+            
+            return p;
+        }
+
+        /**
+         * Setup players.
+         *
+         * @param players the players
+         */
+        public void setupPlayer(Player p, AbstractPlanet startPlanet, Random r) {
+            Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
+            planetNodes.put(p, playersPlanetsNode);
+            levelNode.attachChild(playersPlanetsNode);
+
+            freePlanetsNode.detachChild(startPlanet);
+            playersPlanetsNode.attachChild(startPlanet);
+           
         }
 
         /**
@@ -762,7 +805,7 @@ public class Level {
             }
 
             p.capturePlanet(planet);
-            planet.setShipCount(100);
+            planet.setShipCount(PLAYER_START_SHIP_COUNT);
             return planet;
         }
     }

@@ -30,6 +30,7 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
 import logic.Level;
+import logic.Player;
 
 /**
  * The Class BasePlanet.
@@ -44,8 +45,8 @@ public class BasePlanet extends AbstractPlanet {
      * @param position the position
      * @param size the size
      */
-    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, float size, int sizeID) {
-        super(assetManager, level, position, size, sizeID);
+    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
+        super(assetManager, level, position, sizeID);
     }
 
     /* (non-Javadoc)

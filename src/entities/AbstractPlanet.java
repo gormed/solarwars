@@ -188,9 +188,9 @@ public abstract class AbstractPlanet extends Node {
      * @param position the position
      * @param size the size
      */
-    public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, float size, int sizeID) {
+    public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
         this.id = Level.getContiniousPlanetID();
-        this.size = size;
+        this.size = Level.PLANET_SIZES[sizeID];
         this.sizeID = sizeID;
         this.level = level;
         this.position = position;
@@ -211,7 +211,7 @@ public abstract class AbstractPlanet extends Node {
     /**
      * Creates the label.
      */
-    public void createLabel() {
+    private void createLabel() {
         BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont32");
         label = new BitmapText(f, false);
         label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));

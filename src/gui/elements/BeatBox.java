@@ -63,7 +63,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_HELI);
         baseSound.setLooping(true);
-        baseSound.setVolume(0.1f);
+        baseSound.setVolume(0.05f);
         baseSound.setPitch(1.5f);
 
         Beat baseBeat = new Beat(baseSound, tick * 10, 0) {
@@ -103,7 +103,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_CLICK);
 
-        baselineSound.setVolume(0.10f);
+        baselineSound.setVolume(0.05f);
         baselineSound.setPositional(false);
         baselineSound.setDirectional(false);
         baselineSound.setPitch(0.6f);
@@ -154,7 +154,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_BEEP);
 
-        secondLineSound.setVolume(0.25f);
+        secondLineSound.setVolume(0.1f);
         secondLineSound.setPositional(false);
         secondLineSound.setDirectional(false);
         secondLineSound.setPitch(0.8f);
@@ -198,7 +198,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_BEEP);
 
-        thirdLineSound.setVolume(0.20f);
+        thirdLineSound.setVolume(0.075f);
         thirdLineSound.setPositional(false);
         thirdLineSound.setDirectional(false);
         thirdLineSound.setPitch(1.2f);
@@ -241,7 +241,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_ERROR);
 
-        fourthLineSound.setVolume(0.05f);
+        fourthLineSound.setVolume(0.01f);
         fourthLineSound.setPositional(false);
         fourthLineSound.setDirectional(false);
         fourthLineSound.setPitch(0.9f);
