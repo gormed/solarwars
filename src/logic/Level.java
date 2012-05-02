@@ -42,6 +42,7 @@ import java.util.Set;
 import entities.LevelBackground;
 import gui.GameGUI;
 import gui.elements.GameOverGUI;
+import java.util.Stack;
 import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
 
@@ -300,13 +301,13 @@ public class Level {
 
     public void generateLevel() {
         LevelGenerator g = new LevelGenerator(this);
-        g.generateClassic(seed);
+        g.generateSquare(seed);
     }
 
     public void generateLevel(long seed) {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
-        g.generateClassic(this.seed);
+        g.generateSquare(this.seed);
     }
 
     /**
@@ -475,10 +476,15 @@ public class Level {
         private Vector3f[] corners = {
             Vector3f.ZERO, Vector3f.ZERO,
             Vector3f.ZERO, Vector3f.ZERO};
+        /* space coordinates */
+        private boolean[][] spCoord;
+        /*Spielerplaneten - vektorielle Koordinaten */
+        Stack<Vector2f> positionen = new Stack<Vector2f>();
 
         public LevelGenerator(Level hull) {
             level = hull;
             getCorners();
+            initArrays();
         }
 
         private void getCorners() {
@@ -492,6 +498,18 @@ public class Level {
             corners[1] = getWorldCoordsOnXZPlane(leftTop, 0);
             corners[2] = getWorldCoordsOnXZPlane(rightTop, 0);
             corners[3] = getWorldCoordsOnXZPlane(rightBottom, 0);
+        }
+        
+        private void initArrays(){
+            
+            /* Initialisiere spCoord */
+            int space = (level.playersByID.size())*2+1;
+            spCoord = new boolean[space][space];
+            for (int i = 0; i < space; i++){
+                for (int j = 0; j < space; j++){
+                    spCoord[i][j] = true;
+                }                
+            }
         }
 
         private Vector3f getWorldCoordsOnXZPlane(Vector2f screenCoords, float planeHeight) {
@@ -643,6 +661,171 @@ public class Level {
 
             System.out.println("Level generated!");
         }
+        
+        public void generateSquare(long seed) {
+            System.out.print("[" + seed + "] Generating level...");
+            // create a node for the planet-labels
+            level.labelNode = new Node("Planet Labels");
+            // attach the labels on the root!
+            level.rootNode.attachChild(labelNode);
+            level.background =
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.rootNode.attachChild(background);
+
+
+            level.seed = seed;
+            Random r = new Random(seed);
+
+            int leftBottomX = Math.round(corners[0].x);
+            int leftBottomZ = Math.round(corners[0].z);
+            int topRightX = Math.round(corners[2].x);
+            int topRightZ = Math.round(corners[2].z);
+
+            int playerCount = level.playersByID.size();
+            int pointerX = 0;
+            int pointerZ = 0;
+            int arrayX = playerCount;
+            int arrayZ = playerCount;
+            int decrement = 0;
+            int counter = 0;
+            int zwCounter = 0;
+            int multiplier = 1;
+            int startPlanetNumber = 0;
+            int PlanetCounter = 0;
+            boolean top = true;
+            boolean startPlanet = false;
+            
+            //Schleife für Anzahl der Ringe
+            for (int i = 0; i <= playerCount ;i++){                
+                pointerZ = +i;
+                pointerX = +i;
+                arrayZ = playerCount-i;
+                arrayX = playerCount-i;
+                //Schleife für X-Koord
+                for (int j = 0; j < (i*2+1) ; j++){
+                    //Schleife für Z-Koord
+                    for (int k = 0; k < (i*2+1) ; k++){
+                        if (platz(arrayX, arrayZ) == true){
+                            // CREATE PLANET - defekt?
+                                // if (r.nextFloat() > 650) {
+                                // createPlanet(r, pointerX, pointerZ);
+                                // System.out.print(".");
+                                // }
+                                createPlanet(r, pointerX, pointerZ);
+                                setSpCoordFalse(arrayX, arrayZ);
+                                
+                                
+                                //Wenn letzter Ring erzeugt wird
+                                if (i == playerCount){
+                                    
+                                    // COUNTER INITIALISIERUNG
+                                    // Wenn noch an der ersten Spalte gebaut wird nur counter++
+                                    if (playerCount*2+1 < counter){
+                                        counter++;
+                                    }
+                                    // Wenn oben erstellt wird, initialisiere counter und zwCounter entsprechend
+                                    else if (top == true){
+                                        zwCounter = counter;
+                                        counter = playerCount*8+decrement;
+                                        decrement--;
+                                        top = false;
+                                        }
+                                        // Wenn unten erstellt wird, normaler counter++ über zwCounter
+                                        else{
+                                        zwCounter++;
+                                        counter = zwCounter;
+                                        top = true;
+                                        }
+                                 
+                                    // PLANETENERZEUGUNG
+                                       // An einer zufälligen Stelle den ersten Spielerplanet erstellen
+                                    if (( counter < 8 && randomTake() == true ||counter == 8) && startPlanet == false){
+                                        positionen.push(new Vector2f(pointerX, pointerZ));
+                                        setSpCoordFalse(j,k);
+                                        startPlanetNumber = counter;
+                                        startPlanet = true;
+                                        }
+                                        // Sobald 7 freie Planeten erstellt wurden, den nächsten Spielerplanet erstellen
+                                    else if (counter == startPlanetNumber+8*multiplier){
+                                        positionen.push(new Vector2f(pointerX, pointerZ));
+                                        PlanetCounter++;
+                                        setSpCoordFalse(j,k);
+                                        multiplier++;
+                                        }
+                                        // ganz normalen Planet erstellen
+                                        else{
+                                            createPlanet(r, pointerX, pointerZ);
+                                            setSpCoordFalse(arrayX, arrayZ);
+                                    }
+                                    
+                                }
+                        }
+                        pointerZ--;
+                        arrayZ++;
+                    }
+                    pointerZ = +i;
+                    arrayZ = playerCount-i;
+                    pointerX--;
+                    arrayX++;
+                }
+                
+            }
+            
+            createPlayerPositions(r);
+            
+            if (control != null) {
+                control.addShootable(levelNode);
+            }
+
+            // setupPlayers(level.playersByID, r);
+            
+            levelLoaded = true;
+            System.out.println("Level generated!");
+        }
+        
+        private boolean platz(int xKoord, int zKoord){
+            return spCoord[xKoord][zKoord];
+        }
+        
+        private void setSpCoordFalse(int xKoord, int zKoord){
+            spCoord[xKoord][zKoord] = false;
+        }
+        
+        private Vector2f getRandomPos(Random r) {
+            boolean found = false;
+            while (!found && !positionen.isEmpty()) {
+                int idx = r.nextInt(positionen.size());
+                if (positionen.get(idx) != null) {
+                    Vector2f rand = positionen.get(idx);
+                    positionen.remove(idx);
+                    return rand;
+                }
+            }
+            return null;
+        }
+        
+        private void createPlayerPositions(Random r){
+            for (Map.Entry<Integer, Player> entrySet : level.playersByID.entrySet()) {
+                Player p = entrySet.getValue();
+                Vector2f v = getRandomPos(r);
+                createPlayerPlanet( r,p,v.x, v.y);
+            } 
+        }
+            
+        
+        private boolean randomTake(){
+            if (gibZufallszahl(1000) > 875){
+                return true;
+            }
+            else{
+                return false;
+            }   
+        }
+        
+        // gibt eine Zufallszahl zwischen 1 und pMaximum zurück
+    public int gibZufallszahl(int pMaximum) {
+        return  (int) ((Math.random()*pMaximum)+1);
+    }
 
         private void createSubPlanets(AbstractPlanet basePlanet, Random r, float maxDist) {
             int planetCount = 1 + r.nextInt(basePlanet.getSizeID());
@@ -718,12 +901,12 @@ public class Level {
         }
 
         /**
-         * Creates a planet at given position for a given player
-         * @param r the random generator
-         * @param owner the desired owner of the planet
-         * @param x coord on the xz plane
-         * @param z coord on the xz plane
-         * @return new generated planet for the player
+         * Creates  a       planet at given position for a given player
+         * @param   r       the random generator
+         * @param   owner   the desired owner of the planet
+         * @param   x       coord on the xz plane
+         * @param   z       coord on the xz plane
+         * @return          new generated planet for the player
          */
         private AbstractPlanet createPlayerPlanet(Random r, Player owner, float x, float z) {
             
