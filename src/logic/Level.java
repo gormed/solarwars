@@ -76,7 +76,7 @@ public class Level {
     };
     public static float[] PLANET_INCREMENT_TIME = {
         2f, 1.5f, 1.2f, 1.0f, 0.9f,
-        0.8f, 0.7f, 0.6f, 0.50f};
+        0.8f, 0.7f, 0.6f, 0.50f, 0.50f};
     public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
         0.325f, 0.35f, 0.375f, 0.4f, 0.45f};
@@ -740,6 +740,8 @@ public class Level {
             p.setShipCount(PLAYER_START_SHIP_COUNT);
             // set owner
             p.setOwner(owner);
+            // add planet into list
+            planetList.put(p.getId(), p);
             // create nodes for the player and add the planet
             setupPlayer(owner, p, r);
             
@@ -767,6 +769,7 @@ public class Level {
          * @param players the players
          */
         public void setupPlayers(HashMap<Integer, Player> players, Random r) {
+
             for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
                 Player p = entrySet.getValue();
                 Node playersPlanetsNode = new Node(p.getName() + " Planets Node");
