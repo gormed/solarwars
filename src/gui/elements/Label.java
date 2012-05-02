@@ -83,9 +83,10 @@ public abstract class Label extends GUIElement implements ClickableGUI {
     private void createLabel(GameGUI gui) {
         this.gui = gui;
 
-        font = FontLoader.getInstance().getFont("SolarWarsFont32");
+        font = FontLoader.getInstance().getFont("SolarWarsFont64");
         text = new BitmapText(font, false);
         text.setText(title);
+        text.setSize(44f);
         text.setColor(color);
         Vector3f offset = new Vector3f(-text.getLineWidth() / 2, 
                 text.getLineHeight() / 2, 

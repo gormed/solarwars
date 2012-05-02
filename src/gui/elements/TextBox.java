@@ -260,9 +260,10 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         AssetManager assetManager = solarwars.SolarWarsApplication.getInstance().getAssetManager();
 
         // Create Text
-        font = FontLoader.getInstance().getFont("SolarWarsFont32");
+        font = FontLoader.getInstance().getFont("SolarWarsFont64");
         text = new BitmapText(font, false);
         text.setText(caption);
+        text.setSize(44f);
         text.setColor(color);
         Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
                 text.getLineHeight() / 2,

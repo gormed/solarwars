@@ -52,7 +52,6 @@ import solarwars.SolarWarsApplication;
 public class Level {
 
     public static final int PLAYER_START_SHIP_COUNT = 100;
-    
     public static final String[] LEVEL_SIZE_NAME = {
         "NONE",
         "ONE PLAYER",
@@ -307,7 +306,7 @@ public class Level {
     public void generateLevel(long seed) {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
-        g.generateSquare(this.seed);
+        g.generateClassic(this.seed);
     }
 
     /**
@@ -658,7 +657,7 @@ public class Level {
             }
 
             setupPlayers(level.playersByID, r);
-
+            levelLoaded = true;
             System.out.println("Level generated!");
         }
         
@@ -739,7 +738,9 @@ public class Level {
                                  
                                     // PLANETENERZEUGUNG
                                        // An einer zufälligen Stelle den ersten Spielerplanet erstellen
-                                    if (( counter < 8 && randomTake() == true ||counter == 8) && startPlanet == false){
+                                    if (
+                                            ( counter < 8 && randomTake() == true ||counter == 8) 
+                                            && startPlanet == false){
                                         positionen.push(new Vector2f(pointerX, pointerZ));
                                         setSpCoordFalse(j,k);
                                         startPlanetNumber = counter;
@@ -885,6 +886,15 @@ public class Level {
         }
 
         private AbstractPlanet createPlanet(Random r, float x, float z) {
+            Stack<Vector2f> positionen = new Stack<Vector2f>();
+
+
+            positionen.add(new Vector2f(x, z));
+
+            Vector2f tempPos = positionen.pop();
+
+
+
             int size = generateSize(r);
             AbstractPlanet p = new BasePlanet(
                     assetManager, level,
@@ -909,7 +919,7 @@ public class Level {
          * @return          new generated planet for the player
          */
         private AbstractPlanet createPlayerPlanet(Random r, Player owner, float x, float z) {
-            
+
             // set size to maximum
             int size = PLANET_SIZES.length - 1;
             // create BasePlanet for player on given position
@@ -927,7 +937,7 @@ public class Level {
             planetList.put(p.getId(), p);
             // create nodes for the player and add the planet
             setupPlayer(owner, p, r);
-            
+
             return p;
         }
 
@@ -943,7 +953,7 @@ public class Level {
 
             freePlanetsNode.detachChild(startPlanet);
             playersPlanetsNode.attachChild(startPlanet);
-           
+
         }
 
         /**
@@ -952,6 +962,7 @@ public class Level {
          * @param players the players
          */
         public void setupPlayers(HashMap<Integer, Player> players, Random r) {
+
 
             for (Map.Entry<Integer, Player> entrySet : players.entrySet()) {
                 Player p = entrySet.getValue();
@@ -964,7 +975,7 @@ public class Level {
                 freePlanetsNode.detachChild(randomPlanet);
                 playersPlanetsNode.attachChild(randomPlanet);
             }
-            levelLoaded = true;
+
             System.out.println("Players setup!");
         }
 

@@ -56,7 +56,8 @@ public class FontLoader {
     
     /** The font names. */
     private final String[] fontNames = {
-        "SolarWarsFont32"
+        "SolarWarsFont32",
+            "SolarWarsFont64"
     };
     
     /** The fonts. */
