@@ -693,9 +693,10 @@ public class Level {
             int PlanetCounter = 0;
             boolean top = true;
             boolean startPlanet = false;
+            boolean lastRow = false;
             
             //Schleife für Anzahl der Ringe
-            for (int i = 0; i <= playerCount ;i++){                
+            for (int i = 0; i < playerCount ;i++){                
                 pointerZ = +i;
                 pointerX = +i;
                 arrayZ = playerCount-i;
@@ -712,54 +713,6 @@ public class Level {
                                 // }
                                 createPlanet(r, pointerX, pointerZ);
                                 setSpCoordFalse(arrayX, arrayZ);
-                                
-                                
-                                //Wenn letzter Ring erzeugt wird
-                                if (i == playerCount){
-                                    
-                                    // COUNTER INITIALISIERUNG
-                                    // Wenn noch an der ersten Spalte gebaut wird nur counter++
-                                    if (playerCount*2+1 < counter){
-                                        counter++;
-                                    }
-                                    // Wenn oben erstellt wird, initialisiere counter und zwCounter entsprechend
-                                    else if (top == true){
-                                        zwCounter = counter;
-                                        counter = playerCount*8+decrement;
-                                        decrement--;
-                                        top = false;
-                                        }
-                                        // Wenn unten erstellt wird, normaler counter++ über zwCounter
-                                        else{
-                                        zwCounter++;
-                                        counter = zwCounter;
-                                        top = true;
-                                        }
-                                 
-                                    // PLANETENERZEUGUNG
-                                       // An einer zufälligen Stelle den ersten Spielerplanet erstellen
-                                    if (
-                                            ( counter < 8 && randomTake() == true ||counter == 8) 
-                                            && startPlanet == false){
-                                        positionen.push(new Vector2f(pointerX, pointerZ));
-                                        setSpCoordFalse(j,k);
-                                        startPlanetNumber = counter;
-                                        startPlanet = true;
-                                        }
-                                        // Sobald 7 freie Planeten erstellt wurden, den nächsten Spielerplanet erstellen
-                                    else if (counter == startPlanetNumber+8*multiplier){
-                                        positionen.push(new Vector2f(pointerX, pointerZ));
-                                        PlanetCounter++;
-                                        setSpCoordFalse(j,k);
-                                        multiplier++;
-                                        }
-                                        // ganz normalen Planet erstellen
-                                        else{
-                                            createPlanet(r, pointerX, pointerZ);
-                                            setSpCoordFalse(arrayX, arrayZ);
-                                    }
-                                    
-                                }
                         }
                         pointerZ--;
                         arrayZ++;
@@ -772,6 +725,62 @@ public class Level {
                 
             }
             
+            //Wenn letzter Ring erzeugt wird
+            pointerX = playerCount;
+            pointerZ = playerCount+1;
+            for(int lauf = 0; lauf < playerCount*8; lauf++){
+                                    // COUNTER INITIALISIERUNG
+                                    // Wenn noch an der ersten Spalte gebaut wird nur counter++
+                             if (lastRow == false){
+                                    if (counter < playerCount*2+1){
+                                        counter++;
+                                        pointerZ--;
+                                    }
+                                    // Wenn oben erstellt wird, initialisiere counter und zwCounter entsprechend
+                                    else if (top == true){
+                                            zwCounter = counter;
+                                            counter = playerCount*8+decrement;
+                                            pointerZ = playerCount;
+                                            pointerX--;
+                                            decrement--;
+                                            top = false;
+                                            if (counter == playerCount*6+1){
+                                                lastRow = true;
+                                            }
+                                        }
+                                        // Wenn unten erstellt wird, normaler counter++ über zwCounter
+                                        else{
+                                            zwCounter++;
+                                            counter = zwCounter;
+                                            pointerZ = -playerCount;
+                                            top = true;
+                                        }
+                             }
+                             else{
+                                 counter++;
+                                 pointerZ--;
+                             }
+                                    // PLANETENERZEUGUNG
+                                       // An einer zufälligen Stelle den ersten Spielerplanet erstellen
+                                    if (counter < playerCount*2+1 && randomTake() == true && startPlanet == false ||counter == playerCount*2+1 && startPlanet == false){
+                                        positionen.push(new Vector2f(pointerX, pointerZ));
+                                        //setSpCoordFalse(arrayX, arrayZ);
+                                        startPlanetNumber = counter;
+                                        startPlanet = true;
+                                        }
+                                        // Sobald 7 freie Planeten erstellt wurden, den nächsten Spielerplanet erstellen
+                                    else if (counter%8 == startPlanetNumber){
+                                        positionen.push(new Vector2f(pointerX, pointerZ));
+                                        PlanetCounter++;
+                                        //setSpCoordFalse(arrayX, arrayZ);
+                                        multiplier++;
+                                        }
+                                        // ganz normalen Planet erstellen
+                                        else{
+                                            createPlanet(r, pointerX, pointerZ);
+                                            //setSpCoordFalse(arrayX, arrayZ);
+                                        }
+            }
             createPlayerPositions(r);
             
             if (control != null) {
@@ -815,7 +824,7 @@ public class Level {
             
         
         private boolean randomTake(){
-            if (gibZufallszahl(1000) > 875){
+            if (gibZufallszahl(1000) > 1000-(1000/(level.playersByID.size()*2+1))){
                 return true;
             }
             else{
