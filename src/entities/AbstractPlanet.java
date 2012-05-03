@@ -216,7 +216,7 @@ public abstract class AbstractPlanet extends Node {
         label = new BitmapText(f, false);
         label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
         //label.setQueueBucket(Bucket.Transparent);
-        label.setSize(0.3f);
+        label.setSize(0.31f);
         label.setColor(ColorRGBA.Orange);
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);

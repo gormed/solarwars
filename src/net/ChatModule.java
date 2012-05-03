@@ -87,6 +87,7 @@ public class ChatModule implements ActionListener {
         chatGUI.hide();
     }
 
+    @Override
     public void onAction(String name, boolean isPressed, float tpf) {
         if (!isPressed && name.equals(SolarWarsApplication.INPUT_MAPPING_CHAT)) {
             visible = !visible;

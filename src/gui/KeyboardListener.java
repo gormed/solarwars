@@ -107,7 +107,15 @@ public abstract class KeyboardListener implements ActionListener {
             inputManager.addMapping(KeyInputMap.INPUT_MAPPING_UNDERSCORE, new KeyTrigger(KeyInput.KEY_UNDERLINE));
             inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
 
-            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT, new KeyTrigger(KeyInput.KEY_PERIOD));
+            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT,
+                    new KeyTrigger(KeyInput.KEY_PERIOD),
+                    new KeyTrigger(KeyInput.KEY_NUMPADCOMMA));
+//            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_QUESTIONMARK,
+//                    new KeyTrigger(KeyInput.KEY_PERIOD));
+            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_COMMA,
+                    new KeyTrigger(KeyInput.KEY_COMMA));
+//            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_EXCREMATIONMARK,
+//                    new KeyTrigger(KeyInput.KEY_COMMA));
             mappingsAdded = true;
         }
 
@@ -152,7 +160,10 @@ public abstract class KeyboardListener implements ActionListener {
                 KeyInputMap.INPUT_MAPPING_SPACE,
                 KeyInputMap.INPUT_MAPPING_UNDERSCORE,
                 KeyInputMap.INPUT_MAPPING_BACKSPACE,
-                KeyInputMap.INPUT_MAPPING_POINT);
+                KeyInputMap.INPUT_MAPPING_POINT,
+                KeyInputMap.INPUT_MAPPING_QUESTIONMARK,
+                KeyInputMap.INPUT_MAPPING_COMMA,
+                KeyInputMap.INPUT_MAPPING_EXCREMATIONMARK);
 
     }
 
