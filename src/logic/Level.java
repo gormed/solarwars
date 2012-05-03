@@ -811,6 +811,10 @@ public class Level {
         }
 
         private void createPlayerPositions() {
+            if (level.playersByID.size() > positionen.size()) {
+                return;
+            }
+                
             for (Map.Entry<Integer, Player> entrySet : level.playersByID.entrySet()) {
                 Player p = entrySet.getValue();
                 Vector2f v = getRandomPos();
@@ -870,8 +874,8 @@ public class Level {
         }
 
         private int getRandomShipCount(int size) {
-            return 5 + randomizer.nextInt(5)
-                    + (int) (PLANET_SIZES[size] * (randomizer.nextFloat() * 100.0f));
+            return randomizer.nextInt((int) ((size+1)*1.5f))
+                    + (int) (20/Level.PLANET_INCREMENT_TIME[size]);
         }
 
         private AbstractPlanet createPlanet(int size, float x, float z, int shipCount) {
@@ -896,9 +900,7 @@ public class Level {
                     new Vector3f(x, 0, z),
                     size);
             p.createPlanet();
-            p.setShipCount(
-                    5 + randomizer.nextInt(5)
-                    + (int) (p.getSize() * (randomizer.nextFloat() * 100.0f)));
+            p.setShipCount(getRandomShipCount(size));
 
             planetList.put(p.getId(), p);
             freePlanetsNode.attachChild(p);
