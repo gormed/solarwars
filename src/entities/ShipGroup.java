@@ -194,10 +194,10 @@ public class ShipGroup extends Node {
      */
     public void moveToPlanet(AbstractPlanet p) {
         //if (!owner.hasLost() && !Gameplay.getCurrentLevel().isGameOver()) {
-            order = p;
-            for (AbstractShip s : ships) {
-                s.moveToPlanet(p);
-            }
+        order = p;
+        for (AbstractShip s : ships) {
+            s.moveToPlanet(p);
+        }
         //}
     }
 

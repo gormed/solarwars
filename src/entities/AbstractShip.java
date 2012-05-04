@@ -28,6 +28,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import logic.Level;
 import logic.ActionLib;
 import logic.Gameplay;
@@ -42,7 +43,7 @@ public abstract class AbstractShip extends Node {
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.2f;
     /** The asset manager. */
-    protected AssetManager assetManager;
+    protected static AssetManager assetManager;
     /** The geometry. */
     protected Geometry geometry;
     /** The material. */
@@ -61,6 +62,8 @@ public abstract class AbstractShip extends Node {
     protected Player owner;
     /** The order. */
     protected AbstractPlanet order;
+    protected Spatial shipBatchSpatial;
+    protected ShipBatchManager batchManager = ShipBatchManager.getInstance();
 
     /**
      * Instantiates a new abstract ship.
@@ -128,13 +131,15 @@ public abstract class AbstractShip extends Node {
     /**
      * Removes the from ship group.
      */
-    private void removeFromShipGroup() {
+    private void freeShip() {
         if (shipGroup == null) {
             return;
         } else {
             ActionLib.getInstance().invokeShipAction(
                     this, shipGroup, owner, Gameplay.SHIP_ARRIVES);
         }
+        batchManager.freeShipBatch(shipBatchSpatial);
+        level.removeShip(owner, this);
     }
 
     /**
@@ -176,7 +181,7 @@ public abstract class AbstractShip extends Node {
             Vector3f impact = impactPos.clone();
             impact.subtractLocal(position);
 
-            if (impact.length() < 0.1f) {
+            if (impact.length() < 0.1f || dir.length() < 0.01f) {
 
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
@@ -186,13 +191,16 @@ public abstract class AbstractShip extends Node {
 
                 order.emitImpactParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
 
-                removeFromShipGroup();
-                level.removeShip(owner, this);
-                order = null;
+                freeShip();
+
 
             } else {
                 dir.normalizeLocal();
-                dir.multLocal(tpf);
+                if (tpf < 0.01f)
+                    dir.multLocal(0.01f);
+                else
+                    dir.multLocal(tpf);
+//                System.out.println("Time: " + tpf);
                 position.addLocal(dir);
                 transformNode.setLocalTranslation(position);
 

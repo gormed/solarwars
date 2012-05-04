@@ -125,6 +125,7 @@ public class SolarWarsApplication extends Application {
             new BloomFilter(BloomFilter.GlowMode.Objects);
     /** The game. */
     private SolarWarsGame game;
+    private boolean lostFocus = false;
 
     /**
      * Instantiates a new solar wars application.
@@ -451,8 +452,12 @@ public class SolarWarsApplication extends Application {
         if (speed == 0 || paused) {
             return;
         }
-
         float tpf = timer.getTimePerFrame() * speed;
+        if (lostFocus == true) {
+            tpf = 0;
+            lostFocus = false;
+        }
+        
 
         if (showFps) {
             secondCounter += timer.getTimePerFrame();
@@ -480,6 +485,12 @@ public class SolarWarsApplication extends Application {
         renderManager.render(tpf, context.isRenderable());
         simpleRender(renderManager);
         stateManager.postRender();
+    }
+
+    @Override
+    public void loseFocus() {
+        super.loseFocus();
+        lostFocus = true;
     }
 
     /**

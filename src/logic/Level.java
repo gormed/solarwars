@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import entities.LevelBackground;
+import entities.ShipBatchManager;
 import gui.GameGUI;
 import gui.elements.GameOverGUI;
 import java.util.Stack;
@@ -166,6 +167,7 @@ public class Level {
     /** The currently used game gui. */
     private GameGUI gui;
     private HashMap<Integer, Player> playersByID;
+    private ShipBatchManager batchManager;
     /**
      * Indicates that the level is fully loaded into scene-graph
      */
@@ -294,7 +296,9 @@ public class Level {
             this.shipNodes.put(p, n);
             this.allShipsNode.attachChild(n);
         }
-
+        
+        batchManager = ShipBatchManager.getInstance();
+        batchManager.initialize(Hub.playersByID.size()*100);
 
     }
 
@@ -407,11 +411,17 @@ public class Level {
         for (Map.Entry<Integer, AbstractPlanet> entry : getPlanetSet()) {
             entry.getValue().updatePlanet(tpf);
         }
+        
+        int globalShips = 0;
+        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+            globalShips += entry.getValue().getShipCount();
+        }
+        batchManager.refreshBatchSize(globalShips);
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);
         }
-
+        
         for (Map.Entry<Integer, AbstractShip> entry : shipList.entrySet()) {
             entry.getValue().updateShip(tpf);
         }
@@ -959,8 +969,8 @@ public class Level {
             p.createPlanet();
             // set ships
             p.setShipCount(PLAYER_START_SHIP_COUNT);
-            // set owner
-            p.setOwner(owner);
+            // owner aquires planet
+            owner.capturePlanet(p);
             // add planet into list
             planetList.put(p.getId(), p);
             // create nodes for the player and add the planet
