@@ -306,7 +306,7 @@ public class Level {
     public void generateLevel(long seed) {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
-        g.generateClassic(this.seed);
+        g.generateSquare(this.seed);
     }
 
     /**
@@ -475,6 +475,8 @@ public class Level {
         Stack<Vector2f> positionen = new Stack<Vector2f>();
         /* Randomizer for the level, keeps the same behavior on all clients */
         private Random randomizer;
+        /* Anzahl der Ringe, die sich noch hinter einem Spieler befinden (außen) */
+        private int ringeBehind = 2;
 
         public LevelGenerator(Level hull) {
             level = hull;
@@ -498,7 +500,7 @@ public class Level {
         private void initArrays() {
 
             /* Initialisiere spCoord */
-            int space = (level.playersByID.size()) * 2 + 1;
+            int space = (level.playersByID.size()) * 2 + (ringeBehind*2 +1);
             spCoord = new boolean[space][space];
             for (int i = 0; i < space; i++) {
                 for (int j = 0; j < space; j++) {
@@ -656,7 +658,15 @@ public class Level {
             levelLoaded = true;
             System.out.println("Level generated!");
         }
-
+        
+        /**
+         * Baut das Level mit einem quadratischen Spielfeld auf, bei dem
+         * jeder Spieler den gleichen Abstand bis zum nächsten hat.
+         * Startpositionen sind dabei zufällig und die Anzahl der Ringe ist
+         * abhängig von der Spieleranzahl bzw. von dem Datenfeld ringeBehind!
+         * 
+         * @param seed Zufallsvariable für den Aufbau.
+         */
         public void generateSquare(long seed) {
             System.out.print("[" + seed + "] Generating level...");
             // create a node for the planet-labels
@@ -686,55 +696,35 @@ public class Level {
             int zwCounter = 0;
             int multiplier = 1;
             int startPlanetNumber = 0;
-            int PlanetCounter = 0;
             boolean top = true;
             boolean startPlanet = false;
-            boolean lastRow = false;
-
-            //Schleife für Anzahl der Ringe
-            for (int i = 0; i < playerCount; i++) {
-                pointerZ = +i;
-                pointerX = +i;
-                arrayZ = playerCount - i;
-                arrayX = playerCount - i;
-                //Schleife für X-Koord
-                for (int j = 0; j < (i * 2 + 1); j++) {
-                    //Schleife für Z-Koord
-                    for (int k = 0; k < (i * 2 + 1); k++) {
-                        if (platz(arrayX, arrayZ) == true) {
-                            // CREATE PLANET - defekt?
-                            // if (r.nextFloat() > 650) {
-                            // createPlanet(r, pointerX, pointerZ);
-                            // System.out.print(".");
-                            // }
-                            createPlanet(pointerX, pointerZ);
-                            setSpCoordFalse(arrayX, arrayZ);
-                        }
-                        pointerZ--;
-                        arrayZ++;
-                    }
-                    pointerZ = +i;
-                    arrayZ = playerCount - i;
-                    pointerX--;
-                    arrayX++;
-                }
-
-            }
-
-            //Wenn letzter Ring erzeugt wird
+            boolean lastRow = false;            
+            
+            //ERZEUGUNG DES SPIELERRINGS
+            
+            arrayX = 0+ringeBehind;
+            arrayZ = -1+ringeBehind;
+            
             pointerX = playerCount;
             pointerZ = playerCount + 1;
             for (int lauf = 0; lauf < playerCount * 8; lauf++) {
-                // COUNTER INITIALISIERUNG
+                // Counter-Initialisierung
                 // Wenn noch an der ersten Spalte gebaut wird nur counter++
                 if (lastRow == false) {
                     if (counter < playerCount * 2 + 1) {
                         counter++;
+                        
+                        arrayZ++;
+                        
                         pointerZ--;
                     } // Wenn oben erstellt wird, initialisiere counter und zwCounter entsprechend
                     else if (top == true) {
                         zwCounter = counter;
                         counter = playerCount * 8 + decrement;
+                        
+                        arrayZ = 0+ringeBehind;
+                        arrayX++;
+                        
                         pointerZ = playerCount;
                         pointerX--;
                         decrement--;
@@ -746,33 +736,78 @@ public class Level {
                     else {
                         zwCounter++;
                         counter = zwCounter;
+                        
+                        arrayZ = (playerCount*2)+ringeBehind;
+                        
                         pointerZ = -playerCount;
                         top = true;
                     }
                 } else {
-                    counter++;
+                    counter--;
                     pointerZ--;
+                    
+                    arrayZ++;
+                
                 }
-                // PLANETENERZEUGUNG
+                // Planetenerzeugung
                 // An einer zufälligen Stelle den ersten Spielerplanet erstellen
-                if (counter < playerCount * 2 + 1 && randomTake() == true && startPlanet == false || (counter == playerCount * 2 + 1 && startPlanet == false)) {
+                if ((counter < (playerCount * 2 + 1) && randomTake() == true && startPlanet == false) 
+                     || (counter == playerCount * 2 + 1 && startPlanet == false)
+                     || (counter == 8 && startPlanet == false)  
+                        ) {
                     positionen.push(new Vector2f(pointerX, pointerZ));
-                    //setSpCoordFalse(arrayX, arrayZ);
+                    setSpCoordFalse(arrayX, arrayZ);
                     startPlanetNumber = counter;
                     startPlanet = true;
                 } // Sobald 7 freie Planeten erstellt wurden, den nächsten Spielerplanet erstellen
                 else if (counter % 8 == startPlanetNumber) {
                     positionen.push(new Vector2f(pointerX, pointerZ));
-                    PlanetCounter++;
-                    //setSpCoordFalse(arrayX, arrayZ);
+                    setSpCoordFalse(arrayX, arrayZ);
                     multiplier++;
                 } // ganz normalen Planet erstellen
                 else {
-                    createPlanet(pointerX, pointerZ);
-                    //setSpCoordFalse(arrayX, arrayZ);
+                    // Random Planet erzeugen
+                    if (randomizer.nextFloat() > 0.65f) {
+                             createPlanet(pointerX, pointerZ);
+                             System.out.print(".");
+                             }
+                    // createPlanet(pointerX, pointerZ);
+                    setSpCoordFalse(arrayX, arrayZ);
                 }
             }
+            
             createPlayerPositions();
+
+            //ERZEUGUNG DES RESTLICHEN RASTERS
+            //Schleife für Anzahl der Ringe
+            for (int i = 0; i < playerCount+(ringeBehind+1); i++) {
+                pointerZ = +i;
+                pointerX = +i;
+                arrayZ = (playerCount+ringeBehind)-i;
+                arrayX = (playerCount+ringeBehind)-i;
+                //Schleife für X-Koord
+                for (int j = 0; j < (i * 2 + 1); j++) {
+                    //Schleife für Z-Koord
+                    for (int k = 0; k < (i * 2 + 1); k++) {
+                        if (platz(arrayX, arrayZ) == true) {
+                            // Random Planet erzeugen
+                             if (randomizer.nextFloat() > 0.65f) {
+                             createPlanet(pointerX, pointerZ);
+                             System.out.print(".");
+                             }
+                            // createPlanet(pointerX, pointerZ);
+                            setSpCoordFalse(arrayX, arrayZ);
+                        }
+                        pointerZ--;
+                        arrayZ++;
+                    }
+                    pointerZ = +i;
+                    arrayZ = (playerCount+ringeBehind)-i;
+                    pointerX--;
+                    arrayX++;
+                }
+
+            }
 
             if (control != null) {
                 control.addShootable(levelNode);
@@ -823,16 +858,12 @@ public class Level {
         }
 
         private boolean randomTake() {
-            if (gibZufallszahl(1000) > 1000 - (1000 / (level.playersByID.size() * 2 + 1))) {
+            if ( randomizer.nextFloat() < 1.0f / (level.playersByID.size() * 2 + 1.0f) ) {
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
-        }
-
-        // gibt eine Zufallszahl zwischen 1 und pMaximum zurück
-        public int gibZufallszahl(int pMaximum) {
-            return (int) (randomizer.nextInt(pMaximum) + 1);
         }
 
         private void createSubPlanets(AbstractPlanet basePlanet, float maxDist) {
