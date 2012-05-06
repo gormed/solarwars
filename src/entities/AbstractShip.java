@@ -196,10 +196,7 @@ public abstract class AbstractShip extends Node {
 
             } else {
                 dir.normalizeLocal();
-                if (tpf < 0.01f)
-                    dir.multLocal(0.01f);
-                else
-                    dir.multLocal(tpf);
+                dir.multLocal(tpf);
 //                System.out.println("Time: " + tpf);
                 position.addLocal(dir);
                 transformNode.setLocalTranslation(position);

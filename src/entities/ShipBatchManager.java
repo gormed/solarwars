@@ -108,7 +108,7 @@ public class ShipBatchManager {
     public void refreshBatchSize(float tpf) {
 
         updateTimer += tpf;
-        if (updateTimer > 1.0f) {
+        if (updateTimer > 0.1f) {
 
             int globalShips = 0;
             for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {

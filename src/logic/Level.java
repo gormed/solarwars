@@ -412,7 +412,7 @@ public class Level {
             entry.getValue().updatePlanet(tpf);
         }
         
-        batchManager.refreshBatchSize(tpf);
+        //batchManager.refreshBatchSize(tpf);
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);
