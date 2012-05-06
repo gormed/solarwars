@@ -70,6 +70,7 @@ public class ShipBatchManager {
 
         return shipBatchSpatial;
     }
+    
     private ArrayList<Spatial> usedBatches = new ArrayList<Spatial>();
     private ArrayList<Spatial> unusedBatches = new ArrayList<Spatial>();
     private int currentShipCount;
@@ -107,10 +108,10 @@ public class ShipBatchManager {
         usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
         if (currentShipCount < desiredShipCount) {
             int step = 10;
-            for (int i = 0; i < step; i++) {
+            //for (int i = 0; i < step; i++) {
                 unusedBatches.add(createNextBatch());
-            }
-            currentShipCount += step;
+            //}
+            currentShipCount++;
         }
     }
 }
