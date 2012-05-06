@@ -412,11 +412,7 @@ public class Level {
             entry.getValue().updatePlanet(tpf);
         }
         
-        int globalShips = 0;
-        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-            globalShips += entry.getValue().getShipCount();
-        }
-        batchManager.refreshBatchSize(globalShips);
+        batchManager.refreshBatchSize(tpf);
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);
@@ -486,7 +482,7 @@ public class Level {
         /* Randomizer for the level, keeps the same behavior on all clients */
         private Random randomizer;
         /* Anzahl der Ringe, die sich noch hinter einem Spieler befinden (außen) */
-        private int ringeBehind = 2;
+        private int ringeBehind = 1;
 
         public LevelGenerator(Level hull) {
             level = hull;

@@ -12,7 +12,10 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Line;
 import java.util.ArrayList;
+import java.util.Map;
 import jme3tools.optimize.GeometryBatchFactory;
+import logic.Player;
+import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
 /**
@@ -30,6 +33,8 @@ public class ShipBatchManager {
         }
         return instance = new ShipBatchManager();
     }
+    
+    private float updateTimer;
 
     private ShipBatchManager() {
     }
@@ -70,7 +75,6 @@ public class ShipBatchManager {
 
         return shipBatchSpatial;
     }
-    
     private ArrayList<Spatial> usedBatches = new ArrayList<Spatial>();
     private ArrayList<Spatial> unusedBatches = new ArrayList<Spatial>();
     private int currentShipCount;
@@ -101,17 +105,28 @@ public class ShipBatchManager {
 //        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
     }
 
-    public void refreshBatchSize(int shipCount) {
-        desiredShipCount = shipCount;
+    public void refreshBatchSize(float tpf) {
 
-        unusedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
-        usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
-        if (currentShipCount < desiredShipCount) {
-            int step = 10;
-            //for (int i = 0; i < step; i++) {
+        updateTimer += tpf;
+        if (updateTimer > 1.0f) {
+
+            int globalShips = 0;
+            for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+                globalShips += entry.getValue().getShipCount();
+            }
+
+            desiredShipCount = globalShips;
+
+            unusedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
+            usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
+            if (currentShipCount < desiredShipCount) {
+                int step = 10;
+                //for (int i = 0; i < step; i++) {
                 unusedBatches.add(createNextBatch());
-            //}
-            currentShipCount++;
+                //}
+                currentShipCount++;
+            }
+            updateTimer = 0;
         }
     }
 }
