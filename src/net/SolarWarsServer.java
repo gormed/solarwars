@@ -425,6 +425,7 @@ public class SolarWarsServer extends SimpleApplication {
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
+        @Override
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof StringMessage) {
                 // do something with the message
@@ -445,6 +446,7 @@ public class SolarWarsServer extends SimpleApplication {
 
     private class GameplayListener implements MessageListener<HostedConnection> {
 
+        @Override
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlanetActionMessage) {
                 PlanetActionMessage clientMessage = (PlanetActionMessage) message;

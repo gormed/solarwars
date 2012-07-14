@@ -53,69 +53,18 @@ import logic.ActionLib;
 import logic.Gameplay;
 
 /**
- * The Class IsoControl.
+ * The Class IsoControl for the players interaction on screen. 
+ * Hanles main input through mouse clicks and drags, fires the events for 
+ * planet and ship actions.
  */
 public class IsoControl {
 
+    private static final boolean DEBUG_RAYCASTS = false;
+    //==========================================================================
+    //      Singleton
+    //==========================================================================
+    /** The one and only reference. */
     private static IsoControl instance;
-
-    public static IsoControl getInstance() {
-        if (instance != null) {
-            return instance;
-        }
-        return instance = new IsoControl(SolarWarsApplication.getInstance());
-    }
-    /** The root node. */
-    private Node rootNode;
-    /** The shootables node. */
-    private Node shootablesNode;
-    private final AssetManager assetManager;
-
-    /**
-     * Gets the shootables node.
-     *
-     * @return the shootables node
-     */
-    public Node getShootablesNode() {
-        return shootablesNode;
-    }
-    /** The marker node. */
-    private MarkerNode markerNode;
-    /** The last node. */
-    private Node lastNode;
-    private boolean dragging = false;
-    private Vector3f lastXZPlanePos;
-    private Vector3f startXZPlanePos;
-    private Vector2f startScreenPos;
-    // planet selection
-    private ArrayList<AbstractPlanet> planetSelection;
-    private ArrayList<MarkerNode> markerNodes;
-    // Panels for rect
-    private Panel leftDrag;
-    private Panel topDrag;
-    private Panel rightDrag;
-    private Panel bottomDrag;
-    private Panel centerDrag;
-    // debug
-//    private Cross startDrag;
-//    private Cross endDrag;
-    /** The cam. */
-    private Camera cam;
-    /** The action listener. */
-    private ActionListener actionListener;
-    private InputManager inputManager;
-    /** The action lib. */
-    private ActionLib actionLib;
-    private GameGUI gui;
-
-    /**
-     * Gets the action listener.
-     *
-     * @return the action listener
-     */
-    public ActionListener getActionListener() {
-        return actionListener;
-    }
 
     /**
      * Instantiates a new iso control.
@@ -166,7 +115,71 @@ public class IsoControl {
     }
 
     /**
-     * Initializes the.
+     * Gets the instance of the singleton or creates it.
+     * @return the one and only reference
+     */
+    public static IsoControl getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        return instance = new IsoControl(SolarWarsApplication.getInstance());
+    }
+    //==========================================================================
+    //      Private Fields
+    //==========================================================================
+    // general
+    /** The root node. */
+    private Node rootNode;
+    /** The shootables node. */
+    private Node shootablesNode;
+    /** inner ref to the asset manager */
+    private final AssetManager assetManager;
+    /** The marker node. */
+    private MarkerNode markerNode;
+    /** The last node. */
+    private Node lastNode;
+    // Dragging
+    /** The dragg ing flag indicates if currently dragging. */
+    private boolean dragging = false;
+    private Vector3f lastXZPlanePos;
+    private Vector3f startXZPlanePos;
+    private Vector2f startScreenPos;
+    // planet selection
+    private ArrayList<AbstractPlanet> planetSelection;
+    private ArrayList<MarkerNode> markerNodes;
+    // Panels for rect
+    private Panel leftDrag;
+    private Panel topDrag;
+    private Panel rightDrag;
+    private Panel bottomDrag;
+    private Panel centerDrag;
+    // debug
+//    private Cross startDrag;
+//    private Cross endDrag;
+    /** The cam. */
+    private Camera cam;
+    /** The action listener. */
+    private ActionListener actionListener;
+    private InputManager inputManager;
+    /** The action lib. */
+    private ActionLib actionLib;
+    /** inner ref to the games gui */
+    private GameGUI gui;
+    //==========================================================================
+    //      Methods
+    //==========================================================================
+
+    /**
+     * Gets the action listener.
+     *
+     * @return the action listener
+     */
+    public ActionListener getActionListener() {
+        return actionListener;
+    }
+
+    /**
+     * Initializes the players main controls.
      *
      * @param rootNode the root node
      * @param inputManager the input manager
@@ -174,30 +187,31 @@ public class IsoControl {
     private void initialize(final Node rootNode) {
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
-        // Defining the "Shoot" action: Determine what was hit and how to
-        // respond.
+        // register action listener for right and left clicks and the mouse-weel
         actionListener = new ActionListener() {
 
+            @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
 
-                gui = Gameplay.getCurrentLevel().getGui();
-                int action = -1;
+                gui = Gameplay.getCurrentLevel().getGUI();
 
-                // LEFT CLICK = 1
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
-                    action = 1;
-                } // RIGHT CLICK = 2
-                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)) {
-                    action = 2;
-                } // WHEEL DOWN
-                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN)) {
-                    action = 3;
-                } // WHEEL UP
-                else if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_UP)) {
-                    action = 4;
+                if (keyPressed) {
+                    onButtonDown(name);
+                } else {
+                    if (onButtonUp(name)) {
+                        return;
+                    }
                 }
+                onMouseWeel(name);
 
-                if (keyPressed && action == 1) {
+            }
+            
+            /**
+             * Is executed if the player clicks on left or right mouse button
+             * but not on its hold.
+             */
+            private void onButtonDown(String name) {
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
                     Vector2f click2d = inputManager.getCursorPosition();
                     Vector3f click3d = cam.getWorldCoordinates(
                             new Vector2f(click2d.x, click2d.y), 0f).clone();
@@ -227,208 +241,275 @@ public class IsoControl {
                     }
                     dragging = true;
                 }
+            }
 
-                if ((action == 1 || action == 2) && !keyPressed) {
-                    // 1. Reset results list.
+            /**
+             * Is executed if the mouse-weel is scrolled.
+             */
+            private void onMouseWeel(String name) {
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN)) {
+                    Hub.getLocalPlayer().refreshShipPercentage(0.05f);
+                }
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_UP)) {
+                    Hub.getLocalPlayer().refreshShipPercentage(-0.05f);
+                }
+            }
+
+            /**
+             * Is executed if the left or right mouse button is released.
+             * This can end in a drag action that ended or a normal left click
+             * for selection or right click for attack.
+             */
+            private boolean onButtonUp(String name) {
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
+                        || name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)) {
+                    // reset drag flag
                     dragging = false;
+                    // clear collision results
                     CollisionResults results = new CollisionResults();
-                    // 2. calculate ray from camera to mouse pointer
+                    // get 3d mouse position
                     Vector2f click2d = inputManager.getCursorPosition();
                     Vector3f click3d = cam.getWorldCoordinates(
                             new Vector2f(click2d.x, click2d.y), 0f).clone();
                     Vector3f dir = cam.getWorldCoordinates(
                             new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+                    // create ray for raycasting
                     Ray ray = new Ray(click3d, dir);
-
-                    if (action == 1 && startXZPlanePos != null && lastXZPlanePos != null) {
-//                        rootNode.detachChild(startDrag);
-                        float width = Math.abs(lastXZPlanePos.x - startXZPlanePos.x);
-                        float height = Math.abs(lastXZPlanePos.z - startXZPlanePos.z);
-                        if (width > 0.2f && height > 0.2f) {
-                            removeMarker(markerNode);
-                            float leftX = (startXZPlanePos.x <= lastXZPlanePos.x) ? startXZPlanePos.x : lastXZPlanePos.x;
-                            float topY = (startXZPlanePos.z <= lastXZPlanePos.z) ? startXZPlanePos.z : lastXZPlanePos.z;
-                            Rectangle2D rect = new Rectangle2D.Float(
-                                    leftX, topY, width, height);
-                            selectPlanets(rect);
-                            MarkerNode markerNode = null;
-                            if (!planetSelection.isEmpty()) {
-                                for (AbstractPlanet planet : planetSelection) {
-
-                                    markerNode = new MarkerNode();
-                                    markerNodes.add(markerNode);
-                                    repositMarker(planet, markerNode);
-
-                                }
-                                actionLib.invokePlanetAction(
-                                        IsoControl.getInstance(),
-                                        null,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_MULTI_SELECT);
-
-                            }
-
-                            lastXZPlanePos = null;
-                            startScreenPos = null;
-                            startXZPlanePos = null;
-                            if (centerDrag != null) {
-                                gui.removeGUIElement(centerDrag);
-                                centerDrag = null;
-                            }
-                            if (leftDrag != null) {
-                                gui.removeGUIElement(leftDrag);
-                                leftDrag = null;
-                            }
-                            if (topDrag != null) {
-                                gui.removeGUIElement(topDrag);
-                                topDrag = null;
-                            }
-                            if (rightDrag != null) {
-                                gui.removeGUIElement(rightDrag);
-                                rightDrag = null;
-                            }
-                            if (bottomDrag != null) {
-                                gui.removeGUIElement(bottomDrag);
-                                bottomDrag = null;
-                            }
-                            return;
-                        }
-
+                    // check if play ended a drag and leave if so
+                    if (playerEndsDrag(name)) {
+                        return true;
                     }
 
-                    // 3. Collect intersections between Ray and Shootables in
-                    // results list.
+                    // RAYCASTING
+                    // Collect intersections between Ray and Shootables in results list.
                     shootablesNode.collideWith(ray, results);
-                    // 4. Print the results
-                    System.out.println("----- 3D Collisions? " + results.size()
-                            + "-----");
-                    for (int i = 0; i < results.size(); i++) {
-                        // For each hit, we know distance, impact point, name of
-                        // geometry.
-                        float dist = results.getCollision(i).getDistance();
-                        Vector3f pt = results.getCollision(i).getContactPoint();
-                        String hit = results.getCollision(i).getGeometry().getName();
-                        System.out.println("* Collision #" + i);
-                        System.out.println("  You shot " + hit + " at " + pt
-                                + ", " + dist + " wu away.");
+                    // print if in debug
+                    if (DEBUG_RAYCASTS) {
+                        printRaycastResults(results);
                     }
-                    // 5. Use the results (we mark the hit object)
-                    if (results.size() > 0) {
-                        CollisionResult actual;
+                    // if player releases not having dragged before
+                    if (playerReleases(results, name)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
 
-                        ShipGroup nearestShipGroup = null;
-                        AbstractPlanet nearestPlanet = null;
-                        Node temp = null;
-
-                        // The closest collision point is what was truly hit:
-                        CollisionResult closest = results.getClosestCollision();
-                        temp = closest.getGeometry().getParent().getParent();
-
-                        if (temp != null && temp instanceof AbstractPlanet) {
-                            nearestPlanet = (AbstractPlanet) temp;
-                            lastNode = nearestPlanet;
-                            if (action == 1) {
-                                actionLib.invokePlanetAction(null, nearestPlanet,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_SELECT);
-
-                                repositMarker(nearestPlanet, markerNode);
-                                return;
-
-                            } else if (action == 2 && !Hub.getLocalPlayer().hasLost()) {
-                                actionLib.invokePlanetAction(null, nearestPlanet,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_ATTACK);
-                                return;
-                            }
-
-                        }
-
-
-                        for (int i = 0; i < results.size(); i++) {
-                            actual = results.getCollision(i);
-                            temp = actual.getGeometry().getParent().getParent();
-                            if (temp != null) {
-                                if (temp instanceof AbstractPlanet) {
-                                    nearestPlanet = (AbstractPlanet) temp;
-                                } else if (temp instanceof ShipGroup) {
-                                    nearestShipGroup = (ShipGroup) temp;
-                                }
-                            }
-                            if (nearestPlanet != null && nearestShipGroup != null) {
+            /**
+             * Is executed if it is a normal left click
+             * for selection or right click for attack.
+             */
+            private boolean playerReleases(CollisionResults results, String name) {
+                // use the results and check if there was something hit
+                if (results.size() > 0) {
+                    CollisionResult actual = null;
+                    ShipGroup nearestShipGroup = null;
+                    AbstractPlanet nearestPlanet = null;
+                    Node temp = null;
+                    // order the collisions so that at 0 is the closest
+                    results.getClosestCollision();
+//                    temp = closest.getGeometry().getParent().getParent();
+//                    // if we got an abstract planet here
+//                    if (temp != null && temp instanceof AbstractPlanet) {
+//                        nearestPlanet = (AbstractPlanet) temp;
+//                        lastNode = nearestPlanet;
+//                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+//                            actionLib.invokePlanetAction(null, nearestPlanet,
+//                                    Hub.getLocalPlayer(),
+//                                    Gameplay.PLANET_SELECT);
+//                            repositMarker(nearestPlanet, markerNode);
+//                            return true;
+//                        } else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)
+//                                && !Hub.getLocalPlayer().hasLost()) {
+//                            actionLib.invokePlanetAction(null, nearestPlanet,
+//                                    Hub.getLocalPlayer(),
+//                                    Gameplay.PLANET_ATTACK);
+//                            return true;
+//                        }
+//                    }
+                    // iterate through collisions begin with the closest
+                    for (int i = 0; i < results.size(); i++) {
+                        // currently iterated collision
+                        actual = results.getCollision(i);
+                        // get the node that is parent of the node that holds
+                        // the geometry, that is either a planet or a
+                        // shipgroup
+                        temp = actual.getGeometry().getParent().getParent();
+                        // if that thing is not null
+                        if (temp != null) {
+                            // check if its a planet
+                            if (temp instanceof AbstractPlanet) {
+                                nearestPlanet = (AbstractPlanet) temp;
+                                // if planet found first, break
+                                break;
+                            } else if (temp instanceof ShipGroup) {
+                                nearestShipGroup = (ShipGroup) temp;
+                                // if shipgroup found first, break
                                 break;
                             }
                         }
+                    }
+                    // was planet found
+                    if (nearestPlanet != null) {
+                        // if so, remember last posit marker...
+                        lastNode = nearestPlanet;
+                        // ...check if left button click
+                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+                            // invoke select action
+                            actionLib.invokePlanetAction(null, nearestPlanet,
+                                    Hub.getLocalPlayer(),
+                                    Gameplay.PLANET_SELECT);
+                            // finally set marker
+                            repositMarker(nearestPlanet, markerNode);
 
-                        if (nearestPlanet != null) {
-                            lastNode = nearestPlanet;
-                            if (action == 1) {
-                                actionLib.invokePlanetAction(null, nearestPlanet,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_SELECT);
-
-                                repositMarker(nearestPlanet, markerNode);
-
-                            } else if (action == 2 && !Hub.getLocalPlayer().hasLost()) {
-                                actionLib.invokePlanetAction(null, nearestPlanet,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_ATTACK);
-                            }
-
-                        } else if (nearestShipGroup != null) {
-                            lastNode = nearestShipGroup;
-                            if (action == 1 && !Hub.getLocalPlayer().hasLost()) {
-                                repositMarker(nearestShipGroup, markerNode);
-                                actionLib.invokeShipAction(null, nearestShipGroup,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.SHIP_REDIRECT);
-                            }
-
+                        } // ...check for reight botton click 
+                        // TODO: move hasLost check to actionLib
+                        else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)
+                                && !Hub.getLocalPlayer().hasLost()) {
+                            // invoke attack action
+                            actionLib.invokePlanetAction(null, nearestPlanet,
+                                    Hub.getLocalPlayer(),
+                                    Gameplay.PLANET_ATTACK);
                         }
 
-                        // Let's interact - we mark the hit with a red dot.
-                        // markerNode.setLocalTranslation(closest.getContactPoint());
-
-                        lastNode = closest.getGeometry().getParent();
-
-                        AbstractPlanet p = null;
-                        ShipGroup sg = null;
-                        Node n = lastNode.getParent();
-
-                        if (n instanceof AbstractPlanet) {
-                            p = (AbstractPlanet) n;
-
-
-                        } else if (n instanceof ShipGroup) {
+                    } // was shipgroup found
+                    else if (nearestShipGroup != null) {
+                        // if so, remember last posit marker...
+                        lastNode = nearestShipGroup;
+                        // ...check if left button click
+                        // TODO: move hasLost check to actionLib
+                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
+                                && !Hub.getLocalPlayer().hasLost()) {
+                            repositMarker(nearestShipGroup, markerNode);
+                            // invoke ship redirect action
+                            actionLib.invokeShipAction(null, nearestShipGroup,
+                                    Hub.getLocalPlayer(),
+                                    Gameplay.SHIP_REDIRECT);
                         }
 
-                    } else {
-                        // No hits? Then remove the mark.
-//                        if (lastNode != null) {
-//                            lastNode.detachChild(markerNode);
+                    }
+//                    if (actual != null) {
+//                        // Let's interact - we mark the hit with a red dot.
+//                        // markerNode.setLocalTranslation(closest.getContactPoint());
+//                        lastNode = actual.getGeometry().getParent();
+//                        AbstractPlanet p = null;
+//                        ShipGroup sg = null;
+//                        Node n = lastNode.getParent();
+//                        if (n instanceof AbstractPlanet) {
+//                            p = (AbstractPlanet) n;
+//
+//
+//                        } else if (n instanceof ShipGroup) {
 //                        }
-                        // rootNode.detachChild(markerNode);
+//                    }
+                }
+                return false;
+            }
+
+            /**
+             * Prints the results for a ray cast action ordered from nearest to
+             * farest.
+             */
+            private void printRaycastResults(CollisionResults results) {
+                // 4. Print the results
+                System.out.println("----- 3D Collisions? " + results.size()
+                        + "-----");
+                for (int i = 0; i < results.size(); i++) {
+                    // For each hit, we know distance, impact point, name of
+                    // geometry.
+                    float dist = results.getCollision(i).getDistance();
+                    Vector3f pt = results.getCollision(i).getContactPoint();
+                    String hit = results.getCollision(i).getGeometry().getName();
+                    System.out.println("* Collision #" + i);
+                    System.out.println("  You shot " + hit + " at " + pt
+                            + ", " + dist + " wu away.");
+                }
+            }
+
+            /**
+             * Is executed if a player ends mouse-dragging to collect the plantes
+             * that where selected. 
+             */
+            private boolean playerEndsDrag(String name) {
+                // if player was dragging and releases the mouse to select planets
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
+                        && startXZPlanePos != null
+                        && lastXZPlanePos != null) {
+                    //  rootNode.detachChild(startDrag);
+                    // calculate width and height of the drag rect
+                    float width = Math.abs(lastXZPlanePos.x - startXZPlanePos.x);
+                    float height = Math.abs(lastXZPlanePos.z - startXZPlanePos.z);
+                    // if the rect is big enough
+                    if (width > 0.2f && height > 0.2f) {
+                        // remove old marker of player
+                        removeMarker(markerNode);
+                        // get the left-top coordinate via 1337 confusing conditional assignment
+                        float leftX = (startXZPlanePos.x <= lastXZPlanePos.x) ? startXZPlanePos.x : lastXZPlanePos.x;
+                        float topY = (startXZPlanePos.z <= lastXZPlanePos.z) ? startXZPlanePos.z : lastXZPlanePos.z;
+                        // create the rectangle from it
+                        Rectangle2D rect = new Rectangle2D.Float(
+                                leftX, topY, width, height);
+                        // select all planets in rectangle
+                        selectPlanets(rect);
+                        //
+                        MarkerNode markerNode = null;
+                        if (!planetSelection.isEmpty()) {
+                            for (AbstractPlanet planet : planetSelection) {
+
+                                markerNode = new MarkerNode();
+                                markerNodes.add(markerNode);
+                                repositMarker(planet, markerNode);
+
+                            }
+                            actionLib.invokePlanetAction(
+                                    IsoControl.getInstance(),
+                                    null,
+                                    Hub.getLocalPlayer(),
+                                    Gameplay.PLANET_MULTI_SELECT);
+
+                        }
+                        lastXZPlanePos = null;
+                        startScreenPos = null;
+                        startXZPlanePos = null;
+                        if (centerDrag != null) {
+                            gui.removeGUIElement(centerDrag);
+                            centerDrag = null;
+                        }
+                        if (leftDrag != null) {
+                            gui.removeGUIElement(leftDrag);
+                            leftDrag = null;
+                        }
+                        if (topDrag != null) {
+                            gui.removeGUIElement(topDrag);
+                            topDrag = null;
+                        }
+                        if (rightDrag != null) {
+                            gui.removeGUIElement(rightDrag);
+                            rightDrag = null;
+                        }
+                        if (bottomDrag != null) {
+                            gui.removeGUIElement(bottomDrag);
+                            bottomDrag = null;
+                        }
+                        return true;
                     }
                 }
-
-
-
-                if ((action == 3 || action == 4) && !Hub.getLocalPlayer().hasLost()) {
-                    float percentage = Hub.getLocalPlayer().getShipPercentage();
-                    if (action == 3) {
-                        percentage += 0.05f;
-                    } else {
-                        percentage -= 0.05f;
-                    }
-                    Hub.getLocalPlayer().setShipPercentage(percentage);
-                    
-                }
+                return false;
             }
         };
     }
 
     /**
-     * Reposit marker.
+     * Gets the shootables node.
+     *
+     * @return the shootables node
+     */
+    public Node getShootablesNode() {
+        return shootablesNode;
+    }
+
+    /**
+     * Reposit the marker on a selected planet.
      *
      * @param p the p
      */
@@ -452,6 +533,10 @@ public class IsoControl {
         // marker.emitAllParticles();
     }
 
+    /**
+     * Remove marker completly fron current planet.
+     * @param markerNode 
+     */
     private void removeMarker(MarkerNode markerNode) {
         Node parent = markerNode.getParent();
         if (parent != null) {
@@ -483,28 +568,48 @@ public class IsoControl {
         // marker.emitAllParticles();
     }
 
+    /**
+     * Gets all planets contained in a 2D rectangle on the xz plane and adds all
+     * to the planetSelection.
+     * @param rectangle 
+     */
     private void selectPlanets(Rectangle2D rectangle) {
+        // gets the set of plantes as a ref
         Set<Entry<Integer, AbstractPlanet>> planetSet = Gameplay.getCurrentLevel().getPlanetSet();
-
+        // iterate through the sets planets each
         for (Map.Entry<Integer, AbstractPlanet> entry : planetSet) {
+            // get planet pos
             Vector3f pos = entry.getValue().getPosition().clone();
+            // convert to 2D point
             Point2D planetPos = new Point2D.Float(pos.x, pos.z);
+            // get the planet ref
             AbstractPlanet planet = entry.getValue();
+            // check if planet pos is in rectangle
             if (rectangle.contains(planetPos)) {
+                // if not owned by local player get the next planet in the planet set
                 if (planet.getOwner() == null || !planet.getOwner().equals(Hub.getLocalPlayer())) {
                     continue;
                 }
-                planetSelection.add(entry.getValue());
+                // else add planet to the selection
+                planetSelection.add(planet);
             }
         }
     }
 
+    /**
+     * Gets a copy of the selected planets.
+     * @return 
+     */
     public ArrayList<AbstractPlanet> getSelectedPlanets() {
         ArrayList<AbstractPlanet> planets = new ArrayList<AbstractPlanet>(planetSelection);
         return planets;
 
     }
 
+    /**
+     * Updates the drag-rectangle and/or marker-animation
+     * @param tpf 
+     */
     void updateSelection(float tpf) {
         if (centerDrag != null) {
             gui.removeGUIElement(centerDrag);
@@ -688,8 +793,8 @@ public class IsoControl {
     }
 
     private class MarkerNode extends Node {
-        public static final int SELECTION_ANIMATION_SPEED = 2;
 
+        public static final int SELECTION_ANIMATION_SPEED = 2;
         private float scale;
         private float fadeScale;
         private float running;
@@ -736,8 +841,9 @@ public class IsoControl {
 
         public void updateMarker(float tpf) {
             running += tpf;
-            if (running > 2*Math.PI)
+            if (running > 2 * Math.PI) {
                 running = 0;
+            }
             // size
             fadeScale = 0.05f * (float) Math.sin((double) running * SELECTION_ANIMATION_SPEED) + scale + 0.02f;
             geometry.setLocalScale(fadeScale);

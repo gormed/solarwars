@@ -32,7 +32,6 @@ import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
 import logic.ActionLib;
-import logic.Gameplay;
 import net.NetworkManager;
 
 /**
@@ -120,7 +119,7 @@ public class SolarWarsGame {
     }
 
     /**
-     * Start.
+     * Starts the game, creates all gamestates and enters the first state.
      */
     public void start() {
         MainmenuState m = new MainmenuState(this);
@@ -137,8 +136,9 @@ public class SolarWarsGame {
         gamestateManager.addState(sls);
         gamestateManager.addState(mms);
         gamestateManager.addState(ts);
+        // init gamestate manager with mainmenu state
         gamestateManager.initialize(m);
-        
+        // start the game with the init state
         gamestateManager.start();
     }
 

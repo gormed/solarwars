@@ -108,7 +108,6 @@ public class Player {
             gameOverGUI.display();
         }
     }
-    
     /** The id. */
     private int id;
     /** The artificial. */
@@ -230,11 +229,11 @@ public class Player {
      */
     public void updatePlayer() {
     }
-    
+
     void clearMultiSelect() {
         state.multiSelectedPlanets.clear();
     }
-    
+
     void multiSelectPlanets(ArrayList<AbstractPlanet> planets) {
         ArrayList<Integer> planetIDs = new ArrayList<Integer>();
         for (AbstractPlanet p : planets) {
@@ -242,7 +241,7 @@ public class Player {
         }
         state.multiSelectedPlanets = planetIDs;
     }
-    
+
     /**
      * Checks for multi selected planets.
      *
@@ -251,10 +250,10 @@ public class Player {
     boolean hasMultiSelectedPlanets() {
         return state.multiSelectedPlanets != null && !state.multiSelectedPlanets.isEmpty();
     }
-    
+
     ArrayList<AbstractPlanet> getMultiSelectPlanets() {
         ArrayList<AbstractPlanet> aps = new ArrayList<AbstractPlanet>();
-        
+
         for (Integer i : state.multiSelectedPlanets) {
             aps.add(Gameplay.getCurrentLevel().getPlanet(i));
         }
@@ -290,11 +289,26 @@ public class Player {
         return Gameplay.getCurrentLevel().getPlanet(state.selectedPlanetId);
     }
 
+    public void refreshShipPercentage(float p) {
+        if (hasLost())
+            return;
+        float percentage = state.shipPercentage + p;
+        
+        if (percentage > 1.0f) {
+            percentage = 1.0f;
+        }
+        if (percentage < 0.0f) {
+            percentage = 0.0f;
+        }
+        state.shipPercentage = percentage;
+    }
+
     /**
      * Sets the ship percentage.
      *
      * @param p the new ship percentage
      */
+    @Deprecated
     public void setShipPercentage(float p) {
         if (p > 1.0f) {
             p = 1.0f;
@@ -324,13 +338,14 @@ public class Player {
         for (AbstractPlanet p : planets) {
             ships += p.getShipCount();
         }
-        
-        if (ships == 0 && planets.size() > 0)
+
+        if (ships == 0 && planets.size() > 0) {
             return 1;
+        }
 
         return ships;
     }
-    
+
     public int getPlanetCount() {
         return planets.size();
     }
@@ -347,7 +362,6 @@ public class Player {
 //        }
 //        return false;
 //    }
-
     public boolean hasShips() {
         return (getShipCount() > 0);
     }

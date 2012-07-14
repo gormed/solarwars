@@ -252,6 +252,7 @@ public class SolarWarsApplication extends Application {
         guiNode.attachChild(statsView);
     }
 
+
     /**
      * The listener interface for receiving appAction events.
      * The class that is interested in processing a appAction
@@ -268,6 +269,7 @@ public class SolarWarsApplication extends Application {
         /* (non-Javadoc)
          * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
          */
+        @Override
         public void onAction(String name, boolean value, float tpf) {
             if (!value) {
                 return;
@@ -304,6 +306,9 @@ public class SolarWarsApplication extends Application {
         getInstance().start();
     }
 
+    /**
+     * Initializes basic settings.
+     */
     public void initSettings() {
         if (settings == null) {
             settings = new AppSettings(false);
@@ -362,23 +367,17 @@ public class SolarWarsApplication extends Application {
     @Override
     public void initialize() {
         super.initialize();
-
+        // setup gui node
         guiNode.setQueueBucket(Bucket.Gui);
         guiNode.setCullHint(CullHint.Never);
+        // setup and show debug text
         loadFPSText();
         loadStatsView();
-
-
-        postProcessor = new FilterPostProcessor(assetManager);
-        bloomFilter.setDownSamplingFactor(2);
-        bloomFilter.setBloomIntensity(0.75f);
-        postProcessor.addFilter(bloomFilter);
-        viewPort.addProcessor(postProcessor);
-
-
+        // setup post effects
+        setupPostEffects();
+        // load up main scene
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
-
 
         // Map interface clicking for ingame and GUI and Debugging
         inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
@@ -393,7 +392,7 @@ public class SolarWarsApplication extends Application {
         inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
         inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
         inputManager.addMapping(INPUT_MAPPING_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
-
+        // add app action listener for mappings
         inputManager.addListener(actionListener,
                 INPUT_MAPPING_EXIT,
                 INPUT_MAPPING_CAMERA_POS,
@@ -401,20 +400,29 @@ public class SolarWarsApplication extends Application {
                 INPUT_MAPPING_HIDE_STATS);
 
         // SETUP GAME CONTENT
-
+        // hide stats
         setDisplayStatView(false);
         setDisplayFps(false);
-
+        // setup lights
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
         sun.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 0.7f));
         rootNode.addLight(sun);
-
+        // load, init and start game
         game = SolarWarsGame.getInstance();
         game.initialize(this);
         game.start();
     }
 
+    private void setupPostEffects() {
+        // setup post effects
+        postProcessor = new FilterPostProcessor(assetManager);
+        bloomFilter.setDownSamplingFactor(2);
+        bloomFilter.setBloomIntensity(0.75f);
+        postProcessor.addFilter(bloomFilter);
+        viewPort.addProcessor(postProcessor);
+    }
+    
     public void attachIsoCameraControl() {
         if (inputManager != null) {
             // Init controls

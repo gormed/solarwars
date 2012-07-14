@@ -194,7 +194,7 @@ public class Level {
         this.gameOver = gameOver;
     }
 
-    public GameGUI getGui() {
+    public GameGUI getGUI() {
         return gui;
     }
 
