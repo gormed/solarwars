@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: SolarWarsGame.java
  * Type: solarwars.SolarWarsGame
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
@@ -93,6 +93,7 @@ public class SolarWarsGame {
     /** The action lib. */
     private ActionLib actionLib;   
     
+    /** The audio manager. */
     private AudioManager audioManager;
 
     /**

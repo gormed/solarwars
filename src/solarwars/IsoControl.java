@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: IsoControl.java
  * Type: solarwars.IsoControl
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
@@ -54,11 +54,13 @@ import logic.Gameplay;
 
 /**
  * The Class IsoControl for the players interaction on screen. 
- * Hanles main input through mouse clicks and drags, fires the events for 
+ * Handles main input through mouse clicks and drags, fires the events for 
  * planet and ship actions.
+ * @author Hans Ferchland
  */
 public class IsoControl {
 
+    /** The Constant DEBUG_RAYCASTS. */
     private static final boolean DEBUG_RAYCASTS = false;
     //==========================================================================
     //      Singleton
@@ -69,10 +71,7 @@ public class IsoControl {
     /**
      * Instantiates a new iso control.
      *
-     * @param assetManager the asset manager
-     * @param rootNode the root node
-     * @param cam the cam
-     * @param inputManager the input manager
+     * @param application the application
      */
     private IsoControl(SolarWarsApplication application) {
         assetManager = application.getAssetManager();
@@ -132,7 +131,8 @@ public class IsoControl {
     private Node rootNode;
     /** The shootables node. */
     private Node shootablesNode;
-    /** inner ref to the asset manager */
+    
+    /** inner ref to the asset manager. */
     private final AssetManager assetManager;
     /** The marker node. */
     private MarkerNode markerNode;
@@ -141,17 +141,35 @@ public class IsoControl {
     // Dragging
     /** The dragg ing flag indicates if currently dragging. */
     private boolean dragging = false;
+    
+    /** The last xz plane pos. */
     private Vector3f lastXZPlanePos;
+    
+    /** The start xz plane pos. */
     private Vector3f startXZPlanePos;
+    
+    /** The start screen pos. */
     private Vector2f startScreenPos;
     // planet selection
+    /** The planet selection. */
     private ArrayList<AbstractPlanet> planetSelection;
+    
+    /** The marker nodes. */
     private ArrayList<MarkerNode> markerNodes;
     // Panels for rect
+    /** The left drag. */
     private Panel leftDrag;
+    
+    /** The top drag. */
     private Panel topDrag;
+    
+    /** The right drag. */
     private Panel rightDrag;
+    
+    /** The bottom drag. */
     private Panel bottomDrag;
+    
+    /** The center drag. */
     private Panel centerDrag;
     // debug
 //    private Cross startDrag;
@@ -160,10 +178,13 @@ public class IsoControl {
     private Camera cam;
     /** The action listener. */
     private ActionListener actionListener;
+    
+    /** The input manager. */
     private InputManager inputManager;
     /** The action lib. */
     private ActionLib actionLib;
-    /** inner ref to the games gui */
+    
+    /** inner ref to the games gui. */
     private GameGUI gui;
     //==========================================================================
     //      Methods
@@ -182,7 +203,6 @@ public class IsoControl {
      * Initializes the players main controls.
      *
      * @param rootNode the root node
-     * @param inputManager the input manager
      */
     private void initialize(final Node rootNode) {
         shootablesNode = new Node("Shootables");
@@ -511,7 +531,8 @@ public class IsoControl {
     /**
      * Reposit the marker on a selected planet.
      *
-     * @param p the p
+     * @param planet the planet
+     * @param markerNode the marker node
      */
     private void repositMarker(AbstractPlanet planet, MarkerNode markerNode) {
 //        if (lastNode != null) {
@@ -535,7 +556,8 @@ public class IsoControl {
 
     /**
      * Remove marker completly fron current planet.
-     * @param markerNode 
+     *
+     * @param markerNode the marker node
      */
     private void removeMarker(MarkerNode markerNode) {
         Node parent = markerNode.getParent();
@@ -548,7 +570,8 @@ public class IsoControl {
     /**
      * Reposit marker.
      *
-     * @param g the g
+     * @param shipGroup the ship group
+     * @param markerNode the marker node
      */
     private void repositMarker(ShipGroup shipGroup, MarkerNode markerNode) {
 //        if (lastNode != null) {
@@ -571,7 +594,8 @@ public class IsoControl {
     /**
      * Gets all planets contained in a 2D rectangle on the xz plane and adds all
      * to the planetSelection.
-     * @param rectangle 
+     *
+     * @param rectangle the rectangle
      */
     private void selectPlanets(Rectangle2D rectangle) {
         // gets the set of plantes as a ref
@@ -598,7 +622,8 @@ public class IsoControl {
 
     /**
      * Gets a copy of the selected planets.
-     * @return 
+     *
+     * @return the selected planets
      */
     public ArrayList<AbstractPlanet> getSelectedPlanets() {
         ArrayList<AbstractPlanet> planets = new ArrayList<AbstractPlanet>(planetSelection);
@@ -607,8 +632,9 @@ public class IsoControl {
     }
 
     /**
-     * Updates the drag-rectangle and/or marker-animation
-     * @param tpf 
+     * Updates the drag-rectangle and/or marker-animation.
+     *
+     * @param tpf the tpf
      */
     void updateSelection(float tpf) {
         if (centerDrag != null) {
@@ -758,6 +784,9 @@ public class IsoControl {
         shootablesNode.detachChild(spat);
     }
 
+    /**
+     * Clean up.
+     */
     void cleanUp() {
         lastXZPlanePos = null;
         startScreenPos = null;
@@ -792,20 +821,47 @@ public class IsoControl {
         dragging = false;
     }
 
+    /**
+     * The Class MarkerNode.
+     */
     private class MarkerNode extends Node {
 
+        /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
+        
+        /** The scale. */
         private float scale;
+        
+        /** The fade scale. */
         private float fadeScale;
+        
+        /** The running. */
         private float running;
+        
+        /** The material. */
         private Material material;
+        
+        /** The geometry. */
         private Geometry geometry;
+        
+        /** The start. */
         private ColorRGBA start = ColorRGBA.Orange.clone();
+        
+        /** The end. */
         private ColorRGBA end = ColorRGBA.White.clone();
+        
+        /** The current fade color. */
         private ColorRGBA currentFadeColor = start.clone();
+        
+        /** The fade dir. */
         private boolean fadeDir = true;
+        
+        /** The tick. */
         private float tick = 0f;
 
+        /**
+         * Instantiates a new marker node.
+         */
         public MarkerNode() {
             super("Marker Transform");
 
@@ -839,6 +895,11 @@ public class IsoControl {
 
         }
 
+        /**
+         * Updates the marker.
+         *
+         * @param tpf the tpf
+         */
         public void updateMarker(float tpf) {
             running += tpf;
             if (running > 2 * Math.PI) {
@@ -893,6 +954,11 @@ public class IsoControl {
 
         }
 
+        /**
+         * Sets the scale.
+         *
+         * @param s the new scale
+         */
         public void setScale(float s) {
             scale = s;
             material.setColor("Color", start);

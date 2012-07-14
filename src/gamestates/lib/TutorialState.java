@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: TutorialState.java
+ * Type: gamestates.lib.TutorialState
+ * 
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
 import com.jme3.asset.AssetManager;
@@ -19,26 +36,45 @@ import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
 /**
+ * The Class TutorialState.
  *
  * @author Hans
  */
 public class TutorialState extends Gamestate {
 
+    /** The tutorial label. */
     private Label tutorialLabel;
+    
+    /** The background. */
     private TutorialPanel background;
+    
+    /** The gui. */
     private GameGUI gui;
+    
+    /** The back. */
     private Button back;
+    
+    /** The background frame. */
     private Panel backgroundFrame;
 
+    /**
+     * Instantiates a new tutorial state.
+     */
     public TutorialState() {
         super(GamestateManager.TUTORIAL_STATE);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#update(float)
+     */
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#loadContent(solarwars.SolarWarsGame)
+     */
     @Override
     protected void loadContent(SolarWarsGame game) {
         gui = new GameGUI(game);
@@ -114,14 +150,28 @@ public class TutorialState extends Gamestate {
         gui.addGUIElement(back);
     }
 
+    /* (non-Javadoc)
+     * @see gamestates.Gamestate#unloadContent()
+     */
     @Override
     protected void unloadContent() {
         gui.cleanUpGUI();
         gui = null;
     }
 
+    /**
+     * The Class TutorialPanel.
+     */
     private class TutorialPanel extends Panel {
 
+        /**
+         * Instantiates a new tutorial panel.
+         *
+         * @param name the name
+         * @param pos the pos
+         * @param size the size
+         * @param color the color
+         */
         public TutorialPanel(String name, Vector3f pos, Vector2f size, ColorRGBA color) {
             super(name, pos, size, color);
             AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();

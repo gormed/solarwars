@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: ServerLobbyState.java
  * Type: gamestates.lib.ServerLobbyState
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
@@ -94,7 +94,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private HashMap<Integer, Label> playerLabels;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
+    
+    /** The refreshed players. */
     private HashMap<Integer, Player> refreshedPlayers;
+    
+    /** The players changed. */
     private boolean playersChanged;
     /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
@@ -102,9 +106,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
     /** The no server found. */
     private boolean noServerFound;
-    /** indicates that the game is set up and can be started */
+    
+    /** indicates that the game is set up and can be started. */
     private boolean gameStarted = false;
+    
+    /** The application. */
     private final SolarWarsApplication application;
+    
+    /** The client seed. */
     private long clientSeed;
 
     /**
@@ -170,6 +179,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         //if (!client.isConnected())
     }
     
+    /**
+     * Start game.
+     */
     private void startGame() {
         application.attachIsoCameraControl();
         logic.Level mpLevel =
@@ -397,11 +409,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     }
 
     /**
-     * 
      * Starts the level and changes the gamestate.
-     * 
+     *
      * @param seed the level-seed
-     * @param players the players connected to the server
      */
     private void startClient(long seed) {
         this.clientSeed = seed;
@@ -428,6 +438,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         
     }
     
+    /**
+     * Refresh players.
+     *
+     * @param players the players
+     */
     private void refreshPlayers(HashMap<Integer, Player> players) {
         if (playerLabels == null || gui == null || !playersChanged) {
             return;

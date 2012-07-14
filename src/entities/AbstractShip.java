@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: AbstractShip.java
  * Type: entities.AbstractShip
  * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:03 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
@@ -62,7 +62,11 @@ public abstract class AbstractShip extends Node {
     protected Player owner;
     /** The order. */
     protected AbstractPlanet order;
+    
+    /** The ship batch spatial. */
     protected Spatial shipBatchSpatial;
+    
+    /** The batch manager. */
     protected ShipBatchManager batchManager = ShipBatchManager.getInstance();
 
     /**

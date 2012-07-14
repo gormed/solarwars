@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: GameOverGUI.java
+ * Type: gui.elements.GameOverGUI
+ * 
+ * Documentation created: 14.07.2012 - 19:37:57 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
 import com.jme3.math.ColorRGBA;
@@ -16,18 +33,28 @@ import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
 /**
+ * The Class GameOverGUI.
  *
  * @author Hans
  */
 public class GameOverGUI extends GUIElement implements ClickableGUI {
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#canGainFocus()
+     */
     public boolean canGainFocus() {
         return false;
     }
 
+    /**
+     * The Enum GameOverState.
+     */
     public enum GameOverState {
 
+        /** The WON. */
         WON,
+        
+        /** The LOST. */
         LOST
     }
     /** The gui. */
@@ -40,10 +67,21 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     protected Button mainMenuLabel;
     /** The continue game. */
     protected Button watchGameLabel;
+    
+    /** The background. */
     protected Panel background;
+    
+    /** The watch game. */
     private boolean watchGame = false;
+    
+    /** The instance. */
     private static GameOverGUI instance;
 
+    /**
+     * Gets the single instance of GameOverGUI.
+     *
+     * @return single instance of GameOverGUI
+     */
     public static GameOverGUI getInstance() {
         if (instance != null) {
             return instance;
@@ -60,6 +98,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      *
      * @param swgame the swgame
      * @param gui the gui
+     * @param state the state
      */
     private GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
         this.game = swgame;
@@ -152,6 +191,11 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 
     }
 
+    /**
+     * Sets the game over state.
+     *
+     * @param state the new game over state
+     */
     public void setGameOverState(GameOverState state) {
         String label;
         if (state == GameOverState.WON) {
@@ -164,6 +208,11 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 
     }
 
+    /**
+     * Checks if is watch game.
+     *
+     * @return true, if is watch game
+     */
     public boolean isWatchGame() {
         return watchGame;
     }

@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: PlayerAcceptedMessage.java
  * Type: net.messages.PlayerAcceptedMessage
  * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net.messages;
@@ -38,6 +38,7 @@ public class PlayerAcceptedMessage extends AbstractMessage {
     /** The is host. */
     private boolean isHost;
     
+    /** The is connecting. */
     private boolean isConnecting;
     
     /** The all players. */
@@ -71,6 +72,11 @@ public class PlayerAcceptedMessage extends AbstractMessage {
         return player;
     }
 
+    /**
+     * Checks if is connecting.
+     *
+     * @return true, if is connecting
+     */
     public boolean isConnecting() {
         return isConnecting;
     }
@@ -87,6 +93,7 @@ public class PlayerAcceptedMessage extends AbstractMessage {
      * @param player the player
      * @param allPlayers the all players
      * @param isHost the is host
+     * @param isConnecting the is connecting
      */
     public PlayerAcceptedMessage(Player player,
             ArrayList<Player> allPlayers,

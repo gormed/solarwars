@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: MultiplayerMatchState.java
  * Type: gamestates.lib.MultiplayerMatchState
  * 
- * Documentation created: 31.03.2012 - 19:27:45 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:57 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
@@ -50,17 +50,40 @@ import solarwars.SolarWarsGame;
  */
 public class MultiplayerMatchState extends Gamestate {
 
+    /** The gui. */
     private GameGUI gui;
+    
+    /** The tab scores. */
     private ScoresGUI tabScores;
+    
+    /** The game. */
     private SolarWarsGame game;
+    
+    /** The pause listener. */
     private PauseActionListener pauseListener;
+    
+    /** The pause. */
     private PauseGUI pause;
+    
+    /** The hub. */
     private Hub hub;
+    
+    /** The current level. */
     private Level currentLevel;
+    
+    /** The gameplay. */
     private MultiplayerGameplay gameplay;
+    
+    /** The client. */
     private Client client;
+    
+    /** The application. */
     private final SolarWarsApplication application;
+    
+    /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
+    
+    /** The lost connection. */
     private boolean lostConnection;
 
     /**

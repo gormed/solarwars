@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: CreateServerState.java
  * Type: gamestates.lib.CreateServerState
  * 
- * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
@@ -72,7 +72,10 @@ import solarwars.SolarWarsGame;
  */
 public class CreateServerState extends Gamestate implements ServerRegisterListener, ClientRegisterListener {
 
+    /** The Constant SERVER_FULL_MSG. */
     public static final String SERVER_FULL_MSG = "Server is full!";
+    
+    /** The Constant SERVER_NOT_IN_LOBBY_MSG. */
     public static final String SERVER_NOT_IN_LOBBY_MSG = "Server is locked! The game is probably running...";
     /** The create server label. */
     private Label createServerLabel;
@@ -94,7 +97,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private Label maxPlayersLabel;
     /** The player count. */
     private TextBox playerCountBox;
+    
+    /** The seed label. */
     private Label seedLabel;
+    
+    /** The level seed box. */
     private TextBox levelSeedBox;
     /** The gui. */
     private GameGUI gui;
@@ -102,15 +109,20 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerHub serverHub;
     /** The solar wars server. */
     private SolarWarsServer solarWarsServer;
-    /** The server as the client */
+    
+    /** The server as the client. */
     private Client serverClient;
     /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
     /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
+    
+    /** The player labels node. */
     private Anchor playerLabelsNode;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
+    
+    /** The refreshed players. */
     private HashMap<Integer, Player> refreshedPlayers;
     /** The max player number. */
     private int maxPlayerNumber = Ergonomics.getInstance().getPlayers();
@@ -126,12 +138,23 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
     /** The server connection listener. */
     private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
-    /** indicates that the game is set up and can be started */
+    
+    /** indicates that the game is set up and can be started. */
     private boolean gameStarted = false;
+    
+    /** The application. */
     private final SolarWarsApplication application;
+    
+    /** The client seed. */
     private long clientSeed;
+    
+    /** The players changed. */
     private boolean playersChanged;
+    
+    /** The seed string. */
     private String seedString = Ergonomics.getInstance().getSeed();
+    
+    /** The server seed. */
     private long serverSeed = 42;
 
     /**
@@ -189,6 +212,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 //        leavingPlayers.clear();
     }
 
+    /**
+     * Start game.
+     */
     private void startGame() {
         application.attachIsoCameraControl();
         logic.Level mpLevel =
@@ -531,6 +557,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /**
      * Creates the level.
+     *
+     * @param seed the seed
      */
     private void createLevel(long seed) {
         if (seed == 0)
@@ -539,11 +567,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     }
 
     /**
-     * 
      * Starts the level.
-     * 
+     *
      * @param seed the level-seed
-     * @param players the players connected to the server
      */
     private void startClient(long seed) {
 
@@ -649,6 +675,11 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /*
      * Refreshes the player labels
+     */
+    /**
+     * Refresh players.
+     *
+     * @param players the players
      */
     private void refreshPlayers(HashMap<Integer, Player> players) {
         if (playerLabels == null || gui == null || !playersChanged) {

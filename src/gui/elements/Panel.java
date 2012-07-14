@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: Panel.java
  * Type: gui.elements.Panel
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
@@ -102,14 +102,29 @@ public class Panel extends GUIElement {
         geometry.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
 
+    /**
+     * Gets the color.
+     *
+     * @return the color
+     */
     public ColorRGBA getColor() {
         return color;
     }
 
+    /**
+     * Gets the screen position.
+     *
+     * @return the screen position
+     */
     public Vector3f getScreenPosition() {
         return screenPosition;
     }
 
+    /**
+     * Gets the size.
+     *
+     * @return the size
+     */
     public Vector2f getSize() {
         return size;
     }

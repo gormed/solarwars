@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: MultiplayerGameplay.java
+ * Type: logic.MultiplayerGameplay
+ * 
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
 
 import com.jme3.network.Client;
@@ -18,13 +35,18 @@ import net.messages.PlanetActionMessage;
 import solarwars.Hub;
 
 /**
+ * The Class MultiplayerGameplay.
  *
  * @author Hans
  */
 public class MultiplayerGameplay {
 
+    /** The instance. */
     private static MultiplayerGameplay instance;
 
+    /**
+     * Instantiates a new multiplayer gameplay.
+     */
     private MultiplayerGameplay() {
         client = NetworkManager.getInstance().getThisClient();
         client.addMessageListener(
@@ -34,6 +56,11 @@ public class MultiplayerGameplay {
                 LevelActionMessage.class);
     }
 
+    /**
+     * Gets the single instance of MultiplayerGameplay.
+     *
+     * @return single instance of MultiplayerGameplay
+     */
     public static MultiplayerGameplay getInstance() {
         if (instance != null) {
             return instance;
@@ -42,14 +69,33 @@ public class MultiplayerGameplay {
         }
     }
 
+    /**
+     * Checks if is initialized.
+     *
+     * @return true, if is initialized
+     */
     public static boolean isInitialized() {
         return instance != null;
     }
+    
+    /** The client. */
     private Client client;
+    
+    /** The gameplay listener. */
     private ClientGameplayListener gameplayListener = new ClientGameplayListener();
+    
+    /** The action lib. */
     private ActionLib actionLib = ActionLib.getInstance();
+    
+    /** The recieved messages. */
     private Queue<Message> recievedMessages = new LinkedList<Message>();
 
+    /**
+     * Send planet action message.
+     *
+     * @param actionName the action name
+     * @param planet the planet
+     */
     public void sendPlanetActionMessage(String actionName, AbstractPlanet planet) {
         if (client == null || !client.isConnected()) {
             return;
@@ -70,6 +116,13 @@ public class MultiplayerGameplay {
         client.send(planetActionMessage);
     }
 
+    /**
+     * Send general action message.
+     *
+     * @param actionName the action name
+     * @param sender the sender
+     * @param reciever the reciever
+     */
     public void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
         if (client == null || !client.isConnected()) {
             return;
@@ -94,6 +147,11 @@ public class MultiplayerGameplay {
         client.send(generalActionMessage);
     }
 
+    /**
+     * Updates the MultiplayerGameplay by polling the next network message from the queque.
+     *
+     * @param tpf the tpf
+     */
     public void update(float tpf) {
         while (recievedMessages != null && !recievedMessages.isEmpty()) {
             Message m = recievedMessages.poll();
@@ -134,6 +192,9 @@ public class MultiplayerGameplay {
         }
     }
 
+    /**
+     * Destroys the gameplay on exit.
+     */
     public void destroy() {
         recievedMessages.clear();
         recievedMessages = null;
@@ -150,8 +211,22 @@ public class MultiplayerGameplay {
 
     }
 
+    /**
+     * The listener interface for receiving clientGameplay events.
+     * The class that is interested in processing a clientGameplay
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addClientGameplayListener<code> method. When
+     * the clientGameplay event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see ClientGameplayEvent
+     */
     private class ClientGameplayListener implements MessageListener<Client> {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
+         */
         @Override
         public void messageReceived(Client source, Message message) {
             System.out.println(

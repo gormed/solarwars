@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: ChatGUI.java
  * Type: gui.elements.ChatGUI
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
@@ -45,33 +45,65 @@ import solarwars.SolarWarsApplication;
  */
 public class ChatGUI extends GUIElement implements ClickableGUI {
 
+    /** The Constant COLOR_CHAT_BACKGROUND. */
     public static final ColorRGBA COLOR_CHAT_BACKGROUND = new ColorRGBA(0, 0, 1, 0.6f);
+    
+    /** The Constant COLOR_CHAT_FONT. */
     public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(1, 0.5f, 0, 0.5f);
+    
+    /** The Constant COLOR_CHAT_TEXTFIELD. */
     public static final ColorRGBA COLOR_CHAT_TEXTFIELD = new ColorRGBA(1, 1, 1, 0.4f);
+    
+    /** The Constant PEEK_TIME. */
     public static final float PEEK_TIME = 5;
     /** The gui. */
     private GameGUI gui;
+    
+    /** The chat module. */
     private ChatModule chatModule;
     /** The text area. */
     private Panel textArea;
+    
+    /** The background. */
     private Panel background;
     /** The chat log. */
     private ArrayList<String> chatLog;
+    
+    /** The max messages displayed. */
     private int maxMessagesDisplayed = 12;
+    
+    /** The text lines. */
     private ArrayList<TextLine> textLines;
+    
+    /** The chat input. */
     private ChatInput chatInput;
+    
+    /** The fade max. */
     private float fadeMax;
+    
+    /** The fade current. */
     private float fadeCurrent = 0;
+    
+    /** The peek fade. */
     private float peekFade = 0;
+    
+    /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 3500;
+    
+    /** The fadeing. */
     private boolean fadeing = false;
+    
+    /** The fade direction. */
     private boolean fadeDirection = true;
+    
+    /** The peek. */
     private boolean peek = false;
 
     /**
      * Instantiates a new chat gui.
      *
      * @param gui the gui
+     * @param chatModule the chat module
      */
     public ChatGUI(GameGUI gui, ChatModule chatModule) {
         this.gui = gui;
@@ -133,14 +165,30 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         //attachChild(chatInput);
     }
 
+    /**
+     * Player says.
+     *
+     * @param p the p
+     * @param message the message
+     */
     public void playerSays(Player p, String message) {
         chatLog.add(p.getName() + ": " + message);
     }
 
+    /**
+     * Server says.
+     *
+     * @param message the message
+     */
     public void serverSays(String message) {
         chatLog.add(message);
     }
 
+    /**
+     * Local player says.
+     *
+     * @param message the message
+     */
     private void localPlayerSays(String message) {
         chatLog.add(Hub.getLocalPlayer().getName() + ": " + message);
         chatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
@@ -214,12 +262,18 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         }
     }
 
+    /**
+     * Start fade in.
+     */
     public void startFadeIn() {
         setVisible(true);
         fadeing = true;
         fadeDirection = true;
     }
 
+    /**
+     * Start fade out.
+     */
     public void startFadeOut() {
         //setVisible(true);
         fadeing = true;
@@ -241,6 +295,9 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
     }
 
+    /**
+     * Peek.
+     */
     public void peek() {
         startFadeIn();
         textArea.setVisible(false);
@@ -251,12 +308,18 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         peek = true;
     }
 
+    /**
+     * Show.
+     */
     public void show() {
         startFadeIn();
         gui.setFocus(chatInput);
         peek = false;
     }
 
+    /**
+     * Hide.
+     */
     public void hide() {
         //setVisible(false);
         startFadeOut();
@@ -264,26 +327,53 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         peek = false;
     }
 
+    /**
+     * Checks if is fade direction.
+     *
+     * @return true, if is fade direction
+     */
     public boolean isFadeDirection() {
         return fadeDirection;
     }
 
+    /**
+     * Checks if is fadeing.
+     *
+     * @return true, if is fadeing
+     */
     public boolean isFadeing() {
         return fadeing;
     }
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
+     */
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
         chatInput.onClick(cursor, isPressed, tpf);
     }
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#canGainFocus()
+     */
     public boolean canGainFocus() {
         return false;
     }
 
+    /**
+     * The Class ChatInput.
+     */
     private class ChatInput extends TextBox {
 
+        /** The input manager. */
         private InputManager inputManager;
 
+        /**
+         * Instantiates a new chat input.
+         *
+         * @param screenPosition the screen position
+         * @param scale the scale
+         * @param gui the gui
+         */
         public ChatInput(Vector3f screenPosition, Vector3f scale, GameGUI gui) {
             super(
                     COLOR_CHAT_FONT, screenPosition,
@@ -294,21 +384,47 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
         }
 
+        /* (non-Javadoc)
+         * @see gui.elements.TextBox#onClick(com.jme3.math.Vector2f, boolean, float)
+         */
         @Override
         public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
         }
 
+        /* (non-Javadoc)
+         * @see gui.elements.TextBox#onKeyTrigger(java.lang.String, boolean, float)
+         */
         @Override
         protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
         }
 
+        /* (non-Javadoc)
+         * @see gui.elements.TextBox#updateGUI(float)
+         */
         @Override
         public void updateGUI(float tpf) {
             super.updateGUI(tpf);
         }
 
+        /**
+         * The listener interface for receiving chatInput events.
+         * The class that is interested in processing a chatInput
+         * event implements this interface, and the object created
+         * with that class is registered with a component using the
+         * component's <code>addChatInputListener<code> method. When
+         * the chatInput event occurs, that object's appropriate
+         * method is invoked.
+         *
+         * @see ChatInputEvent
+         */
         private class ChatInputListener extends KeyboardListener {
 
+            /**
+             * Instantiates a new chat input listener.
+             *
+             * @param inputManager the input manager
+             * @param textBox the text box
+             */
             public ChatInputListener(InputManager inputManager, TextBox textBox) {
                 super(inputManager, textBox);
                 inputManager.addMapping(KeyInputMap.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
@@ -316,6 +432,9 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
                 inputManager.addListener(this, KeyInputMap.INPUT_MAPPING_ENTER);
             }
 
+            /* (non-Javadoc)
+             * @see gui.KeyboardListener#onAction(java.lang.String, boolean, float)
+             */
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
                 GUIElement e = gui.getFocusElement();
@@ -342,11 +461,23 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         }
     }
 
+    /**
+     * The Class TextLine.
+     */
     private class TextLine extends GUIElement {
 
+        /** The line. */
         private Label line;
+        
+        /** The line text. */
         private String lineText;
 
+        /**
+         * Instantiates a new text line.
+         *
+         * @param initialText the initial text
+         * @param scale the scale
+         */
         public TextLine(String initialText, float scale) {
             line = new Label(initialText, Vector3f.ZERO, Vector3f.UNIT_XYZ, COLOR_CHAT_FONT, gui) {
 
@@ -364,25 +495,46 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
             attachChild(line);
         }
 
+        /* (non-Javadoc)
+         * @see gui.GUIElement#setVisible(boolean)
+         */
         @Override
         public void setVisible(boolean show) {
             super.setVisible(show);
             line.setVisible(show);
         }
 
+        /* (non-Javadoc)
+         * @see gui.GUIElement#updateGUI(float)
+         */
         @Override
         public void updateGUI(float tpf) {
             line.updateGUI(tpf);
         }
 
+        /**
+         * Gets the line text.
+         *
+         * @return the line text
+         */
         public String getLineText() {
             return lineText;
         }
 
+        /**
+         * Sets the line text.
+         *
+         * @param lineText the new line text
+         */
         public void setLineText(String lineText) {
             this.lineText = lineText;
         }
 
+        /**
+         * Gets the bitmap text.
+         *
+         * @return the bitmap text
+         */
         public BitmapText getBitmapText() {
             return line.text;
         }

@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: TextBox.java
  * Type: gui.elements.TextBox
  * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:03 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
@@ -59,6 +59,8 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     protected Vector3f screenPosition;
     /** The scale. */
     protected Vector3f scale;
+    
+    /** The size. */
     protected Vector2f size;
     /** The caption. */
     protected String caption;
@@ -131,6 +133,18 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         createListener();
     }
 
+    /**
+     * Instantiates a new text box.
+     *
+     * @param color the color
+     * @param screenPosition the screen position
+     * @param scale the scale
+     * @param size the size
+     * @param caption the caption
+     * @param boxColor the box color
+     * @param gui the gui
+     * @param numberBox the number box
+     */
     public TextBox(ColorRGBA color, Vector3f screenPosition,
             Vector3f scale, Vector2f size, String caption,
             ColorRGBA boxColor, GameGUI gui, boolean numberBox) {
@@ -149,6 +163,16 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
 
     }
 
+    /**
+     * Instantiates a new text box.
+     *
+     * @param color the color
+     * @param screenPosition the screen position
+     * @param scale the scale
+     * @param caption the caption
+     * @param boxColor the box color
+     * @param gui the gui
+     */
     public TextBox(ColorRGBA color, Vector3f screenPosition,
             Vector3f scale, String caption,
             ColorRGBA boxColor, GameGUI gui) {
@@ -245,6 +269,9 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      */
     protected abstract void onKeyTrigger(String key, boolean isPressed, float tpf);
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#canGainFocus()
+     */
     @Override
     public boolean canGainFocus() {
         return true;

@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: ScoresGUI.java
+ * Type: gui.elements.ScoresGUI
+ * 
+ * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
 import com.jme3.input.controls.ActionListener;
@@ -19,31 +36,74 @@ import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
 /**
+ * The Class ScoresGUI.
  *
  * @author Hans
  */
 public class ScoresGUI extends GUIElement {
 
+    /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 3500;
+    
+    /** The fadeing. */
     private boolean fadeing = false;
+    
+    /** The fade direction. */
     private boolean fadeDirection = true;
+    
+    /** The gui. */
     private GameGUI gui;
+    
+    /** The show. */
     private boolean show;
+    
+    /** The fade max. */
     private float fadeMax;
+    
+    /** The fade current. */
     private float fadeCurrent = 0;
+    
+    /** The action listener. */
     private TabActionListener actionListener = new TabActionListener();
+    
+    /** The player labels. */
     private ArrayList<ScoresLine> playerLabels = new ArrayList<ScoresLine>();
+    
+    /** The label position. */
     private HashMap<Integer, Vector3f> labelPosition = new HashMap<Integer, Vector3f>(8);
+    
+    /** The scores label. */
     private Label scoresLabel;
+    
+    /** The background. */
     private Panel background;
+    
+    /** The head name label. */
     private Label headNameLabel;
+    
+    /** The head ships label. */
     private Label headShipsLabel;
+    
+    /** The head planets label. */
     private Label headPlanetsLabel;
+    
+    /** The head percent label. */
     private Label headPercentLabel;
+    
+    /** The head state label. */
     private Label headStateLabel;
+    
+    /** The head color label. */
     private Label headColorLabel;
+    
+    /** The background frame. */
     private Panel backgroundFrame;
 
+    /**
+     * Instantiates a new scores gui.
+     *
+     * @param gui the gui
+     */
     public ScoresGUI(GameGUI gui) {
         this.gui = gui;
         fadeMax = -(2 * gui.getWidth() / 3) + 10;
@@ -107,6 +167,12 @@ public class ScoresGUI extends GUIElement {
         gui.addGUIElement(this);
     }
 
+    /**
+     * Creates the table.
+     *
+     * @param parentPanel the parent panel
+     * @param scale the scale
+     */
     private void createTable(Panel parentPanel, float scale) {
         ColorRGBA textColor = ColorRGBA.Orange;
         float height = 7.2f * gui.getHeight() / 10;
@@ -212,6 +278,9 @@ public class ScoresGUI extends GUIElement {
 
     }
 
+    /**
+     * Adds the players.
+     */
     private void addPlayers() {
         Label l;
         ScoresLine line;
@@ -228,6 +297,9 @@ public class ScoresGUI extends GUIElement {
         }
     }
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#updateGUI(float)
+     */
     @Override
     public void updateGUI(float tpf) {
 
@@ -281,6 +353,9 @@ public class ScoresGUI extends GUIElement {
 //        }
     }
 
+    /* (non-Javadoc)
+     * @see gui.GUIElement#setVisible(boolean)
+     */
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);
@@ -309,21 +384,35 @@ public class ScoresGUI extends GUIElement {
 //        }
 //    }
 //
-    public void startFadeIn() {
+    /**
+ * Start fade in.
+ */
+public void startFadeIn() {
         setVisible(true);
         fadeing = true;
         fadeDirection = true;
     }
 
+    /**
+     * Start fade out.
+     */
     public void startFadeOut() {
         fadeing = true;
         fadeDirection = false;
     }
 
+    /**
+     * Gets the action listener.
+     *
+     * @return the action listener
+     */
     public ActionListener getActionListener() {
         return actionListener;
     }
 
+    /**
+     * Destroy.
+     */
     public void destroy() {
         this.detachAllChildren();
         SolarWarsApplication.getInstance().
@@ -335,16 +424,40 @@ public class ScoresGUI extends GUIElement {
         fadeDirection = false;
     }
 
+    /**
+     * The Class ScoresLine.
+     */
     private class ScoresLine extends GUIElement {
 
+        /** The player name label. */
         private Label playerNameLabel;
+        
+        /** The player ships label. */
         private Label playerShipsLabel;
+        
+        /** The player planets label. */
         private Label playerPlanetsLabel;
+        
+        /** The player percent label. */
         private Label playerPercentLabel;
+        
+        /** The player state label. */
         private Label playerStateLabel;
+        
+        /** The player color panel. */
         private Panel playerColorPanel;
+        
+        /** The player. */
         private Player player;
 
+        /**
+         * Instantiates a new scores line.
+         *
+         * @param p the p
+         * @param scale the scale
+         * @param textColor the text color
+         * @param parentPanel the parent panel
+         */
         public ScoresLine(
                 Player p,
                 float scale,
@@ -464,6 +577,9 @@ public class ScoresGUI extends GUIElement {
             attachChild(playerColorPanel);
         }
 
+        /* (non-Javadoc)
+         * @see gui.GUIElement#setVisible(boolean)
+         */
         @Override
         public void setVisible(boolean show) {
             super.setVisible(show);
@@ -475,6 +591,9 @@ public class ScoresGUI extends GUIElement {
             playerColorPanel.setVisible(show);
         }
 
+        /* (non-Javadoc)
+         * @see gui.GUIElement#updateGUI(float)
+         */
         @Override
         public void updateGUI(float tpf) {
             float percent = 0;
@@ -511,8 +630,22 @@ public class ScoresGUI extends GUIElement {
         }
     }
 
+    /**
+     * The listener interface for receiving tabAction events.
+     * The class that is interested in processing a tabAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addTabActionListener<code> method. When
+     * the tabAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see TabActionEvent
+     */
     private class TabActionListener implements ActionListener {
 
+        /* (non-Javadoc)
+         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+         */
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed && name.equals(SolarWarsApplication.INPUT_MAPPING_TABSCORE)) {
                 //setVisible(show = true);

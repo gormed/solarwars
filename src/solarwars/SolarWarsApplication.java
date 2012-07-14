@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: SolarWarsApplication.java
  * Type: solarwars.SolarWarsApplication
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
@@ -121,10 +121,14 @@ public class SolarWarsApplication extends Application {
     private AppActionListener actionListener = new AppActionListener();
     /** The post processor. */
     private FilterPostProcessor postProcessor;
+    
+    /** The bloom filter. */
     private BloomFilter bloomFilter =
             new BloomFilter(BloomFilter.GlowMode.Objects);
     /** The game. */
     private SolarWarsGame game;
+    
+    /** The lost focus. */
     private boolean lostFocus = false;
 
     /**
@@ -171,10 +175,20 @@ public class SolarWarsApplication extends Application {
         return isoControl;
     }
 
+    /**
+     * Gets the post processor.
+     *
+     * @return the post processor
+     */
     public FilterPostProcessor getPostProcessor() {
         return postProcessor;
     }
 
+    /**
+     * Gets the camera view port.
+     *
+     * @return the camera view port
+     */
     public ViewPort getCameraViewPort() {
         return viewPort;
     }
@@ -414,6 +428,9 @@ public class SolarWarsApplication extends Application {
         game.start();
     }
 
+    /**
+     * Setup post effects.
+     */
     private void setupPostEffects() {
         // setup post effects
         postProcessor = new FilterPostProcessor(assetManager);
@@ -423,6 +440,9 @@ public class SolarWarsApplication extends Application {
         viewPort.addProcessor(postProcessor);
     }
     
+    /**
+     * Attach iso camera control.
+     */
     public void attachIsoCameraControl() {
         if (inputManager != null) {
             // Init controls
@@ -442,6 +462,9 @@ public class SolarWarsApplication extends Application {
         isoCam.reset();
     }
 
+    /**
+     * Detach iso camera control.
+     */
     public void detachIsoCameraControl() {
         if (inputManager != null && isoCam != null) {
             isoCam.destroy();
@@ -495,6 +518,9 @@ public class SolarWarsApplication extends Application {
         stateManager.postRender();
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#loseFocus()
+     */
     @Override
     public void loseFocus() {
         super.loseFocus();

@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: GeneralAction.java
  * Type: logic.GeneralAction
  * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
@@ -50,7 +50,9 @@ public abstract class GeneralAction {
     /**
      * Do action.
      *
-     * 
+     * @param sender the sender
+     * @param a the a
+     * @param b the b
      */
     abstract void doAction(Object sender, Player a, Player b);
 }

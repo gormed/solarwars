@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: GamestateManager.java
  * Type: gamestates.GamestateManager
  * 
- * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates;
@@ -42,6 +42,8 @@ public class GamestateManager {
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
     /** The Constant MULTIPLAYER_MATCH_STATE. */
     public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
+    
+    /** The Constant TUTORIAL_STATE. */
     public static final String TUTORIAL_STATE = "Tutorial";
     /** The instance. */
     private static GamestateManager instance;
@@ -51,16 +53,29 @@ public class GamestateManager {
     private Gamestate currentState;
     /** The next state. */
     private Gamestate nextState;
+    
+    /** The lock update. */
     private static volatile boolean lockUpdate = false;
 
+    /**
+     * Checks if is locked.
+     *
+     * @return true, if is locked
+     */
     public static synchronized boolean isLocked() {
         return lockUpdate;
     }
 
+    /**
+     * Lock.
+     */
     static synchronized void lock() {
         lockUpdate = true;
     }
 
+    /**
+     * Unlock.
+     */
     static synchronized void unlock() {
         lockUpdate = false;
     }

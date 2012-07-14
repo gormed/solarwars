@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: Level.java
- * Type: logic.level.Level
+ * Type: logic.Level
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:58 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
@@ -52,7 +52,10 @@ import solarwars.SolarWarsApplication;
  */
 public class Level {
 
+    /** The Constant PLAYER_START_SHIP_COUNT. */
     public static final int PLAYER_START_SHIP_COUNT = 100;
+    
+    /** The Constant LEVEL_SIZE_NAME. */
     public static final String[] LEVEL_SIZE_NAME = {
         "NONE",
         "ONE PLAYER",
@@ -64,6 +67,8 @@ public class Level {
         "SEVEN PLAYER",
         "EIGHT PLAYER"
     };
+    
+    /** The PLAYER s_ camer a_ height. */
     public static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
         10,
@@ -75,17 +80,22 @@ public class Level {
         16,
         16
     };
+    
+    /** The PLANE t_ incremen t_ time. */
     public static float[] PLANET_INCREMENT_TIME = {
         2f, 1.5f, 1.2f, 1.0f, 0.9f,
         0.8f, 0.7f, 0.6f, 0.50f, 0.50f};
+    
+    /** The PLANE t_ sizes. */
     public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
         0.325f, 0.35f, 0.375f, 0.4f, 0.425f};
 
     /**
-     * Gets the camera height for a given player count
-     * @param players
-     * @return 
+     * Gets the camera height for a given player count.
+     *
+     * @param players the players
+     * @return the level size
      */
     public static float getLevelSize(int players) {
         if (players > 1 && players < 9) {
@@ -127,6 +137,9 @@ public class Level {
         return SHIP_GROUP_ID++;
     }
 
+    /**
+     * Reset entity i ds.
+     */
     void resetEntityIDs() {
         SHIP_ID = 0;
         SHIP_GROUP_ID = 0;
@@ -146,7 +159,8 @@ public class Level {
     private Node labelNode;
     /** The background. */
     private LevelBackground background;
-    /** The particle node for particle emitters of the planets */
+    
+    /** The particle node for particle emitters of the planets. */
     private Node particleEmitters;
     /** The all ships node. */
     private Node allShipsNode;
@@ -166,14 +180,20 @@ public class Level {
     private IsoControl control;
     /** The currently used game gui. */
     private GameGUI gui;
+    
+    /** The players by id. */
     private HashMap<Integer, Player> playersByID;
+    
+    /** The batch manager. */
     private ShipBatchManager batchManager;
-    /**
-     * Indicates that the level is fully loaded into scene-graph
-     */
+    
+    /** Indicates that the level is fully loaded into scene-graph. */
     private boolean levelLoaded = false;
-    /** indicates that the game ended */
+    
+    /** indicates that the game ended. */
     private boolean gameOver = false;
+    
+    /** The watch game. */
     private boolean watchGame = false;
 
     /**
@@ -194,6 +214,11 @@ public class Level {
         this.gameOver = gameOver;
     }
 
+    /**
+     * Gets the gUI.
+     *
+     * @return the gUI
+     */
     public GameGUI getGUI() {
         return gui;
     }
@@ -233,6 +258,8 @@ public class Level {
      * @param rootNode the root node
      * @param assetManager the asset manager
      * @param control the control
+     * @param gui the gui
+     * @param players the players
      */
     public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players) {
         this.gui = gui;
@@ -246,6 +273,7 @@ public class Level {
      * @param rootNode the root node
      * @param assetManager the asset manager
      * @param control the control
+     * @param gui the gui
      * @param players the players
      * @param seed the seed
      */
@@ -302,11 +330,19 @@ public class Level {
 
     }
 
+    /**
+     * Generate level.
+     */
     public void generateLevel() {
         LevelGenerator g = new LevelGenerator(this);
         g.generateSquare(seed);
     }
 
+    /**
+     * Generate level.
+     *
+     * @param seed the seed
+     */
     public void generateLevel(long seed) {
         this.seed = seed;
         LevelGenerator g = new LevelGenerator(this);
@@ -361,10 +397,20 @@ public class Level {
         shipGroupList.remove(s.getId());
     }
 
+    /**
+     * Adds the particle emitter.
+     *
+     * @param emitter the emitter
+     */
     public void addParticleEmitter(ParticleEmitter emitter) {
         particleEmitters.attachChild(emitter);
     }
 
+    /**
+     * Removes the particle emitter.
+     *
+     * @param emitter the emitter
+     */
     public void removeParticleEmitter(ParticleEmitter emitter) {
         particleEmitters.detachChild(emitter);
     }
@@ -378,14 +424,32 @@ public class Level {
         return planetList.entrySet();
     }
 
+    /**
+     * Gets the planet.
+     *
+     * @param id the id
+     * @return the planet
+     */
     public AbstractPlanet getPlanet(int id) {
         return planetList.get(id);
     }
 
+    /**
+     * Gets the ship group.
+     *
+     * @param id the id
+     * @return the ship group
+     */
     public ShipGroup getShipGroup(int id) {
         return shipGroupList.get(id);
     }
 
+    /**
+     * Gets the ship.
+     *
+     * @param id the id
+     * @return the ship
+     */
     public AbstractShip getShip(int id) {
         return shipList.get(id);
     }
@@ -431,6 +495,9 @@ public class Level {
 
     }
 
+    /**
+     * Destroy.
+     */
     public void destroy() {
         GameOverGUI.getInstance().hide();
         control.removeShootable(levelNode);
@@ -465,31 +532,56 @@ public class Level {
         this.gui = null;
     }
 
+    /**
+     * The Class LevelGenerator.
+     */
     class LevelGenerator {
 
+        /** The Constant PLANET_SPACE_HORIZ. */
         public static final float PLANET_SPACE_HORIZ = 1.0f;
+        
+        /** The Constant PLANET_SPACE_VERT. */
         public static final float PLANET_SPACE_VERT = 0.5f;
+        
+        /** The SUBPLANETS. */
         public final int[] SUBPLANETS = {0, 1, 2, 3, 4, 4, 6, 8, 8};
+        
+        /** The level. */
         private Level level;
         /* linksunten, linksoben, rechtsoben, rechtsunten */
+        /** The corners. */
         private Vector3f[] corners = {
             Vector3f.ZERO, Vector3f.ZERO,
             Vector3f.ZERO, Vector3f.ZERO};
         /* space coordinates */
+        /** The sp coord. */
         private boolean[][] spCoord;
         /*Spielerplaneten - vektorielle Koordinaten */
+        /** The positionen. */
         Stack<Vector2f> positionen = new Stack<Vector2f>();
         /* Randomizer for the level, keeps the same behavior on all clients */
+        /** The randomizer. */
         private Random randomizer;
         /* Anzahl der Ringe, die sich noch hinter einem Spieler befinden (außen) */
+        /** The ringe behind. */
         private int ringeBehind = 1;
 
+        /**
+         * Instantiates a new level generator.
+         *
+         * @param hull the hull
+         */
         public LevelGenerator(Level hull) {
             level = hull;
             getCorners();
             initArrays();
         }
 
+        /**
+         * Gets the corners.
+         *
+         * @return the corners
+         */
         private void getCorners() {
 
             Vector2f leftBottom = new Vector2f(0, 0);
@@ -503,6 +595,9 @@ public class Level {
             corners[3] = getWorldCoordsOnXZPlane(rightBottom, 0);
         }
 
+        /**
+         * Inits the arrays.
+         */
         private void initArrays() {
 
             /* Initialisiere spCoord */
@@ -515,6 +610,13 @@ public class Level {
             }
         }
 
+        /**
+         * Gets the world coords on xz plane.
+         *
+         * @param screenCoords the screen coords
+         * @param planeHeight the plane height
+         * @return the world coords on xz plane
+         */
         private Vector3f getWorldCoordsOnXZPlane(Vector2f screenCoords, float planeHeight) {
             Camera cam = SolarWarsApplication.getInstance().getCamera();
 
@@ -532,6 +634,11 @@ public class Level {
             return XZPlanePos;
         }
 
+        /**
+         * Generate old.
+         *
+         * @param seed the seed
+         */
         public void generateOld(long seed) {
             System.out.print("[" + seed + "] Generating level...");
             // create a node for the planet-labels
@@ -569,6 +676,11 @@ public class Level {
 
         }
 
+        /**
+         * Generate.
+         *
+         * @param seed the seed
+         */
         public void generate(long seed) {
             System.out.print("[" + seed + "] Generating level...");
             // create a node for the planet-labels
@@ -626,6 +738,11 @@ public class Level {
             System.out.println("Level generated!");
         }
 
+        /**
+         * Generate classic.
+         *
+         * @param seed the seed
+         */
         public void generateClassic(long seed) {
             System.out.print("[" + seed + "] Generating level...");
             // create a node for the planet-labels
@@ -825,19 +942,42 @@ public class Level {
             System.out.println("Level generated!");
         }
 
+        /**
+         * Platz.
+         *
+         * @param xKoord the x koord
+         * @param zKoord the z koord
+         * @return true, if successful
+         */
         private boolean platz(int xKoord, int zKoord) {
             return spCoord[xKoord][zKoord];
         }
 
+        /**
+         * Sets the sp coord false.
+         *
+         * @param xKoord the x koord
+         * @param zKoord the z koord
+         */
         private void setSpCoordFalse(int xKoord, int zKoord) {
             spCoord[xKoord][zKoord] = false;
         }
 
+        /**
+         * Generate size.
+         *
+         * @return the int
+         */
         private int generateSize() {
 
             return randomizer.nextInt(PLANET_SIZES.length);
         }
 
+        /**
+         * Gets the random pos.
+         *
+         * @return the random pos
+         */
         private Vector2f getRandomPos() {
             boolean found = false;
             while (!found && !positionen.isEmpty()) {
@@ -851,6 +991,9 @@ public class Level {
             return null;
         }
 
+        /**
+         * Creates the player positions.
+         */
         private void createPlayerPositions() {
             if (level.playersByID.size() > positionen.size()) {
                 return;
@@ -863,6 +1006,11 @@ public class Level {
             }
         }
 
+        /**
+         * Random take.
+         *
+         * @return true, if successful
+         */
         private boolean randomTake() {
             if ( randomizer.nextFloat() < 1.0f / (level.playersByID.size() * 2 + 1.0f) ) {
                 return true;
@@ -872,6 +1020,12 @@ public class Level {
             }
         }
 
+        /**
+         * Creates the sub planets.
+         *
+         * @param basePlanet the base planet
+         * @param maxDist the max dist
+         */
         private void createSubPlanets(AbstractPlanet basePlanet, float maxDist) {
             int planetCount = 1 + randomizer.nextInt(basePlanet.getSizeID());
             maxDist = planetCount * 0.8f;
@@ -901,6 +1055,14 @@ public class Level {
             }
         }
 
+        /**
+         * Gets the rotated position.
+         *
+         * @param center the center
+         * @param dist the dist
+         * @param rotated the rotated
+         * @return the rotated position
+         */
         private Vector2f getRotatedPosition(Vector2f center, float dist, float rotated) {
             Vector2f pos = new Vector2f(1, 0);
             pos.multLocal(dist);
@@ -910,11 +1072,26 @@ public class Level {
             return pos;
         }
 
+        /**
+         * Gets the random ship count.
+         *
+         * @param size the size
+         * @return the random ship count
+         */
         private int getRandomShipCount(int size) {
             return randomizer.nextInt((int) ((size+1)*1.5f))
                     + (int) (20/Level.PLANET_INCREMENT_TIME[size]);
         }
 
+        /**
+         * Creates the planet.
+         *
+         * @param size the size
+         * @param x the x
+         * @param z the z
+         * @param shipCount the ship count
+         * @return the abstract planet
+         */
         private AbstractPlanet createPlanet(int size, float x, float z, int shipCount) {
             AbstractPlanet p = new BasePlanet(
                     assetManager, level,
@@ -929,6 +1106,13 @@ public class Level {
             return p;
         }
 
+        /**
+         * Creates the planet.
+         *
+         * @param x the x
+         * @param z the z
+         * @return the abstract planet
+         */
         private AbstractPlanet createPlanet(float x, float z) {
  
             int size = generateSize();
@@ -945,11 +1129,11 @@ public class Level {
         }
 
         /**
-         * Creates  a       planet at given position for a given player
-         * @param   randomizer       the random generator
-         * @param   owner   the desired owner of the planet
-         * @param   x       coord on the xz plane
-         * @param   z       coord on the xz plane
+         * Creates  a       planet at given position for a given player.
+         *
+         * @param owner the owner
+         * @param x the x
+         * @param z the z
          * @return          new generated planet for the player
          */
         private AbstractPlanet createPlayerPlanet(Player owner, float x, float z) {
@@ -978,7 +1162,8 @@ public class Level {
         /**
          * Setup players.
          *
-         * @param players the players
+         * @param p the p
+         * @param startPlanet the start planet
          */
         public void setupPlayer(Player p, AbstractPlanet startPlanet) {
             Node playersPlanetsNode = new Node(p.getName() + " Planets Node");

@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: AbstractPlanet.java
  * Type: entities.AbstractPlanet
  * 
- * Documentation created: 31.03.2012 - 19:27:49 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
@@ -63,6 +63,8 @@ public abstract class AbstractPlanet extends Node {
     protected Node transformNode;
     /** The size. */
     protected float size;
+    
+    /** The size id. */
     protected int sizeID;
     /** The level. */
     protected Level level;
@@ -80,9 +82,16 @@ public abstract class AbstractPlanet extends Node {
     protected float shipGainTime;
     /** The owner. */
     protected Player owner;
+    
+    /** The impact. */
     private ParticleEmitter impact;
+    
+    /** The capture. */
     private ParticleEmitter capture;
 
+    /**
+     * Creates the impact emitter.
+     */
     private void createImpactEmitter() {
         if (impact == null) {
             impact = new ParticleEmitter("ShipImpactEffect ", ParticleMesh.Type.Triangle, 15);
@@ -107,6 +116,14 @@ public abstract class AbstractPlanet extends Node {
         }
     }
 
+    /**
+     * Emit impact particles.
+     *
+     * @param start the start
+     * @param end the end
+     * @param pos the pos
+     * @param dir the dir
+     */
     void emitImpactParticles(ColorRGBA start, ColorRGBA end, Vector3f pos, Vector3f dir) {
 
         impact.setLowLife(0.3f);
@@ -128,6 +145,9 @@ public abstract class AbstractPlanet extends Node {
         impact.setParticlesPerSec(0);
     }
 
+    /**
+     * Creates the capture emitter.
+     */
     private void createCaptureEmitter() {
         if (capture == null) {
             capture = new ParticleEmitter(
@@ -163,6 +183,9 @@ public abstract class AbstractPlanet extends Node {
         }
     }
 
+    /**
+     * Emit capture particles.
+     */
     public void emitCaptureParticles() {
 
         capture.killAllParticles();
@@ -186,7 +209,7 @@ public abstract class AbstractPlanet extends Node {
      * @param assetManager the asset manager
      * @param level the level
      * @param position the position
-     * @param size the size
+     * @param sizeID the size id
      */
     public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
         this.id = Level.getContiniousPlanetID();
@@ -320,6 +343,11 @@ public abstract class AbstractPlanet extends Node {
         return size;
     }
 
+    /**
+     * Gets the size id.
+     *
+     * @return the size id
+     */
     public int getSizeID() {
         return sizeID;
     }
@@ -392,6 +420,11 @@ public abstract class AbstractPlanet extends Node {
         return position;
     }
 
+    /**
+     * Gets the transform node.
+     *
+     * @return the transform node
+     */
     public Node getTransformNode() {
         return transformNode;
     }
@@ -408,6 +441,11 @@ public abstract class AbstractPlanet extends Node {
         shipIncrement = Level.PLANET_INCREMENT_TIME[sizeID];
     }
 
+    /**
+     * Updates the label.
+     *
+     * @param tpf the tpf
+     */
     private void updateLabel(float tpf) {
 
         boolean visible = (

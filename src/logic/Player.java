@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: Player.java
  * Type: logic.Player
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
@@ -36,12 +36,20 @@ import solarwars.Hub;
 @Serializable
 public class Player {
 
+    /** The Constant PLAYER_COLORS. */
     public static final ColorRGBA[] PLAYER_COLORS = {
         ColorRGBA.Blue, ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};
 
+    /**
+     * Gets the unused color.
+     *
+     * @param players the players
+     * @param start the start
+     * @return the unused color
+     */
     public static ColorRGBA getUnusedColor(ArrayList<Player> players, int start) {
         ColorRGBA color = ColorRGBA.randomColor();
         for (int i = start; i < PLAYER_COLORS.length; i++) {
@@ -59,8 +67,9 @@ public class Player {
 
     /**
      * Invokes Game over action if player has lost game.
-     * @param victorious
-     * @param defeated 
+     *
+     * @param victorious the victorious
+     * @param defeated the defeated
      */
     static void reportPlayerLost(Player victorious, Player defeated) {
         if (defeated != null && !defeated.hasShips()) {
@@ -70,6 +79,11 @@ public class Player {
         }
     }
 
+    /**
+     * Last player.
+     *
+     * @return true, if successful
+     */
     static boolean lastPlayer() {
         int lostPlayerCount = 0;
         for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
@@ -83,6 +97,9 @@ public class Player {
         return Hub.playersByID.size() - 1 == lostPlayerCount;
     }
 
+    /**
+     * Local player wins.
+     */
     static void localPlayerWins() {
         if (lastPlayer()) {
             Gameplay.getCurrentLevel().setGameOver(true);
@@ -96,6 +113,9 @@ public class Player {
 
     }
 
+    /**
+     * Local player looses.
+     */
     static void localPlayerLooses() {
         if (lastPlayer()) {
             Gameplay.getCurrentLevel().setGameOver(true);
@@ -118,7 +138,8 @@ public class Player {
     private ArrayList<ShipGroup> shipGroups;
     /** The is host. */
     private boolean isHost;
-    /** defines the state of a player */
+    
+    /** defines the state of a player. */
     private PlayerState state = new PlayerState();
 
     /**
@@ -158,10 +179,20 @@ public class Player {
         shipGroups = new ArrayList<ShipGroup>();
     }
 
+    /**
+     * Gets the state.
+     *
+     * @return the state
+     */
     public PlayerState getState() {
         return state;
     }
 
+    /**
+     * Apply state.
+     *
+     * @param newState the new state
+     */
     void applyState(PlayerState newState) {
         this.state = newState;
     }
@@ -194,14 +225,27 @@ public class Player {
         return state.lost;
     }
 
+    /**
+     * Sets the lost.
+     */
     void setLost() {
         state.lost = true;
     }
 
+    /**
+     * Gets the defeated player.
+     *
+     * @return the defeated player
+     */
     public int getDefeatedPlayer() {
         return state.defeatedPlayerID;
     }
 
+    /**
+     * Sets the defeated player.
+     *
+     * @param id the new defeated player
+     */
     void setDefeatedPlayer(int id) {
         state.defeatedPlayerID = id;
     }
@@ -230,10 +274,18 @@ public class Player {
     public void updatePlayer() {
     }
 
+    /**
+     * Clear multi select.
+     */
     void clearMultiSelect() {
         state.multiSelectedPlanets.clear();
     }
 
+    /**
+     * Multi select planets.
+     *
+     * @param planets the planets
+     */
     void multiSelectPlanets(ArrayList<AbstractPlanet> planets) {
         ArrayList<Integer> planetIDs = new ArrayList<Integer>();
         for (AbstractPlanet p : planets) {
@@ -251,6 +303,11 @@ public class Player {
         return state.multiSelectedPlanets != null && !state.multiSelectedPlanets.isEmpty();
     }
 
+    /**
+     * Gets the multi select planets.
+     *
+     * @return the multi select planets
+     */
     ArrayList<AbstractPlanet> getMultiSelectPlanets() {
         ArrayList<AbstractPlanet> aps = new ArrayList<AbstractPlanet>();
 
@@ -289,6 +346,11 @@ public class Player {
         return Gameplay.getCurrentLevel().getPlanet(state.selectedPlanetId);
     }
 
+    /**
+     * Refresh ship percentage.
+     *
+     * @param p the p
+     */
     public void refreshShipPercentage(float p) {
         if (hasLost())
             return;
@@ -328,6 +390,11 @@ public class Player {
         return state.shipPercentage;
     }
 
+    /**
+     * Gets the ship count.
+     *
+     * @return the ship count
+     */
     public int getShipCount() {
         int ships = 0;
 
@@ -346,6 +413,11 @@ public class Player {
         return ships;
     }
 
+    /**
+     * Gets the planet count.
+     *
+     * @return the planet count
+     */
     public int getPlanetCount() {
         return planets.size();
     }
@@ -362,7 +434,12 @@ public class Player {
 //        }
 //        return false;
 //    }
-    public boolean hasShips() {
+    /**
+ * Checks for ships.
+ *
+ * @return true, if successful
+ */
+public boolean hasShips() {
         return (getShipCount() > 0);
     }
 

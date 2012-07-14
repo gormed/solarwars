@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: GameGUI.java
  * Type: gui.GameGUI
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:58 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
@@ -43,7 +43,11 @@ public class GameGUI {
     SolarWarsGame game;
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElements;
+    
+    /** The add gui elements. */
     volatile private ArrayList<GUIElement> addGUIElements;
+    
+    /** The remove gui elements. */
     volatile private ArrayList<GUIElement> removeGUIElements;
     /** The width. */
     private float width;
@@ -204,6 +208,11 @@ public class GameGUI {
 
     }
 
+    /**
+     * Sets the focus.
+     *
+     * @param g the new focus
+     */
     public void setFocus(ClickableGUI g) {
         if (g instanceof GUIElement) {
             focus = (GUIElement) g;

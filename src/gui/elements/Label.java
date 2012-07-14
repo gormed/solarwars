@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: Label.java
  * Type: gui.elements.Label
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:58 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
@@ -112,14 +112,29 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
     
+    /**
+     * Sets the caption.
+     *
+     * @param caption the new caption
+     */
     public void setCaption(String caption) {
         this.text.setText(caption);
     }
     
+    /**
+     * Sets the font color.
+     *
+     * @param color the new font color
+     */
     public void setFontColor(ColorRGBA color) {
         this.text.setColor(color);
     }
     
+    /**
+     * Gets the caption.
+     *
+     * @return the caption
+     */
     public String getCaption() {
         return this.text.getText();
     }
@@ -129,6 +144,9 @@ public abstract class Label extends GUIElement implements ClickableGUI {
      */
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#canGainFocus()
+     */
     public boolean canGainFocus() {
         return false;
     }

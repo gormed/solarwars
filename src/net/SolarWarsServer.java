@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: SolarWarsServer.java
  * Type: net.SolarWarsServer
  * 
- * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
@@ -59,10 +59,18 @@ import net.messages.StartGameMessage;
  */
 public class SolarWarsServer extends SimpleApplication {
 
+    /**
+     * The Enum ServerState.
+     */
     public enum ServerState {
 
+        /** The INIT. */
         INIT,
+        
+        /** The LOBBY. */
         LOBBY,
+        
+        /** The INGAME. */
         INGAME
     }
     /** The Constant SERVER_VERSION. */
@@ -130,9 +138,17 @@ public class SolarWarsServer extends SimpleApplication {
     private ArrayList<Player> leavingPlayers;
     /** The is running. */
     private boolean isRunning;
+    
+    /** The seed. */
     private long seed;
+    
+    /** The gameplay listener. */
     private GameplayListener gameplayListener = new GameplayListener();
+    
+    /** The server state. */
     private ServerState serverState = ServerState.INIT;
+    
+    /** The level sync. */
     private float levelSync = 0;
 
     /**
@@ -158,15 +174,28 @@ public class SolarWarsServer extends SimpleApplication {
         isRunning = true;
     }
 
+    /**
+     * Prepare level.
+     *
+     * @param seed the seed
+     */
     public void prepareLevel(long seed) {
         this.seed = seed;
     }
 
+    /**
+     * Enter level.
+     */
     public void enterLevel() {
         serverState = ServerState.INGAME;
         gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
     }
     
+    /**
+     * Syncronize level.
+     *
+     * @param tpf the tpf
+     */
     public void syncronizeLevel(float tpf) {
         if (serverState != ServerState.INGAME)
             return;
@@ -236,6 +265,9 @@ public class SolarWarsServer extends SimpleApplication {
     public void simpleRender(RenderManager rm) {
     }
 
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#stop(boolean)
+     */
     @Override
     public void stop(boolean waitFor) {
         System.out.println("Closing server...");
@@ -444,8 +476,22 @@ public class SolarWarsServer extends SimpleApplication {
         }
     }
 
+    /**
+     * The listener interface for receiving gameplay events.
+     * The class that is interested in processing a gameplay
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addGameplayListener<code> method. When
+     * the gameplay event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see GameplayEvent
+     */
     private class GameplayListener implements MessageListener<HostedConnection> {
 
+        /* (non-Javadoc)
+         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
+         */
         @Override
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlanetActionMessage) {

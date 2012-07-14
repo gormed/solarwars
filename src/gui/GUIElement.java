@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: GUIElement.java
  * Type: gui.GUIElement
  * 
- * Documentation created: 31.03.2012 - 19:27:46 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:37:58 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
@@ -28,6 +28,7 @@ import com.jme3.scene.Node;
  */
 public abstract class GUIElement extends Node {
 
+    /** The visible. */
     private boolean visible = true;
     
     /**
@@ -47,8 +48,9 @@ public abstract class GUIElement extends Node {
     }
     
     /**
-     * Retrieves the visibility of the GUIElement
-     * @return 
+     * Retrieves the visibility of the GUIElement.
+     *
+     * @return true, if is visible
      */
     public boolean isVisible() {
         return visible;

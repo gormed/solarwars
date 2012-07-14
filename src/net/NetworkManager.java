@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: NetworkManager.java
  * Type: net.NetworkManager
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
@@ -125,14 +125,20 @@ public class NetworkManager {
     private InetAddress clientIPAdress;
     /** The server ip adress. */
     private InetAddress serverIPAdress;
+    
+    /** The is multiplayer game. */
     private boolean isMultiplayerGame = false;
     /** The this client. */
     private Client thisClient;
     /** The this server. */
     private SolarWarsServer thisServer;
+    
+    /** The chat module. */
     private ChatModule chatModule;
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
+    
+    /** The client listener. */
     private ClientListener clientListener = new ClientListener();
 
     /**
@@ -313,6 +319,7 @@ public class NetworkManager {
      * Close server.
      *
      * @param wait the wait
+     * @return the solar wars server
      */
     public SolarWarsServer closeAllConnections(boolean wait) {
         if (thisClient != null && thisClient.isConnected()) {
@@ -339,6 +346,11 @@ public class NetworkManager {
         return thisServer.isRunning();
     }
 
+    /**
+     * Checks if is multiplayer game.
+     *
+     * @return true, if is multiplayer game
+     */
     public boolean isMultiplayerGame() {
         return isMultiplayerGame;
     }

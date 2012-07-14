@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: Percentage.java
  * Type: gui.elements.Percentage
  * 
- * Documentation created: 31.03.2012 - 19:27:48 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
@@ -32,17 +32,37 @@ import solarwars.Hub;
  */
 public class Percentage extends Label {
 
+    /** The value changed. */
     private boolean valueChanged = false;
+    
+    /** The percentage. */
     private int percentage = 50;
+    
+    /** The background. */
     private final Panel background;
+    
+    /** The background frame. */
     private final Panel backgroundFrame;
 //    private final Label frame;
-    private float fadeMax;
+    /** The fade max. */
+private float fadeMax;
+    
+    /** The peek. */
     private float peek;
+    
+    /** The fade current. */
     private float fadeCurrent = 0;
+    
+    /** The Constant PEEK_DURATION. */
     public static final float PEEK_DURATION = 1.5f;
+    
+    /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 400;
+    
+    /** The fadeing. */
     private boolean fadeing = false;
+    
+    /** The fade direction. */
     private boolean fadeDirection = true;
 
     /**
@@ -121,6 +141,11 @@ public class Percentage extends Label {
 //        setVisible(true);
     }
 
+    /**
+     * Refresh percentage.
+     *
+     * @return true, if successful
+     */
     private boolean refreshPercentage() {
         int newPerc = (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
         boolean changed = (percentage != newPerc);
@@ -180,12 +205,18 @@ public class Percentage extends Label {
         text.setText("Percentage: " + percentage + "%");
     }
 
+    /**
+     * Start fade in.
+     */
     public void startFadeIn() {
         setVisible(true);
         fadeing = true;
         fadeDirection = true;
     }
 
+    /**
+     * Start fade out.
+     */
     public void startFadeOut() {
         //setVisible(true);
         fadeing = true;

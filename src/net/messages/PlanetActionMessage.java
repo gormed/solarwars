@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: PlanetActionMessage.java
+ * Type: net.messages.PlanetActionMessage
+ * 
+ * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net.messages;
 
 import com.jme3.network.AbstractMessage;
@@ -10,40 +27,81 @@ import entities.AbstractPlanet;
 import logic.PlayerState;
 
 /**
+ * The Class PlanetActionMessage.
  *
  * @author Hans
  */
 @Serializable
 public class PlanetActionMessage extends AbstractMessage {
 
+    /** The client time. */
     private long clientTime;
+    
+    /** The server time. */
     private long serverTime;
+    
+    /** The action name. */
     private String actionName;
+    
+    /** The player id. */
     private int playerID;
+    
+    /** The planet id. */
     private int planetID;
     //private int planetShips;
+    /** The player state. */
     private PlayerState playerState;
 
+    /**
+     * Gets the action name.
+     *
+     * @return the action name
+     */
     public String getActionName() {
         return actionName;
     }
 
+    /**
+     * Gets the client time.
+     *
+     * @return the client time
+     */
     public long getClientTime() {
         return clientTime;
     }
 
+    /**
+     * Gets the player id.
+     *
+     * @return the player id
+     */
     public int getPlayerID() {
         return playerID;
     }
 
+    /**
+     * Gets the server time.
+     *
+     * @return the server time
+     */
     public long getServerTime() {
         return serverTime;
     }
 
+    /**
+     * Gets the planet id.
+     *
+     * @return the planet id
+     */
     public int getPlanetID() {
         return planetID;
     }
 
+    /**
+     * Gets the player state.
+     *
+     * @return the player state
+     */
     public PlayerState getPlayerState() {
         return playerState;
     }
@@ -52,9 +110,21 @@ public class PlanetActionMessage extends AbstractMessage {
 //        return planetShips;
 //    }
 
-    public PlanetActionMessage() {
+    /**
+ * Instantiates a new planet action message.
+ */
+public PlanetActionMessage() {
     }
 
+    /**
+     * Instantiates a new planet action message.
+     *
+     * @param clientTime the client time
+     * @param actionName the action name
+     * @param playerID the player id
+     * @param state the state
+     * @param planetID the planet id
+     */
     public PlanetActionMessage(long clientTime, String actionName, int playerID, PlayerState state, int planetID) {
         this.clientTime = clientTime;
         this.actionName = actionName;
@@ -64,6 +134,16 @@ public class PlanetActionMessage extends AbstractMessage {
 //        this.planetShips = planetShips;
     }
 
+    /**
+     * Instantiates a new planet action message.
+     *
+     * @param clientTime the client time
+     * @param serverTime the server time
+     * @param actionName the action name
+     * @param playerID the player id
+     * @param state the state
+     * @param planetID the planet id
+     */
     public PlanetActionMessage(long clientTime, long serverTime, String actionName, int playerID, PlayerState state, int planetID) {
         this.clientTime = clientTime;
         this.serverTime = serverTime;

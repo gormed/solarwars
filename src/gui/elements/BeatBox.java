@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * 
+ * 
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
+ * 
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: BeatBox.java
+ * Type: gui.elements.BeatBox
+ * 
+ * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
+ * 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
 import com.jme3.audio.AudioNode;
@@ -14,20 +31,39 @@ import solarwars.AudioManager;
 import solarwars.SolarWarsApplication;
 
 /**
+ * The Class BeatBox.
  *
  * @author Hans
  */
 public class BeatBox {
 
+    /** The global timer. */
     private Timer globalTimer;
+    
+    /** The timer tasks. */
     private ArrayList<Beat> timerTasks;
+    
+    /** The sound samples. */
     private ArrayList<AudioNode> soundSamples;
+    
+    /** The audio manager. */
     private AudioManager audioManager;
+    
+    /** The application. */
     private SolarWarsApplication application;
+    
+    /** The base sound. */
     private AudioNode baseSound;
+    
+    /** The randomizer. */
     private Random randomizer;
+    
+    /** The seed. */
     private long seed;
 
+    /**
+     * Instantiates a new beat box.
+     */
     public BeatBox() {
         seed = System.currentTimeMillis();
         randomizer = new Random(seed);
@@ -40,6 +76,11 @@ public class BeatBox {
 
     }
 
+    /**
+     * Instantiates a new beat box.
+     *
+     * @param seed the seed
+     */
     public BeatBox(long seed) {
         this.seed = seed;
         randomizer = new Random(seed);
@@ -51,6 +92,9 @@ public class BeatBox {
 
     }
 
+    /**
+     * Setup sounds.
+     */
     public void setupSounds() {
 
         final int baseKick = 1 + randomizer.nextInt(5);
@@ -311,6 +355,9 @@ public class BeatBox {
         timerTasks.add(baseBeat);
     }
 
+    /**
+     * Play.
+     */
     public void play() {
         baseSound.play();
 
@@ -319,6 +366,9 @@ public class BeatBox {
         }
     }
 
+    /**
+     * Stop.
+     */
     public void stop() {
         baseSound.stop();
         for (Beat beat : timerTasks) {
@@ -326,12 +376,27 @@ public class BeatBox {
         }
     }
 
+    /**
+     * The Class Beat.
+     */
     private abstract class Beat extends TimerTask {
 
+        /** The sound. */
         public AudioNode sound;
+        
+        /** The period. */
         public int period;
+        
+        /** The layback. */
         public int layback;
 
+        /**
+         * Instantiates a new beat.
+         *
+         * @param sound the sound
+         * @param period the period
+         * @param layback the layback
+         */
         public Beat(AudioNode sound, int period, int layback) {
             this.period = period;
             this.layback = layback;

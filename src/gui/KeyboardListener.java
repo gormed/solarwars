@@ -10,13 +10,13 @@
  * You have no right to edit, publish and/or deliver the code or application 
  * in any way! If that is done by someone, please report it!
  * 
- * Email me: hans.ferchland@gmx.de
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
  * File: KeyboardListener.java
  * Type: gui.KeyboardListener
  * 
- * Documentation created: 31.03.2012 - 19:27:47 by Hans Ferchland
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui;
@@ -42,10 +42,17 @@ public abstract class KeyboardListener implements ActionListener {
 
     /** The mappings added. */
     private static boolean mappingsAdded = false;
+    
+    /** The input manager. */
     protected InputManager inputManager;
     /** The text box. */
     protected TextBox textBox;
 
+    /**
+     * Gets the input manager.
+     *
+     * @return the input manager
+     */
     public InputManager getInputManager() {
         return inputManager;
     }
@@ -60,6 +67,7 @@ public abstract class KeyboardListener implements ActionListener {
      * Instantiates a new keyboard listener.
      *
      * @param inputManager the input manager
+     * @param textBox the text box
      */
     public KeyboardListener(InputManager inputManager, TextBox textBox) {
         this.textBox = textBox;
