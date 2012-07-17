@@ -398,6 +398,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     /* (non-Javadoc)
      * @see com.jme3.input.controls.AnalogListener#onAnalog(java.lang.String, float, float)
      */
+    @Override
     public void onAnalog(String name, float value, float tpf) {
         if (!enabled) {
             return;
@@ -425,6 +426,7 @@ public class IsoCamera implements AnalogListener, ActionListener {
     /* (non-Javadoc)
      * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
      */
+    @Override
     public void onAction(String name, boolean value, float tpf) {
         if (!enabled) {
             return;

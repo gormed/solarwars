@@ -44,58 +44,40 @@ public class ScoresGUI extends GUIElement {
 
     /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 3500;
-    
     /** The fadeing. */
     private boolean fadeing = false;
-    
     /** The fade direction. */
     private boolean fadeDirection = true;
-    
     /** The gui. */
     private GameGUI gui;
-    
     /** The show. */
     private boolean show;
-    
     /** The fade max. */
     private float fadeMax;
-    
     /** The fade current. */
     private float fadeCurrent = 0;
-    
     /** The action listener. */
     private TabActionListener actionListener = new TabActionListener();
-    
     /** The player labels. */
     private ArrayList<ScoresLine> playerLabels = new ArrayList<ScoresLine>();
-    
     /** The label position. */
     private HashMap<Integer, Vector3f> labelPosition = new HashMap<Integer, Vector3f>(8);
-    
     /** The scores label. */
     private Label scoresLabel;
-    
     /** The background. */
     private Panel background;
-    
     /** The head name label. */
     private Label headNameLabel;
-    
     /** The head ships label. */
     private Label headShipsLabel;
-    
     /** The head planets label. */
     private Label headPlanetsLabel;
-    
     /** The head percent label. */
     private Label headPercentLabel;
-    
     /** The head state label. */
     private Label headStateLabel;
-    
     /** The head color label. */
     private Label headColorLabel;
-    
     /** The background frame. */
     private Panel backgroundFrame;
 
@@ -108,24 +90,24 @@ public class ScoresGUI extends GUIElement {
         this.gui = gui;
         fadeMax = -(2 * gui.getWidth() / 3) + 10;
         this.setLocalTranslation(fadeMax, 0, 0);
-        
+
         background = new Panel("TabScores",
                 new Vector3f(gui.getWidth() / 3, gui.getHeight() / 2, 0),
                 new Vector2f(gui.getWidth() / 3 + 4, gui.getHeight() / 3 + 4),
                 new ColorRGBA(0, 0, 1, 0.2f));
-        
+
         backgroundFrame = new Panel("TabScoresFrame",
                 new Vector3f(gui.getWidth() / 3, gui.getHeight() / 2, 0),
                 new Vector2f(gui.getWidth() / 3, gui.getHeight() / 3),
                 new ColorRGBA(0, 0, 1, 0.4f));
-        
+
         for (int i = 0; i < 8; i++) {
             labelPosition.put(i,
                     new Vector3f(
                     gui.getWidth() / 3,
                     (6.5f - i * 0.5f) * gui.getHeight() / 10, 0));
         }
-        
+
         scoresLabel = new Label("SCORES", new Vector3f(gui.getWidth() / 3,
                 8f * gui.getHeight() / 10,
                 0),
@@ -152,7 +134,7 @@ public class ScoresGUI extends GUIElement {
             }
         };
         addPlayers();
-        
+
 
         this.attachChild(background);
         this.attachChild(backgroundFrame);
@@ -385,9 +367,9 @@ public class ScoresGUI extends GUIElement {
 //    }
 //
     /**
- * Start fade in.
- */
-public void startFadeIn() {
+     * Start fade in.
+     */
+    public void startFadeIn() {
         setVisible(true);
         fadeing = true;
         fadeDirection = true;
@@ -431,22 +413,16 @@ public void startFadeIn() {
 
         /** The player name label. */
         private Label playerNameLabel;
-        
         /** The player ships label. */
         private Label playerShipsLabel;
-        
         /** The player planets label. */
         private Label playerPlanetsLabel;
-        
         /** The player percent label. */
         private Label playerPercentLabel;
-        
         /** The player state label. */
         private Label playerStateLabel;
-        
         /** The player color panel. */
         private Panel playerColorPanel;
-        
         /** The player. */
         private Player player;
 
@@ -568,7 +544,7 @@ public void startFadeIn() {
                     Vector2f.UNIT_XY.clone().multLocal(15f),
                     playerColor);
             //playerColorPanel.material.setColor("GlowColor", playerColor);
-            
+
             attachChild(playerNameLabel);
             attachChild(playerPercentLabel);
             attachChild(playerShipsLabel);

@@ -54,7 +54,6 @@ public class Level {
 
     /** The Constant PLAYER_START_SHIP_COUNT. */
     public static final int PLAYER_START_SHIP_COUNT = 100;
-    
     /** The Constant LEVEL_SIZE_NAME. */
     public static final String[] LEVEL_SIZE_NAME = {
         "NONE",
@@ -67,7 +66,6 @@ public class Level {
         "SEVEN PLAYER",
         "EIGHT PLAYER"
     };
-    
     /** The PLAYER s_ camer a_ height. */
     public static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
@@ -80,12 +78,10 @@ public class Level {
         16,
         16
     };
-    
     /** The PLANE t_ incremen t_ time. */
     public static float[] PLANET_INCREMENT_TIME = {
         2f, 1.5f, 1.2f, 1.0f, 0.9f,
         0.8f, 0.7f, 0.6f, 0.50f, 0.50f};
-    
     /** The PLANE t_ sizes. */
     public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
@@ -159,7 +155,6 @@ public class Level {
     private Node labelNode;
     /** The background. */
     private LevelBackground background;
-    
     /** The particle node for particle emitters of the planets. */
     private Node particleEmitters;
     /** The all ships node. */
@@ -180,19 +175,14 @@ public class Level {
     private IsoControl control;
     /** The currently used game gui. */
     private GameGUI gui;
-    
     /** The players by id. */
     private HashMap<Integer, Player> playersByID;
-    
     /** The batch manager. */
     private ShipBatchManager batchManager;
-    
     /** Indicates that the level is fully loaded into scene-graph. */
     private boolean levelLoaded = false;
-    
     /** indicates that the game ended. */
     private boolean gameOver = false;
-    
     /** The watch game. */
     private boolean watchGame = false;
 
@@ -324,9 +314,9 @@ public class Level {
             this.shipNodes.put(p, n);
             this.allShipsNode.attachChild(n);
         }
-        
+
         batchManager = ShipBatchManager.getInstance();
-        batchManager.initialize(Hub.playersByID.size()*100);
+        batchManager.initialize(Hub.playersByID.size() * 100);
 
     }
 
@@ -416,12 +406,21 @@ public class Level {
     }
 
     /**
-     * Gets the planet iterator.
+     * Gets the planet set.
      *
      * @return the planet iterator
      */
     public Set<Entry<Integer, AbstractPlanet>> getPlanetSet() {
         return planetList.entrySet();
+    }
+
+    /**
+     * Gets the planet iterator.
+     *
+     * @return the planet iterator
+     */
+    public Set<Entry<Integer, ShipGroup>> getShipGroupSet() {
+        return shipGroupList.entrySet();
     }
 
     /**
@@ -475,13 +474,13 @@ public class Level {
         for (Map.Entry<Integer, AbstractPlanet> entry : getPlanetSet()) {
             entry.getValue().updatePlanet(tpf);
         }
-        
+
         //batchManager.refreshBatchSize(tpf);
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);
         }
-        
+
         for (Map.Entry<Integer, AbstractShip> entry : shipList.entrySet()) {
             entry.getValue().updateShip(tpf);
         }
@@ -539,13 +538,10 @@ public class Level {
 
         /** The Constant PLANET_SPACE_HORIZ. */
         public static final float PLANET_SPACE_HORIZ = 1.0f;
-        
         /** The Constant PLANET_SPACE_VERT. */
         public static final float PLANET_SPACE_VERT = 0.5f;
-        
         /** The SUBPLANETS. */
         public final int[] SUBPLANETS = {0, 1, 2, 3, 4, 4, 6, 8, 8};
-        
         /** The level. */
         private Level level;
         /* linksunten, linksoben, rechtsoben, rechtsunten */
@@ -601,7 +597,7 @@ public class Level {
         private void initArrays() {
 
             /* Initialisiere spCoord */
-            int space = (level.playersByID.size()) * 2 + (ringeBehind*2 +1);
+            int space = (level.playersByID.size()) * 2 + (ringeBehind * 2 + 1);
             spCoord = new boolean[space][space];
             for (int i = 0; i < space; i++) {
                 for (int j = 0; j < space; j++) {
@@ -781,7 +777,7 @@ public class Level {
             levelLoaded = true;
             System.out.println("Level generated!");
         }
-        
+
         /**
          * Baut das Level mit einem quadratischen Spielfeld auf, bei dem
          * jeder Spieler den gleichen Abstand bis zum nächsten hat.
@@ -821,13 +817,13 @@ public class Level {
             int startPlanetNumber = 0;
             boolean top = true;
             boolean startPlanet = false;
-            boolean lastRow = false;            
-            
+            boolean lastRow = false;
+
             //ERZEUGUNG DES SPIELERRINGS
-            
-            arrayX = 0+ringeBehind;
-            arrayZ = -1+ringeBehind;
-            
+
+            arrayX = 0 + ringeBehind;
+            arrayZ = -1 + ringeBehind;
+
             pointerX = playerCount;
             pointerZ = playerCount + 1;
             for (int lauf = 0; lauf < playerCount * 8; lauf++) {
@@ -836,18 +832,18 @@ public class Level {
                 if (lastRow == false) {
                     if (counter < playerCount * 2 + 1) {
                         counter++;
-                        
+
                         arrayZ++;
-                        
+
                         pointerZ--;
                     } // Wenn oben erstellt wird, initialisiere counter und zwCounter entsprechend
                     else if (top == true) {
                         zwCounter = counter;
                         counter = playerCount * 8 + decrement;
-                        
-                        arrayZ = 0+ringeBehind;
+
+                        arrayZ = 0 + ringeBehind;
                         arrayX++;
-                        
+
                         pointerZ = playerCount;
                         pointerX--;
                         decrement--;
@@ -859,25 +855,24 @@ public class Level {
                     else {
                         zwCounter++;
                         counter = zwCounter;
-                        
-                        arrayZ = (playerCount*2)+ringeBehind;
-                        
+
+                        arrayZ = (playerCount * 2) + ringeBehind;
+
                         pointerZ = -playerCount;
                         top = true;
                     }
                 } else {
                     counter--;
                     pointerZ--;
-                    
+
                     arrayZ++;
-                
+
                 }
                 // Planetenerzeugung
                 // An einer zufälligen Stelle den ersten Spielerplanet erstellen
-                if ((counter < (playerCount * 2 + 1) && randomTake() == true && startPlanet == false) 
-                     || (counter == playerCount * 2 + 1 && startPlanet == false)
-                     || (counter == 8 && startPlanet == false)  
-                        ) {
+                if ((counter < (playerCount * 2 + 1) && randomTake() == true && startPlanet == false)
+                        || (counter == playerCount * 2 + 1 && startPlanet == false)
+                        || (counter == 8 && startPlanet == false)) {
                     positionen.push(new Vector2f(pointerX, pointerZ));
                     setSpCoordFalse(arrayX, arrayZ);
                     startPlanetNumber = counter;
@@ -891,33 +886,33 @@ public class Level {
                 else {
                     // Random Planet erzeugen
                     if (randomizer.nextFloat() > 0.65f) {
-                             createPlanet(pointerX, pointerZ);
-                             System.out.print(".");
-                             }
+                        createPlanet(pointerX, pointerZ);
+                        System.out.print(".");
+                    }
                     // createPlanet(pointerX, pointerZ);
                     setSpCoordFalse(arrayX, arrayZ);
                 }
             }
-            
+
             createPlayerPositions();
 
             //ERZEUGUNG DES RESTLICHEN RASTERS
             //Schleife für Anzahl der Ringe
-            for (int i = 0; i < playerCount+(ringeBehind+1); i++) {
+            for (int i = 0; i < playerCount + (ringeBehind + 1); i++) {
                 pointerZ = +i;
                 pointerX = +i;
-                arrayZ = (playerCount+ringeBehind)-i;
-                arrayX = (playerCount+ringeBehind)-i;
+                arrayZ = (playerCount + ringeBehind) - i;
+                arrayX = (playerCount + ringeBehind) - i;
                 //Schleife für X-Koord
                 for (int j = 0; j < (i * 2 + 1); j++) {
                     //Schleife für Z-Koord
                     for (int k = 0; k < (i * 2 + 1); k++) {
                         if (platz(arrayX, arrayZ) == true) {
                             // Random Planet erzeugen
-                             if (randomizer.nextFloat() > 0.65f) {
-                             createPlanet(pointerX, pointerZ);
-                             System.out.print(".");
-                             }
+                            if (randomizer.nextFloat() > 0.65f) {
+                                createPlanet(pointerX, pointerZ);
+                                System.out.print(".");
+                            }
                             // createPlanet(pointerX, pointerZ);
                             setSpCoordFalse(arrayX, arrayZ);
                         }
@@ -925,7 +920,7 @@ public class Level {
                         arrayZ++;
                     }
                     pointerZ = +i;
-                    arrayZ = (playerCount+ringeBehind)-i;
+                    arrayZ = (playerCount + ringeBehind) - i;
                     pointerX--;
                     arrayX++;
                 }
@@ -998,7 +993,7 @@ public class Level {
             if (level.playersByID.size() > positionen.size()) {
                 return;
             }
-                
+
             for (Map.Entry<Integer, Player> entrySet : level.playersByID.entrySet()) {
                 Player p = entrySet.getValue();
                 Vector2f v = getRandomPos();
@@ -1012,10 +1007,9 @@ public class Level {
          * @return true, if successful
          */
         private boolean randomTake() {
-            if ( randomizer.nextFloat() < 1.0f / (level.playersByID.size() * 2 + 1.0f) ) {
+            if (randomizer.nextFloat() < 1.0f / (level.playersByID.size() * 2 + 1.0f)) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -1079,8 +1073,8 @@ public class Level {
          * @return the random ship count
          */
         private int getRandomShipCount(int size) {
-            return randomizer.nextInt((int) ((size+1)*1.5f))
-                    + (int) (20/Level.PLANET_INCREMENT_TIME[size]);
+            return randomizer.nextInt((int) ((size + 1) * 1.5f))
+                    + (int) (20 / Level.PLANET_INCREMENT_TIME[size]);
         }
 
         /**
@@ -1114,7 +1108,7 @@ public class Level {
          * @return the abstract planet
          */
         private AbstractPlanet createPlanet(float x, float z) {
- 
+
             int size = generateSize();
             AbstractPlanet p = new BasePlanet(
                     assetManager, level,

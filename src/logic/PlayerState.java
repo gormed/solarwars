@@ -53,7 +53,6 @@ public class PlayerState {
         this.name = name;
         this.color = color;
     }
-    
     /** The selected planet. */
     public int selectedPlanetId;
     /** The selected ship group. */
@@ -66,13 +65,12 @@ public class PlayerState {
     public String name;
     /** The color. */
     public ColorRGBA color;
-    
     /** The lost. */
     public boolean lost;
-    
     /** The defeated player id. */
     public int defeatedPlayerID = -1;
-    
     /** The multi selected planets. */
     public ArrayList<Integer> multiSelectedPlanets = new ArrayList<Integer>();
+    /** The multi selected shipgroups. */
+    public ArrayList<Integer> multiSelectedShipGroups = new ArrayList<Integer>();
 }

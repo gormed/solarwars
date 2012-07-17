@@ -38,15 +38,16 @@ public class Gameplay {
 
     /** The Constant PLANET_SELECT. */
     public static final String PLANET_SELECT = "SelectPlanet";
-    
     /** The Constant PLANET_MULTI_SELECT. */
     public static final String PLANET_MULTI_SELECT = "MultiSelectPlanet";
     /** The Constant PLANET_ATTACK. */
     public static final String PLANET_ATTACK = "AttackPlanet";
-    /** The Constant SHIP_REDIRECT. */
-    public static final String SHIP_REDIRECT = "RedirectShip";
+    /** The Constant SHIP_SELECT. */
+    public static final String SHIP_SELECT = "RedirectShip";
     /** The Constant SHIP_ARRIVES. */
     public static final String SHIP_ARRIVES = "ArrivesShip";
+    /** The Constant SHIP_MULTI_SELECT. */
+    public static final String SHIP_MULTI_SELECT = "MultiSelectShips";
     /** The Constant PLANET_CAPTURE. */
     public static final String PLANET_CAPTURE = "CapturePlanet";
     /** The Constant GAME_OVER. */
@@ -104,7 +105,7 @@ public class Gameplay {
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
                 if (planet.getOwner() == p) {
-                    p.clearMultiSelect();
+                    p.clearPlanetMultiSelect();
                     p.selectPlanet(planet);
 
                 } else if (planet.getOwner() != null) {
@@ -117,8 +118,9 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
-                if (p.hasLost() || currentLevel.isGameOver())
+                if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
+                }
                 if (sender instanceof IsoControl) {
                     IsoControl control = (IsoControl) sender;
                     ArrayList<AbstractPlanet> selection = control.getSelectedPlanets();
@@ -139,15 +141,17 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet target, Player p) {
-                if (p.hasLost() || currentLevel.isGameOver())
+                if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
+                }
                 if (p.hasMultiSelectedPlanets()) {
                     multiAttackPlanet(p.getMultiSelectPlanets(), target, p);
-                }
-                else if (p.hasSelectedPlanet()) {
+                } else if (p.hasSelectedPlanet()) {
                     singleAttackPlanet(p.getSelectedPlanet(), target, p);
+                } else if (p.hasMultiSelectedShipGroups()) {
+                    multiAttackShipGroup(p.getMultiSelectShipGroups(), target);
                 } else if (p.hasSelectedShipGroup()) {
-                    singelAttackShipGroup(p.getSelectedShipGroup(), target);
+                    singleAttackShipGroup(p.getSelectedShipGroup(), target);
                 }
             }
 
@@ -156,8 +160,12 @@ public class Gameplay {
                     singleAttackPlanet(planet, target, p);
                 }
             }
-
-            private void singelAttackShipGroup(ShipGroup shipGroup, AbstractPlanet target) {
+            private void multiAttackShipGroup(ArrayList<ShipGroup> ships, AbstractPlanet target) {
+                for (ShipGroup sg : ships) {
+                    singleAttackShipGroup(sg, target);
+                }
+            }
+            private void singleAttackShipGroup(ShipGroup shipGroup, AbstractPlanet target) {
                 if (shipGroup != null) {
                     shipGroup.moveToPlanet(target);
                 }
@@ -186,8 +194,9 @@ public class Gameplay {
 
             @Override
             public void doAction(Object sender, AbstractPlanet planet, Player p) {
-                if (p.hasLost() || currentLevel.isGameOver())
+                if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
+                }
                 if (planet.getOwner() == p) {
                     planet.incrementShips();
                 } else {
@@ -213,19 +222,21 @@ public class Gameplay {
         // SHIP ACTIONS
         // ========================================================
 
-        ShipAction redirectShipGroup = new ShipAction(SHIP_REDIRECT) {
+        ShipGroupAction redirectShipGroup = new ShipGroupAction(SHIP_SELECT) {
 
             @Override
             public void doAction(Object sender, ShipGroup shipGroup, Player p) {
-                if (p.hasLost() || currentLevel.isGameOver())
+                if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
+                }
                 if (shipGroup.getOwner() == p) {
+                    p.clearShipGroupMultiSelect();
                     p.selectShipGroup(shipGroup);
                 }
             }
         };
 
-        ShipAction shipArrives = new ShipAction(SHIP_ARRIVES) {
+        ShipGroupAction shipArrives = new ShipGroupAction(SHIP_ARRIVES) {
 
             @Override
             public void doAction(Object sender, ShipGroup shipGroup, Player p) {
@@ -241,8 +252,24 @@ public class Gameplay {
             }
         };
 
-        actionLib.getShipActions().put(SHIP_REDIRECT, redirectShipGroup);
+        ShipGroupAction multiSelectShipGroup = new ShipGroupAction(SHIP_MULTI_SELECT) {
+
+            @Override
+            void doAction(Object sender, ShipGroup shipGroup, Player p) {
+                if (p.hasLost() || currentLevel.isGameOver()) {
+                    return;
+                }
+                if (sender instanceof IsoControl) {
+                    IsoControl control = (IsoControl) sender;
+                    ArrayList<ShipGroup> selection = control.getSelectedShipGroups();
+                    p.multiSelectShipGroup(selection);
+                }
+            }
+        };
+
+        actionLib.getShipActions().put(SHIP_SELECT, redirectShipGroup);
         actionLib.getShipActions().put(SHIP_ARRIVES, shipArrives);
+        actionLib.getShipActions().put(SHIP_MULTI_SELECT, multiSelectShipGroup);
 
         // ========================================================
         // GENERAL ACTIONS

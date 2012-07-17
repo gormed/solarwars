@@ -13,8 +13,8 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: ShipAction.java
- * Type: logic.ShipAction
+ * File: ShipGroupAction.java
+ * Type: logic.ShipGroupAction
  * 
  * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
@@ -24,9 +24,9 @@ package logic;
 import entities.ShipGroup;
 
 /**
- * The Class ShipAction.
+ * The Class ShipGroupAction.
  */
-public abstract class ShipAction {
+public abstract class ShipGroupAction {
 
     /** The name. */
     private final String name;
@@ -45,7 +45,7 @@ public abstract class ShipAction {
      *
      * @param name the name
      */
-    public ShipAction(String name) {
+    public ShipGroupAction(String name) {
         this.name = name;
     }
 

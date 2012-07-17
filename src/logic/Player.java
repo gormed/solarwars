@@ -138,7 +138,6 @@ public class Player {
     private ArrayList<ShipGroup> shipGroups;
     /** The is host. */
     private boolean isHost;
-    
     /** defines the state of a player. */
     private PlayerState state = new PlayerState();
 
@@ -277,7 +276,7 @@ public class Player {
     /**
      * Clear multi select.
      */
-    void clearMultiSelect() {
+    void clearPlanetMultiSelect() {
         state.multiSelectedPlanets.clear();
     }
 
@@ -287,6 +286,11 @@ public class Player {
      * @param planets the planets
      */
     void multiSelectPlanets(ArrayList<AbstractPlanet> planets) {
+        state.multiSelectedPlanets.clear();
+        state.multiSelectedShipGroups.clear();
+        state.selectedPlanetId = -1;
+        state.selectedShipGroupId = -1;
+        
         ArrayList<Integer> planetIDs = new ArrayList<Integer>();
         for (AbstractPlanet p : planets) {
             planetIDs.add(p.getId());
@@ -324,6 +328,7 @@ public class Player {
      */
     void selectPlanet(AbstractPlanet p) {
         state.multiSelectedPlanets.clear();
+        state.multiSelectedShipGroups.clear();
         state.selectedPlanetId = p.getId();
         state.selectedShipGroupId = -1;
     }
@@ -352,10 +357,11 @@ public class Player {
      * @param p the p
      */
     public void refreshShipPercentage(float p) {
-        if (hasLost())
+        if (hasLost()) {
             return;
+        }
         float percentage = state.shipPercentage + p;
-        
+
         if (percentage > 1.0f) {
             percentage = 1.0f;
         }
@@ -422,25 +428,62 @@ public class Player {
         return planets.size();
     }
 
-//    public boolean canSurvive() {
-//        int ships = getShipCount();
-//
-//        for (Map.Entry<Integer, AbstractPlanet> entry : Gameplay.getCurrentLevel().getPlanetSet()) {
-//            AbstractPlanet planet = entry.getValue();
-//
-//            if (planet != null && planet.getShipCount() < ships) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
     /**
- * Checks for ships.
- *
- * @return true, if successful
- */
-public boolean hasShips() {
+     * Checks for ships.
+     *
+     * @return true, if successful
+     */
+    public boolean hasShips() {
         return (getShipCount() > 0);
+    }
+
+    /**
+     * Clear multi select.
+     */
+    void clearShipGroupMultiSelect() {
+        state.multiSelectedShipGroups.clear();
+    }
+
+    /**
+     * Multi select planets.
+     *
+     * @param planets the planets
+     */
+    void multiSelectShipGroup(ArrayList<ShipGroup> shipGroupSelction) {
+
+        state.multiSelectedPlanets.clear();
+        state.multiSelectedShipGroups.clear();
+        state.selectedPlanetId = -1;
+        state.selectedShipGroupId = -1;
+
+        ArrayList<Integer> shipGroupIDs = new ArrayList<Integer>();
+        for (ShipGroup s : shipGroups) {
+            shipGroupIDs.add(s.getId());
+        }
+        state.multiSelectedShipGroups = shipGroupIDs;
+    }
+
+    /**
+     * Checks for multi selected planets.
+     *
+     * @return true, if successful
+     */
+    boolean hasMultiSelectedShipGroups() {
+        return state.multiSelectedShipGroups != null && !state.multiSelectedShipGroups.isEmpty();
+    }
+
+    /**
+     * Gets the multi select planets.
+     *
+     * @return the multi select planets
+     */
+    ArrayList<ShipGroup> getMultiSelectShipGroups() {
+        ArrayList<ShipGroup> sgs = new ArrayList<ShipGroup>();
+
+        for (Integer i : state.multiSelectedShipGroups) {
+            sgs.add(Gameplay.getCurrentLevel().getShipGroup(i));
+        }
+        return sgs;
     }
 
     /**
@@ -450,6 +493,7 @@ public boolean hasShips() {
      */
     void selectShipGroup(ShipGroup g) {
         state.multiSelectedPlanets.clear();
+        state.multiSelectedShipGroups.clear();
         state.selectedShipGroupId = g.getId();
         state.selectedPlanetId = -1;
     }

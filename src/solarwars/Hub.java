@@ -84,7 +84,7 @@ public class Hub {
     }
 
     /**
-     * Initializes the.
+     * Initializes the Hub to the other players.
      *
      * @param localPlayer the local player
      * @param players the players

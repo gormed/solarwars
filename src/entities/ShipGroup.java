@@ -278,4 +278,8 @@ public class ShipGroup extends Node {
     public Player getOwner() {
         return owner;
     }
+
+    public Vector3f getPosition() {
+        return position;
+    }
 }

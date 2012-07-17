@@ -522,12 +522,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         /* (non-Javadoc)
          * @see com.jme3.network.ClientStateListener#clientConnected(com.jme3.network.Client)
          */
+        @Override
         public void clientConnected(Client c) {
         }
 
         /* (non-Javadoc)
          * @see com.jme3.network.ClientStateListener#clientDisconnected(com.jme3.network.Client, com.jme3.network.ClientStateListener.DisconnectInfo)
          */
+        @Override
         public void clientDisconnected(Client c, DisconnectInfo info) {
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
             
@@ -560,6 +562,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
+        @Override
         public void messageReceived(Client source, Message message) {
             System.out.println(
                     "Client #" + source.getId() + " recieved a "

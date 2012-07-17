@@ -213,7 +213,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     }
 
     /**
-     * Start game.
+     * Starts a multiplayer game as server.
      */
     private void startGame() {
         application.attachIsoCameraControl();
@@ -639,6 +639,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * Removes the leaving player.
      *
      * @param p the p
+     * @deprecated
      */
     private void removeLeavingPlayer(Player p) {
         if (playerLabelIdx.containsKey(p)) {
@@ -675,10 +676,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /*
      * Refreshes the player labels
-     */
-    /**
-     * Refresh players.
-     *
+     * 
      * @param players the players
      */
     private void refreshPlayers(HashMap<Integer, Player> players) {
@@ -782,9 +780,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
                 System.out.println("Player " + newPlayer.getName() + "[ID#" + newPlayer.getId() + "] joined the Game.");
                 solarWarsServer.addConnectingPlayer(newPlayer, source);
-                source.setAttribute("PlayerObject", newPlayer);
-                source.setAttribute("PlayerID", newPlayer.getId());
-                source.setAttribute("PlayerName", newPlayer.getName());
+
 
                 refreshedPlayers = ServerHub.playersByID;
                 playersChanged = true;
@@ -814,9 +810,12 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             System.out.println(
                     "Client #" + source.getId() + " recieved a "
                     + message.getClass().getSimpleName());
+            // if this player or any other player connects to the server
             if (message instanceof PlayerAcceptedMessage) {
                 PlayerAcceptedMessage pam = (PlayerAcceptedMessage) message;
+                // get the firing player
                 Player thisPlayer = pam.getPlayer();
+                // 
                 boolean isConnecting = pam.isConnecting();
                 ArrayList<Player> players = pam.getPlayers();
 

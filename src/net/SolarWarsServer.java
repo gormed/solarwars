@@ -66,12 +66,12 @@ public class SolarWarsServer extends SimpleApplication {
 
         /** The INIT. */
         INIT,
-        
         /** The LOBBY. */
         LOBBY,
-        
         /** The INGAME. */
-        INGAME
+        INGAME,
+        
+        CLOSED
     }
     /** The Constant SERVER_VERSION. */
     public static final int SERVER_VERSION = 15;
@@ -138,16 +138,12 @@ public class SolarWarsServer extends SimpleApplication {
     private ArrayList<Player> leavingPlayers;
     /** The is running. */
     private boolean isRunning;
-    
     /** The seed. */
     private long seed;
-    
     /** The gameplay listener. */
     private GameplayListener gameplayListener = new GameplayListener();
-    
     /** The server state. */
     private ServerState serverState = ServerState.INIT;
-    
     /** The level sync. */
     private float levelSync = 0;
 
@@ -190,15 +186,16 @@ public class SolarWarsServer extends SimpleApplication {
         serverState = ServerState.INGAME;
         gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
     }
-    
+
     /**
      * Syncronize level.
      *
      * @param tpf the tpf
      */
     public void syncronizeLevel(float tpf) {
-        if (serverState != ServerState.INGAME)
+        if (serverState != ServerState.INGAME) {
             return;
+        }
         levelSync += tpf;
         if (levelSync > 2) {
             HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(100);
@@ -206,9 +203,9 @@ public class SolarWarsServer extends SimpleApplication {
             for (Map.Entry<Integer, AbstractPlanet> entry : l.getPlanetSet()) {
                 hashMap.put(entry.getKey(), entry.getValue().getShipCount());
             }
-            LevelActionMessage message = 
+            LevelActionMessage message =
                     new LevelActionMessage(
-                            hashMap, seed, System.currentTimeMillis());
+                    hashMap, seed, System.currentTimeMillis());
             this.gameServer.broadcast(message);
             levelSync = 0;
         }
@@ -279,7 +276,9 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void destroy() {
-
+        if (serverState == ServerState.CLOSED) {
+            return;
+        }
         connectedPlayers.clear();
         joinedPlayers.clear();
         leavingPlayers.clear();
@@ -295,6 +294,7 @@ public class SolarWarsServer extends SimpleApplication {
         gameServer = null;
         serverApp = null;
         isRunning = false;
+        serverState = ServerState.CLOSED;
         super.destroy();
         System.out.println("...Server closed!");
     }
@@ -399,7 +399,7 @@ public class SolarWarsServer extends SimpleApplication {
      * Respond player.
      *
      * @param p the p
-     * @param connecting the connecting
+     * @param connecting the connecting flag
      */
     public void respondPlayer(Player p, boolean connecting) {
         if (!connectedPlayers.containsKey(p)) {
@@ -408,10 +408,14 @@ public class SolarWarsServer extends SimpleApplication {
         if (connecting) {
             boolean isHost = p.isHost();
             HostedConnection hc = connectedPlayers.get(p);
+            checkPlayersName(p);
             PlayerAcceptedMessage joiningPlayer =
                     new PlayerAcceptedMessage(p,
                     ServerHub.getPlayers(),
                     isHost, true);
+            hc.setAttribute("PlayerObject", p);
+            hc.setAttribute("PlayerID", p.getId());
+            hc.setAttribute("PlayerName", p.getName());
 
             gameServer.broadcast(Filters.equalTo(hc), joiningPlayer);
 
@@ -439,6 +443,24 @@ public class SolarWarsServer extends SimpleApplication {
             gameServer.broadcast(Filters.notEqualTo(hc), plm);
             connectedPlayers.remove(p);
         }
+    }
+
+    private void checkPlayersName(Player p) {
+        String name = p.getName();
+        for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
+            Player player = entrySet.getKey();
+
+            if (player.getName().equals(name) && p != player) {
+                long rand = System.currentTimeMillis() % 2000;
+                String s = ""+rand;
+                s.substring(0, s.length()/2);
+                s = "" + s.hashCode();
+                s.substring(s.length()/2);
+                p.getState().name = ("" + s);
+                return;
+            }
+        }
+        return;
     }
 
     /**

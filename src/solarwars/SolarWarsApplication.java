@@ -78,6 +78,8 @@ public class SolarWarsApplication extends Application {
     public static final String INPUT_MAPPING_WHEEL_UP = "SOLARWARS_WheelUp";
     /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
     public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
+    /** The Constant INPUT_MAPPING_LEFT_CTRL. */
+    public static final String INPUT_MAPPING_LEFT_CTRL = "SOLARWARS_LeftStrg";
     /** The instance. */
     private static SolarWarsApplication instance;
     //private static AppSettings settings;
@@ -121,13 +123,11 @@ public class SolarWarsApplication extends Application {
     private AppActionListener actionListener = new AppActionListener();
     /** The post processor. */
     private FilterPostProcessor postProcessor;
-    
     /** The bloom filter. */
     private BloomFilter bloomFilter =
             new BloomFilter(BloomFilter.GlowMode.Objects);
     /** The game. */
     private SolarWarsGame game;
-    
     /** The lost focus. */
     private boolean lostFocus = false;
 
@@ -265,7 +265,6 @@ public class SolarWarsApplication extends Application {
         statsView.setLocalTranslation(0, fpsText.getLineHeight(), 0);
         guiNode.attachChild(statsView);
     }
-
 
     /**
      * The listener interface for receiving appAction events.
@@ -406,6 +405,8 @@ public class SolarWarsApplication extends Application {
         inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
         inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
         inputManager.addMapping(INPUT_MAPPING_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
+        inputManager.addMapping(INPUT_MAPPING_LEFT_CTRL, new KeyTrigger(KeyInput.KEY_LCONTROL));
+
         // add app action listener for mappings
         inputManager.addListener(actionListener,
                 INPUT_MAPPING_EXIT,
@@ -439,7 +440,7 @@ public class SolarWarsApplication extends Application {
         postProcessor.addFilter(bloomFilter);
         viewPort.addProcessor(postProcessor);
     }
-    
+
     /**
      * Attach iso camera control.
      */
@@ -454,9 +455,7 @@ public class SolarWarsApplication extends Application {
             isoCam.registerWithInput(inputManager);
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
-            inputManager.addListener(isoControl.getActionListener(),
-                    INPUT_MAPPING_LEFT_CLICK, INPUT_MAPPING_RIGHT_CLICK,
-                    INPUT_MAPPING_WHEEL_DOWN, INPUT_MAPPING_WHEEL_UP);
+            isoControl.addControlListener();
 
         }
         isoCam.reset();
@@ -470,7 +469,7 @@ public class SolarWarsApplication extends Application {
             isoCam.destroy();
             isoCam = null;
             isoControl.cleanUp();
-            inputManager.removeListener(isoControl.getActionListener());
+            isoControl.removeControlListener();
         }
     }
 
@@ -488,7 +487,7 @@ public class SolarWarsApplication extends Application {
             tpf = 0;
             lostFocus = false;
         }
-        
+
 
         if (showFps) {
             secondCounter += timer.getTimePerFrame();

@@ -131,44 +131,36 @@ public class IsoControl {
     private Node rootNode;
     /** The shootables node. */
     private Node shootablesNode;
-    
     /** inner ref to the asset manager. */
     private final AssetManager assetManager;
     /** The marker node. */
     private MarkerNode markerNode;
-    /** The last node. */
-    private Node lastNode;
     // Dragging
     /** The dragg ing flag indicates if currently dragging. */
     private boolean dragging = false;
-    
     /** The last xz plane pos. */
     private Vector3f lastXZPlanePos;
-    
     /** The start xz plane pos. */
     private Vector3f startXZPlanePos;
-    
     /** The start screen pos. */
     private Vector2f startScreenPos;
-    // planet selection
+    // planet & shipgroup selection
     /** The planet selection. */
     private ArrayList<AbstractPlanet> planetSelection;
-    
+    /** The shipgroup selection. */
+    private ArrayList<ShipGroup> shipGroupSelection;
     /** The marker nodes. */
     private ArrayList<MarkerNode> markerNodes;
+    private boolean controlPressed = false;
     // Panels for rect
     /** The left drag. */
     private Panel leftDrag;
-    
     /** The top drag. */
     private Panel topDrag;
-    
     /** The right drag. */
     private Panel rightDrag;
-    
     /** The bottom drag. */
     private Panel bottomDrag;
-    
     /** The center drag. */
     private Panel centerDrag;
     // debug
@@ -176,28 +168,19 @@ public class IsoControl {
 //    private Cross endDrag;
     /** The cam. */
     private Camera cam;
-    /** The action listener. */
-    private ActionListener actionListener;
-    
+    /** The mouse action listener. */
+    private ActionListener mouseActionListener;
+    /** The key action listener. */
+    private ActionListener keyActionListener;
     /** The input manager. */
     private InputManager inputManager;
     /** The action lib. */
     private ActionLib actionLib;
-    
     /** inner ref to the games gui. */
     private GameGUI gui;
     //==========================================================================
     //      Methods
     //==========================================================================
-
-    /**
-     * Gets the action listener.
-     *
-     * @return the action listener
-     */
-    public ActionListener getActionListener() {
-        return actionListener;
-    }
 
     /**
      * Initializes the players main controls.
@@ -207,8 +190,9 @@ public class IsoControl {
     private void initialize(final Node rootNode) {
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
-        // register action listener for right and left clicks and the mouse-weel
-        actionListener = new ActionListener() {
+        // register action listener for right and left clicks 
+        // and the mouse-weel
+        mouseActionListener = new ActionListener() {
 
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
@@ -225,7 +209,7 @@ public class IsoControl {
                 onMouseWeel(name);
 
             }
-            
+
             /**
              * Is executed if the player clicks on left or right mouse button
              * but not on its hold.
@@ -248,6 +232,7 @@ public class IsoControl {
                         startXZPlanePos = currentXZPlanePos;
                         startScreenPos = click2d.clone();
                         planetSelection = new ArrayList<AbstractPlanet>();
+                        shipGroupSelection = new ArrayList<ShipGroup>();
                         if (markerNodes != null && !markerNodes.isEmpty()) {
                             for (MarkerNode markerNode : markerNodes) {
                                 removeMarker(markerNode);
@@ -371,8 +356,6 @@ public class IsoControl {
                     }
                     // was planet found
                     if (nearestPlanet != null) {
-                        // if so, remember last posit marker...
-                        lastNode = nearestPlanet;
                         // ...check if left button click
                         if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
                             // invoke select action
@@ -394,8 +377,6 @@ public class IsoControl {
 
                     } // was shipgroup found
                     else if (nearestShipGroup != null) {
-                        // if so, remember last posit marker...
-                        lastNode = nearestShipGroup;
                         // ...check if left button click
                         // TODO: move hasLost check to actionLib
                         if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
@@ -404,7 +385,7 @@ public class IsoControl {
                             // invoke ship redirect action
                             actionLib.invokeShipAction(null, nearestShipGroup,
                                     Hub.getLocalPlayer(),
-                                    Gameplay.SHIP_REDIRECT);
+                                    Gameplay.SHIP_SELECT);
                         }
 
                     }
@@ -469,25 +450,48 @@ public class IsoControl {
                         // create the rectangle from it
                         Rectangle2D rect = new Rectangle2D.Float(
                                 leftX, topY, width, height);
-                        // select all planets in rectangle
-                        selectPlanets(rect);
-                        //
-                        MarkerNode markerNode = null;
-                        if (!planetSelection.isEmpty()) {
-                            for (AbstractPlanet planet : planetSelection) {
+                        if (!isControlPressed()) {
+                            // select all planets in rectangle
+                            selectPlanets(rect);
 
-                                markerNode = new MarkerNode();
-                                markerNodes.add(markerNode);
-                                repositMarker(planet, markerNode);
+                            MarkerNode markerNode = null;
+                            if (!planetSelection.isEmpty()) {
+                                for (AbstractPlanet planet : planetSelection) {
+
+                                    markerNode = new MarkerNode();
+                                    markerNodes.add(markerNode);
+                                    repositMarker(planet, markerNode);
+
+                                }
+                                actionLib.invokePlanetAction(
+                                        IsoControl.getInstance(),
+                                        null,
+                                        Hub.getLocalPlayer(),
+                                        Gameplay.PLANET_MULTI_SELECT);
 
                             }
-                            actionLib.invokePlanetAction(
-                                    IsoControl.getInstance(),
-                                    null,
-                                    Hub.getLocalPlayer(),
-                                    Gameplay.PLANET_MULTI_SELECT);
+                        } else {
+                            selectShipGroups(rect);
 
+                            MarkerNode markerNode = null;
+                            if (!shipGroupSelection.isEmpty()) {
+                                for (ShipGroup shipGroup : shipGroupSelection) {
+
+                                    markerNode = new MarkerNode();
+                                    markerNodes.add(markerNode);
+                                    repositMarker(shipGroup, markerNode);
+
+                                }
+                                actionLib.invokeShipAction(
+                                        IsoControl.getInstance(),
+                                        null,
+                                        Hub.getLocalPlayer(),
+                                        Gameplay.SHIP_MULTI_SELECT);
+
+                            }
                         }
+                        //
+
                         lastXZPlanePos = null;
                         startScreenPos = null;
                         startXZPlanePos = null;
@@ -517,6 +521,36 @@ public class IsoControl {
                 return false;
             }
         };
+
+        keyActionListener = new ActionListener() {
+
+            @Override
+            public void onAction(String name, boolean isPressed, float tpf) {
+                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CTRL)) {
+                    controlPressed = isPressed;
+                }
+            }
+        };
+
+    }
+
+    public void addControlListener() {
+        inputManager.addListener(mouseActionListener,
+                SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK,
+                SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK,
+                SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN,
+                SolarWarsApplication.INPUT_MAPPING_WHEEL_UP);
+        inputManager.addListener(keyActionListener,
+                SolarWarsApplication.INPUT_MAPPING_LEFT_CTRL);
+    }
+
+    public void removeControlListener() {
+        inputManager.removeListener(mouseActionListener);
+        inputManager.removeListener(keyActionListener);
+    }
+
+    public boolean isControlPressed() {
+        return controlPressed;
     }
 
     /**
@@ -621,6 +655,35 @@ public class IsoControl {
     }
 
     /**
+     * Gets all ShipGroup contained in a 2D rectangle on the xz plane and adds all
+     * to the shipGroupSelection.
+     *
+     * @param rectangle the rectangle
+     */
+    private void selectShipGroups(Rectangle2D rectangle) {
+        // gets the set of plantes as a ref
+        Set<Entry<Integer, ShipGroup>> planetSet = Gameplay.getCurrentLevel().getShipGroupSet();
+        // iterate through the sets planets each
+        for (Map.Entry<Integer, ShipGroup> entry : planetSet) {
+            // get planet pos
+            Vector3f pos = entry.getValue().getPosition().clone();
+            // convert to 2D point
+            Point2D shipGroupPos = new Point2D.Float(pos.x, pos.z);
+            // get the planet ref
+            ShipGroup shipGroup = entry.getValue();
+            // check if planet pos is in rectangle
+            if (rectangle.contains(shipGroupPos)) {
+                // if not owned by local player get the next planet in the planet set
+                if (shipGroup.getOwner() == null || !shipGroup.getOwner().equals(Hub.getLocalPlayer())) {
+                    continue;
+                }
+                // else add planet to the selection
+                shipGroupSelection.add(shipGroup);
+            }
+        }
+    }
+
+    /**
      * Gets a copy of the selected planets.
      *
      * @return the selected planets
@@ -628,6 +691,17 @@ public class IsoControl {
     public ArrayList<AbstractPlanet> getSelectedPlanets() {
         ArrayList<AbstractPlanet> planets = new ArrayList<AbstractPlanet>(planetSelection);
         return planets;
+
+    }
+
+    /**
+     * Gets a copy of the selected ShipGroups.
+     *
+     * @return the selected planets
+     */
+    public ArrayList<ShipGroup> getSelectedShipGroups() {
+        ArrayList<ShipGroup> sgs = new ArrayList<ShipGroup>(shipGroupSelection);
+        return sgs;
 
     }
 
@@ -828,34 +902,24 @@ public class IsoControl {
 
         /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
-        
         /** The scale. */
         private float scale;
-        
         /** The fade scale. */
         private float fadeScale;
-        
         /** The running. */
         private float running;
-        
         /** The material. */
         private Material material;
-        
         /** The geometry. */
         private Geometry geometry;
-        
         /** The start. */
         private ColorRGBA start = ColorRGBA.Orange.clone();
-        
         /** The end. */
         private ColorRGBA end = ColorRGBA.White.clone();
-        
         /** The current fade color. */
         private ColorRGBA currentFadeColor = start.clone();
-        
         /** The fade dir. */
         private boolean fadeDir = true;
-        
         /** The tick. */
         private float tick = 0f;
 

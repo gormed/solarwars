@@ -35,7 +35,7 @@ public class ActionLib {
     /** The planet actions. */
     private HashMap<String, PlanetAction> planetActions;
     /** The ship actions. */
-    private HashMap<String, ShipAction> shipActions;
+    private HashMap<String, ShipGroupAction> shipActions;
     /** The instance. */
     private static ActionLib instance;
 
@@ -57,7 +57,7 @@ public class ActionLib {
     private ActionLib() {
         generalActions = new HashMap<String, GeneralAction>();
         planetActions = new HashMap<String, PlanetAction>();
-        shipActions = new HashMap<String, ShipAction>();
+        shipActions = new HashMap<String, ShipGroupAction>();
     }
 
     /**
@@ -89,7 +89,7 @@ public class ActionLib {
      *
      * @return the ship actions
      */
-    public HashMap<String, ShipAction> getShipActions() {
+    public HashMap<String, ShipGroupAction> getShipActions() {
         return shipActions;
     }
 
