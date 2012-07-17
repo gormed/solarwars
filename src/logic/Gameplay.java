@@ -103,7 +103,7 @@ public class Gameplay {
         PlanetAction selectPlanet = new PlanetAction(PLANET_SELECT) {
 
             @Override
-            public void doAction(Object sender, AbstractPlanet planet, Player p) {
+            public void doAction(Object sender, long delay, AbstractPlanet planet, Player p) {
                 if (planet.getOwner() == p) {
                     p.clearPlanetMultiSelect();
                     p.selectPlanet(planet);
@@ -117,7 +117,7 @@ public class Gameplay {
         PlanetAction multiSelectPlanet = new PlanetAction(PLANET_MULTI_SELECT) {
 
             @Override
-            public void doAction(Object sender, AbstractPlanet planet, Player p) {
+            public void doAction(Object sender, long delay, AbstractPlanet planet, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
                 }
@@ -140,7 +140,7 @@ public class Gameplay {
         PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
 
             @Override
-            public void doAction(Object sender, AbstractPlanet target, Player p) {
+            public void doAction(Object sender, long delay, AbstractPlanet target, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
                 }
@@ -153,6 +153,7 @@ public class Gameplay {
                 } else if (p.hasSelectedShipGroup()) {
                     singleAttackShipGroup(p.getSelectedShipGroup(), target);
                 }
+//                target.syncronize(delay);
             }
 
             private void multiAttackPlanet(ArrayList<AbstractPlanet> planets, AbstractPlanet target, Player p) {
@@ -193,7 +194,7 @@ public class Gameplay {
         PlanetAction capturePlanet = new PlanetAction(PLANET_CAPTURE) {
 
             @Override
-            public void doAction(Object sender, AbstractPlanet planet, Player p) {
+            public void doAction(Object sender, long delay, AbstractPlanet planet, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return;
                 }

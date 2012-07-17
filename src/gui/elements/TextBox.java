@@ -258,6 +258,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
      */
+    @Override
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
     /**

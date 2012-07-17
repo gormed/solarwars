@@ -40,7 +40,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import logic.Gameplay;
 import logic.Level;
@@ -197,11 +200,16 @@ public class SolarWarsServer extends SimpleApplication {
             return;
         }
         levelSync += tpf;
-        if (levelSync > 2) {
-            HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>(100);
-            Level l = Gameplay.getCurrentLevel();
-            for (Map.Entry<Integer, AbstractPlanet> entry : l.getPlanetSet()) {
-                hashMap.put(entry.getKey(), entry.getValue().getShipCount());
+        Level l = Gameplay.getCurrentLevel();
+        if (levelSync > 0.1f && l != null) {
+            HashMap<Integer, Integer> hashMap = 
+                    new HashMap<Integer, Integer>(100);
+            HashSet<Entry<Integer, AbstractPlanet>> clone = 
+                    new HashSet<Entry<Integer, AbstractPlanet>>(l.getPlanetSet());
+            for (Map.Entry<Integer, AbstractPlanet> entry : clone) {
+                hashMap.put(
+                        entry.getKey(), 
+                        entry.getValue().getShipCount());
             }
             LevelActionMessage message =
                     new LevelActionMessage(

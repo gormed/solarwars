@@ -33,6 +33,7 @@ import net.messages.GeneralActionMessage;
 import net.messages.LevelActionMessage;
 import net.messages.PlanetActionMessage;
 import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class MultiplayerGameplay.
@@ -40,7 +41,8 @@ import solarwars.Hub;
  * @author Hans
  */
 public class MultiplayerGameplay {
-
+    
+    public static final boolean MULTIPLAYER_GAMEPLAY_DEBUG = true;
     /** The instance. */
     private static MultiplayerGameplay instance;
 
@@ -77,16 +79,12 @@ public class MultiplayerGameplay {
     public static boolean isInitialized() {
         return instance != null;
     }
-    
     /** The client. */
     private Client client;
-    
     /** The gameplay listener. */
     private ClientGameplayListener gameplayListener = new ClientGameplayListener();
-    
     /** The action lib. */
     private ActionLib actionLib = ActionLib.getInstance();
-    
     /** The recieved messages. */
     private Queue<Message> recievedMessages = new LinkedList<Message>();
 
@@ -136,7 +134,7 @@ public class MultiplayerGameplay {
                     reciever.getId(),
                     reciever.getState());
         } else {
-
+            
             generalActionMessage = new GeneralActionMessage(
                     actionName,
                     sender.getId(),
@@ -155,39 +153,51 @@ public class MultiplayerGameplay {
     public void update(float tpf) {
         while (recievedMessages != null && !recievedMessages.isEmpty()) {
             Message m = recievedMessages.poll();
-
+            
             if (m instanceof PlanetActionMessage) {
                 PlanetActionMessage serverMessage = (PlanetActionMessage) m;
-
+                
                 Player p = Hub.getInstance().getPlayer(serverMessage.getPlayerID());
                 p.applyState(serverMessage.getPlayerState());
                 AbstractPlanet planet =
                         Gameplay.getCurrentLevel().
                         getPlanet(serverMessage.getPlanetID());
-                if (planet != null) {
-                    long sendTime = serverMessage.getClientTime();
-                    long serverTime = serverMessage.getServerTime();
-                    long currentTime = System.currentTimeMillis();
-                    long delay = currentTime - sendTime;
-                    //planet.setShipCount(serverMessage.getPlanetShips(), delay);
-                }
+                //TODO: Clean up the mess, nobody needs this anymore!
+                long sendTime = serverMessage.getClientTime();
+                long serverTime = serverMessage.getServerTime();
+                long currentTime = System.currentTimeMillis();
+                long delay = currentTime - serverTime;
+                
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
+                        delay,
                         planet,
                         p,
                         serverMessage.getActionName());
+                
+                
+                
+                if (MULTIPLAYER_GAMEPLAY_DEBUG) {
+                    System.out.println("ID#" + serverMessage.getPlayerID()
+                            + "/" + serverMessage.getPlayerState().name
+                            + " sent a " + serverMessage.getActionName()
+                            + " with delay " + delay);
+                }
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
-
-
+                
+                
             } else if (m instanceof LevelActionMessage) {
                 LevelActionMessage actionMessage = (LevelActionMessage) m;
                 
-                for (Map.Entry<Integer, Integer> entry : actionMessage.getPlanetShipCount().entrySet()) {
-                    int id = entry.getKey();
-                    int shipCount = entry.getValue();
-                    Gameplay.getCurrentLevel().getPlanet(id).setShipCount(shipCount);
-                }
+//                for (Map.Entry<Integer, Integer> entry : actionMessage.getPlanetShipCount().entrySet()) {
+//                    int id = entry.getKey();
+//                    int shipCount = entry.getValue();
+//                    Gameplay.getCurrentLevel().getPlanet(id).setShipCount(shipCount);
+//                }
+                long currentTime = System.currentTimeMillis();
+                long delay = currentTime - actionMessage.getServerTime();
+                SolarWarsApplication.getInstance().syncronize(delay * .001f);
             }
         }
     }
@@ -198,7 +208,7 @@ public class MultiplayerGameplay {
     public void destroy() {
         recievedMessages.clear();
         recievedMessages = null;
-
+        
         if (client != null) {
             client.removeMessageListener(
                     gameplayListener,
@@ -206,9 +216,9 @@ public class MultiplayerGameplay {
                     GeneralActionMessage.class);
         }
         gameplayListener = null;
-
+        
         instance = null;
-
+        
     }
 
     /**

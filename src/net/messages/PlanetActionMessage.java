@@ -23,7 +23,6 @@ package net.messages;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;
-import entities.AbstractPlanet;
 import logic.PlayerState;
 
 /**
@@ -36,16 +35,12 @@ public class PlanetActionMessage extends AbstractMessage {
 
     /** The client time. */
     private long clientTime;
-    
     /** The server time. */
     private long serverTime;
-    
     /** The action name. */
     private String actionName;
-    
     /** The player id. */
     private int playerID;
-    
     /** The planet id. */
     private int planetID;
     //private int planetShips;
@@ -109,11 +104,10 @@ public class PlanetActionMessage extends AbstractMessage {
 //    public int getPlanetShips() {
 //        return planetShips;
 //    }
-
     /**
- * Instantiates a new planet action message.
- */
-public PlanetActionMessage() {
+     * Instantiates a new planet action message.
+     */
+    public PlanetActionMessage() {
     }
 
     /**

@@ -102,8 +102,10 @@ public class ActionLib {
      * @param actionName the action name
      */
     public void invokeGeneralAction(Object sender, Player a, Player b, String actionName) {
+        // if invoked from other client dont resend
         if (sender instanceof MultiplayerGameplay) {
             generalActions.get(actionName).doAction(sender, a, b);
+        // else if invoked from this client, send via network to server
         } else {
             generalActions.get(actionName).doAction(sender, a, b);
             if (MultiplayerGameplay.isInitialized()) {
@@ -120,11 +122,13 @@ public class ActionLib {
      * @param p the p
      * @param actionName the action name
      */
-    public void invokePlanetAction(Object sender, AbstractPlanet planet, Player p, String actionName) {
+    public void invokePlanetAction(Object sender, long delay, AbstractPlanet planet, Player p, String actionName) {
+        // if invoked from other client dont resend
         if (sender instanceof MultiplayerGameplay) {
-            planetActions.get(actionName).doAction(sender, planet, p);
+            planetActions.get(actionName).doAction(sender, delay, planet, p);
+        // else if invoked from this client, send via network to server
         } else {
-            planetActions.get(actionName).doAction(sender, planet, p);
+            planetActions.get(actionName).doAction(sender, delay, planet, p);
             if (MultiplayerGameplay.isInitialized()) {
                 MultiplayerGameplay.getInstance().sendPlanetActionMessage(actionName, planet);
             }
@@ -139,7 +143,7 @@ public class ActionLib {
      * @param p the p
      * @param actionName the action name
      */
-    public void invokeShipAction(Object sender, ShipGroup shipGroup, Player p, String actionName) {
+    public void invokeShipAction(Object sender, long delay, ShipGroup shipGroup, Player p, String actionName) {
         shipActions.get(actionName).doAction(sender, shipGroup, p);
     }
 }

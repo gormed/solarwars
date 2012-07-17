@@ -140,7 +140,11 @@ public abstract class AbstractShip extends Node {
             return;
         } else {
             ActionLib.getInstance().invokeShipAction(
-                    this, shipGroup, owner, Gameplay.SHIP_ARRIVES);
+                    this, 
+                    0,
+                    shipGroup, 
+                    owner, 
+                    Gameplay.SHIP_ARRIVES);
         }
         batchManager.freeShipBatch(shipBatchSpatial);
         level.removeShip(owner, this);
@@ -189,7 +193,11 @@ public abstract class AbstractShip extends Node {
 
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
-                            this, order, owner, Gameplay.PLANET_CAPTURE);
+                            this, 
+                            0L,
+                            order, 
+                            owner, 
+                            Gameplay.PLANET_CAPTURE);
 
                 }
 

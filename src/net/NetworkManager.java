@@ -125,19 +125,16 @@ public class NetworkManager {
     private InetAddress clientIPAdress;
     /** The server ip adress. */
     private InetAddress serverIPAdress;
-    
     /** The is multiplayer game. */
     private boolean isMultiplayerGame = false;
     /** The this client. */
     private Client thisClient;
     /** The this server. */
     private SolarWarsServer thisServer;
-    
     /** The chat module. */
     private ChatModule chatModule;
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
-    
     /** The client listener. */
     private ClientListener clientListener = new ClientListener();
 
@@ -155,7 +152,7 @@ public class NetworkManager {
      * Chat module controls the visibilty of the chat 
      * gui and recieves messages from network.
      * Only is valid in a network session!
-     * Is generally needed to move the ghat gui to the next GameGUI ingame.
+     * Is generally needed to move the chat gui to the next GameGUI ingame.
      * 
      * @return chat module from the current session
      */
@@ -329,7 +326,7 @@ public class NetworkManager {
         if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
             thisServer.stop(wait);
         }
-        
+
         isMultiplayerGame = false;
         return thisServer;
     }
@@ -371,10 +368,16 @@ public class NetworkManager {
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
          */
+        @Override
         public void messageReceived(Client source, Message message) {
             if (message instanceof StringMessage) {
                 // do something with the message
                 StringMessage stringMessage = (StringMessage) message;
+//                if (chatModule != null) {
+//                    chatModule.playerSays(
+//                            Hub.getInstance().getPlayer(source.getId()),
+//                            stringMessage.getMessage());
+//                }
                 System.out.println("Client #" + source.getId() + " received: '" + stringMessage.getMessage() + "'");
             } else if (message instanceof ChatMessage) {
                 ChatMessage chatMessage = (ChatMessage) message;

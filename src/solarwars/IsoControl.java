@@ -359,7 +359,10 @@ public class IsoControl {
                         // ...check if left button click
                         if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
                             // invoke select action
-                            actionLib.invokePlanetAction(null, nearestPlanet,
+                            actionLib.invokePlanetAction(
+                                    null,
+                                    0L,
+                                    nearestPlanet,
                                     Hub.getLocalPlayer(),
                                     Gameplay.PLANET_SELECT);
                             // finally set marker
@@ -370,7 +373,10 @@ public class IsoControl {
                         else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)
                                 && !Hub.getLocalPlayer().hasLost()) {
                             // invoke attack action
-                            actionLib.invokePlanetAction(null, nearestPlanet,
+                            actionLib.invokePlanetAction(
+                                    null, 
+                                    0L,
+                                    nearestPlanet,
                                     Hub.getLocalPlayer(),
                                     Gameplay.PLANET_ATTACK);
                         }
@@ -383,7 +389,10 @@ public class IsoControl {
                                 && !Hub.getLocalPlayer().hasLost()) {
                             repositMarker(nearestShipGroup, markerNode);
                             // invoke ship redirect action
-                            actionLib.invokeShipAction(null, nearestShipGroup,
+                            actionLib.invokeShipAction(
+                                    null, 
+                                    0,
+                                    nearestShipGroup,
                                     Hub.getLocalPlayer(),
                                     Gameplay.SHIP_SELECT);
                         }
@@ -465,6 +474,7 @@ public class IsoControl {
                                 }
                                 actionLib.invokePlanetAction(
                                         IsoControl.getInstance(),
+                                        0L,
                                         null,
                                         Hub.getLocalPlayer(),
                                         Gameplay.PLANET_MULTI_SELECT);
@@ -484,6 +494,7 @@ public class IsoControl {
                                 }
                                 actionLib.invokeShipAction(
                                         IsoControl.getInstance(),
+                                        0L,
                                         null,
                                         Hub.getLocalPlayer(),
                                         Gameplay.SHIP_MULTI_SELECT);

@@ -130,6 +130,12 @@ public class SolarWarsApplication extends Application {
     private SolarWarsGame game;
     /** The lost focus. */
     private boolean lostFocus = false;
+    /** value for the delay if in network */
+    private float delay;
+    
+    private float lastDelay = 0;
+    /** indicates that the application already is at current max delay */
+    private boolean syncronized;
 
     /**
      * Instantiates a new solar wars application.
@@ -479,6 +485,7 @@ public class SolarWarsApplication extends Application {
     @Override
     public void update() {
         super.update(); // makes sure to execute AppTasks
+        resetSync();
         if (speed == 0 || paused) {
             return;
         }
@@ -487,7 +494,7 @@ public class SolarWarsApplication extends Application {
             tpf = 0;
             lostFocus = false;
         }
-
+        tpf += lastDelay;
 
         if (showFps) {
             secondCounter += timer.getTimePerFrame();
@@ -558,5 +565,22 @@ public class SolarWarsApplication extends Application {
             NetworkManager.getInstance().closeAllConnections(false);
         }
         super.destroy();
+    }
+    
+    private void resetSync() {
+        this.lastDelay = delay;
+        this.delay = 0;
+        this.syncronized = false;
+    }
+    
+    public void syncronize(float delay) {
+        if ((this.delay > delay))
+            return;
+        this.delay = delay;
+        this.syncronized = true;
+    }
+
+    public boolean isSyncronized() {
+        return syncronized;
     }
 }
