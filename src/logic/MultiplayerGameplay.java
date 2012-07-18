@@ -41,7 +41,7 @@ import solarwars.SolarWarsApplication;
  * @author Hans
  */
 public class MultiplayerGameplay {
-    
+
     public static final boolean MULTIPLAYER_GAMEPLAY_DEBUG = true;
     /** The instance. */
     private static MultiplayerGameplay instance;
@@ -134,7 +134,7 @@ public class MultiplayerGameplay {
                     reciever.getId(),
                     reciever.getState());
         } else {
-            
+
             generalActionMessage = new GeneralActionMessage(
                     actionName,
                     sender.getId(),
@@ -153,10 +153,10 @@ public class MultiplayerGameplay {
     public void update(float tpf) {
         while (recievedMessages != null && !recievedMessages.isEmpty()) {
             Message m = recievedMessages.poll();
-            
+
             if (m instanceof PlanetActionMessage) {
                 PlanetActionMessage serverMessage = (PlanetActionMessage) m;
-                
+
                 Player p = Hub.getInstance().getPlayer(serverMessage.getPlayerID());
                 p.applyState(serverMessage.getPlayerState());
                 AbstractPlanet planet =
@@ -167,16 +167,16 @@ public class MultiplayerGameplay {
                 long serverTime = serverMessage.getServerTime();
                 long currentTime = System.currentTimeMillis();
                 long delay = currentTime - serverTime;
-                
+
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
                         delay,
                         planet,
                         p,
                         serverMessage.getActionName());
-                
-                
-                
+
+
+
                 if (MULTIPLAYER_GAMEPLAY_DEBUG) {
                     System.out.println("ID#" + serverMessage.getPlayerID()
                             + "/" + serverMessage.getPlayerState().name
@@ -185,11 +185,11 @@ public class MultiplayerGameplay {
                 }
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
-                
-                
+
+
             } else if (m instanceof LevelActionMessage) {
                 LevelActionMessage actionMessage = (LevelActionMessage) m;
-                
+
 //                for (Map.Entry<Integer, Integer> entry : actionMessage.getPlanetShipCount().entrySet()) {
 //                    int id = entry.getKey();
 //                    int shipCount = entry.getValue();
@@ -208,7 +208,7 @@ public class MultiplayerGameplay {
     public void destroy() {
         recievedMessages.clear();
         recievedMessages = null;
-        
+
         if (client != null) {
             client.removeMessageListener(
                     gameplayListener,
@@ -216,9 +216,9 @@ public class MultiplayerGameplay {
                     GeneralActionMessage.class);
         }
         gameplayListener = null;
-        
+
         instance = null;
-        
+
     }
 
     /**
@@ -242,7 +242,9 @@ public class MultiplayerGameplay {
             System.out.println(
                     "Client #" + source.getId() + " recieved a "
                     + message.getClass().getSimpleName());
-            recievedMessages.add(message);
+            if (recievedMessages != null) {
+                recievedMessages.add(message);
+            }
         }
     }
 }

@@ -584,10 +584,10 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         //solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
         networkManager.removeClientRegisterListener(this);
-        Future fut = application.enqueue(new Callable() {
+        Future fut = application.enqueue(new Callable<SolarWarsServer>() {
 
             @Override
-            public Object call()
+            public SolarWarsServer call()
                     throws Exception {
 
                 return networkManager.closeAllConnections(true);
@@ -641,6 +641,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param p the p
      * @deprecated
      */
+    @Deprecated
     private void removeLeavingPlayer(Player p) {
         if (playerLabelIdx.containsKey(p)) {
             int id = playerLabelIdx.get(p);

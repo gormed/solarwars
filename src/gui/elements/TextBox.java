@@ -34,6 +34,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import gui.ClickableGUI;
 import gui.GUIElement;
@@ -59,7 +60,6 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     protected Vector3f screenPosition;
     /** The scale. */
     protected Vector3f scale;
-    
     /** The size. */
     protected Vector2f size;
     /** The caption. */
@@ -205,12 +205,12 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see com.jme3.scene.Node#detachChild(com.jme3.scene.Spatial)
      */
-//    @Override
-//    public int detachChild(Spatial child) {
-//
-//        destroy();
-//        return super.detachChild(child);
-//    }
+    @Override
+    public int detachChild(Spatial child) {
+
+        destroy();
+        return super.detachChild(child);
+    }
     /**
      * Destroy.
      */
@@ -231,10 +231,10 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         offset.multLocal(scale);
         text.setLocalTranslation(screenPosition.add(offset));
         text.setLocalScale(scale);
-
         time += tpf;
 
         if (gui.getFocusElement() != null && gui.getFocusElement().equals(this)) {
+            
             if (time < 0.2f) {
                 text.setText(caption + "_");
             } else if (time < 0.4f) {
@@ -335,7 +335,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      *
      * @see NumberBoxActionEvent
      */
-    private class NumberBoxActionListener extends KeyboardListener {
+    private static class NumberBoxActionListener extends KeyboardListener {
 
         /**
          * Instantiates a new number box action listener.
@@ -386,7 +386,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
          */
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            GUIElement e = gui.getFocusElement();
+            GUIElement e = textBox.gui.getFocusElement();
             TextBox activeTextBox = null;
             if (e instanceof TextBox) {
                 activeTextBox = (TextBox) e;
@@ -395,15 +395,19 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
 
             if (!isPressed && activeTextBox.equals(textBox)) {
-                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
-                    caption = caption.substring(0, caption.length() - 1);
-                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() < 15) {
-                    caption += name;
+                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                        && textBox.caption.length() >= 1) {
+                    textBox.caption = 
+                            textBox.caption.substring(0, 
+                            textBox.caption.length() - 1);
+                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                        && textBox.caption.length() < 15) {
+                    textBox.caption += name;
                 }
 
             }
             if (activeTextBox.equals(textBox)) {
-                onKeyTrigger(name, isPressed, tpf);
+                textBox.onKeyTrigger(name, isPressed, tpf);
             }
         }
     }
@@ -419,7 +423,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      *
      * @see TextBoxActionEvent
      */
-    private class TextBoxActionListener extends KeyboardListener {
+    private static class TextBoxActionListener extends KeyboardListener {
 
         /**
          * Instantiates a new text box action listener.
@@ -437,7 +441,7 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
 
-            GUIElement e = gui.getFocusElement();
+            GUIElement e = textBox.gui.getFocusElement();
             TextBox activeTextBox = null;
             if (e instanceof TextBox) {
                 activeTextBox = (TextBox) e;
@@ -446,14 +450,16 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
 
             if (!isPressed && activeTextBox.equals(textBox)) {
-                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
-                    caption = caption.substring(0, caption.length() - 1);
+                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                        && textBox.caption.length() >= 1) {
+                    textBox.caption = 
+                            textBox.caption.substring(0, textBox.caption.length() - 1);
                 } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)) {
-                    caption += name;
+                    textBox.caption += name;
                 }
             }
             if (activeTextBox.equals(textBox)) {
-                onKeyTrigger(name, isPressed, tpf);
+                textBox.onKeyTrigger(name, isPressed, tpf);
             }
         }
     }

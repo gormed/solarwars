@@ -22,7 +22,6 @@
 package solarwars;
 
 import com.jme3.asset.AssetManager;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;

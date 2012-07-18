@@ -40,6 +40,7 @@ import logic.Gameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
 import net.NetworkManager;
+import net.SolarWarsServer;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -139,12 +140,10 @@ public class MultiplayerMatchState extends Gamestate {
 
         NetworkManager.getInstance().getChatModule().destroy();
         
-        Future fut = application.enqueue(new Callable() {
+        Future fut = application.enqueue(new Callable<SolarWarsServer>() {
 
             @Override
-            public Object call()
-                    throws Exception {
-
+            public SolarWarsServer call() throws Exception {
                 return NetworkManager.getInstance().closeAllConnections(true);
             }
         });

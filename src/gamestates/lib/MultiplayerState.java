@@ -86,11 +86,11 @@ public class MultiplayerState extends Gamestate {
         gui = new GameGUI(game);
         networkManager = NetworkManager.getInstance();
         playerName = new TextBox(
-                ColorRGBA.Blue,
+                ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
+                Vector3f.UNIT_XYZ.clone(),
                 Ergonomics.getInstance().getName(),
-                ColorRGBA.White,
+                ColorRGBA.White.clone(),
                 gui, false) {
 
             @Override
@@ -99,6 +99,8 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+                if (caption.length() == 0)
+                    caption = ">";
                 if (caption.length() > 20) {
                     caption = caption.substring(0, caption.length() - 1);
                 }
@@ -108,7 +110,7 @@ public class MultiplayerState extends Gamestate {
 
         joinServer = new Button("Join Sever",
                 new Vector3f(gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange, ColorRGBA.White, gui) {
+                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(), ColorRGBA.White.clone(), gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -125,10 +127,10 @@ public class MultiplayerState extends Gamestate {
         };
 
         serverip = new TextBox(
-                ColorRGBA.Blue,
+                ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, Ergonomics.getInstance().getIpAddress(),
-                ColorRGBA.White, gui, true) {
+                Vector3f.UNIT_XYZ.clone(), Ergonomics.getInstance().getIpAddress(),
+                ColorRGBA.White.clone(), gui, true) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -142,8 +144,8 @@ public class MultiplayerState extends Gamestate {
 
         back = new Button("Back",
                 new Vector3f(gui.getWidth() / 2, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-                ColorRGBA.White, gui) {
+                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(),
+                ColorRGBA.White.clone(), gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -161,7 +163,7 @@ public class MultiplayerState extends Gamestate {
 
         createServer = new Button("Create Sever",
                 new Vector3f(3 * gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange, ColorRGBA.White, gui) {
+                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(), ColorRGBA.White.clone(), gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -207,11 +209,11 @@ public class MultiplayerState extends Gamestate {
                 "BackgroundPanel",
                 new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
                 new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-                ColorRGBA.Blue);
+                ColorRGBA.Blue.clone());
 
         line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-                ColorRGBA.White);
+                ColorRGBA.White.clone());
 
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
@@ -242,7 +244,7 @@ public class MultiplayerState extends Gamestate {
         if (g instanceof CreateServerState) {
             CreateServerState cs = (CreateServerState) g;
             cs.setHostPlayerName(playerName.getCaption());
-            cs.setHostPlayerColor(ColorRGBA.Blue);
+            cs.setHostPlayerColor(ColorRGBA.Blue.clone());
         }
         GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
     }
@@ -262,7 +264,7 @@ public class MultiplayerState extends Gamestate {
             if (g instanceof ServerLobbyState) {
                 ServerLobbyState serverLobbyState = (ServerLobbyState) g;
                 serverLobbyState.setClientPlayerName(playerName.getCaption());
-                serverLobbyState.setClientPlayerColor(ColorRGBA.Red);
+                serverLobbyState.setClientPlayerColor(ColorRGBA.Red.clone());
                 serverLobbyState.setServerIPAddress(ip);
 
                 gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
