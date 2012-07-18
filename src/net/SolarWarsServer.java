@@ -34,19 +34,13 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
-import entities.AbstractPlanet;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
-import logic.Gameplay;
-import logic.Level;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
@@ -56,6 +50,7 @@ import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
+import solarwars.Hub;
 
 /**
  * The Class SolarWarsServer.
@@ -73,7 +68,6 @@ public class SolarWarsServer extends SimpleApplication {
         LOBBY,
         /** The INGAME. */
         INGAME,
-        
         CLOSED
     }
     /** The Constant SERVER_VERSION. */
@@ -129,6 +123,7 @@ public class SolarWarsServer extends SimpleApplication {
     private int udpPort = NetworkManager.DEFAULT_PORT;
     /** The tcp port. */
     private int tcpPort = NetworkManager.DEFAULT_PORT;
+    private HostedConnection host = null;
     /** The server name. */
     private String serverName = "unnamed";
     /** The connected players. */
@@ -186,8 +181,12 @@ public class SolarWarsServer extends SimpleApplication {
      * Enter level.
      */
     public void enterLevel() {
+        host = connectedPlayers.get(ServerHub.getHostPlayer());
         serverState = ServerState.INGAME;
-        gameServer.addMessageListener(gameplayListener, PlanetActionMessage.class, GeneralActionMessage.class);
+        gameServer.addMessageListener(
+                gameplayListener,
+                PlanetActionMessage.class,
+                GeneralActionMessage.class);
     }
 
     /**
@@ -199,24 +198,12 @@ public class SolarWarsServer extends SimpleApplication {
         if (serverState != ServerState.INGAME) {
             return;
         }
-        levelSync += tpf;
-        Level l = Gameplay.getCurrentLevel();
-        if (levelSync > 0.1f && l != null) {
-            HashMap<Integer, Integer> hashMap = 
-                    new HashMap<Integer, Integer>(100);
-            HashSet<Entry<Integer, AbstractPlanet>> clone = 
-                    new HashSet<Entry<Integer, AbstractPlanet>>(l.getPlanetSet());
-            for (Map.Entry<Integer, AbstractPlanet> entry : clone) {
-                hashMap.put(
-                        entry.getKey(), 
-                        entry.getValue().getShipCount());
-            }
-            LevelActionMessage message =
-                    new LevelActionMessage(
-                    hashMap, seed, System.currentTimeMillis());
-            this.gameServer.broadcast(message);
-            levelSync = 0;
-        }
+
+        LevelActionMessage message = new LevelActionMessage(
+                seed,
+                System.currentTimeMillis());
+        this.gameServer.broadcast(Filters.notEqualTo(host), message);
+
     }
 
     /* (non-Javadoc)
@@ -251,7 +238,9 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void simpleUpdate(float tpf) {
-        syncronizeLevel(tpf);
+        if (serverState == ServerState.INGAME) {
+            syncronizeLevel(tpf);
+        }
 //        for (Player p : joinedPlayers) {
 //            respondPlayer(p, true);
 //        }
@@ -460,10 +449,10 @@ public class SolarWarsServer extends SimpleApplication {
 
             if (player.getName().equals(name) && p != player) {
                 long rand = System.currentTimeMillis() % 2000;
-                String s = ""+rand;
-                s.substring(0, s.length()/2);
+                String s = "" + rand;
+                s.substring(0, s.length() / 2);
                 s = "" + s.hashCode();
-                s.substring(s.length()/2);
+                s.substring(s.length() / 2);
                 p.getState().name = ("" + s);
                 return;
             }

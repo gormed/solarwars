@@ -127,6 +127,7 @@ public class ServerHub {
      * @param players the players
      */
     public void initialize(Player hostPlayer, ArrayList<Player> players) {
+        hostPlayer.setHost();
         this.hostPlayer = hostPlayer;
         if (players != null) {
             for (Player p : players) {

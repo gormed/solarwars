@@ -449,7 +449,6 @@ public abstract class AbstractPlanet extends Node {
 //            shipGainTime -= secDelay;
 //        }
 //    }
-
     /**
      * Updates the label.
      *
@@ -460,11 +459,13 @@ public abstract class AbstractPlanet extends Node {
         if (owner != null && !level.isGameOver()) {
 
             if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
-                while (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
-                    shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER * shipIncrement);
-                    ships += 1;
-                }
-//                shipGainTime = 0;
+//                while (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
+//                    shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER * shipIncrement);
+                    ships++;
+//                }
+//                if (shipGainTime < 0) {
+                    shipGainTime = 0;
+//                }
             }
         }
         updateLabel(tpf);

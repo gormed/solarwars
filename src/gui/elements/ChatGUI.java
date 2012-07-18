@@ -348,6 +348,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
      */
+    @Override
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
         chatInput.onClick(cursor, isPressed, tpf);
     }
@@ -355,6 +356,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see gui.ClickableGUI#canGainFocus()
      */
+    @Override
     public boolean canGainFocus() {
         return false;
     }

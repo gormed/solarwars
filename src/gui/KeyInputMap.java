@@ -105,7 +105,7 @@ public class KeyInputMap {
     /** The Constant INPUT_MAPPING_UNDERSCORE. */
     public static final String INPUT_MAPPING_UNDERSCORE = "_";
     /** The Constant INPUT_MAPPING_BACKSPACE. */
-    public static final String INPUT_MAPPING_BACKSPACE = "<";
+    public static final String INPUT_MAPPING_BACKSPACE = "";
     /** The Constant INPUT_MAPPING_POINT. */
     public static final String INPUT_MAPPING_POINT = ".";
     /** The Constant INPUT_MAPPING_POINT. */

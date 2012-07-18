@@ -86,7 +86,7 @@ public class MultiplayerGameplay {
     /** The action lib. */
     private ActionLib actionLib = ActionLib.getInstance();
     /** The recieved messages. */
-    private Queue<Message> recievedMessages = new LinkedList<Message>();
+    private volatile Queue<Message> recievedMessages = new LinkedList<Message>();
 
     /**
      * Send planet action message.
@@ -151,8 +151,12 @@ public class MultiplayerGameplay {
      * @param tpf the tpf
      */
     public void update(float tpf) {
-        while (recievedMessages != null && !recievedMessages.isEmpty()) {
-            Message m = recievedMessages.poll();
+        Queue<Message> clone = null;
+        synchronized (recievedMessages) {
+            clone = new LinkedList<Message>(recievedMessages);
+        }
+        while (clone != null && !clone.isEmpty()) {
+            Message m = clone.poll();
 
             if (m instanceof PlanetActionMessage) {
                 PlanetActionMessage serverMessage = (PlanetActionMessage) m;
@@ -199,6 +203,9 @@ public class MultiplayerGameplay {
                 long delay = currentTime - actionMessage.getServerTime();
                 SolarWarsApplication.getInstance().syncronize(delay * .001f);
             }
+            synchronized (recievedMessages) {
+                recievedMessages.remove(m);
+            }
         }
     }
 
@@ -206,9 +213,10 @@ public class MultiplayerGameplay {
      * Destroys the gameplay on exit.
      */
     public void destroy() {
-        recievedMessages.clear();
-        recievedMessages = null;
-
+        synchronized (recievedMessages) {
+            recievedMessages.clear();
+            recievedMessages = null;
+        }
         if (client != null) {
             client.removeMessageListener(
                     gameplayListener,
@@ -239,11 +247,15 @@ public class MultiplayerGameplay {
          */
         @Override
         public void messageReceived(Client source, Message message) {
-            System.out.println(
-                    "Client #" + source.getId() + " recieved a "
-                    + message.getClass().getSimpleName());
+//            System.out.println(
+//                    "Client #" + source.getId() + " recieved a "
+//                    + message.getClass().getSimpleName());
+
+
             if (recievedMessages != null) {
-                recievedMessages.add(message);
+                synchronized (recievedMessages) {
+                    recievedMessages.add(message);
+                }
             }
         }
     }

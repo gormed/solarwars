@@ -53,7 +53,7 @@ public final class Ergonomics {
     private String ipAddress = "127.0.0.1";
     
     /** The name. */
-    private String name = ">Player";
+    private String name = "Player";
     
     /** The players. */
     private int players = 8;

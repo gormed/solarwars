@@ -616,8 +616,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         Label player = new Label(p.getName(),
                 playerNamePos.get(id),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Blue,
+                Vector3f.UNIT_XYZ.clone(),
+                ColorRGBA.Blue.clone(),
                 gui) {
 
             @Override

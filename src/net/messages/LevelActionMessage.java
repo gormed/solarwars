@@ -34,7 +34,7 @@ import java.util.HashMap;
 public class LevelActionMessage extends AbstractMessage {
 
     /** The planet ship count. */
-    private HashMap<Integer, Integer> planetShipCount;
+//    private HashMap<Integer, Integer> planetShipCount;
     
     /** The level seed. */
     private long levelSeed;
@@ -55,8 +55,7 @@ public class LevelActionMessage extends AbstractMessage {
      * @param levelSeed the level seed
      * @param serverTime the server time
      */
-    public LevelActionMessage(HashMap<Integer, Integer> planetShipCount, long levelSeed, long serverTime) {
-        this.planetShipCount = planetShipCount;
+    public LevelActionMessage(long levelSeed, long serverTime) {
         this.levelSeed = levelSeed;
         this.serverTime = serverTime;
     }
@@ -68,15 +67,6 @@ public class LevelActionMessage extends AbstractMessage {
      */
     public long getLevelSeed() {
         return levelSeed;
-    }
-
-    /**
-     * Gets the planet ship count.
-     *
-     * @return the planet ship count
-     */
-    public HashMap<Integer, Integer> getPlanetShipCount() {
-        return planetShipCount;
     }
 
     /**

@@ -117,6 +117,7 @@ public class SolarWarsApplication extends Application {
     protected IsoControl isoControl;
     /** The show settings. */
     protected boolean showSettings = true;
+    private String pingString = "";
     /** The show fps. */
     private boolean showFps = true;
     /** The action listener. */
@@ -131,9 +132,10 @@ public class SolarWarsApplication extends Application {
     /** The lost focus. */
     private boolean lostFocus = false;
     /** value for the delay if in network */
-    private float delay;
-    
+    private float tempDelay;
     private float lastDelay = 0;
+    private float currentDelay = 0;
+    private float interpolator = 0;
     /** indicates that the application already is at current max delay */
     private boolean syncronized;
 
@@ -494,18 +496,24 @@ public class SolarWarsApplication extends Application {
             tpf = 0;
             lostFocus = false;
         }
-        tpf += lastDelay;
+        tpf += (lastDelay + currentDelay) * timer.getTimePerFrame();
 
+        //<editor-fold defaultstate="collapsed" desc="Frames Per Second and Ping Output">
         if (showFps) {
             secondCounter += timer.getTimePerFrame();
             frameCounter++;
             if (secondCounter >= 1.0f) {
                 int fps = (int) (frameCounter / secondCounter);
-                fpsText.setText("Frames per second: " + fps);
+                float ping = ((lastDelay + tempDelay) / 2f) * 1000f;
+                if (ping > 0.1f) {
+                    pingString = String.format("%3.2f",ping) + "";
+                }
+                fpsText.setText("FPS: " + fps + " | PING: " + pingString);
                 secondCounter = 0.0f;
                 frameCounter = 0;
             }
         }
+        //</editor-fold>
 
         // update states
         stateManager.update(tpf);
@@ -522,6 +530,8 @@ public class SolarWarsApplication extends Application {
         renderManager.render(tpf, context.isRenderable());
         simpleRender(renderManager);
         stateManager.postRender();
+
+        endSync();
     }
 
     /* (non-Javadoc)
@@ -566,18 +576,30 @@ public class SolarWarsApplication extends Application {
         }
         super.destroy();
     }
-    
+
     private void resetSync() {
-        this.lastDelay = delay;
-        this.delay = 0;
+        this.tempDelay = 0;
         this.syncronized = false;
+
     }
-    
+
     public void syncronize(float delay) {
-        if ((this.delay > delay))
+//        if (Hub.getLocalPlayer().isHost()) {
+//            this.tempDelay = 0;
+//            return;
+//        }
+        if ((this.tempDelay > delay)) {
             return;
-        this.delay = delay;
+        }
+        this.tempDelay = delay;
+
+//        System.out.println(Math.round(System.currentTimeMillis() + 0.00001) + " - Ping: " + ((lastDelay + delay) / 2f) * (int) 1000 + "ms");
         this.syncronized = true;
+    }
+
+    private void endSync() {
+        this.lastDelay = currentDelay;
+        this.currentDelay = tempDelay;
     }
 
     public boolean isSyncronized() {

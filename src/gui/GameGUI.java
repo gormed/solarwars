@@ -114,6 +114,7 @@ public class GameGUI {
 
         this.actionListener = new ActionListener() {
 
+            @Override
             public void onAction(String name, boolean isPressed, float tpf) {
                 if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
                     //if (isPressed) {

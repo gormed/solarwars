@@ -128,6 +128,7 @@ public class Player {
             gameOverGUI.display();
         }
     }
+    private static boolean hostSet = false;
     /** The id. */
     private int id;
     /** The artificial. */
@@ -214,6 +215,13 @@ public class Player {
         return isHost;
     }
 
+    public boolean setHost() {
+        if (hostSet) {
+            return false;
+        }
+        return isHost = hostSet = true;
+    }
+
     /**
      * 
      * Returns if the player is defeated and out of game.
@@ -290,7 +298,7 @@ public class Player {
         state.multiSelectedShipGroups.clear();
         state.selectedPlanetId = -1;
         state.selectedShipGroupId = -1;
-        
+
         ArrayList<Integer> planetIDs = new ArrayList<Integer>();
         for (AbstractPlanet p : planets) {
             planetIDs.add(p.getId());

@@ -99,9 +99,7 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-                if (caption.length() == 0)
-                    caption = ">";
-                if (caption.length() > 20) {
+                if (caption.length() > 8) {
                     caption = caption.substring(0, caption.length() - 1);
                 }
                 Ergonomics.getInstance().setName(caption);
@@ -110,7 +108,9 @@ public class MultiplayerState extends Gamestate {
 
         joinServer = new Button("Join Sever",
                 new Vector3f(gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(), ColorRGBA.White.clone(), gui) {
+                Vector3f.UNIT_XYZ.clone(), 
+                ColorRGBA.Orange.clone(), 
+                ColorRGBA.White.clone(), gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -129,7 +129,8 @@ public class MultiplayerState extends Gamestate {
         serverip = new TextBox(
                 ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), Ergonomics.getInstance().getIpAddress(),
+                Vector3f.UNIT_XYZ.clone(), 
+                Ergonomics.getInstance().getIpAddress(),
                 ColorRGBA.White.clone(), gui, true) {
 
             @Override
@@ -144,7 +145,8 @@ public class MultiplayerState extends Gamestate {
 
         back = new Button("Back",
                 new Vector3f(gui.getWidth() / 2, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(),
+                Vector3f.UNIT_XYZ.clone(), 
+                ColorRGBA.Orange.clone(),
                 ColorRGBA.White.clone(), gui) {
 
             @Override
@@ -163,7 +165,9 @@ public class MultiplayerState extends Gamestate {
 
         createServer = new Button("Create Sever",
                 new Vector3f(3 * gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Orange.clone(), ColorRGBA.White.clone(), gui) {
+                Vector3f.UNIT_XYZ.clone(), 
+                ColorRGBA.Orange.clone(), 
+                ColorRGBA.White.clone(), gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -183,7 +187,7 @@ public class MultiplayerState extends Gamestate {
                 "MULTIPLAYER",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
                 new Vector3f(2, 2, 1),
-                ColorRGBA.White, gui) {
+                ColorRGBA.White.clone(), gui) {
 
             private float time;
 

@@ -185,7 +185,6 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
         this.boxColor = boxColor;
         this.gui = gui;
         createTextBox(gui);
-
     }
 
     /**
@@ -205,12 +204,12 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see com.jme3.scene.Node#detachChild(com.jme3.scene.Spatial)
      */
-    @Override
-    public int detachChild(Spatial child) {
-
-        destroy();
-        return super.detachChild(child);
-    }
+//    @Override
+//    public int detachChild(Spatial child) {
+//
+//        destroy();
+//        return super.detachChild(child);
+//    }
     /**
      * Destroy.
      */
@@ -224,17 +223,22 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      */
     @Override
     public void updateGUI(float tpf) {
-        text.setText(caption);
-        Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
-                text.getLineHeight() / 2,
-                0);
-        offset.multLocal(scale);
-        text.setLocalTranslation(screenPosition.add(offset));
-        text.setLocalScale(scale);
+        if (caption.length() > 0) {
+            text.setText(caption);
+            Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
+                    text.getLineHeight() / 2,
+                    0);
+            offset.multLocal(scale);
+            text.setLocalTranslation(screenPosition.add(offset));
+            text.setLocalScale(scale);
+        }
+        text.setSize(44f);
+        text.setColor(color);
         time += tpf;
 
-        if (gui.getFocusElement() != null && gui.getFocusElement().equals(this)) {
-            
+        if (gui.getFocusElement() != null
+                && gui.getFocusElement().equals(this)) {
+
             if (time < 0.2f) {
                 text.setText(caption + "_");
             } else if (time < 0.4f) {
@@ -285,15 +289,19 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      */
     private void createTextBox(GameGUI gui) {
         // Init
-        AssetManager assetManager = solarwars.SolarWarsApplication.getInstance().getAssetManager();
+        AssetManager assetManager =
+                solarwars.SolarWarsApplication.getInstance().getAssetManager();
 
         // Create Text
-        font = FontLoader.getInstance().getFont("SolarWarsFont64");
+        font = assetManager.loadFont(
+                "Interface/Fonts/SolarWarsFont64.fnt");
         text = new BitmapText(font, false);
+        text.setName("BitmapText_" + name);
         text.setText(caption);
         text.setSize(44f);
         text.setColor(color);
-        Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
+        Vector3f offset = new Vector3f(
+                -text.getLineWidth() / 2,
                 text.getLineHeight() / 2,
                 0);
         offset.multLocal(scale);
@@ -395,12 +403,12 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
 
             if (!isPressed && activeTextBox.equals(textBox)) {
-                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)
                         && textBox.caption.length() >= 1) {
-                    textBox.caption = 
-                            textBox.caption.substring(0, 
+                    textBox.caption =
+                            textBox.caption.substring(0,
                             textBox.caption.length() - 1);
-                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)
                         && textBox.caption.length() < 15) {
                     textBox.caption += name;
                 }
@@ -450,11 +458,12 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
             }
 
             if (!isPressed && activeTextBox.equals(textBox)) {
-                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) 
+                if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)
                         && textBox.caption.length() >= 1) {
-                    textBox.caption = 
+                    textBox.caption =
                             textBox.caption.substring(0, textBox.caption.length() - 1);
-                } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE)) {
+
+                } else {
                     textBox.caption += name;
                 }
             }
