@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import logic.Gameplay;
+import logic.Level;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
@@ -201,7 +203,8 @@ public class SolarWarsServer extends SimpleApplication {
 
         LevelActionMessage message = new LevelActionMessage(
                 seed,
-                System.currentTimeMillis());
+                System.currentTimeMillis(),
+                Gameplay.getGameTick());
         this.gameServer.broadcast(Filters.notEqualTo(host), message);
 
     }

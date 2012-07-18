@@ -23,7 +23,6 @@ package net.messages;
 
 import com.jme3.network.AbstractMessage;
 import com.jme3.network.serializing.Serializable;
-import java.util.HashMap;
 
 /**
  * The Class LevelActionMessage.
@@ -41,6 +40,8 @@ public class LevelActionMessage extends AbstractMessage {
     
     /** The server time. */
     private long serverTime;
+    
+    private double gameTick;
 
     /**
      * Instantiates a new level action message.
@@ -55,9 +56,10 @@ public class LevelActionMessage extends AbstractMessage {
      * @param levelSeed the level seed
      * @param serverTime the server time
      */
-    public LevelActionMessage(long levelSeed, long serverTime) {
+    public LevelActionMessage(long levelSeed, long serverTime, double gameTick) {
         this.levelSeed = levelSeed;
         this.serverTime = serverTime;
+        this.gameTick = gameTick;
     }
 
     /**
@@ -76,6 +78,10 @@ public class LevelActionMessage extends AbstractMessage {
      */
     public long getServerTime() {
         return serverTime;
+    }
+
+    public double getGameTick() {
+        return gameTick;
     }
     
     

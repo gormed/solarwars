@@ -59,7 +59,6 @@ public class SolarWarsGame {
         }
         return instance = new SolarWarsGame();
     }
-    
     /** The application. */
     private SolarWarsApplication application;
 
@@ -71,28 +70,20 @@ public class SolarWarsGame {
     public SolarWarsApplication getApplication() {
         return application;
     }
-    
     /** The asset manager. */
     private AssetManager assetManager;
-    
     /** The gamestate manager. */
     private GamestateManager gamestateManager;
-    
     /** The network manager. */
     private NetworkManager networkManager;
-    
     /** The iso control. */
     private IsoControl isoControl;
-    
     /** The input manager. */
     private InputManager inputManager;
-    
     /** The font loader. */
     private FontLoader fontLoader;
-    
     /** The action lib. */
-    private ActionLib actionLib;   
-    
+    private ActionLib actionLib;
     /** The audio manager. */
     private AudioManager audioManager;
 
@@ -109,14 +100,14 @@ public class SolarWarsGame {
         audioManager.initialize();
         gamestateManager = GamestateManager.getInstance();
         networkManager = NetworkManager.getInstance();
-        
+
         actionLib = ActionLib.getInstance();
         // Init fonts
         fontLoader = FontLoader.getInstance();
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
 
-        
+
     }
 
     /**
@@ -178,7 +169,6 @@ public class SolarWarsGame {
      */
     void update(float tpf) {
         gamestateManager.update(tpf);
-        if (application.isoCam != null)
-            isoControl.updateSelection(tpf);
+
     }
 }

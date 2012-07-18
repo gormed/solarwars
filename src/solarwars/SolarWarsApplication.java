@@ -138,6 +138,8 @@ public class SolarWarsApplication extends Application {
     private float interpolator = 0;
     /** indicates that the application already is at current max delay */
     private boolean syncronized;
+    private float realTimePerFrame;
+    private float correctedTimePerFrame;
 
     /**
      * Instantiates a new solar wars application.
@@ -487,7 +489,7 @@ public class SolarWarsApplication extends Application {
     @Override
     public void update() {
         super.update(); // makes sure to execute AppTasks
-        resetSync();
+
         if (speed == 0 || paused) {
             return;
         }
@@ -496,7 +498,8 @@ public class SolarWarsApplication extends Application {
             tpf = 0;
             lostFocus = false;
         }
-        tpf += (lastDelay + currentDelay) * timer.getTimePerFrame();
+
+//        tpf += (lastDelay + currentDelay) * timer.getTimePerFrame();
 
         //<editor-fold defaultstate="collapsed" desc="Frames Per Second and Ping Output">
         if (showFps) {
@@ -506,7 +509,7 @@ public class SolarWarsApplication extends Application {
                 int fps = (int) (frameCounter / secondCounter);
                 float ping = ((lastDelay + tempDelay) / 2f) * 1000f;
                 if (ping > 0.1f) {
-                    pingString = String.format("%3.2f",ping) + "";
+                    pingString = String.format("%3.2f", ping) + "";
                 }
                 fpsText.setText("FPS: " + fps + " | PING: " + pingString);
                 secondCounter = 0.0f;
@@ -531,7 +534,7 @@ public class SolarWarsApplication extends Application {
         simpleRender(renderManager);
         stateManager.postRender();
 
-        endSync();
+
     }
 
     /* (non-Javadoc)
@@ -549,12 +552,19 @@ public class SolarWarsApplication extends Application {
      * @param tpf the tpf
      */
     public void simpleUpdate(float tpf) {
-
-        game.update(tpf);
-        if (isoCam != null && isoCam.isDragged()) {
-            Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
-            isoCam.dragCamera(tpf, currentSceenPos);
+        realTimePerFrame = tpf;
+        resetSync();
+        correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
+        game.update(correctedTimePerFrame);
+        endSync();
+        if (isoCam != null && isoControl != null) {
+            isoControl.updateSelection(tpf);
+            if (isoCam.isDragged()) {
+                Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
+                isoCam.dragCamera(tpf, currentSceenPos);
+            }
         }
+
     }
 
     /**
@@ -604,5 +614,13 @@ public class SolarWarsApplication extends Application {
 
     public boolean isSyncronized() {
         return syncronized;
+    }
+
+    public float getCorrectedTimePerFrame() {
+        return correctedTimePerFrame;
+    }
+
+    public float getRealTimePerFrame() {
+        return realTimePerFrame;
     }
 }

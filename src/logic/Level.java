@@ -453,17 +453,23 @@ public class Level {
         return shipList.get(id);
     }
 
+
     /**
      * Updates the level.
      *
      * @param tpf the tpf
      */
     public void updateLevel(float tpf) {
+
+
+
         if (!levelLoaded || gameOver) {
             GameOverGUI.getInstance().display();
             return;
         }
-
+        
+        Gameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
+        
         if (Hub.getLocalPlayer().hasLost()) {
             Player.localPlayerLooses();
         } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1 || Player.lastPlayer()) {
@@ -491,7 +497,6 @@ public class Level {
         }
 
         removeShipsList.clear();
-
     }
 
     /**

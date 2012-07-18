@@ -87,6 +87,8 @@ public class MultiplayerGameplay {
     private ActionLib actionLib = ActionLib.getInstance();
     /** The recieved messages. */
     private volatile Queue<Message> recievedMessages = new LinkedList<Message>();
+    private double currentTickDiff = 0;
+    private double lastTickDiff = 0;
 
     /**
      * Send planet action message.
@@ -167,10 +169,7 @@ public class MultiplayerGameplay {
                         Gameplay.getCurrentLevel().
                         getPlanet(serverMessage.getPlanetID());
                 //TODO: Clean up the mess, nobody needs this anymore!
-                long sendTime = serverMessage.getClientTime();
-                long serverTime = serverMessage.getServerTime();
-                long currentTime = System.currentTimeMillis();
-                long delay = currentTime - serverTime;
+                long delay = 0;
 
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
@@ -178,15 +177,6 @@ public class MultiplayerGameplay {
                         planet,
                         p,
                         serverMessage.getActionName());
-
-
-
-                if (MULTIPLAYER_GAMEPLAY_DEBUG) {
-                    System.out.println("ID#" + serverMessage.getPlayerID()
-                            + "/" + serverMessage.getPlayerState().name
-                            + " sent a " + serverMessage.getActionName()
-                            + " with delay " + delay);
-                }
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
 
@@ -199,9 +189,24 @@ public class MultiplayerGameplay {
 //                    int shipCount = entry.getValue();
 //                    Gameplay.getCurrentLevel().getPlanet(id).setShipCount(shipCount);
 //                }
+                double tick = Gameplay.getGameTick();
+                double serverTick = actionMessage.getGameTick();
+                double tickDiff = tick - serverTick;
+                currentTickDiff = tickDiff;
+                double tickDelay = currentTickDiff - lastTickDiff;
                 long currentTime = System.currentTimeMillis();
                 long delay = currentTime - actionMessage.getServerTime();
-                SolarWarsApplication.getInstance().syncronize(delay * .001f);
+//                SolarWarsApplication.getInstance().syncronize((float) tickDelay);
+                if (MULTIPLAYER_GAMEPLAY_DEBUG) {
+                    System.out.println(
+                            currentTime
+                            + " - delay: " + delay
+                            + " - tickDelay: " + String.format("%1.4f", (float) tickDelay)
+                            + " - tickDiff: " + String.format("%1.3f", (float) tickDiff));
+                }
+                SolarWarsApplication.getInstance().syncronize((float) tickDelay);
+//                SolarWarsApplication.getInstance().syncronize(delay * .001f);
+                lastTickDiff = currentTickDiff;
             }
             synchronized (recievedMessages) {
                 recievedMessages.remove(m);

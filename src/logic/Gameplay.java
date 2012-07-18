@@ -62,7 +62,11 @@ public class Gameplay {
     private static Gameplay instance;
     /** The current level. */
     private static Level currentLevel = null;
+    static double GAMETICK = 0;
 
+    public static double getGameTick() {
+        return GAMETICK;
+    }
     /**
      * Gets the current level.
      *
