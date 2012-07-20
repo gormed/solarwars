@@ -41,6 +41,7 @@ import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -74,7 +75,6 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
     /** The Constant SERVER_FULL_MSG. */
     public static final String SERVER_FULL_MSG = "Server is full!";
-    
     /** The Constant SERVER_NOT_IN_LOBBY_MSG. */
     public static final String SERVER_NOT_IN_LOBBY_MSG = "Server is locked! The game is probably running...";
     /** The create server label. */
@@ -97,10 +97,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private Label maxPlayersLabel;
     /** The player count. */
     private TextBox playerCountBox;
-    
     /** The seed label. */
     private Label seedLabel;
-    
     /** The level seed box. */
     private TextBox levelSeedBox;
     /** The gui. */
@@ -109,19 +107,16 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerHub serverHub;
     /** The solar wars server. */
     private SolarWarsServer solarWarsServer;
-    
     /** The server as the client. */
     private Client serverClient;
     /** The player name pos. */
     private HashMap<Integer, Vector3f> playerNamePos;
     /** The player labels. */
     private HashMap<Integer, Label> playerLabels;
-    
     /** The player labels node. */
     private Anchor playerLabelsNode;
     /** The player label idx. */
     private HashMap<Player, Integer> playerLabelIdx;
-    
     /** The refreshed players. */
     private HashMap<Integer, Player> refreshedPlayers;
     /** The max player number. */
@@ -138,22 +133,16 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
     /** The server connection listener. */
     private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
-    
     /** indicates that the game is set up and can be started. */
     private boolean gameStarted = false;
-    
     /** The application. */
     private final SolarWarsApplication application;
-    
     /** The client seed. */
     private long clientSeed;
-    
     /** The players changed. */
     private boolean playersChanged;
-    
     /** The seed string. */
     private String seedString = Ergonomics.getInstance().getSeed();
-    
     /** The server seed. */
     private long serverSeed = 42;
 
@@ -386,8 +375,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
         maxPlayersLabel = new Label("Players",
                 new Vector3f(
-                        7 * gui.getWidth() / 10, 
-                        7f * gui.getHeight() / 10, 0),
+                7 * gui.getWidth() / 10,
+                7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Orange, gui) {
 
@@ -537,9 +526,17 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
 
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
         } catch (UnknownHostException ex) {
-            Logger.getLogger(CreateServerState.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreateServerState.class.getName()).
+                    log(Level.WARNING, ex.getMessage(), ex);
         } catch (IOException ex) {
-            Logger.getLogger(CreateServerState.class.getName()).log(Level.SEVERE, null, ex);
+            if (ex instanceof ConnectException) {
+                Logger.getLogger(CreateServerState.class.getName()).
+                        log(Level.SEVERE, "Unable to establish server! Reason: "
+                        + ex.getMessage(), ex);
+            } else {
+                Logger.getLogger(CreateServerState.class.getName()).
+                        log(Level.SEVERE, ex.getMessage(), ex);
+            }
         }
     }
 
@@ -561,8 +558,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      * @param seed the seed
      */
     private void createLevel(long seed) {
-        if (seed == 0)
+        if (seed == 0) {
             seed = System.currentTimeMillis();
+        }
         solarWarsServer.prepareLevel(seed);
     }
 
@@ -688,7 +686,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             playerLabelsNode.removeElement(entry.getValue());
         }
-        
+
         playerLabels.clear();
 
         for (Map.Entry<Integer, Player> entry : clone.entrySet()) {

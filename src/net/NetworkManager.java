@@ -80,11 +80,16 @@ public class NetworkManager {
         if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals(""))) {
             return false;
         }
-        for (String s : parts) {
-            int i = Integer.parseInt(s);
-            if (i < 0 || i > 255) {
-                return false;
+        try {
+            for (String s : parts) {
+                int i = Integer.parseInt(s);
+                if (i < 0 || i > 255) {
+                    return false;
+                }
             }
+        } catch (NumberFormatException exception) {
+            Logger.getLogger(NetworkManager.class.getName()).log(Level.INFO, exception.getMessage(), exception);
+            return false;
         }
         return true;
     }
@@ -116,6 +121,11 @@ public class NetworkManager {
      */
     private NetworkManager() {
         clientRegisterListeners = new ArrayList<ClientRegisterListener>();
+        try {
+            clientIPAdress = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(NetworkManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     /** The udp port. */
     private int udpPort = DEFAULT_PORT;

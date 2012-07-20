@@ -49,8 +49,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.ActionLib;
 import logic.Gameplay;
+import logic.Player;
 
 /**
  * The Class IsoControl for the players interaction on screen. 
@@ -61,7 +64,7 @@ import logic.Gameplay;
 public class IsoControl {
 
     /** The Constant DEBUG_RAYCASTS. */
-    private static final boolean DEBUG_RAYCASTS = false;
+    private static final boolean DEBUG_RAYCASTS = true;
     //==========================================================================
     //      Singleton
     //==========================================================================
@@ -74,6 +77,8 @@ public class IsoControl {
      * @param application the application
      */
     private IsoControl(SolarWarsApplication application) {
+        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+
         assetManager = application.getAssetManager();
         inputManager = application.getInputManager();
 
@@ -178,6 +183,7 @@ public class IsoControl {
     private ActionLib actionLib;
     /** inner ref to the games gui. */
     private GameGUI gui;
+    private static final Logger logger = Logger.getLogger(IsoControl.class.getName());
     //==========================================================================
     //      Methods
     //==========================================================================
@@ -215,7 +221,7 @@ public class IsoControl {
              * but not on its hold.
              */
             private void onButtonDown(String name) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
                     Vector2f click2d = inputManager.getCursorPosition();
                     Vector3f click3d = cam.getWorldCoordinates(
                             new Vector2f(click2d.x, click2d.y), 0f).clone();
@@ -245,6 +251,9 @@ public class IsoControl {
 //                        rootNode.attachChild(startDrag);
                     }
                     dragging = true;
+                    final String mouseDownMsg = "Left mouse-button down @["
+                            + click2d.x + "/" + click2d.y + "]";
+                    logger.log(Level.INFO, mouseDownMsg);
                 }
             }
 
@@ -252,11 +261,16 @@ public class IsoControl {
              * Is executed if the mouse-weel is scrolled.
              */
             private void onMouseWeel(String name) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN)) {
-                    Hub.getLocalPlayer().refreshShipPercentage(0.05f);
+                Player local = Hub.getLocalPlayer();
+                if (name.equals(InputMappings.MOUSE_WHEEL_DOWN)) {
+                    local.refreshShipPercentage(0.05f);
+                    final String percentageChange = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
+                    logger.log(Level.FINE, percentageChange);
                 }
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_WHEEL_UP)) {
-                    Hub.getLocalPlayer().refreshShipPercentage(-0.05f);
+                if (name.equals(InputMappings.MOUSE_WHEEL_UP)) {
+                    local.refreshShipPercentage(-0.05f);
+                    final String percentageChange = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
+                    logger.log(Level.FINE, percentageChange);
                 }
             }
 
@@ -266,8 +280,8 @@ public class IsoControl {
              * for selection or right click for attack.
              */
             private boolean onButtonUp(String name) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
-                        || name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)) {
+                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
+                        || name.equals(InputMappings.MOUSE_RIGHT_CLICK)) {
                     // reset drag flag
                     dragging = false;
                     // clear collision results
@@ -313,25 +327,6 @@ public class IsoControl {
                     Node temp = null;
                     // order the collisions so that at 0 is the closest
                     results.getClosestCollision();
-//                    temp = closest.getGeometry().getParent().getParent();
-//                    // if we got an abstract planet here
-//                    if (temp != null && temp instanceof AbstractPlanet) {
-//                        nearestPlanet = (AbstractPlanet) temp;
-//                        lastNode = nearestPlanet;
-//                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
-//                            actionLib.invokePlanetAction(null, nearestPlanet,
-//                                    Hub.getLocalPlayer(),
-//                                    Gameplay.PLANET_SELECT);
-//                            repositMarker(nearestPlanet, markerNode);
-//                            return true;
-//                        } else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)
-//                                && !Hub.getLocalPlayer().hasLost()) {
-//                            actionLib.invokePlanetAction(null, nearestPlanet,
-//                                    Hub.getLocalPlayer(),
-//                                    Gameplay.PLANET_ATTACK);
-//                            return true;
-//                        }
-//                    }
                     // iterate through collisions begin with the closest
                     for (int i = 0; i < results.size(); i++) {
                         // currently iterated collision
@@ -349,15 +344,14 @@ public class IsoControl {
                                 break;
                             } else if (temp instanceof ShipGroup) {
                                 nearestShipGroup = (ShipGroup) temp;
-                                // if shipgroup found first, break
-                                break;
                             }
                         }
                     }
                     // was planet found
+                    //<editor-fold defaultstate="collapsed" desc="Planet Found Section">
                     if (nearestPlanet != null) {
                         // ...check if left button click
-                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+                        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
                             // invoke select action
                             actionLib.invokePlanetAction(
                                     null,
@@ -365,53 +359,51 @@ public class IsoControl {
                                     nearestPlanet,
                                     Hub.getLocalPlayer(),
                                     Gameplay.PLANET_SELECT);
+                            final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
+                            logger.info(planetSelectMsg);
                             // finally set marker
                             repositMarker(nearestPlanet, markerNode);
 
-                        } // ...check for reight botton click 
+                        } // ...check for reight botton click
                         // TODO: move hasLost check to actionLib
-                        else if (name.equals(SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK)
+                        else if (name.equals(InputMappings.MOUSE_RIGHT_CLICK)
                                 && !Hub.getLocalPlayer().hasLost()) {
                             // invoke attack action
                             actionLib.invokePlanetAction(
-                                    null, 
+                                    null,
                                     0L,
                                     nearestPlanet,
                                     Hub.getLocalPlayer(),
                                     Gameplay.PLANET_ATTACK);
+                            final String planetAttackMsg = "Player attacked/moved to planet id#"
+                                    + nearestPlanet.getId() + ", owned by "
+                                    + ((nearestPlanet.getOwner() != null)
+                                    ? nearestPlanet.getOwner().getName()
+                                    : "nobody");
+                            logger.info(planetAttackMsg);
                         }
 
-                    } // was shipgroup found
+                    } //</editor-fold>
+                    // was shipgroup found
+                    //<editor-fold defaultstate="collapsed" desc="ShipGroup Found Section">
                     else if (nearestShipGroup != null) {
                         // ...check if left button click
                         // TODO: move hasLost check to actionLib
-                        if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
+                        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
                                 && !Hub.getLocalPlayer().hasLost()) {
                             repositMarker(nearestShipGroup, markerNode);
                             // invoke ship redirect action
                             actionLib.invokeShipAction(
-                                    null, 
+                                    null,
                                     0,
                                     nearestShipGroup,
                                     Hub.getLocalPlayer(),
                                     Gameplay.SHIP_SELECT);
+                            final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
+                            logger.info(sgSelectMsg);
                         }
-
+                        //</editor-fold>
                     }
-//                    if (actual != null) {
-//                        // Let's interact - we mark the hit with a red dot.
-//                        // markerNode.setLocalTranslation(closest.getContactPoint());
-//                        lastNode = actual.getGeometry().getParent();
-//                        AbstractPlanet p = null;
-//                        ShipGroup sg = null;
-//                        Node n = lastNode.getParent();
-//                        if (n instanceof AbstractPlanet) {
-//                            p = (AbstractPlanet) n;
-//
-//
-//                        } else if (n instanceof ShipGroup) {
-//                        }
-//                    }
                 }
                 return false;
             }
@@ -422,18 +414,23 @@ public class IsoControl {
              */
             private void printRaycastResults(CollisionResults results) {
                 // 4. Print the results
-                System.out.println("----- 3D Collisions? " + results.size()
-                        + "-----");
+                if (results.size() <= 0) {
+                    logger.log(Level.FINE, "Nothing was hit in raycasting!", results);
+                    return;
+                }
+                logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
+                String hits = "";
                 for (int i = 0; i < results.size(); i++) {
                     // For each hit, we know distance, impact point, name of
                     // geometry.
                     float dist = results.getCollision(i).getDistance();
                     Vector3f pt = results.getCollision(i).getContactPoint();
                     String hit = results.getCollision(i).getGeometry().getName();
-                    System.out.println("* Collision #" + i);
-                    System.out.println("  You shot " + hit + " at " + pt
-                            + ", " + dist + " wu away.");
+                    hits += "* Collision #" + i;
+                    hits += " - You shot " + hit + " at " + pt
+                            + ", " + dist + " wu away.\n";
                 }
+                logger.log(Level.FINER, hits, results);
             }
 
             /**
@@ -442,7 +439,7 @@ public class IsoControl {
              */
             private boolean playerEndsDrag(String name) {
                 // if player was dragging and releases the mouse to select planets
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)
+                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
                         && startXZPlanePos != null
                         && lastXZPlanePos != null) {
                     //  rootNode.detachChild(startDrag);
@@ -478,7 +475,8 @@ public class IsoControl {
                                         null,
                                         Hub.getLocalPlayer(),
                                         Gameplay.PLANET_MULTI_SELECT);
-
+                                final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
+                                logger.info(multiSelectMsg);
                             }
                         } else {
                             selectShipGroups(rect);
@@ -498,7 +496,8 @@ public class IsoControl {
                                         null,
                                         Hub.getLocalPlayer(),
                                         Gameplay.SHIP_MULTI_SELECT);
-
+                                final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
+                                logger.info(multiSelectMsg);
                             }
                         }
                         //
@@ -537,7 +536,7 @@ public class IsoControl {
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CTRL)) {
+                if (name.equals(InputMappings.KEYBOARD_CONTROL)) {
                     controlPressed = isPressed;
                 }
             }
@@ -547,12 +546,12 @@ public class IsoControl {
 
     public void addControlListener() {
         inputManager.addListener(mouseActionListener,
-                SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK,
-                SolarWarsApplication.INPUT_MAPPING_RIGHT_CLICK,
-                SolarWarsApplication.INPUT_MAPPING_WHEEL_DOWN,
-                SolarWarsApplication.INPUT_MAPPING_WHEEL_UP);
+                InputMappings.MOUSE_LEFT_CLICK,
+                InputMappings.MOUSE_RIGHT_CLICK,
+                InputMappings.MOUSE_WHEEL_DOWN,
+                InputMappings.MOUSE_WHEEL_UP);
         inputManager.addListener(keyActionListener,
-                SolarWarsApplication.INPUT_MAPPING_LEFT_CTRL);
+                InputMappings.KEYBOARD_CONTROL);
     }
 
     public void removeControlListener() {
@@ -580,23 +579,10 @@ public class IsoControl {
      * @param markerNode the marker node
      */
     private void repositMarker(AbstractPlanet planet, MarkerNode markerNode) {
-//        if (lastNode != null) {
-//            lastNode.detachChild(markerNode);
-//        }
         removeMarker(markerNode);
-
         planet.getTransformNode().attachChild(markerNode);
-
         float s = planet.getSize() * 2.6f;
-
         markerNode.setScale(s);
-
-//        geometry.setLocalScale(s);
-//        geometry.setLocalTranslation(-s / 2, 0, -s / 2);
-        // marker.killAllParticles();
-        // marker.setStartSize(p.getSize() + 0.2f);
-        // marker.setEndSize(p.getSize() + 0.2f);
-        // marker.emitAllParticles();
     }
 
     /**
@@ -619,21 +605,10 @@ public class IsoControl {
      * @param markerNode the marker node
      */
     private void repositMarker(ShipGroup shipGroup, MarkerNode markerNode) {
-//        if (lastNode != null) {
-//            lastNode.detachChild(markerNode);
-//        }
-
         removeMarker(markerNode);
-
         shipGroup.getTransformNode().attachChild(markerNode);
-
         float s = shipGroup.getSize() * 2.0f;
-
         markerNode.setScale(s);
-        // marker.killAllParticles();
-        // marker.setStartSize(g.getSize()*8 + 0.2f);
-        // marker.setEndSize(g.getSize()*8 + 0.2f);
-        // marker.emitAllParticles();
     }
 
     /**

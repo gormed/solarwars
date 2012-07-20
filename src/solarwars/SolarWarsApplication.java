@@ -25,12 +25,8 @@ import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
+import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
@@ -49,6 +45,12 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
+import java.io.IOException;
+import java.util.Date;
+import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.NetworkManager;
 
 /**
@@ -56,30 +58,8 @@ import net.NetworkManager;
  */
 public class SolarWarsApplication extends Application {
 
-    /** The Constant INPUT_MAPPING_EXIT. */
-    public static final String INPUT_MAPPING_EXIT = "SOLARWARS_Exit";
-    /** The Constant INPUT_MAPPING_PAUSE. */
-    public static final String INPUT_MAPPING_PAUSE = "SOLARWARS_Pause";
-    /** The Constant INPUT_MAPPING_TABSCORE. */
-    public static final String INPUT_MAPPING_TABSCORE = "SOLARWARS_tabScore";
-    /** The Constant INPUT_MAPPING_CHAT. */
-    public static final String INPUT_MAPPING_CHAT = "SOLARWARS_chat";
-    /** The Constant INPUT_MAPPING_CAMERA_POS. */
-    public static final String INPUT_MAPPING_CAMERA_POS = "SOLARWARS_CameraPos";
-    /** The Constant INPUT_MAPPING_MEMORY. */
-    public static final String INPUT_MAPPING_MEMORY = "SOLARWARS_Memory";
-    /** The Constant INPUT_MAPPING_HIDE_STATS. */
-    public static final String INPUT_MAPPING_HIDE_STATS = "SOLARWARS_HideStats";
-    /** The Constant INPUT_MAPPING_LEFT_CLICK. */
-    public static final String INPUT_MAPPING_LEFT_CLICK = "SOLARWARS_LeftClick";
-    /** The Constant INPUT_MAPPING_RIGHT_CLICK. */
-    public static final String INPUT_MAPPING_RIGHT_CLICK = "SOLARWARS_RightClick";
-    /** The Constant INPUT_MAPPING_WHEEL_UP. */
-    public static final String INPUT_MAPPING_WHEEL_UP = "SOLARWARS_WheelUp";
-    /** The Constant INPUT_MAPPING_WHEEL_DOWN. */
-    public static final String INPUT_MAPPING_WHEEL_DOWN = "SOLARWARS_WheelDown";
-    /** The Constant INPUT_MAPPING_LEFT_CTRL. */
-    public static final String INPUT_MAPPING_LEFT_CTRL = "SOLARWARS_LeftStrg";
+    public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
+    
     /** The instance. */
     private static SolarWarsApplication instance;
     //private static AppSettings settings;
@@ -140,12 +120,53 @@ public class SolarWarsApplication extends Application {
     private boolean syncronized;
     private float realTimePerFrame;
     private float correctedTimePerFrame;
+    private FileHandler logFileHandler;
+    private String fileName;
+    /** The logger for the complete client, called 'solarwars'*/
+    private static final Logger clientLogger =
+            Logger.getLogger(SolarWarsApplication.class.getPackage().getName() /* solarwars */);
+
+    private String removeSpaces(String s) {
+        StringTokenizer st = new StringTokenizer(s, " ", false);
+        String t = "";
+        while (st.hasMoreElements()) {
+            t += st.nextElement();
+        }
+        StringTokenizer st2 = new StringTokenizer(t, ":", false);
+        t = "";
+        while (st2.hasMoreElements()) {
+            t += st2.nextElement();
+        }
+        return t;
+    }
+
+    public static Logger getClientLogger() {
+        return clientLogger;
+    }
+
+    public String getClientLogFileName() {
+        return fileName;
+    }
 
     /**
      * Instantiates a new solar wars application.
      */
-    public SolarWarsApplication() {
+    private SolarWarsApplication() {
         super();
+        try {
+            fileName = new Date(System.currentTimeMillis()).toString();
+            fileName = removeSpaces(fileName);
+            logFileHandler = new FileHandler(fileName + ".swlog", true);
+            logFileHandler.setLevel(Level.ALL);
+            clientLogger.addHandler(logFileHandler);
+            clientLogger.setLevel(Level.ALL);
+            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(Level.ALL);
+
+        } catch (IOException ex) {
+            clientLogger.log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            clientLogger.log(Level.SEVERE, null, ex);
+        }
         assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
     }
 
@@ -298,9 +319,9 @@ public class SolarWarsApplication extends Application {
                 return;
             }
 
-            if (name.equals(INPUT_MAPPING_EXIT)) {
+            if (name.equals(InputMappings.KEYBOARD_EXIT)) {
                 stop();
-            } else if (name.equals(INPUT_MAPPING_CAMERA_POS)) {
+            } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
                 if (cam != null) {
                     Vector3f loc = cam.getLocation();
                     Quaternion rot = cam.getRotation();
@@ -309,9 +330,9 @@ public class SolarWarsApplication extends Application {
                     System.out.println("Camera Rotation: " + rot);
                     System.out.println("Camera Direction: " + cam.getDirection());
                 }
-            } else if (name.equals(INPUT_MAPPING_MEMORY)) {
+            } else if (name.equals(InputMappings.DEBUG_MEMORY)) {
                 BufferUtils.printCurrentDirectMemory(null);
-            } else if (name.equals(INPUT_MAPPING_HIDE_STATS)) {
+            } else if (name.equals(InputMappings.DEBUG_HIDE_STATS)) {
                 boolean show = showFps;
                 setDisplayFps(!show);
                 setDisplayStatView(!show);
@@ -402,27 +423,14 @@ public class SolarWarsApplication extends Application {
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
 
-        // Map interface clicking for ingame and GUI and Debugging
-        inputManager.addMapping(INPUT_MAPPING_LEFT_CLICK,
-                new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        inputManager.addMapping(INPUT_MAPPING_RIGHT_CLICK,
-                new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addMapping(INPUT_MAPPING_WHEEL_DOWN,
-                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-        inputManager.addMapping(INPUT_MAPPING_WHEEL_UP,
-                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-        inputManager.addMapping(INPUT_MAPPING_CAMERA_POS, new KeyTrigger(KeyInput.KEY_C));
-        inputManager.addMapping(INPUT_MAPPING_MEMORY, new KeyTrigger(KeyInput.KEY_M));
-        inputManager.addMapping(INPUT_MAPPING_HIDE_STATS, new KeyTrigger(KeyInput.KEY_F3));
-        inputManager.addMapping(INPUT_MAPPING_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
-        inputManager.addMapping(INPUT_MAPPING_LEFT_CTRL, new KeyTrigger(KeyInput.KEY_LCONTROL));
+        InputMappings.getInstance().initialize(inputManager);
 
         // add app action listener for mappings
         inputManager.addListener(actionListener,
-                INPUT_MAPPING_EXIT,
-                INPUT_MAPPING_CAMERA_POS,
-                INPUT_MAPPING_MEMORY,
-                INPUT_MAPPING_HIDE_STATS);
+                InputMappings.KEYBOARD_EXIT,
+                InputMappings.DEBUG_CAMERA_POS,
+                InputMappings.DEBUG_MEMORY,
+                InputMappings.DEBUG_HIDE_STATS);
 
         // SETUP GAME CONTENT
         // hide stats
@@ -437,6 +445,14 @@ public class SolarWarsApplication extends Application {
         game = SolarWarsGame.getInstance();
         game.initialize(this);
         game.start();
+        attachLogger();
+    }
+
+    private void attachLogger() {
+        Logger inputLogger = Logger.getLogger(InputManager.class.getName());
+        inputLogger.setUseParentHandlers(true);
+        inputLogger.setParent(clientLogger);
+
     }
 
     /**
@@ -552,19 +568,36 @@ public class SolarWarsApplication extends Application {
      * @param tpf the tpf
      */
     public void simpleUpdate(float tpf) {
-        realTimePerFrame = tpf;
-        resetSync();
-        correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
-        game.update(correctedTimePerFrame);
-        endSync();
-        if (isoCam != null && isoControl != null) {
-            isoControl.updateSelection(tpf);
-            if (isoCam.isDragged()) {
-                Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
-                isoCam.dragCamera(tpf, currentSceenPos);
+        try {
+            realTimePerFrame = tpf;
+            resetSync();
+            correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
+            game.update(correctedTimePerFrame);
+            endSync();
+            if (isoCam != null && isoControl != null) {
+                isoControl.updateSelection(tpf);
+                if (isoCam.isDragged()) {
+                    Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
+                    isoCam.dragCamera(tpf, currentSceenPos);
+                }
             }
-        }
+        } catch (NullPointerException nullPointerException) {
 
+            clientLogger.log(Level.FINE, nullPointerException.getMessage(), nullPointerException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            clientLogger.log(Level.FINE, illegalArgumentException.getMessage(), illegalArgumentException);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            clientLogger.log(Level.FINE, aioobe.getMessage(), aioobe);
+        } catch (RuntimeException runtimeException) {
+            clientLogger.log(Level.FINE, runtimeException.getMessage(), runtimeException);
+        } catch (StackOverflowError stackOverflowError) {
+            clientLogger.log(Level.FINER, stackOverflowError.getMessage(), stackOverflowError);
+            logFileHandler.close();
+        } catch (Exception exception) {
+            clientLogger.log(Level.FINEST, exception.getMessage(), exception);
+            logFileHandler.close();
+        } finally {
+        }
     }
 
     /**
@@ -583,7 +616,10 @@ public class SolarWarsApplication extends Application {
         NetworkManager nm = NetworkManager.getInstance();
         if (nm != null && nm.isServerRunning()) {
             NetworkManager.getInstance().closeAllConnections(false);
+            clientLogger.log(Level.INFO, "Connections closed!");
         }
+
+        logFileHandler.close();
         super.destroy();
     }
 

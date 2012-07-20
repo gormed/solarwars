@@ -38,11 +38,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Gameplay;
-import logic.Level;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
@@ -52,7 +54,7 @@ import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
-import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class SolarWarsServer.
@@ -109,6 +111,19 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
+        try {
+            String fileName = SolarWarsApplication.getInstance().getClientLogFileName();
+
+            serverLogFileHandler = new FileHandler(fileName + ".swsvrlog", true);
+            serverLogFileHandler.setLevel(Level.ALL);
+            logger.addHandler(serverLogFileHandler);
+            logger.setLevel(Level.ALL);
+        } catch (IOException ex) {
+            Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
     /** The game server. */
     private Server gameServer;
@@ -146,6 +161,8 @@ public class SolarWarsServer extends SimpleApplication {
     private ServerState serverState = ServerState.INIT;
     /** The level sync. */
     private float levelSync = 0;
+    private FileHandler serverLogFileHandler;
+    private static final Logger logger = Logger.getLogger(SolarWarsServer.class.getName());
 
     /**
      * Start.
@@ -183,7 +200,16 @@ public class SolarWarsServer extends SimpleApplication {
      * Enter level.
      */
     public void enterLevel() {
-        host = connectedPlayers.get(ServerHub.getHostPlayer());
+        Player hostPlayer = ServerHub.getHostPlayer();
+        host = connectedPlayers.get(hostPlayer);
+        final String hostMsg = "#" + hostPlayer.getId() + "/" + hostPlayer.getName() + " is host!";
+        logger.log(Level.INFO, hostMsg, hostPlayer);
+
+        for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
+            Player player = entrySet.getKey();
+            final String playerMsg = "#" + player.getId() + "/" + player.getName();
+            logger.log(Level.INFO, playerMsg, player);
+        }
         serverState = ServerState.INGAME;
         gameServer.addMessageListener(
                 gameplayListener,
@@ -231,7 +257,7 @@ public class SolarWarsServer extends SimpleApplication {
             //gameServer.addConnectionListener(connections);
 
         } catch (IOException ex) {
-            Logger.getLogger(SolarWarsServer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -241,8 +267,26 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void simpleUpdate(float tpf) {
-        if (serverState == ServerState.INGAME) {
-            syncronizeLevel(tpf);
+        try {
+            if (serverState == ServerState.INGAME) {
+                syncronizeLevel(tpf);
+            }
+        } catch (NullPointerException nullPointerException) {
+
+            logger.log(Level.SEVERE, nullPointerException.getMessage(), nullPointerException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            logger.log(Level.SEVERE, illegalArgumentException.getMessage(), illegalArgumentException);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            logger.log(Level.SEVERE, aioobe.getMessage(), aioobe);
+        } catch (RuntimeException runtimeException) {
+            logger.log(Level.SEVERE, runtimeException.getMessage(), runtimeException);
+        } catch (StackOverflowError stackOverflowError) {
+            logger.log(Level.SEVERE, stackOverflowError.getMessage(), stackOverflowError);
+            serverLogFileHandler.close();
+        } catch (Exception exception) {
+            logger.log(Level.SEVERE, exception.getMessage(), exception);
+            serverLogFileHandler.close();
+        } finally {
         }
 //        for (Player p : joinedPlayers) {
 //            respondPlayer(p, true);
@@ -268,7 +312,9 @@ public class SolarWarsServer extends SimpleApplication {
     @Override
     public void stop(boolean waitFor) {
         System.out.println("Closing server...");
+        logger.info("Closing server...");
         super.stop(waitFor);
+        serverLogFileHandler.close();
     }
 
     /* (non-Javadoc)
@@ -277,6 +323,7 @@ public class SolarWarsServer extends SimpleApplication {
     @Override
     public void destroy() {
         if (serverState == ServerState.CLOSED) {
+            logger.warning("Server is already closed!");
             return;
         }
         connectedPlayers.clear();
@@ -285,11 +332,16 @@ public class SolarWarsServer extends SimpleApplication {
         registerListeners.clear();
 
         for (HostedConnection connection : gameServer.getConnections()) {
+            final String shutdownMsg = "Shutting down connection to #" + connection.getId() + " ...";
+            logger.info(shutdownMsg);
             connection.close("Shutting down...");
         }
-
+        long t1 = System.currentTimeMillis();
         while (gameServer.hasConnections()) {
         }
+        long t2 = System.currentTimeMillis();
+        final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
+        logger.info(timeMsg);
         gameServer.close();
         gameServer = null;
         serverApp = null;
@@ -297,6 +349,7 @@ public class SolarWarsServer extends SimpleApplication {
         serverState = ServerState.CLOSED;
         super.destroy();
         System.out.println("...Server closed!");
+        logger.info("...Server closed!");
     }
 
     /**
@@ -418,7 +471,8 @@ public class SolarWarsServer extends SimpleApplication {
             hc.setAttribute("PlayerName", p.getName());
 
             gameServer.broadcast(Filters.equalTo(hc), joiningPlayer);
-
+            final String connectMsg = "#" + p.getId() + "/" + p.getName() + " joined server.";
+            logger.log(Level.INFO, connectMsg, joiningPlayer);
             //Collection<HostedConnection> connections = gameServer.getConnections();
 
             for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
@@ -434,6 +488,11 @@ public class SolarWarsServer extends SimpleApplication {
                             isHost,
                             false);
                     gameServer.broadcast(Filters.equalTo(connection), otherPlayer);
+                    final String othersMsg =
+                            "Told #" + player.getId() + "/" + player.getName()
+                            + " that #" + p.getId() + "/" + p.getName()
+                            + " joined server.";
+                    logger.log(Level.INFO, othersMsg, joiningPlayer);
                 }
             }
         } else {
@@ -441,6 +500,9 @@ public class SolarWarsServer extends SimpleApplication {
             PlayerLeavingMessage plm = new PlayerLeavingMessage(p);
 
             gameServer.broadcast(Filters.notEqualTo(hc), plm);
+            final String leavingMsg = "#" + p.getId() + "/" + p.getName() + " left server.";
+            logger.log(Level.INFO, leavingMsg, plm);
+
             connectedPlayers.remove(p);
         }
     }
@@ -484,16 +546,19 @@ public class SolarWarsServer extends SimpleApplication {
             if (message instanceof StringMessage) {
                 // do something with the message
                 StringMessage stringMessage = (StringMessage) message;
-                System.out.println(
-                        "Server received '"
+
+                final String msg = "Server received '"
                         + stringMessage.getMessage()
-                        + "' from client #" + source.getId());
+                        + "' from client #" + source.getId();
+                System.out.println(msg);
+                logger.log(Level.INFO, msg, stringMessage);
             } else if (message instanceof ChatMessage) {
                 ChatMessage chatMessage = (ChatMessage) message;
-
                 ChatMessage aPlayerSays = new ChatMessage(chatMessage.getPlayerID(), chatMessage.getMessage());
 
                 gameServer.broadcast(Filters.notEqualTo(source), aPlayerSays);
+                final String chatMsg = "#" + chatMessage.getPlayerID() + " says " + chatMessage.getMessage();
+                logger.log(Level.INFO, chatMsg, chatMessage);
             }
         }
     }
@@ -518,7 +583,6 @@ public class SolarWarsServer extends SimpleApplication {
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlanetActionMessage) {
                 PlanetActionMessage clientMessage = (PlanetActionMessage) message;
-
                 PlanetActionMessage serverMessage =
                         new PlanetActionMessage(
                         clientMessage.getClientTime(),
@@ -529,6 +593,13 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getPlanetID());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
+                final String planetActionMsg =
+                        "Client@" + new Date(clientMessage.getClientTime()).toString()
+                        + " | " + clientMessage.getActionName() + " from #"
+                        + clientMessage.getPlayerID()
+                        + "/" + clientMessage.getPlayerState().name
+                        + " moves ships to planet #" + clientMessage.getPlanetID();
+                logger.log(Level.INFO, planetActionMsg, serverMessage);
             } else if (message instanceof GeneralActionMessage) {
                 GeneralActionMessage clientMessage = (GeneralActionMessage) message;
 
@@ -541,6 +612,13 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getRecieverState());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
+                final String generalMsg =
+                        clientMessage.getActionName() + " from #"
+                        + clientMessage.getSender()
+                        + "/" + clientMessage.getSenderState().name
+                        + " to #" + clientMessage.getReciever()
+                        + "/" + clientMessage.getRecieverState().name;
+                logger.log(Level.INFO, generalMsg, serverMessage);
             }
         }
     }

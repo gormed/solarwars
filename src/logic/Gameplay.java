@@ -52,6 +52,8 @@ public class Gameplay {
     public static final String PLANET_CAPTURE = "CapturePlanet";
     /** The Constant GAME_OVER. */
     public static final String GAME_OVER = "GameOver";
+    /** The Constant GAME_OVER. */
+    public static final String DEFEATED = "Defeated";
     /** The game. */
     private SolarWarsGame game;
     /** The application. */
@@ -304,7 +306,15 @@ public class Gameplay {
 //                }
             }
         };
+        
+        GeneralAction playerDefeated = new GeneralAction(DEFEATED) {
+
+            @Override
+            void doAction(Object sender, Player a, Player b) {
+            }
+        };
 
         actionLib.getGeneralActions().put(GAME_OVER, gameOver);
+        actionLib.getGeneralActions().put(DEFEATED, playerDefeated);
     }
 }

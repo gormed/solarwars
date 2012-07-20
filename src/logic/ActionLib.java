@@ -24,6 +24,8 @@ package logic;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
 import java.util.HashMap;
+import java.util.logging.Logger;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class ActionLib.
@@ -38,6 +40,7 @@ public class ActionLib {
     private HashMap<String, ShipGroupAction> shipActions;
     /** The instance. */
     private static ActionLib instance;
+    private static final Logger logger = Logger.getLogger(ActionLib.class.getName());
 
     /**
      * Gets the single instance of ActionLib.
@@ -55,6 +58,9 @@ public class ActionLib {
      * Instantiates a new action lib.
      */
     private ActionLib() {
+        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+        logger.setParent(SolarWarsApplication.getClientLogger());
+        logger.setUseParentHandlers(true);
         generalActions = new HashMap<String, GeneralAction>();
         planetActions = new HashMap<String, PlanetAction>();
         shipActions = new HashMap<String, ShipGroupAction>();
@@ -105,12 +111,22 @@ public class ActionLib {
         // if invoked from other client dont resend
         if (sender instanceof MultiplayerGameplay) {
             generalActions.get(actionName).doAction(sender, a, b);
-        // else if invoked from this client, send via network to server
+            final String generalActionMsg = "GeneralAction invoked for another "
+                    + "player via Network, type is " + actionName + " from #"
+                    + a.getId() + "/" + a.getName();
+            logger.log(java.util.logging.Level.FINE, generalActionMsg,
+                    new Object[]{a, b});
+            // else if invoked from this client, send via network to server
         } else {
             generalActions.get(actionName).doAction(sender, a, b);
             if (MultiplayerGameplay.isInitialized()) {
                 MultiplayerGameplay.getInstance().sendGeneralActionMessage(actionName, a, b);
             }
+            final String generalActionMsg = "GeneralAction invoked for local player"
+                    + ", type is " + actionName + " from #"
+                    + a.getId() + "/" + a.getName();
+            logger.log(java.util.logging.Level.FINE, generalActionMsg,
+                    new Object[]{a, b});
         }
     }
 
@@ -126,12 +142,30 @@ public class ActionLib {
         // if invoked from other client dont resend
         if (sender instanceof MultiplayerGameplay) {
             planetActions.get(actionName).doAction(sender, delay, planet, p);
-        // else if invoked from this client, send via network to server
+            String planetActionMsg = "PlanetAction invoked for another "
+                    + "player via Network, type is " + actionName;
+            if (p != null && planet != null) {
+                planetActionMsg +=
+                        " from #" + p.getId() + "/"
+                        + p.getName() + " to planet #" + planet.getId();
+            }
+            logger.log(java.util.logging.Level.FINE, planetActionMsg,
+                    new Object[]{planet, p});
+            // else if invoked from this client, send via network to server
         } else {
             planetActions.get(actionName).doAction(sender, delay, planet, p);
             if (MultiplayerGameplay.isInitialized()) {
                 MultiplayerGameplay.getInstance().sendPlanetActionMessage(actionName, planet);
             }
+            String planetActionMsg = "PlanetAction invoked for local player, "
+                    + "type is " + actionName;
+            if (p != null && planet != null) {
+                planetActionMsg +=
+                        " from #" + p.getId() + "/"
+                        + p.getName() + " to planet #" + planet.getId();
+            }
+            logger.log(java.util.logging.Level.FINE, planetActionMsg,
+                    new Object[]{planet, p});
         }
     }
 
@@ -145,5 +179,11 @@ public class ActionLib {
      */
     public void invokeShipAction(Object sender, long delay, ShipGroup shipGroup, Player p, String actionName) {
         shipActions.get(actionName).doAction(sender, shipGroup, p);
+        final String shipActionMsg =
+                "ShipAction is invoked for local player, type " + actionName
+                + " for player #" + p.getId() + "/" + p.getName()
+                + " for shipgroup #" + shipGroup.getId();
+        logger.log(java.util.logging.Level.FINE,
+                shipActionMsg, new Object[]{shipGroup, p});
     }
 }

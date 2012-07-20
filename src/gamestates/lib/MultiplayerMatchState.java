@@ -43,6 +43,7 @@ import net.NetworkManager;
 import net.SolarWarsServer;
 import solarwars.AudioManager;
 import solarwars.Hub;
+import solarwars.InputMappings;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -181,19 +182,19 @@ public class MultiplayerMatchState extends Gamestate {
         pauseListener = new PauseActionListener();
 
         application.getInputManager().addMapping(
-                SolarWarsApplication.INPUT_MAPPING_PAUSE,
+                InputMappings.KEYBOARD_PAUSE,
                 new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),
                 new KeyTrigger(KeyInput.KEY_ESCAPE));
         game.getApplication().getInputManager().addListener(
                 pauseListener,
-                SolarWarsApplication.INPUT_MAPPING_PAUSE);
+                InputMappings.KEYBOARD_PAUSE);
         tabScores = new ScoresGUI(gui);
         //tabScores.setVisible(false);
         application.getInputManager().
                 addListener(
                 tabScores.getActionListener(),
-                SolarWarsApplication.INPUT_MAPPING_TABSCORE);
+                InputMappings.KEYBOARD_TABSCORE);
         NetworkManager.getInstance().getChatModule().changeGUI(gui);
     }
 
@@ -258,7 +259,7 @@ public class MultiplayerMatchState extends Gamestate {
             if (isPressed) {
                 return;
             }
-            if (name.equals(SolarWarsApplication.INPUT_MAPPING_PAUSE)) {
+            if (name.equals(InputMappings.KEYBOARD_PAUSE)) {
                 pause.togglePause();
             }
         }

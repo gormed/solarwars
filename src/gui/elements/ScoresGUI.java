@@ -33,6 +33,7 @@ import logic.Gameplay;
 import logic.Level;
 import logic.Player;
 import solarwars.Hub;
+import solarwars.InputMappings;
 import solarwars.SolarWarsApplication;
 
 /**
@@ -622,11 +623,12 @@ public class ScoresGUI extends GUIElement {
         /* (non-Javadoc)
          * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
          */
+        @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (isPressed && name.equals(SolarWarsApplication.INPUT_MAPPING_TABSCORE)) {
+            if (isPressed && name.equals(InputMappings.KEYBOARD_TABSCORE)) {
                 //setVisible(show = true);
                 startFadeIn();
-            } else if (!isPressed && name.equals(SolarWarsApplication.INPUT_MAPPING_TABSCORE)) {
+            } else if (!isPressed && name.equals(InputMappings.KEYBOARD_TABSCORE)) {
                 //setVisible(show = false);
                 startFadeOut();
             }

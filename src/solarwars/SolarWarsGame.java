@@ -31,6 +31,8 @@ import gamestates.lib.MultiplayerState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.ActionLib;
 import net.NetworkManager;
 
@@ -46,6 +48,8 @@ public class SolarWarsGame {
      * Instantiates a new solar wars game.
      */
     private SolarWarsGame() {
+        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+        logger.setUseParentHandlers(true);
     }
 
     /**
@@ -86,6 +90,7 @@ public class SolarWarsGame {
     private ActionLib actionLib;
     /** The audio manager. */
     private AudioManager audioManager;
+    private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
 
     /**
      * Initializes the.
@@ -106,7 +111,7 @@ public class SolarWarsGame {
         fontLoader = FontLoader.getInstance();
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
-
+        logger.info("SolarWarsGame initialized!");
 
     }
 
@@ -132,6 +137,7 @@ public class SolarWarsGame {
         gamestateManager.initialize(m);
         // start the game with the init state
         gamestateManager.start();
+        logger.info("SolarWarsGame started!");
     }
 
     /**
@@ -139,6 +145,7 @@ public class SolarWarsGame {
      */
     public void pause() {
         gamestateManager.pause();
+        logger.info("SolarWarsGame paused!");
     }
 
     /**
@@ -146,6 +153,7 @@ public class SolarWarsGame {
      */
     public void resume() {
         gamestateManager.resume();
+        logger.info("SolarWarsGame resumed!");
     }
 
     /**
@@ -153,6 +161,7 @@ public class SolarWarsGame {
      */
     public void reset() {
         gamestateManager.reset();
+        logger.info("SolarWarsGame reset!");
     }
 
     /**
@@ -160,6 +169,7 @@ public class SolarWarsGame {
      */
     public void terminate() {
         gamestateManager.terminate();
+        logger.info("SolarWarsGame terminated!");
     }
 
     /**
@@ -169,6 +179,5 @@ public class SolarWarsGame {
      */
     void update(float tpf) {
         gamestateManager.update(tpf);
-
     }
 }

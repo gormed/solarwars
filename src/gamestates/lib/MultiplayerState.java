@@ -274,7 +274,10 @@ public class MultiplayerState extends Gamestate {
                 gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
             }
         } else {
-            serverip.setCaption("255.255.255.255");
+            AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
+            ip = NetworkManager.getInstance().getClientIPAdress().getHostAddress();
+            serverip.setCaption(ip);
+            Ergonomics.getInstance().setIpAddress(ip);
         }
     }
 }

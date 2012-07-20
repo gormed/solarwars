@@ -29,8 +29,8 @@ import gui.GameGUI;
 import gui.elements.ChatGUI;
 import logic.Player;
 import net.messages.ChatMessage;
+import solarwars.InputMappings;
 import solarwars.IsoCamera;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class ChatModule.
@@ -73,8 +73,8 @@ public class ChatModule implements ActionListener {
         this.networkManager = networkManager;
         this.chatGUI = new ChatGUI(gameGUI, this);
         this.gameGUI = gameGUI;
-        inputManager.addMapping(SolarWarsApplication.INPUT_MAPPING_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
-        inputManager.addListener(this, SolarWarsApplication.INPUT_MAPPING_CHAT);
+        inputManager.addMapping(InputMappings.KEYBOARD_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
+        inputManager.addListener(this, InputMappings.KEYBOARD_CHAT);
         chatGUI.setVisible(false);
         gameGUI.addGUIElement(chatGUI);
         chatGUI.hide();
@@ -161,7 +161,7 @@ public class ChatModule implements ActionListener {
      */
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        if (!isPressed && name.equals(SolarWarsApplication.INPUT_MAPPING_CHAT)) {
+        if (!isPressed && name.equals(InputMappings.KEYBOARD_CHAT)) {
             visible = !visible;
             if (visible) {
                 chatGUI.show();

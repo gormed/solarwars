@@ -183,12 +183,6 @@ public class MultiplayerGameplay {
 
             } else if (m instanceof LevelActionMessage) {
                 LevelActionMessage actionMessage = (LevelActionMessage) m;
-
-//                for (Map.Entry<Integer, Integer> entry : actionMessage.getPlanetShipCount().entrySet()) {
-//                    int id = entry.getKey();
-//                    int shipCount = entry.getValue();
-//                    Gameplay.getCurrentLevel().getPlanet(id).setShipCount(shipCount);
-//                }
                 double tick = Gameplay.getGameTick();
                 double serverTick = actionMessage.getGameTick();
                 double tickDiff = tick - serverTick;
@@ -196,7 +190,7 @@ public class MultiplayerGameplay {
                 double tickDelay = currentTickDiff - lastTickDiff;
                 long currentTime = System.currentTimeMillis();
                 long delay = currentTime - actionMessage.getServerTime();
-//                SolarWarsApplication.getInstance().syncronize((float) tickDelay);
+                
                 if (MULTIPLAYER_GAMEPLAY_DEBUG) {
                     System.out.println(
                             currentTime
@@ -204,8 +198,8 @@ public class MultiplayerGameplay {
                             + " - tickDelay: " + String.format("%1.4f", (float) tickDelay)
                             + " - tickDiff: " + String.format("%1.3f", (float) tickDiff));
                 }
-                SolarWarsApplication.getInstance().syncronize((float) tickDelay);
-//                SolarWarsApplication.getInstance().syncronize(delay * .001f);
+                SolarWarsApplication.getInstance().syncronize((float) (tickDelay));
+                Gameplay.GAMETICK += tickDelay;
                 lastTickDiff = currentTickDiff;
             }
             synchronized (recievedMessages) {

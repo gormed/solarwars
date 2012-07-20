@@ -22,6 +22,9 @@
 package gamestates;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class GamestateManager.
@@ -42,7 +45,6 @@ public class GamestateManager {
     public static final String SERVER_LOBBY_STATE = "Server Lobby";
     /** The Constant MULTIPLAYER_MATCH_STATE. */
     public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
-    
     /** The Constant TUTORIAL_STATE. */
     public static final String TUTORIAL_STATE = "Tutorial";
     /** The instance. */
@@ -53,7 +55,7 @@ public class GamestateManager {
     private Gamestate currentState;
     /** The next state. */
     private Gamestate nextState;
-    
+    private static final Logger logger = Logger.getLogger(GamestateManager.class.getName());
     /** The lock update. */
     private static volatile boolean lockUpdate = false;
 
@@ -84,6 +86,9 @@ public class GamestateManager {
      * Instantiates a new gamestate manager.
      */
     private GamestateManager() {
+        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+        logger.setUseParentHandlers(true);
+        logger.setParent(SolarWarsApplication.getClientLogger());
         gamestates = new HashMap<String, Gamestate>();
     }
 
@@ -107,6 +112,8 @@ public class GamestateManager {
     public void initialize(Gamestate startState) {
         addState(startState);
         currentState = startState;
+        final String initMsg = "GamestateManager initialized with start-state " + currentState.getName();
+        logger.info(initMsg);
     }
 
     /**
@@ -114,6 +121,8 @@ public class GamestateManager {
      */
     public void start() {
         currentState.enter();
+        final String startMsg = "GamestateManager started, entering " + currentState.getName() + "...";
+        logger.info(startMsg);
     }
 
     /**
@@ -125,13 +134,15 @@ public class GamestateManager {
         lock();
         if (gamestates.containsKey(nextState)) {
             this.nextState = gamestates.get(nextState);
-            
+
             this.currentState.leave();
+            final String leaveStateMsg = "Gamestate: " + currentState.getName() + " left!";
+            logger.info(leaveStateMsg);
             this.currentState = null;
             this.nextState.enter();
-            
+            final String enterStateMsg = "Gamestate: " + nextState + " enterd!";
+            logger.info(enterStateMsg);
             this.currentState = this.nextState;
-            System.out.println("Gamestate: " + nextState + " enterd!");
         }
         unlock();
     }
@@ -143,7 +154,8 @@ public class GamestateManager {
      */
     public void addState(Gamestate g) {
         gamestates.put(g.getName(), g);
-        System.out.println("Gamestate: " + g.getName() + " added!");
+        final String gsAddedMsg = "Gamestate: " + g.getName() + " added!";
+        logger.info(gsAddedMsg);
     }
 
     /**
@@ -153,7 +165,8 @@ public class GamestateManager {
      */
     public void removeState(Gamestate g) {
         gamestates.remove(g.getName());
-        System.out.println("Gamestate: " + g.getName() + " removed!");
+        final String gsremovedMsg = "Gamestate: " + g.getName() + " removed!";
+        logger.info(gsremovedMsg);
     }
 
     /**

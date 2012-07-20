@@ -30,7 +30,17 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import gui.elements.TextBox;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import solarwars.InputMappings;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -43,16 +53,11 @@ public class GameGUI {
     SolarWarsGame game;
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElements;
-    
-    /** The add gui elements. */
-    volatile private ArrayList<GUIElement> addGUIElements;
-    
-    /** The remove gui elements. */
-    volatile private ArrayList<GUIElement> removeGUIElements;
     /** The width. */
     private float width;
     /** The action listener. */
-    private ActionListener actionListener;
+    private ActionListener clickActionListener;
+    private ActionListener keyActionListener;
     /** The focus. */
     private GUIElement focus;
     /** The height. */
@@ -61,6 +66,7 @@ public class GameGUI {
     private Node clickableNode;
     /** The deco node. */
     private Node decoNode;
+    private static final Logger logger = Logger.getLogger(GameGUI.class.getName());
 
     /**
      * Gets the height.
@@ -95,12 +101,12 @@ public class GameGUI {
      * @param game the game
      */
     public GameGUI(SolarWarsGame game) {
+
+        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
         this.game = game;
         this.width = game.getApplication().getCamera().getWidth();
         this.height = game.getApplication().getCamera().getHeight();
         this.guiElements = new ArrayList<GUIElement>();
-        this.addGUIElements = new ArrayList<GUIElement>();
-        this.removeGUIElements = new ArrayList<GUIElement>();
 
         this.clickableNode = new Node("ClickableGUI");
         this.decoNode = new Node("DecoNode");
@@ -112,11 +118,11 @@ public class GameGUI {
         guiNode.attachChild(decoNode);
         guiNode.attachChild(clickableNode);
 
-        this.actionListener = new ActionListener() {
+        this.clickActionListener = new ActionListener() {
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
-                if (name.equals(SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK)) {
+                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
                     //if (isPressed) {
                     // 1. Reset results list.
                     CollisionResults results = new CollisionResults();
@@ -129,19 +135,9 @@ public class GameGUI {
                     // 3. Collect intersections between Ray and Shootables in
                     // results list.
                     clickableNode.collideWith(ray, results);
-                    // 4. Print the results
-                    System.out.println("----- ScreenCollisions? " + results.size()
-                            + "-----");
-                    for (int i = 0; i < results.size(); i++) {
-                        // For each hit, we know distance, impact point, name of
-                        // geometry.
-                        float dist = results.getCollision(i).getDistance();
-                        Vector3f pt = results.getCollision(i).getContactPoint();
-                        String hit = results.getCollision(i).getGeometry().getName();
-                        System.out.println("* Collision #" + i);
-                        System.out.println("  You shot " + hit + " at " + pt
-                                + ", " + dist + " wu away.");
-                    }
+
+                    debugRaycasting(results);
+
                     // 5. Use the results (we mark the hit object)
                     if (results.size() > 0) {
                         // The closest collision point is what was truly hit:
@@ -151,6 +147,7 @@ public class GameGUI {
                         if (n instanceof ClickableGUI) {
 
                             clickableHit(n, click2d, isPressed, tpf);
+                            logGUIHit(isPressed, n);
                         }
 
                         Node parent = null;
@@ -158,11 +155,42 @@ public class GameGUI {
                         while (parent != null) {
 
                             clickableHit(parent, click2d, isPressed, tpf);
+                            logGUIHit(isPressed, parent);
                             parent = parent.getParent();
                         }
                     }
                 } else {
                 }
+            }
+
+            private void logGUIHit(boolean isPressed, Node n) {
+                if (isPressed) {
+                    final String clickMsg = "Clicked at GUI-Element " + n.getName();
+                    logger.info(clickMsg);
+                } else {
+                    final String releaseMsg = "Released at GUI-Element " + n.getName();
+                    logger.info(releaseMsg);
+                }
+            }
+
+            private void debugRaycasting(CollisionResults results) {
+                if (results.size() <= 0) {
+                    logger.log(Level.FINE, "Nothing was hit in GUI (2D) raycasting!", results);
+                    return;
+                }
+                logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
+                String hits = "";
+                for (int i = 0; i < results.size(); i++) {
+                    // For each hit, we know distance, impact point, name of
+                    // geometry.
+                    float dist = results.getCollision(i).getDistance();
+                    Vector3f pt = results.getCollision(i).getContactPoint();
+                    String hit = results.getCollision(i).getGeometry().getName();
+                    hits += "* Collision #" + i;
+                    hits += " - You shot " + hit + " at " + pt
+                            + ", " + dist + " wu away.\n";
+                }
+                logger.log(Level.FINER, hits, results);
             }
 
             private void clickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
@@ -182,9 +210,63 @@ public class GameGUI {
             }
             //}
         };
-        if (inputManager != null) {
-            inputManager.addListener(actionListener,
-                    SolarWarsApplication.INPUT_MAPPING_LEFT_CLICK);
+
+        this.keyActionListener = new ActionListener() {
+
+            private boolean ctrlHold = false;
+            private boolean vHold = false;
+
+            @Override
+            public void onAction(String name, boolean isPressed, float tpf) {
+                if (name.equals(InputMappings.KEYBOARD_CONTROL)) {
+                    ctrlHold = isPressed;
+                } else if (name.equals(InputMappings.KEY_V)) {
+                    vHold = isPressed;
+                }
+                if (ctrlHold && vHold) {
+                    if (focus != null && focus instanceof TextBox) {
+                        TextBox t = (TextBox) focus;
+                        t.setCaption(getClipboardContents());
+                    }
+                }
+            }
+
+            /**
+             * Get the String residing on the clipboard.
+             *
+             * @return any text found on the Clipboard; if none found, return an
+             * empty String.
+             */
+            public String getClipboardContents() {
+                String result = "";
+                Clipboard clipboard =
+                        Toolkit.getDefaultToolkit().getSystemClipboard();
+                //odd: the Object param of getContents is not currently used
+                Transferable contents = clipboard.getContents(null);
+                boolean hasTransferableText =
+                        (contents != null)
+                        && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+                if (hasTransferableText) {
+                    try {
+                        result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                    } catch (UnsupportedFlavorException ex) {
+                        //highly unlikely since we are using a standard DataFlavor
+                        Logger.getLogger(GameGUI.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(GameGUI.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                }
+                return result;
+            }
+        };
+
+
+        if (inputManager
+                != null) {
+            inputManager.addListener(clickActionListener,
+                    InputMappings.MOUSE_LEFT_CLICK);
+            inputManager.addListener(keyActionListener,
+                    InputMappings.KEYBOARD_CONTROL, InputMappings.KEY_V);
         }
     }
 
