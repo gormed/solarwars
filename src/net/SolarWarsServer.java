@@ -31,10 +31,12 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
+import com.jme3.network.kernel.KernelException;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -241,7 +243,6 @@ public class SolarWarsServer extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         try {
-
             gameServer = Network.createServer(
                     SERVER_NAME,
                     SERVER_VERSION,
@@ -255,10 +256,10 @@ public class SolarWarsServer extends SimpleApplication {
             //NetworkManager.getInstance().registerServerListeners();
             //addClientMessageListener(createServer.serverConListener, PlayerConnectingMessage.class, PlayerLeavingMessage.class);
             //gameServer.addConnectionListener(connections);
-
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
+
 
     }
 
@@ -311,10 +312,16 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void stop(boolean waitFor) {
-        System.out.println("Closing server...");
+//        System.out.println("Closing server...");
         logger.info("Closing server...");
+        long t1 = System.currentTimeMillis();
+
         super.stop(waitFor);
         serverLogFileHandler.close();
+
+        long t2 = System.currentTimeMillis();
+        final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
+        logger.info(timeMsg);
     }
 
     /* (non-Javadoc)
@@ -336,19 +343,14 @@ public class SolarWarsServer extends SimpleApplication {
             logger.info(shutdownMsg);
             connection.close("Shutting down...");
         }
-        long t1 = System.currentTimeMillis();
-        while (gameServer.hasConnections()) {
-        }
-        long t2 = System.currentTimeMillis();
-        final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
-        logger.info(timeMsg);
+
+
         gameServer.close();
         gameServer = null;
         serverApp = null;
         isRunning = false;
         serverState = ServerState.CLOSED;
         super.destroy();
-        System.out.println("...Server closed!");
         logger.info("...Server closed!");
     }
 
@@ -422,8 +424,8 @@ public class SolarWarsServer extends SimpleApplication {
      * @param hc the hc
      * @param classes the classes
      */
-    public void removeClientMessageListener(MessageListener<HostedConnection> hc, Class... classes) {
-        gameServer.removeMessageListener(hc, classes);
+    public void removeClientMessageListener(MessageListener hc) {
+        gameServer.removeMessageListener(hc);
     }
 
     /**

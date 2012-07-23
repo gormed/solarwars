@@ -35,12 +35,15 @@ import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import gui.elements.ScoresGUI;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import logic.Gameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
 import net.NetworkManager;
-import net.SolarWarsServer;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.InputMappings;
@@ -54,37 +57,26 @@ public class MultiplayerMatchState extends Gamestate {
 
     /** The gui. */
     private GameGUI gui;
-    
     /** The tab scores. */
     private ScoresGUI tabScores;
-    
     /** The game. */
     private SolarWarsGame game;
-    
     /** The pause listener. */
     private PauseActionListener pauseListener;
-    
     /** The pause. */
     private PauseGUI pause;
-    
     /** The hub. */
     private Hub hub;
-    
     /** The current level. */
     private Level currentLevel;
-    
     /** The gameplay. */
     private MultiplayerGameplay gameplay;
-    
     /** The client. */
     private Client client;
-    
     /** The application. */
     private final SolarWarsApplication application;
-    
     /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
-    
     /** The lost connection. */
     private boolean lostConnection;
 
@@ -138,17 +130,37 @@ public class MultiplayerMatchState extends Gamestate {
     @Override
     protected void unloadContent() {
         lostConnection = false;
+        NetworkManager networkManager = NetworkManager.getInstance();
+        networkManager.getChatModule().destroy();
 
-        NetworkManager.getInstance().getChatModule().destroy();
-        
-        Future fut = application.enqueue(new Callable<SolarWarsServer>() {
+        Future<Thread> fut = application.enqueue(new Callable<Thread>() {
 
             @Override
-            public SolarWarsServer call() throws Exception {
-                return NetworkManager.getInstance().closeAllConnections(true);
+            public Thread call() throws Exception {
+                return NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             }
         });
 
+        try {
+            Thread diconnector = fut.get(
+                    NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT, 
+                    TimeUnit.SECONDS);
+            diconnector.interrupt();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).
+                    log(java.util.logging.Level.SEVERE,
+                    ex.getMessage(), ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).
+                    log(java.util.logging.Level.SEVERE,
+                    ex.getMessage(), ex);
+        } catch (TimeoutException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).
+                    log(java.util.logging.Level.SEVERE,
+                    "Server did not shut down in time: {0} {1}",
+                    new Object[]{ex.getMessage(), ex});
+        }
+ 
         GameOverGUI.getInstance().hide();
         application.getInputManager().removeListener(pauseListener);
         pauseListener = null;
@@ -168,7 +180,7 @@ public class MultiplayerMatchState extends Gamestate {
         gameplay = null;
         application.detachIsoCameraControl();
 
-        
+
     }
 
     /**

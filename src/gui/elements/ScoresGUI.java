@@ -25,16 +25,19 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import entities.AbstractPlanet;
 import gui.GUIElement;
 import gui.GameGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import logic.Gameplay;
 import logic.Level;
 import logic.Player;
 import solarwars.Hub;
 import solarwars.InputMappings;
 import solarwars.SolarWarsApplication;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class ScoresGUI.
@@ -68,15 +71,15 @@ public class ScoresGUI extends GUIElement {
     /** The background. */
     private Panel background;
     /** The head name label. */
-    private Label headNameLabel;
+    private TexturedPanel headNamePanel;
     /** The head ships label. */
-    private Label headShipsLabel;
+    private TexturedPanel headShipsPanel;
     /** The head planets label. */
-    private Label headPlanetsLabel;
+    private TexturedPanel headPlanetsPanel;
     /** The head percent label. */
-    private Label headPercentLabel;
+    private TexturedPanel headPercentPanel;
     /** The head state label. */
-    private Label headStateLabel;
+    private TexturedPanel headStatePanel;
     /** The head color label. */
     private Label headColorLabel;
     /** The background frame. */
@@ -140,7 +143,7 @@ public class ScoresGUI extends GUIElement {
         this.attachChild(background);
         this.attachChild(backgroundFrame);
         createTable(background, 0.6f);
-        this.attachChild(headNameLabel);
+        this.attachChild(headNamePanel);
         this.attachChild(scoresLabel);
         for (ScoresLine l : playerLabels) {
             this.attachChild(l);
@@ -159,86 +162,39 @@ public class ScoresGUI extends GUIElement {
     private void createTable(Panel parentPanel, float scale) {
         ColorRGBA textColor = ColorRGBA.Orange;
         float height = 7.2f * gui.getHeight() / 10;
-        this.headNameLabel = new Label(
+        this.headNamePanel = new TexturedPanel(
                 "NAME",
-                new Vector3f(parentPanel.getSize().x / 3, height, 0),
-                Vector3f.UNIT_XYZ.clone().multLocal(scale),
-                textColor,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        this.headShipsLabel = new Label(
+                new Vector3f(1.4f * parentPanel.getSize().x / 3, height, 0),
+                Vector2f.UNIT_XY.clone().multLocal(24f),
+                "Interface/player_icon.png");
+        
+        this.headShipsPanel = new TexturedPanel(
                 "SHIPS",
-                new Vector3f(2 * parentPanel.getSize().x / 3, height, 0),
-                Vector3f.UNIT_XYZ.clone().multLocal(scale),
-                textColor,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-        this.headPlanetsLabel = new Label(
+                new Vector3f(2.5f * parentPanel.getSize().x / 3, height, 0),
+                Vector2f.UNIT_XY.clone().multLocal(20f),
+                "Interface/ship_icon.png");
+        
+        this.headPlanetsPanel = new TexturedPanel(
                 "PLANETS",
-                new Vector3f(0.95f * parentPanel.getSize().x, height, 0),
-                Vector3f.UNIT_XYZ.clone().multLocal(scale),
-                textColor,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-        this.headPercentLabel = new Label(
+                new Vector3f(3.15f * parentPanel.getSize().x / 3, height, 0),
+                Vector2f.UNIT_XY.clone().multLocal(25f),
+                "Interface/planet_icon.png");
+        
+        this.headPercentPanel = new TexturedPanel(
                 "% OF ALL",
                 new Vector3f(3.8f * parentPanel.getSize().x / 3, height, 0),
-                Vector3f.UNIT_XYZ.clone().multLocal(scale),
-                textColor,
-                gui) {
+                Vector2f.UNIT_XY.clone().multLocal(24f),
+                "Interface/power_icon.png");
 
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-        this.headStateLabel = new Label(
-                "STATE",
-                new Vector3f(4.7f * parentPanel.getSize().x / 3, height, 0),
-                Vector3f.UNIT_XYZ.clone().multLocal(scale),
-                textColor,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
+        this.headStatePanel = new TexturedPanel(
+                "Gain",
+                new Vector3f(4.6f * parentPanel.getSize().x / 3, height-0.1f, 0),
+                Vector2f.UNIT_XY.clone().multLocal(24f),
+                "Interface/gain_icon.png");
 
         this.headColorLabel = new Label(
                 "Color",
-                new Vector3f(5.55f * parentPanel.getSize().x / 3, height, 0),
+                new Vector3f(5.4f * parentPanel.getSize().x / 3, height, 0),
                 Vector3f.UNIT_XYZ.clone().multLocal(scale),
                 textColor,
                 gui) {
@@ -253,11 +209,11 @@ public class ScoresGUI extends GUIElement {
         };
 
         attachChild(headColorLabel);
-        attachChild(headNameLabel);
-        attachChild(headPercentLabel);
-        attachChild(headShipsLabel);
-        attachChild(headStateLabel);
-        attachChild(headPlanetsLabel);
+        attachChild(headNamePanel);
+        attachChild(headPercentPanel);
+        attachChild(headShipsPanel);
+        attachChild(headStatePanel);
+        attachChild(headPlanetsPanel);
 
     }
 
@@ -345,12 +301,12 @@ public class ScoresGUI extends GUIElement {
         background.setVisible(show);
         backgroundFrame.setVisible(show);
         scoresLabel.setVisible(show);
-        headNameLabel.setVisible(show);
-        headNameLabel.setVisible(show);
-        headPercentLabel.setVisible(show);
-        headShipsLabel.setVisible(show);
-        headStateLabel.setVisible(show);
-        headPlanetsLabel.setVisible(show);
+        headNamePanel.setVisible(show);
+        headNamePanel.setVisible(show);
+        headPercentPanel.setVisible(show);
+        headShipsPanel.setVisible(show);
+        headStatePanel.setVisible(show);
+        headPlanetsPanel.setVisible(show);
         headColorLabel.setVisible(show);
         for (ScoresLine l : playerLabels) {
             l.setVisible(show);
@@ -412,6 +368,10 @@ public class ScoresGUI extends GUIElement {
      */
     private class ScoresLine extends GUIElement {
 
+        private float avgSize;
+        private float globalSize;
+        private float avgGrowth;
+        private float growthPerSecond;
         /** The player name label. */
         private Label playerNameLabel;
         /** The player ships label. */
@@ -421,7 +381,8 @@ public class ScoresGUI extends GUIElement {
         /** The player percent label. */
         private Label playerPercentLabel;
         /** The player state label. */
-        private Label playerStateLabel;
+        private Label playerGrowthPerSecLabel;
+        private TexturedPanel playerStatePanel;
         /** The player color panel. */
         private Panel playerColorPanel;
         /** The player. */
@@ -440,6 +401,8 @@ public class ScoresGUI extends GUIElement {
                 float scale,
                 ColorRGBA textColor,
                 Panel parentPanel) {
+            avgSize = 0;
+            globalSize = 0;
 
             this.player = p;
             float percent = 0;
@@ -462,9 +425,14 @@ public class ScoresGUI extends GUIElement {
             //textColor.addLocal(playerColor.clone().multLocal(0.1f));
             textColor.a = 1.0f;
 
+            this.playerStatePanel = new TexturedPanel("PlayerState",
+                    new Vector3f(0.4f * parentPanel.getSize().x / 3, -5f, 0),
+                    Vector2f.UNIT_XY.clone().multLocal(10f),
+                    "Interface/state_plays.png");
+
             this.playerNameLabel = new Label(
                     playerName,
-                    new Vector3f(parentPanel.getSize().x / 3, 0, 0),
+                    new Vector3f(1.4f * parentPanel.getSize().x / 3, 0, 0),
                     Vector3f.UNIT_XYZ.clone().multLocal(scale),
                     textColor,
                     gui) {
@@ -480,7 +448,7 @@ public class ScoresGUI extends GUIElement {
 
             this.playerShipsLabel = new Label(
                     ships + "",
-                    new Vector3f(2 * parentPanel.getSize().x / 3, 0, 0),
+                    new Vector3f(2.35f * parentPanel.getSize().x / 3, 0, 0),
                     Vector3f.UNIT_XYZ.clone().multLocal(scale),
                     textColor,
                     gui) {
@@ -493,9 +461,10 @@ public class ScoresGUI extends GUIElement {
                 public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 }
             };
+
             this.playerPlanetsLabel = new Label(
                     planets + "",
-                    new Vector3f(0.95f * parentPanel.getSize().x, 0, 0),
+                    new Vector3f(3.2f * parentPanel.getSize().x / 3, 0, 0),
                     Vector3f.UNIT_XYZ.clone().multLocal(scale),
                     textColor,
                     gui) {
@@ -508,9 +477,10 @@ public class ScoresGUI extends GUIElement {
                 public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 }
             };
+
             this.playerPercentLabel = new Label(
                     (int) percent + " %",
-                    new Vector3f(3.75f * parentPanel.getSize().x / 3, 0, 0),
+                    new Vector3f(3.8f * parentPanel.getSize().x / 3, 0, 0),
                     Vector3f.UNIT_XYZ.clone().multLocal(scale),
                     textColor,
                     gui) {
@@ -523,9 +493,10 @@ public class ScoresGUI extends GUIElement {
                 public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
                 }
             };
-            this.playerStateLabel = new Label(
+
+            this.playerGrowthPerSecLabel = new Label(
                     state,
-                    new Vector3f(4.85f * parentPanel.getSize().x / 3, 0, 0),
+                    new Vector3f(4.8f * parentPanel.getSize().x / 3, 0, 0),
                     Vector3f.UNIT_XYZ.clone().multLocal(scale),
                     textColor,
                     gui) {
@@ -541,7 +512,7 @@ public class ScoresGUI extends GUIElement {
 
             this.playerColorPanel = new Panel(
                     "PlayerColor",
-                    new Vector3f(5.55f * parentPanel.getSize().x / 3, -2, 0),
+                    new Vector3f(5.4f * parentPanel.getSize().x / 3, -2, 0),
                     Vector2f.UNIT_XY.clone().multLocal(15f),
                     playerColor);
             //playerColorPanel.material.setColor("GlowColor", playerColor);
@@ -549,7 +520,8 @@ public class ScoresGUI extends GUIElement {
             attachChild(playerNameLabel);
             attachChild(playerPercentLabel);
             attachChild(playerShipsLabel);
-            attachChild(playerStateLabel);
+            attachChild(playerStatePanel);
+            attachChild(playerGrowthPerSecLabel);
             attachChild(playerPlanetsLabel);
             attachChild(playerColorPanel);
         }
@@ -563,7 +535,8 @@ public class ScoresGUI extends GUIElement {
             playerNameLabel.setVisible(show);
             playerPercentLabel.setVisible(show);
             playerShipsLabel.setVisible(show);
-            playerStateLabel.setVisible(show);
+            playerStatePanel.setVisible(show);
+            playerGrowthPerSecLabel.setVisible(show);
             playerPlanetsLabel.setVisible(show);
             playerColorPanel.setVisible(show);
         }
@@ -574,36 +547,85 @@ public class ScoresGUI extends GUIElement {
         @Override
         public void updateGUI(float tpf) {
             float percent = 0;
+            float growth = 0;
             Level l = Gameplay.getCurrentLevel();
             if (l != null) {
-                percent =
-                        (float) player.getPlanetCount()
-                        / (float) l.getPlanetSet().size();
+                calculateGrowthAndGain();
+//                percent = 
+//                        (float) player.getPlanetCount()
+//                        / (float) l.getPlanetSet().size();
+//                percent *= 100;
+                percent = getPercentageOfGain();
                 percent *= 100;
+                growth = getAvgGrowthPerSecond();
+
             }
 
-            String playerName = player.getName();
             int ships = player.getShipCount();
-
             int planets = player.getPlanetCount();
-            String state = (player.hasLost() ? "LOST" : "PLAYS");
-            ColorRGBA playerColor = player.getColor();
+            String iconPath = getIconPath();
 
-            playerColorPanel.material.setColor("Color", playerColor);
-            playerNameLabel.setCaption(playerName);
             playerPercentLabel.setCaption((int) percent + " %");
             playerPlanetsLabel.setCaption(planets + "");
             playerShipsLabel.setCaption(ships + "");
-            playerStateLabel.setCaption(state);
+            playerStatePanel.changeTexture(iconPath);
+            playerGrowthPerSecLabel.setCaption((int) growth + "");
 
             playerNameLabel.updateGUI(tpf);
             playerPercentLabel.updateGUI(tpf);
             playerShipsLabel.updateGUI(tpf);
-            playerStateLabel.updateGUI(tpf);
+            playerStatePanel.updateGUI(tpf);
             playerPlanetsLabel.updateGUI(tpf);
             playerColorPanel.updateGUI(tpf);
+            playerGrowthPerSecLabel.updateGUI(tpf);
 
 
+        }
+
+        private String getIconPath() {
+            String iconPath = "Interface/state_pause.png";
+            if (player.hasLost()) {
+                return iconPath = "Interface/state_stop.png";
+            }
+            if (!player.hasLost() && !SolarWarsApplication.getInstance().isPaused()) {
+                return iconPath = "Interface/state_plays.png";
+            }
+            return iconPath;
+        }
+
+        private void calculateGrowthAndGain() {
+            float size = 0;
+            float growth = 0;
+            avgSize = 0;
+            avgGrowth = 0;
+            globalSize = 0;
+            growthPerSecond = 0;
+            
+            for (AbstractPlanet p : player.getPlanets()) {
+                size = p.getSizeID();
+                growth += Level.PLANET_INCREMENT_TIME[p.getSizeID()];
+                avgSize += size;
+
+            }
+            avgGrowth = growth / (float) player.getPlanets().size();
+            float times = 1.0f / avgGrowth;
+            growthPerSecond = times * (float) player.getPlanets().size();
+            for (Entry<Integer, AbstractPlanet> e : Gameplay.getCurrentLevel().getPlanetSet()) {
+                size = e.getValue().getSizeID();
+                globalSize += size;
+
+            }
+
+//            avgSize /= (float) player.getPlanetCount();
+//            globalSize /= (float) Gameplay.getCurrentLevel().getPlanetSet().size();
+        }
+
+        private float getPercentageOfGain() {
+            return avgSize / globalSize;
+        }
+
+        private float getAvgGrowthPerSecond() {
+            return growthPerSecond;
         }
     }
 

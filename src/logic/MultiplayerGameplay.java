@@ -26,7 +26,6 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import entities.AbstractPlanet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import net.NetworkManager;
 import net.messages.GeneralActionMessage;
@@ -82,13 +81,58 @@ public class MultiplayerGameplay {
     /** The client. */
     private Client client;
     /** The gameplay listener. */
-    private ClientGameplayListener gameplayListener = new ClientGameplayListener();
+    private ClientGameplayListener gameplayListener =
+            new ClientGameplayListener();
     /** The action lib. */
     private ActionLib actionLib = ActionLib.getInstance();
     /** The recieved messages. */
-    private volatile Queue<Message> recievedMessages = new LinkedList<Message>();
+    private volatile Queue<Message> recievedMessages =
+            new LinkedList<Message>();
     private double currentTickDiff = 0;
     private double lastTickDiff = 0;
+
+    /**
+     * Destroys the gameplay on exit.
+     */
+    public void destroy() {
+        synchronized (recievedMessages) {
+            recievedMessages.clear();
+            recievedMessages = null;
+        }
+        removeGameplayListener();
+        gameplayListener = null;
+
+        instance = null;
+
+    }
+
+    public void addGameplayListener() {
+        if (client != null && gameplayListener != null) {
+            client.addMessageListener(
+                    gameplayListener,
+                    PlanetActionMessage.class,
+                    GeneralActionMessage.class);
+        }
+    }
+
+    public void removeGameplayListener() {
+        if (client != null && gameplayListener != null) {
+            client.removeMessageListener(
+                    gameplayListener,
+                    PlanetActionMessage.class,
+                    GeneralActionMessage.class);
+        }
+    }
+    //==========================================================================
+    //          SEND MESSAGES OVER NETWORK TO OTHER PLAYERS
+    //==========================================================================
+    /**
+     * Checks if game still needs to send messages to other players via network.
+     * @return true if still running a game, false otherwise
+     */
+    private boolean gameIsNotRunning() {
+        return client == null || !client.isConnected() || Gameplay.getCurrentLevel().isGameOver();
+    }
 
     /**
      * Send planet action message.
@@ -97,7 +141,7 @@ public class MultiplayerGameplay {
      * @param planet the planet
      */
     public void sendPlanetActionMessage(String actionName, AbstractPlanet planet) {
-        if (client == null || !client.isConnected()) {
+        if (gameIsNotRunning()) {
             return;
         }
         int id = -1;
@@ -124,7 +168,7 @@ public class MultiplayerGameplay {
      * @param reciever the reciever
      */
     public void sendGeneralActionMessage(String actionName, Player sender, Player reciever) {
-        if (client == null || !client.isConnected()) {
+        if (gameIsNotRunning()) {
             return;
         }
         GeneralActionMessage generalActionMessage;
@@ -146,9 +190,14 @@ public class MultiplayerGameplay {
         }
         client.send(generalActionMessage);
     }
+    
+    //==========================================================================
+    //          RECIEVE MESSAGES FROM OTHER OVER NETWORK
+    //==========================================================================
 
     /**
-     * Updates the MultiplayerGameplay by polling the next network message from the queque.
+     * Updates the MultiplayerGameplay by polling the next network message 
+     * from the queque.
      *
      * @param tpf the tpf
      */
@@ -179,28 +228,19 @@ public class MultiplayerGameplay {
                         serverMessage.getActionName());
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
-
-
+                
+                Player a = Hub.getPlayers().get(serverMessage.getSender());
+                Player b = Hub.getPlayers().get(serverMessage.getReciever());
+                a.applyState(serverMessage.getSenderState());
+                b.applyState(serverMessage.getRecieverState());
+                
+                actionLib.invokeGeneralAction(
+                        MultiplayerGameplay.getInstance(), 
+                        a, b, 
+                        serverMessage.getActionName());
             } else if (m instanceof LevelActionMessage) {
                 LevelActionMessage actionMessage = (LevelActionMessage) m;
-                double tick = Gameplay.getGameTick();
-                double serverTick = actionMessage.getGameTick();
-                double tickDiff = tick - serverTick;
-                currentTickDiff = tickDiff;
-                double tickDelay = currentTickDiff - lastTickDiff;
-                long currentTime = System.currentTimeMillis();
-                long delay = currentTime - actionMessage.getServerTime();
-                
-                if (MULTIPLAYER_GAMEPLAY_DEBUG) {
-                    System.out.println(
-                            currentTime
-                            + " - delay: " + delay
-                            + " - tickDelay: " + String.format("%1.4f", (float) tickDelay)
-                            + " - tickDiff: " + String.format("%1.3f", (float) tickDiff));
-                }
-                SolarWarsApplication.getInstance().syncronize((float) (tickDelay));
-                Gameplay.GAMETICK += tickDelay;
-                lastTickDiff = currentTickDiff;
+                syncronizeClient(actionMessage);
             }
             synchronized (recievedMessages) {
                 recievedMessages.remove(m);
@@ -209,24 +249,32 @@ public class MultiplayerGameplay {
     }
 
     /**
-     * Destroys the gameplay on exit.
+     * Syncs the client with the servers action message. Gives the client the
+     * current game tick from the server and calculates the message delay and 
+     * average delay of the client to the server.
+     * @param actionMessage 
      */
-    public void destroy() {
-        synchronized (recievedMessages) {
-            recievedMessages.clear();
-            recievedMessages = null;
-        }
-        if (client != null) {
-            client.removeMessageListener(
-                    gameplayListener,
-                    PlanetActionMessage.class,
-                    GeneralActionMessage.class);
-        }
-        gameplayListener = null;
+    private void syncronizeClient(LevelActionMessage actionMessage) {
+        double tick = Gameplay.getGameTick();
+        double serverTick = actionMessage.getGameTick();
+        double tickDiff = tick - serverTick;
+        currentTickDiff = tickDiff;
+        double tickDelay = currentTickDiff - lastTickDiff;
+        long currentTime = System.currentTimeMillis();
+        long delay = currentTime - actionMessage.getServerTime();
 
-        instance = null;
-
+        if (MULTIPLAYER_GAMEPLAY_DEBUG) {
+            System.out.println(
+                    currentTime
+                    + " - delay: " + delay
+                    + " - tickDelay: " + String.format("%1.4f", (float) tickDelay)
+                    + " - tickDiff: " + String.format("%1.3f", (float) tickDiff));
+        }
+        SolarWarsApplication.getInstance().syncronize((float) (tickDelay));
+        Gameplay.GAMETICK += (currentTickDiff - lastTickDiff) * 0.5f;
+        lastTickDiff = currentTickDiff;
     }
+
 
     /**
      * The listener interface for receiving clientGameplay events.
@@ -249,8 +297,6 @@ public class MultiplayerGameplay {
 //            System.out.println(
 //                    "Client #" + source.getId() + " recieved a "
 //                    + message.getClass().getSimpleName());
-
-
             if (recievedMessages != null) {
                 synchronized (recievedMessages) {
                     recievedMessages.add(message);

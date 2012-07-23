@@ -202,6 +202,7 @@ public class Level {
      */
     void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+        MultiplayerGameplay.getInstance().removeGameplayListener();
     }
 
     /**
@@ -460,9 +461,7 @@ public class Level {
      * @param tpf the tpf
      */
     public void updateLevel(float tpf) {
-
-
-
+        
         if (!levelLoaded || gameOver) {
             GameOverGUI.getInstance().display();
             return;

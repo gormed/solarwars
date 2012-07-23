@@ -67,6 +67,8 @@ public class PlayerState {
     public ColorRGBA color;
     /** The lost. */
     public boolean lost;
+    
+    public boolean leaver = false;
     /** The defeated player id. */
     public int defeatedPlayerID = -1;
     /** The multi selected planets. */

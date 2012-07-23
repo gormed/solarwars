@@ -30,7 +30,6 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
 import logic.Level;
-import logic.Player;
 
 /**
  * The Class BasePlanet.
@@ -67,7 +66,9 @@ public class BasePlanet extends AbstractPlanet {
         //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setBoolean("UseMaterialColors", true);
         material.setColor("Specular", new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));//new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
-
+        material.setTexture("DiffuseMap", 
+                assetManager.loadTexture("Textures/Planets/noise.png"));
+        
         if (material.getMaterialDef().getName().equals("Phong Lighting")) {
             Texture t = assetManager.loadTexture("Textures/Shader/toon.png");
             //t.setMinFilter(Texture.MinFilter.NearestNoMipMaps);

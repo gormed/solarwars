@@ -22,6 +22,8 @@
 package net;
 
 import com.jme3.network.Client;
+import com.jme3.network.ConnectionListener;
+import com.jme3.network.MessageListener;
 
 /**
  * The listener interface for receiving clientRegister events.
@@ -35,12 +37,15 @@ import com.jme3.network.Client;
  * @see ClientRegisterEvent
  */
 public interface ClientRegisterListener {
-        
+
     /**
      * Register client listener.
      *
      * @param client the client
      */
     public void registerClientListener(Client client);
-    
+
+    public MessageListener getMessageListener();
+
+    public ConnectionListener getConnectionListener();
 }

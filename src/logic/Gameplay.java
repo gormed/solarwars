@@ -289,7 +289,8 @@ public class Gameplay {
 
                 Player victorious = a;
                 Player defeated = b;
-
+                if (defeated.hasLost())
+                    return;
                 defeated.setLost();
                 if (victorious != null) {
                     victorious.setDefeatedPlayer(defeated.getId());

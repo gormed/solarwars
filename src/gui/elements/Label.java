@@ -22,7 +22,10 @@
 package gui.elements;
 
 import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapFont.Align;
 import com.jme3.font.BitmapText;
+import com.jme3.font.LineWrapMode;
+import com.jme3.font.Rectangle;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -38,24 +41,19 @@ public abstract class Label extends GUIElement implements ClickableGUI {
 
     /** The font. */
     protected BitmapFont font;
-    
     /** The text. */
     protected BitmapText text;
-    
     /** The color. */
     protected ColorRGBA color;
-    
     /** The gui. */
     protected GameGUI gui;
-    
     /** The screen position. */
     protected Vector3f screenPosition;
-    
     /** The scale. */
     protected Vector3f scale;
-    
     /** The title. */
     protected String title;
+    protected Align align = Align.Left;
 
     /**
      * Instantiates a new label.
@@ -84,12 +82,17 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         this.gui = gui;
 
         font = FontLoader.getInstance().getFont("SolarWarsFont64");
-        text = new BitmapText(font, false);
+        text = new BitmapText(font);
         text.setText(title);
+//        text.setBox(new Rectangle(
+//                0,
+//                0,
+//                text.getLineWidth(),
+//                text.getHeight()));
         text.setSize(44f);
         text.setColor(color);
-        Vector3f offset = new Vector3f(-text.getLineWidth() / 2, 
-                text.getLineHeight() / 2, 
+        Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
+                text.getLineHeight() / 2,
                 0);
         offset.multLocal(scale);
         text.setLocalTranslation(screenPosition.add(offset));
@@ -111,7 +114,7 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         super.setVisible(show);
         text.setCullHint(show ? CullHint.Never : CullHint.Always);
     }
-    
+
     /**
      * Sets the caption.
      *
@@ -119,8 +122,18 @@ public abstract class Label extends GUIElement implements ClickableGUI {
      */
     public void setCaption(String caption) {
         this.text.setText(caption);
+        Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
+                text.getLineHeight() / 2,
+                0);
+        offset.multLocal(scale);
+        text.setLocalTranslation(screenPosition.add(offset));
+//        this.text.setBox(new Rectangle(
+//                0,
+//                0,
+//                text.getLineWidth(),
+//                text.getLineHeight()));
     }
-    
+
     /**
      * Sets the font color.
      *
@@ -129,7 +142,7 @@ public abstract class Label extends GUIElement implements ClickableGUI {
     public void setFontColor(ColorRGBA color) {
         this.text.setColor(color);
     }
-    
+
     /**
      * Gets the caption.
      *
@@ -139,16 +152,32 @@ public abstract class Label extends GUIElement implements ClickableGUI {
         return this.text.getText();
     }
 
+    public BitmapText getText() {
+        return text;
+    }
+
+    public void setAlginment(Rectangle rectangle, Align align) {
+
+        text.setBox(rectangle);
+        text.setAlignment(align);
+
+    }
+
+    public void setLineWrapMode(LineWrapMode lineWrapMode) {
+        text.setLineWrapMode(LineWrapMode.NoWrap);
+    }
+
     /* (non-Javadoc)
      * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
      */
+    @Override
     public abstract void onClick(Vector2f cursor, boolean isPressed, float tpf);
 
     /* (non-Javadoc)
      * @see gui.ClickableGUI#canGainFocus()
      */
+    @Override
     public boolean canGainFocus() {
         return false;
     }
-    
 }

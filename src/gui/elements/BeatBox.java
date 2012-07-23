@@ -374,6 +374,8 @@ public class BeatBox {
         for (Beat beat : timerTasks) {
             beat.cancel();
         }
+        globalTimer.cancel();
+        globalTimer = null;
     }
 
     /**

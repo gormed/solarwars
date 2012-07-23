@@ -107,6 +107,8 @@ public class ChatModule implements ActionListener {
      * @param p the p
      */
     public void playerLeaves(Player p) {
+        if (p.isLeaver())
+            return;
         chatGUI.serverSays(
                 p.getName() + " leaves the game...");
         if (!chatGUI.isFadeDirection()) {

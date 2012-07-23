@@ -72,7 +72,7 @@ public class Player {
      * @param defeated the defeated
      */
     static void reportPlayerLost(Player victorious, Player defeated) {
-        if (defeated != null && !defeated.hasShips()) {
+        if (defeated != null && !defeated.hasShips() && !defeated.hasLost()) {
 
             ActionLib.getInstance().
                     invokeGeneralAction(null, victorious, defeated, Gameplay.GAME_OVER);
@@ -128,6 +128,7 @@ public class Player {
             gameOverGUI.display();
         }
     }
+    
     private static boolean hostSet = false;
     /** The id. */
     private int id;
@@ -426,6 +427,14 @@ public class Player {
 
         return ships;
     }
+    
+    public boolean isLeaver() {
+        return state.leaver;
+    }
+    
+    public void setLeaver(boolean value) {
+        state.leaver = value;
+    }
 
     /**
      * Gets the planet count.
@@ -599,10 +608,10 @@ public class Player {
 
     /**
      * Gets the planets.
-     *
+     *  TODO: Change back to package visibility
      * @return the planets
      */
-    ArrayList<AbstractPlanet> getPlanets() {
+    public ArrayList<AbstractPlanet> getPlanets() {
         return planets;
     }
 

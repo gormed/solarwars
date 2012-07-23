@@ -59,7 +59,6 @@ import net.NetworkManager;
 public class SolarWarsApplication extends Application {
 
     public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
-    
     /** The instance. */
     private static SolarWarsApplication instance;
     //private static AppSettings settings;
@@ -122,11 +121,12 @@ public class SolarWarsApplication extends Application {
     private float correctedTimePerFrame;
     private FileHandler logFileHandler;
     private String fileName;
+    
     /** The logger for the complete client, called 'solarwars'*/
     private static final Logger clientLogger =
             Logger.getLogger(SolarWarsApplication.class.getPackage().getName() /* solarwars */);
 
-    private String removeSpaces(String s) {
+    public static String removeSpaces(String s) {
         StringTokenizer st = new StringTokenizer(s, " ", false);
         String t = "";
         while (st.hasMoreElements()) {
@@ -168,6 +168,16 @@ public class SolarWarsApplication extends Application {
             clientLogger.log(Level.SEVERE, null, ex);
         }
         assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
+    }
+
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
+        getInstance().initSettings();
+        getInstance().start();
     }
 
     /**
@@ -295,59 +305,6 @@ public class SolarWarsApplication extends Application {
         // move it up so it appears above fps text
         statsView.setLocalTranslation(0, fpsText.getLineHeight(), 0);
         guiNode.attachChild(statsView);
-    }
-
-    /**
-     * The listener interface for receiving appAction events.
-     * The class that is interested in processing a appAction
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addAppActionListener<code> method. When
-     * the appAction event occurs, that object's appropriate
-     * method is invoked.
-     *
-     * @see AppActionEvent
-     */
-    private class AppActionListener implements ActionListener {
-
-        /* (non-Javadoc)
-         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
-         */
-        @Override
-        public void onAction(String name, boolean value, float tpf) {
-            if (!value) {
-                return;
-            }
-
-            if (name.equals(InputMappings.KEYBOARD_EXIT)) {
-                stop();
-            } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
-                if (cam != null) {
-                    Vector3f loc = cam.getLocation();
-                    Quaternion rot = cam.getRotation();
-                    System.out.println("Camera Position: ("
-                            + loc.x + ", " + loc.y + ", " + loc.z + ")");
-                    System.out.println("Camera Rotation: " + rot);
-                    System.out.println("Camera Direction: " + cam.getDirection());
-                }
-            } else if (name.equals(InputMappings.DEBUG_MEMORY)) {
-                BufferUtils.printCurrentDirectMemory(null);
-            } else if (name.equals(InputMappings.DEBUG_HIDE_STATS)) {
-                boolean show = showFps;
-                setDisplayFps(!show);
-                setDisplayStatView(!show);
-            }
-        }
-    }
-
-    /**
-     * The main method.
-     *
-     * @param args the arguments
-     */
-    public static void main(String[] args) {
-        getInstance().initSettings();
-        getInstance().start();
     }
 
     /**
@@ -615,7 +572,7 @@ public class SolarWarsApplication extends Application {
     public void destroy() {
         NetworkManager nm = NetworkManager.getInstance();
         if (nm != null && nm.isServerRunning()) {
-            NetworkManager.getInstance().closeAllConnections(false);
+            NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             clientLogger.log(Level.INFO, "Connections closed!");
         }
 
@@ -652,11 +609,58 @@ public class SolarWarsApplication extends Application {
         return syncronized;
     }
 
+    public boolean isPaused() {
+        return paused;
+    }
+
     public float getCorrectedTimePerFrame() {
         return correctedTimePerFrame;
     }
 
     public float getRealTimePerFrame() {
         return realTimePerFrame;
+    }
+
+    /**                                                         
+     * The listener interface for receiving appAction events.
+     * The class that is interested in processing a appAction
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addAppActionListener<code> method. When
+     * the appAction event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see AppActionEvent
+     */
+    private class AppActionListener implements ActionListener {
+
+        /* (non-Javadoc)
+         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+         */
+        @Override
+        public void onAction(String name, boolean value, float tpf) {
+            if (!value) {
+                return;
+            }
+
+            if (name.equals(InputMappings.KEYBOARD_EXIT)) {
+                stop();
+            } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
+                if (cam != null) {
+                    Vector3f loc = cam.getLocation();
+                    Quaternion rot = cam.getRotation();
+                    System.out.println("Camera Position: ("
+                            + loc.x + ", " + loc.y + ", " + loc.z + ")");
+                    System.out.println("Camera Rotation: " + rot);
+                    System.out.println("Camera Direction: " + cam.getDirection());
+                }
+            } else if (name.equals(InputMappings.DEBUG_MEMORY)) {
+                BufferUtils.printCurrentDirectMemory(null);
+            } else if (name.equals(InputMappings.DEBUG_HIDE_STATS)) {
+                boolean show = showFps;
+                setDisplayFps(!show);
+                setDisplayStatView(!show);
+            }
+        }
     }
 }

@@ -44,7 +44,6 @@ public class ShipBatchManager {
 
     /** The instance. */
     private static ShipBatchManager instance;
-    
     /** The asset manager. */
     private static AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
 
@@ -59,7 +58,6 @@ public class ShipBatchManager {
         }
         return instance = new ShipBatchManager();
     }
-    
     /** The update timer. */
     private float updateTimer;
 
@@ -115,16 +113,12 @@ public class ShipBatchManager {
 
         return shipBatchSpatial;
     }
-    
     /** The used batches. */
     private ArrayList<Spatial> usedBatches = new ArrayList<Spatial>();
-    
     /** The unused batches. */
     private ArrayList<Spatial> unusedBatches = new ArrayList<Spatial>();
-    
     /** The current ship count. */
     private int currentShipCount;
-    
     /** The desired ship count. */
     private int desiredShipCount;
 
@@ -137,8 +131,8 @@ public class ShipBatchManager {
         if (unusedBatches.isEmpty()) {
             Spatial s = createNextBatch();
             usedBatches.add(s);
-//            System.out.println("Created new Batch");
-//            System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
+            System.out.println("Created new Batch");
+            System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
             return s;
         }
         Spatial s = unusedBatches.get(unusedBatches.size() - 1);
@@ -171,7 +165,7 @@ public class ShipBatchManager {
     public void refreshBatchSize(float tpf) {
 
         updateTimer += tpf;
-        if (updateTimer > 0.1f) {
+        if (updateTimer > 0.16f) {
 
             int globalShips = 0;
             for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
@@ -180,13 +174,13 @@ public class ShipBatchManager {
 
             desiredShipCount = globalShips;
 
-            unusedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
-            usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
+            unusedBatches.ensureCapacity((int) (desiredShipCount * 2f));
+            usedBatches.ensureCapacity((int) (desiredShipCount * 2f));
             if (currentShipCount < desiredShipCount) {
                 int step = 10;
-                //for (int i = 0; i < step; i++) {
-                unusedBatches.add(createNextBatch());
-                //}
+                for (int i = 0; i < step; i++) {
+                    unusedBatches.add(createNextBatch());
+                }
                 currentShipCount++;
             }
             updateTimer = 0;

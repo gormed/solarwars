@@ -262,7 +262,6 @@ public class MultiplayerState extends Gamestate {
 
         if (NetworkManager.checkIP(ip)) {
 
-
             GamestateManager gm = GamestateManager.getInstance();
             Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
             if (g instanceof ServerLobbyState) {

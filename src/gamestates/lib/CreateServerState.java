@@ -40,6 +40,7 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
+import gui.elements.TexturedPanel;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -48,7 +49,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.Gameplay;
@@ -71,7 +75,8 @@ import solarwars.SolarWarsGame;
 /**
  * The Class CreateServerState.
  */
-public class CreateServerState extends Gamestate implements ServerRegisterListener, ClientRegisterListener {
+public class CreateServerState extends Gamestate
+        implements ServerRegisterListener, ClientRegisterListener {
 
     /** The Constant SERVER_FULL_MSG. */
     public static final String SERVER_FULL_MSG = "Server is full!";
@@ -132,9 +137,10 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
     /** The server message listener. */
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
     /** The server connection listener. */
-    private ServerConnectionListener serverConnectionListener = new ServerConnectionListener();
+    private ClientConnectedListener clientConnectedListener = new ClientConnectedListener();
     /** indicates that the game is set up and can be started. */
     private boolean gameStarted = false;
+    private boolean serverEstablished = false;
     /** The application. */
     private final SolarWarsApplication application;
     /** The client seed. */
@@ -181,6 +187,9 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     @Override
     public void update(float tpf) {
+        if (!serverEstablished) {
+            cancelServer();
+        }
         gui.updateGUIElements(tpf);
         if (gameStarted) {
             Server server = solarWarsServer.getGameServer();
@@ -516,7 +525,8 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         serverHub.initialize(hostPlayer, null);
         //hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
-            solarWarsServer = networkManager.setupServer(hostPlayerName);
+            solarWarsServer = networkManager.setupServer(System.currentTimeMillis() + "");
+            serverEstablished = true;
             solarWarsServer.addServerRegisterListener(this);
             networkManager.addClientRegisterListener(this);
             serverClient = networkManager.setupClient(hostPlayerName,
@@ -528,6 +538,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
         } catch (UnknownHostException ex) {
             Logger.getLogger(CreateServerState.class.getName()).
                     log(Level.WARNING, ex.getMessage(), ex);
+            serverEstablished = false;
         } catch (IOException ex) {
             if (ex instanceof ConnectException) {
                 Logger.getLogger(CreateServerState.class.getName()).
@@ -537,6 +548,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
                 Logger.getLogger(CreateServerState.class.getName()).
                         log(Level.SEVERE, ex.getMessage(), ex);
             }
+            serverEstablished = false;
         }
     }
 
@@ -580,18 +592,41 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     private void cancelServer() {
 
-        //solarWarsServer.removeClientMessageListener(serverMessageListener, PlayerAcceptedMessage.class, PlayerLeavingMessage.class);
         networkManager.removeClientRegisterListener(this);
-        Future fut = application.enqueue(new Callable<SolarWarsServer>() {
+        networkManager.serverRemoveClientMessageListener(
+                serverMessageListener);
+        networkManager.serverRemoveConnectionListener(
+                clientConnectedListener);
+        networkManager.clientRemoveMessageListener(
+                clientMessageListener);
 
-            @Override
-            public SolarWarsServer call()
-                    throws Exception {
+        if (serverEstablished) {
+            Future<Thread> fut = application.enqueue(new Callable<Thread>() {
 
-                return networkManager.closeAllConnections(true);
+                @Override
+                public Thread call() throws Exception {
+
+                    return networkManager.closeAllConnections(true);
+                }
+            });
+            try {
+                Thread connect = fut.get(
+                        NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT,
+                        TimeUnit.SECONDS);
+                connect.interrupt();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(CreateServerState.class.getName()).
+                        log(Level.SEVERE, ex.getMessage(), ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(CreateServerState.class.getName()).
+                        log(Level.SEVERE, ex.getMessage(), ex);
+            } catch (TimeoutException ex) {
+                Logger.getLogger(CreateServerState.class.getName()).
+                        log(Level.SEVERE,
+                        "Server did not shut down in time: {0} {1}",
+                        new Object[]{ex.getMessage(), ex});
             }
-        });
-
+        }
         GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
@@ -656,10 +691,20 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      */
     @Override
     public void registerServerListener(Server gameServer) {
-        gameServer.addConnectionListener(serverConnectionListener);
+        gameServer.addConnectionListener(clientConnectedListener);
         gameServer.addMessageListener(serverMessageListener,
                 PlayerConnectingMessage.class, StartGameMessage.class);
 
+    }
+
+    @Override
+    public MessageListener getMessageListener() {
+        return serverMessageListener;
+    }
+
+    @Override
+    public ConnectionListener getConnectionListener() {
+        return clientConnectedListener;
     }
 
     /* (non-Javadoc)
@@ -706,7 +751,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
      *
      * @see ServerConnectionEvent
      */
-    private class ServerConnectionListener implements ConnectionListener {
+    private class ClientConnectedListener implements ConnectionListener {
 
         /* (non-Javadoc)
          * @see com.jme3.network.ConnectionListener#connectionAdded(com.jme3.network.Server, com.jme3.network.HostedConnection)
@@ -827,6 +872,7 @@ public class CreateServerState extends Gamestate implements ServerRegisterListen
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
+                p.setLeaver(true);
                 NetworkManager.getInstance().getChatModule().playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
             } else if (message instanceof StartGameMessage) {

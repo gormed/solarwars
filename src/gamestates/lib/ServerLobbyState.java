@@ -21,11 +21,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
+import com.jme3.font.BitmapFont.Align;
+import com.jme3.font.Rectangle;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
+import com.jme3.network.ConnectionListener;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
@@ -35,7 +38,6 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ import logic.Gameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
+import net.NetworkManager.ClientConnectionState;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
@@ -61,7 +64,7 @@ import solarwars.SolarWarsGame;
 public class ServerLobbyState extends Gamestate implements ClientRegisterListener {
 
     /** The lobby. */
-    private Label lobby;
+    private Label lobbyLabel;
     /** The background panel. */
     private Panel backgroundPanel;
     /** The line. */
@@ -103,13 +106,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     /** The player connection listener. */
     private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
     /** The no server found. */
-    private boolean noServerFound;
+    private ClientConnectionState clientState = ClientConnectionState.CONNECTING;
     /** indicates that the game is set up and can be started. */
     private boolean gameStarted = false;
     /** The application. */
     private final SolarWarsApplication application;
     /** The client seed. */
     private long clientSeed;
+    private Thread connectorThread = null;
 
     /**
      * Sets the client player color.
@@ -158,12 +162,30 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     @Override
     public void update(float tpf) {
         gui.updateGUIElements(tpf);
-        if (noServerFound) {
+        if (clientState == ClientConnectionState.ERROR
+                || clientState == ClientConnectionState.DISCONNECTED) {
+            if (clientState == ClientConnectionState.ERROR) {
+                AudioManager.getInstance().
+                        playSoundInstance(AudioManager.SOUND_ERROR);
+            }
             disconnect();
             GamestateManager.getInstance().
                     enterState(GamestateManager.MULTIPLAYER_STATE);
         }
-        if (gameStarted) {
+        if (clientState == ClientConnectionState.CONNECTED) {
+            networkManager.getChatModule().
+                    initialize(gui, networkManager);
+            serverName.setCaption(
+                    client.getGameName() + " ver." + client.getVersion()
+                    + " - "
+                    + networkManager.getServerIPAdress().getHostName());
+
+            float w = serverName.getText().getLineWidth();
+            float h = serverName.getText().getHeight();
+            serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
+            clientState = ClientConnectionState.JOINED;
+        }
+        if (gameStarted && clientState == ClientConnectionState.JOINED) {
             startGame();
             GamestateManager.getInstance().
                     enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
@@ -195,7 +217,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     @Override
     protected void loadContent(SolarWarsGame game) {
         gameStarted = false;
-        noServerFound = false;
+        clientState = ClientConnectionState.CONNECTING;
         playersChanged = false;
         gui = new GameGUI(game);
         game.getApplication().setPauseOnLostFocus(false);
@@ -215,14 +237,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     0));
         }
 
-        // TODO: Sorround with try catch
-        joinServer();
-        if (noServerFound) {
-            AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
-            return;
-        }
-
-        lobby = new Label(
+        lobbyLabel = new Label(
                 "LOBBY",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
                 new Vector3f(2, 2, 1),
@@ -254,7 +269,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
                 ColorRGBA.Blue);
 
-        line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
+        line = new Panel("Line",
+                new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
                 ColorRGBA.White);
 
@@ -296,19 +312,37 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             }
         };
 
-        serverName = new Label(client.getGameName() + " ver." + client.getVersion() + " - " + networkManager.getServerIPAdress().getHostName(),
+        serverName = new Label("Connecting to " + serverIPAddress,
                 new Vector3f(gui.getWidth() / 2, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                ColorRGBA.Orange, gui) {
+                ColorRGBA.Orange,
+                gui) {
+
+            private float time;
 
             @Override
             public void updateGUI(float tpf) {
+                if (clientState == ClientConnectionState.JOINED) {
+                    return;
+                }
+                time += tpf;
+
+                if (time < 0.2f) {
+                    text.setText(title + "_");
+                } else if (time < 0.4f) {
+                    text.setText(title);
+                } else {
+                    time = 0;
+                }
             }
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
+//        float w = serverName.getText().getLineWidth();
+//        float h = serverName.getText().getHeight();
+//        serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Center);
 
         playerPanel = new Panel(
                 "BackgroundPanel",
@@ -320,12 +354,20 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         gui.addGUIElement(backgroundPanel);
         gui.addGUIElement(line);
-        gui.addGUIElement(lobby);
+        gui.addGUIElement(lobbyLabel);
         gui.addGUIElement(leave);
         gui.addGUIElement(serverName);
         gui.addGUIElement(playerPanel);
         gui.addGUIElement(ready);
-        networkManager.getChatModule().initialize(gui, networkManager);
+
+        connectorThread = new Thread("ConnectionThread") {
+
+            @Override
+            public void run() {
+                clientState = joinServer();
+            }
+        };
+        connectorThread.start();
     }
 
     /* (non-Javadoc)
@@ -335,7 +377,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     protected void unloadContent() {
 
         gameStarted = false;
-        noServerFound = false;
         playersChanged = false;
 
         playerLabels.clear();
@@ -358,7 +399,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         this.hub = null;
         this.networkManager = null;
-        this.noServerFound = false;
+        this.clientState = ClientConnectionState.DISCONNECTED;
         this.playerLabelIdx = null;
         this.playerLabels = null;
         this.playerNamePos = null;
@@ -373,32 +414,38 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         if (client != null && client.isConnected()) {
             client.close();
         }
+
+        try {
+            connectorThread.interrupt();
+        } catch (Exception e) {
+            Logger.getLogger(ServerLobbyState.class.getName()).
+                    log(Level.SEVERE, e.getMessage(), e);
+        }
         disconnect();
-        noServerFound = true;
+        clientState = ClientConnectionState.DISCONNECTED;
     }
 
     /**
      * Join server.
      */
-    private void joinServer() {
+    private NetworkManager.ClientConnectionState joinServer() {
         try {
             networkManager.setClientIPAdress(InetAddress.getLocalHost());
-            InetAddress add = InetAddress.
-                    getByAddress(NetworkManager.
-                    getByteInetAddress(serverIPAddress));
+            InetAddress add = InetAddress.getByAddress(
+                    NetworkManager.getByteInetAddress(serverIPAddress));
             networkManager.setServerIPAdress(add);
             networkManager.addClientRegisterListener(this);
-            client = networkManager.
-                    setupClient(clientPlayerName, clientPlayerColor, false);
-
+            client = networkManager.setupClient(
+                    clientPlayerName, clientPlayerColor, false);
+            return ClientConnectionState.CONNECTED;
         } catch (UnknownHostException ex) {
             Logger.getLogger(MultiplayerState.class.getName()).
                     log(Level.SEVERE, ex.getMessage(), ex);
-            noServerFound = true;
+            return ClientConnectionState.ERROR;
         } catch (IOException ex) {
             Logger.getLogger(MultiplayerState.class.getName()).
                     log(Level.SEVERE, ex.getMessage(), ex);
-            noServerFound = true;
+            return ClientConnectionState.ERROR;
         }
     }
 
@@ -430,6 +477,16 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
 
+    }
+
+    @Override
+    public MessageListener getMessageListener() {
+        return playerConnectionListener;
+    }
+
+    @Override
+    public ConnectionListener getConnectionListener() {
+        return null;
     }
 
     /**
@@ -529,10 +586,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
             if (info != null) {
                 System.out.println(info.reason);
-                noServerFound = true;
+                clientState = ClientConnectionState.DISCONNECTED;
             } else {
                 System.out.println("client closed");
-                noServerFound = true;
+                clientState = ClientConnectionState.DISCONNECTED;
             }
 //                if (c.equals(client)) {
 //                    noServerFound = true;
@@ -583,7 +640,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
-
+                p.setLeaver(true);
                 NetworkManager.getInstance().getChatModule().playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);

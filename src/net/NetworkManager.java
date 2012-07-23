@@ -25,6 +25,9 @@ import net.messages.PlayerConnectingMessage;
 import net.messages.StringMessage;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
+import com.jme3.network.ClientStateListener;
+import com.jme3.network.ConnectionListener;
+import com.jme3.network.ErrorListener;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
@@ -52,6 +55,17 @@ import solarwars.SolarWarsApplication;
  */
 public class NetworkManager {
 
+    public static final boolean WAIT_FOR_CLIENTS = true;
+    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 5;
+
+    public enum ClientConnectionState {
+
+        CONNECTING,
+        CONNECTED,
+        ERROR,
+        DISCONNECTED,
+        JOINED
+    }
     /** The Constant DEFAULT_PORT. */
     public static final int DEFAULT_PORT = 6142;
     /** The instance. */
@@ -147,6 +161,7 @@ public class NetworkManager {
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
     /** The client listener. */
     private ClientListener clientListener = new ClientListener();
+    private Thread connectionCloser = null;
 
     /**
      * Gets the this client.
@@ -204,6 +219,26 @@ public class NetworkManager {
      */
     public void removeClientRegisterListener(ClientRegisterListener rl) {
         clientRegisterListeners.remove(rl);
+    }
+
+    public void clientRemoveClientStateListener(ClientStateListener csl) {
+        thisClient.removeClientStateListener(csl);
+    }
+
+    public void clientRemoveErrorListener(ErrorListener el) {
+        thisClient.removeErrorListener(el);
+    }
+
+    public void clientRemoveMessageListener(MessageListener<? super Client> listener) {
+        thisClient.removeMessageListener(listener);
+    }
+
+    public void serverRemoveClientMessageListener(MessageListener listener) {
+        thisServer.removeClientMessageListener(listener);
+    }
+
+    public void serverRemoveConnectionListener(ConnectionListener listener) {
+        thisServer.removeConnectionListener(listener);
     }
 
     /**
@@ -328,17 +363,27 @@ public class NetworkManager {
      * @param wait the wait
      * @return the solar wars server
      */
-    public SolarWarsServer closeAllConnections(boolean wait) {
+    public Thread closeAllConnections(final boolean wait) {
         if (thisClient != null && thisClient.isConnected()) {
             thisClient.close();
         }
         thisClient = null;
-        if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
-            thisServer.stop(wait);
-        }
+
+        connectionCloser = new Thread("ConnectionCloserThread") {
+
+            @Override
+            public void run() {
+                if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
+                    thisServer.stop(wait);
+                }
+            }
+        };
+//        thisServer = null;
+        connectionCloser.start();
+
 
         isMultiplayerGame = false;
-        return thisServer;
+        return connectionCloser;
     }
 
     /**
