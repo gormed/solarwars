@@ -39,25 +39,18 @@ public class BeatBox {
 
     /** The global timer. */
     private Timer globalTimer;
-    
     /** The timer tasks. */
     private ArrayList<Beat> timerTasks;
-    
     /** The sound samples. */
     private ArrayList<AudioNode> soundSamples;
-    
     /** The audio manager. */
     private AudioManager audioManager;
-    
     /** The application. */
     private SolarWarsApplication application;
-    
     /** The base sound. */
     private AudioNode baseSound;
-    
     /** The randomizer. */
     private Random randomizer;
-    
     /** The seed. */
     private long seed;
 
@@ -99,7 +92,7 @@ public class BeatBox {
 
         final int baseKick = 1 + randomizer.nextInt(5);
         final float basePitch = (randomizer.nextFloat() * 0.5f) + 0.5f;
-        
+
         final int tick = 1 + randomizer.nextInt(5);
         System.out.println("Base kick is: " + baseKick);
 
@@ -119,6 +112,7 @@ public class BeatBox {
                 application.enqueue(
                         new Callable<Beat>() {
 
+                            @Override
                             public Beat call()
                                     throws Exception {
                                 if (tick == baseKick + 3) {
@@ -198,7 +192,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_BEEP);
 
-        secondLineSound.setVolume(0.1f);
+        secondLineSound.setVolume(0.085f);
         secondLineSound.setPositional(false);
         secondLineSound.setDirectional(false);
         secondLineSound.setPitch(0.8f);
@@ -242,7 +236,7 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_BEEP);
 
-        thirdLineSound.setVolume(0.075f);
+        thirdLineSound.setVolume(0.065f);
         thirdLineSound.setPositional(false);
         thirdLineSound.setDirectional(false);
         thirdLineSound.setPitch(1.2f);
@@ -285,12 +279,12 @@ public class BeatBox {
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_ERROR);
 
-        fourthLineSound.setVolume(0.01f);
+        fourthLineSound.setVolume(0.03f);
         fourthLineSound.setPositional(false);
         fourthLineSound.setDirectional(false);
-        fourthLineSound.setPitch(0.9f);
+        fourthLineSound.setPitch(0.5f);
 
-        Beat fourthLineBeat = new Beat(fourthLineSound, 2*tick*100, 200) {
+        Beat fourthLineBeat = new Beat(fourthLineSound, 2 * tick * 100, 200) {
 
             private int kick = 1;
             private int kickTimes = baseKick + 1;
@@ -301,19 +295,14 @@ public class BeatBox {
                 application.enqueue(
                         new Callable<Beat>() {
 
+                            @Override
                             public Beat call()
                                     throws Exception {
                                 if (kick == 1) {
                                     sound.setPitch(0.8f);
                                     sound.playInstance();
-                                } else if (kick == 2) {
-                                    sound.setPitch(1.2f);
-                                    sound.playInstance();
                                 } else if (kick == 4) {
                                     sound.setPitch(1.1f);
-                                    sound.playInstance();
-                                } else if (kick == kickTimes + 1) {
-                                    sound.setPitch(0.65f);
                                     sound.playInstance();
                                 } else if (kick == kickTimes + 2) {
                                     sound.setPitch(0.7f);
@@ -321,17 +310,11 @@ public class BeatBox {
                                 } else if (kick == kickTimes + 4) {
                                     sound.setPitch(0.55f);
                                     sound.playInstance();
-                                } else if (kick == kickTimes + kickTimes) {
-                                    sound.setPitch(0.75f);
-                                    sound.playInstance();
                                 } else if (kick == kickTimes + 7) {
                                     sound.setPitch(0.65f);
                                     sound.playInstance();
                                 } else if (kick == kickTimes + 10) {
                                     sound.setPitch(0.55f);
-                                    sound.playInstance();
-                                } else if (kick == kickTimes + kickTimes + kickTimes) {
-                                    sound.setPitch(0.5f);
                                     sound.playInstance();
                                 } else if (kick >= kickTimes + 13) {
                                     sound.setPitch(0.6f);
@@ -359,23 +342,28 @@ public class BeatBox {
      * Play.
      */
     public void play() {
-        baseSound.play();
+//        if (baseSound != null) {
+//            baseSound.play();
+//            for (Beat beat : timerTasks) {
+//                globalTimer.schedule(beat, beat.layback, beat.period);
+//            }
+//        }
 
-        for (Beat beat : timerTasks) {
-            globalTimer.schedule(beat, beat.layback, beat.period);
-        }
+
     }
 
     /**
      * Stop.
      */
     public void stop() {
-        baseSound.stop();
-        for (Beat beat : timerTasks) {
-            beat.cancel();
-        }
-        globalTimer.cancel();
-        globalTimer = null;
+//        if (baseSound != null) {
+//        baseSound.stop();
+//        for (Beat beat : timerTasks) {
+//            beat.cancel();
+//        }
+//        globalTimer.cancel();
+//        globalTimer = null;
+//        }
     }
 
     /**
@@ -385,10 +373,8 @@ public class BeatBox {
 
         /** The sound. */
         public AudioNode sound;
-        
         /** The period. */
         public int period;
-        
         /** The layback. */
         public int layback;
 

@@ -25,6 +25,8 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.TouchListener;
+import com.jme3.input.event.TouchEvent;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -53,17 +55,19 @@ public class GameGUI {
     SolarWarsGame game;
     /** The gui elemetns. */
     private ArrayList<GUIElement> guiElements;
+    private InputManager inputManager;
     /** The width. */
     private float width;
     /** The action listener. */
     private ActionListener clickActionListener;
     private ActionListener keyActionListener;
+    private TouchListener touchListener;
     /** The focus. */
     private GUIElement focus;
     /** The height. */
     private float height;
     /** The clickable node. */
-    private Node clickableNode;
+    private final Node clickableNode = new Node("ClickableGUI");
     /** The deco node. */
     private Node decoNode;
     private static final Logger logger = Logger.getLogger(GameGUI.class.getName());
@@ -108,10 +112,10 @@ public class GameGUI {
         this.height = game.getApplication().getCamera().getHeight();
         this.guiElements = new ArrayList<GUIElement>();
 
-        this.clickableNode = new Node("ClickableGUI");
         this.decoNode = new Node("DecoNode");
+        inputManager = game.getApplication().getInputManager();
 
-        final InputManager inputManager = game.getApplication().getInputManager();
+        inputManager = game.getApplication().getInputManager();
         final Camera cam = game.getApplication().getCamera();
         final Node guiNode = game.getApplication().getGuiNode();
 
@@ -123,89 +127,8 @@ public class GameGUI {
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
                 if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
-                    //if (isPressed) {
-                    // 1. Reset results list.
-                    CollisionResults results = new CollisionResults();
-                    // 2. calculate ray from camera to mouse pointer
-                    Vector2f click2d = inputManager.getCursorPosition();
-                    Vector3f click3d =
-                            new Vector3f(click2d.x, click2d.y, 0f);
-                    Vector3f dir = new Vector3f(click2d.x, click2d.y, 1f).subtractLocal(click3d).normalizeLocal();
-                    Ray ray = new Ray(click3d, dir);
-                    // 3. Collect intersections between Ray and Shootables in
-                    // results list.
-                    clickableNode.collideWith(ray, results);
-
-                    debugRaycasting(results);
-
-                    // 5. Use the results (we mark the hit object)
-                    if (results.size() > 0) {
-                        // The closest collision point is what was truly hit:
-                        CollisionResult closest = results.getClosestCollision();
-                        Node n = closest.getGeometry().getParent();
-
-                        if (n instanceof ClickableGUI) {
-
-                            clickableHit(n, click2d, isPressed, tpf);
-                            logGUIHit(isPressed, n);
-                        }
-
-                        Node parent = null;
-                        parent = n.getParent();
-                        while (parent != null) {
-
-                            clickableHit(parent, click2d, isPressed, tpf);
-                            logGUIHit(isPressed, parent);
-                            parent = parent.getParent();
-                        }
-                    }
+                    onClick(isPressed, tpf, inputManager.getCursorPosition());
                 } else {
-                }
-            }
-
-            private void logGUIHit(boolean isPressed, Node n) {
-                if (isPressed) {
-                    final String clickMsg = "Clicked at GUI-Element " + n.getName();
-                    logger.info(clickMsg);
-                } else {
-                    final String releaseMsg = "Released at GUI-Element " + n.getName();
-                    logger.info(releaseMsg);
-                }
-            }
-
-            private void debugRaycasting(CollisionResults results) {
-                if (results.size() <= 0) {
-                    logger.log(Level.FINE, "Nothing was hit in GUI (2D) raycasting!", results);
-                    return;
-                }
-                logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
-                String hits = "";
-                for (int i = 0; i < results.size(); i++) {
-                    // For each hit, we know distance, impact point, name of
-                    // geometry.
-                    float dist = results.getCollision(i).getDistance();
-                    Vector3f pt = results.getCollision(i).getContactPoint();
-                    String hit = results.getCollision(i).getGeometry().getName();
-                    hits += "* Collision #" + i;
-                    hits += " - You shot " + hit + " at " + pt
-                            + ", " + dist + " wu away.\n";
-                }
-                logger.log(Level.FINER, hits, results);
-            }
-
-            private void clickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
-
-                if (n instanceof GUIElement) {
-                    GUIElement element = (GUIElement) n;
-
-                    if (element.isVisible() && n instanceof ClickableGUI) {
-                        ClickableGUI g = (ClickableGUI) n;
-                        if (g.canGainFocus()) {
-                            setFocus(g);
-
-                        }
-                        g.onClick(click2d, isPressed, tpf);
-                    }
                 }
             }
             //}
@@ -260,6 +183,30 @@ public class GameGUI {
             }
         };
 
+        this.touchListener = new TouchListener() {
+
+            @Override
+            public void onTouch(String name, TouchEvent event, float tpf) {
+                float x;
+                float y;
+                float pressure;
+                if (event.getType() == TouchEvent.Type.DOWN) {
+                    x = event.getX();
+                    y = event.getY();
+                    onClick(true, tpf, new Vector2f(x, y));
+
+//                    pressure = event.getPressure();
+                } else if (event.getType() == TouchEvent.Type.UP) {
+                    x = event.getX();
+                    y = event.getY();
+                    onClick(false, tpf, new Vector2f(x, y));
+//                    onButtonDown(name);
+                } else if (event.getType() == TouchEvent.Type.LONGPRESSED) {
+                }
+//                Log.e("", "Event Type " + event.getType());
+                event.setConsumed();
+            }
+        };
 
         if (inputManager
                 != null) {
@@ -267,6 +214,99 @@ public class GameGUI {
                     InputMappings.MOUSE_LEFT_CLICK);
             inputManager.addListener(keyActionListener,
                     InputMappings.KEYBOARD_CONTROL, InputMappings.KEY_V);
+        }
+    }
+
+    private void onClick(boolean isPressed, float tpf, Vector2f point) {
+        //if (isPressed) {
+        // 1. Reset results list.
+        CollisionResults results = new CollisionResults();
+        // 2. calculate ray from camera to mouse pointer
+        Vector2f click2d = point;
+        Vector3f click3d =
+                new Vector3f(click2d.x, click2d.y, 0f);
+        Vector3f dir = new Vector3f(click2d.x, click2d.y, 1f).subtractLocal(click3d).normalizeLocal();
+        Ray ray = new Ray(click3d, dir);
+        // 3. Collect intersections between Ray and Shootables in
+        // results list.
+        try {
+            synchronized (clickableNode) {
+                clickableNode.collideWith(ray, results);
+            }
+
+            debugRaycasting(results);
+
+            // 5. Use the results (we mark the hit object)
+            if (results.size() > 0) {
+                // The closest collision point is what was truly hit:
+                CollisionResult closest = results.getClosestCollision();
+                Node n = closest.getGeometry().getParent();
+
+                if (n instanceof ClickableGUI) {
+
+                    clickableHit(n, click2d, isPressed, tpf);
+                    logGUIHit(isPressed, n);
+                }
+
+                Node parent = null;
+                parent = n.getParent();
+                while (parent != null) {
+
+                    clickableHit(parent, click2d, isPressed, tpf);
+                    logGUIHit(isPressed, parent);
+                    parent = parent.getParent();
+                }
+
+            }
+        } catch (IndexOutOfBoundsException exception) {
+            Logger.getLogger(GameGUI.class.getName()).
+                    log(Level.SEVERE, exception.getMessage(), exception);
+        }
+    }
+
+    private void logGUIHit(boolean isPressed, Node n) {
+        if (isPressed) {
+            final String clickMsg = "Clicked at GUI-Element " + n.getName();
+            logger.info(clickMsg);
+        } else {
+            final String releaseMsg = "Released at GUI-Element " + n.getName();
+            logger.info(releaseMsg);
+        }
+    }
+
+    private void debugRaycasting(CollisionResults results) {
+        if (results.size() <= 0) {
+            logger.log(Level.FINE, "Nothing was hit in GUI (2D) raycasting!", results);
+            return;
+        }
+        logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
+        String hits = "";
+        for (int i = 0; i < results.size(); i++) {
+            // For each hit, we know distance, impact point, name of
+            // geometry.
+            float dist = results.getCollision(i).getDistance();
+            Vector3f pt = results.getCollision(i).getContactPoint();
+            String hit = results.getCollision(i).getGeometry().getName();
+            hits += "* Collision #" + i;
+            hits += " - You shot " + hit + " at " + pt
+                    + ", " + dist + " wu away.\n";
+        }
+        logger.log(Level.FINER, hits, results);
+    }
+
+    private void clickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
+
+        if (n instanceof GUIElement) {
+            GUIElement element = (GUIElement) n;
+
+            if (element.isVisible() && n instanceof ClickableGUI) {
+                ClickableGUI g = (ClickableGUI) n;
+                if (g.canGainFocus()) {
+                    setFocus(g);
+
+                }
+                g.onClick(click2d, isPressed, tpf);
+            }
         }
     }
 

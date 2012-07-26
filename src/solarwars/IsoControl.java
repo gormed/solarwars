@@ -26,6 +26,8 @@ import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.TouchListener;
+import com.jme3.input.event.TouchEvent;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
@@ -76,14 +78,11 @@ public class IsoControl {
      *
      * @param application the application
      */
-    private IsoControl(SolarWarsApplication application) {
+    private IsoControl() {
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
 
-        assetManager = application.getAssetManager();
-        inputManager = application.getInputManager();
-
-        this.rootNode = application.getRootNode();
-        this.cam = application.getCamera();
+//        this.rootNode = application.getRootNode();
+//        this.cam = application.getCamera();
         this.actionLib = ActionLib.getInstance();
 
         this.markerNode = new MarkerNode();
@@ -126,18 +125,18 @@ public class IsoControl {
         if (instance != null) {
             return instance;
         }
-        return instance = new IsoControl(SolarWarsApplication.getInstance());
+        return instance = new IsoControl();
     }
     //==========================================================================
     //      Private Fields
     //==========================================================================
     // general
     /** The root node. */
-    private Node rootNode;
+    private Node rootNode = SolarWarsApplication.getInstance().getRootNode();
     /** The shootables node. */
     private Node shootablesNode;
     /** inner ref to the asset manager. */
-    private final AssetManager assetManager;
+    private final AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
     /** The marker node. */
     private MarkerNode markerNode;
     // Dragging
@@ -172,13 +171,14 @@ public class IsoControl {
 //    private Cross startDrag;
 //    private Cross endDrag;
     /** The cam. */
-    private Camera cam;
+    private Camera cam = SolarWarsApplication.getInstance().getCamera();
     /** The mouse action listener. */
     private ActionListener mouseActionListener;
     /** The key action listener. */
     private ActionListener keyActionListener;
+    private TouchListener touchListener;
     /** The input manager. */
-    private InputManager inputManager;
+    private InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
     /** The action lib. */
     private ActionLib actionLib;
     /** inner ref to the games gui. */
@@ -204,331 +204,16 @@ public class IsoControl {
             public void onAction(String name, boolean keyPressed, float tpf) {
 
                 gui = Gameplay.getCurrentLevel().getGUI();
-
+                Vector2f point = inputManager.getCursorPosition();
                 if (keyPressed) {
-                    onButtonDown(name);
+                    onButtonDown(name, point);
                 } else {
-                    if (onButtonUp(name)) {
+                    if (onButtonUp(name, point)) {
                         return;
                     }
                 }
                 onMouseWeel(name);
 
-            }
-
-            /**
-             * Is executed if the player clicks on left or right mouse button
-             * but not on its hold.
-             */
-            private void onButtonDown(String name) {
-                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
-                    Vector2f click2d = inputManager.getCursorPosition();
-                    Vector3f click3d = cam.getWorldCoordinates(
-                            new Vector2f(click2d.x, click2d.y), 0f).clone();
-                    Vector3f dir = cam.getWorldCoordinates(
-                            new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-                    Ray ray = new Ray(click3d, dir);
-
-                    float t = -ray.getOrigin().y / ray.getDirection().y;
-                    Vector3f currentXZPlanePos =
-                            ray.getDirection().clone().
-                            mult(t).addLocal(ray.getOrigin().clone());
-
-                    if (!dragging) {
-                        startXZPlanePos = currentXZPlanePos;
-                        startScreenPos = click2d.clone();
-                        planetSelection = new ArrayList<AbstractPlanet>();
-                        shipGroupSelection = new ArrayList<ShipGroup>();
-                        if (markerNodes != null && !markerNodes.isEmpty()) {
-                            for (MarkerNode markerNode : markerNodes) {
-                                removeMarker(markerNode);
-                            }
-                            markerNodes.clear();
-                        }
-                        markerNodes = new ArrayList<MarkerNode>();
-//                        startDrag = new Cross(assetManager);
-//                        startDrag.setLocalTranslation(startXZPlanePos);
-//                        rootNode.attachChild(startDrag);
-                    }
-                    dragging = true;
-                    final String mouseDownMsg = "Left mouse-button down @["
-                            + click2d.x + "/" + click2d.y + "]";
-                    logger.log(Level.INFO, mouseDownMsg);
-                }
-            }
-
-            /**
-             * Is executed if the mouse-weel is scrolled.
-             */
-            private void onMouseWeel(String name) {
-                Player local = Hub.getLocalPlayer();
-                if (name.equals(InputMappings.MOUSE_WHEEL_DOWN)) {
-                    local.refreshShipPercentage(0.05f);
-                    final String percentageChange = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
-                    logger.log(Level.FINE, percentageChange);
-                }
-                if (name.equals(InputMappings.MOUSE_WHEEL_UP)) {
-                    local.refreshShipPercentage(-0.05f);
-                    final String percentageChange = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
-                    logger.log(Level.FINE, percentageChange);
-                }
-            }
-
-            /**
-             * Is executed if the left or right mouse button is released.
-             * This can end in a drag action that ended or a normal left click
-             * for selection or right click for attack.
-             */
-            private boolean onButtonUp(String name) {
-                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
-                        || name.equals(InputMappings.MOUSE_RIGHT_CLICK)) {
-                    // reset drag flag
-                    dragging = false;
-                    // clear collision results
-                    CollisionResults results = new CollisionResults();
-                    // get 3d mouse position
-                    Vector2f click2d = inputManager.getCursorPosition();
-                    Vector3f click3d = cam.getWorldCoordinates(
-                            new Vector2f(click2d.x, click2d.y), 0f).clone();
-                    Vector3f dir = cam.getWorldCoordinates(
-                            new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-                    // create ray for raycasting
-                    Ray ray = new Ray(click3d, dir);
-                    // check if play ended a drag and leave if so
-                    if (playerEndsDrag(name)) {
-                        return true;
-                    }
-
-                    // RAYCASTING
-                    // Collect intersections between Ray and Shootables in results list.
-                    shootablesNode.collideWith(ray, results);
-                    // print if in debug
-                    if (DEBUG_RAYCASTS) {
-                        printRaycastResults(results);
-                    }
-                    // if player releases not having dragged before
-                    if (playerReleases(results, name)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            /**
-             * Is executed if it is a normal left click
-             * for selection or right click for attack.
-             */
-            private boolean playerReleases(CollisionResults results, String name) {
-                // use the results and check if there was something hit
-                if (results.size() > 0) {
-                    CollisionResult actual = null;
-                    ShipGroup nearestShipGroup = null;
-                    AbstractPlanet nearestPlanet = null;
-                    Node temp = null;
-                    // order the collisions so that at 0 is the closest
-                    results.getClosestCollision();
-                    // iterate through collisions begin with the closest
-                    for (int i = 0; i < results.size(); i++) {
-                        // currently iterated collision
-                        actual = results.getCollision(i);
-                        // get the node that is parent of the node that holds
-                        // the geometry, that is either a planet or a
-                        // shipgroup
-                        temp = actual.getGeometry().getParent().getParent();
-                        // if that thing is not null
-                        if (temp != null) {
-                            // check if its a planet
-                            if (temp instanceof AbstractPlanet) {
-                                nearestPlanet = (AbstractPlanet) temp;
-                                // if planet found first, break
-                                break;
-                            } else if (temp instanceof ShipGroup) {
-                                nearestShipGroup = (ShipGroup) temp;
-                            }
-                        }
-                    }
-                    // was planet found
-                    //<editor-fold defaultstate="collapsed" desc="Planet Found Section">
-                    if (nearestPlanet != null) {
-                        // ...check if left button click
-                        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
-                            // invoke select action
-                            actionLib.invokePlanetAction(
-                                    null,
-                                    0L,
-                                    nearestPlanet,
-                                    Hub.getLocalPlayer(),
-                                    Gameplay.PLANET_SELECT);
-                            final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
-                            logger.info(planetSelectMsg);
-                            // finally set marker
-                            repositMarker(nearestPlanet, markerNode);
-
-                        } // ...check for reight botton click
-                        // TODO: move hasLost check to actionLib
-                        else if (name.equals(InputMappings.MOUSE_RIGHT_CLICK)
-                                && !Hub.getLocalPlayer().hasLost()) {
-                            // invoke attack action
-                            actionLib.invokePlanetAction(
-                                    null,
-                                    0L,
-                                    nearestPlanet,
-                                    Hub.getLocalPlayer(),
-                                    Gameplay.PLANET_ATTACK);
-                            final String planetAttackMsg = "Player attacked/moved to planet id#"
-                                    + nearestPlanet.getId() + ", owned by "
-                                    + ((nearestPlanet.getOwner() != null)
-                                    ? nearestPlanet.getOwner().getName()
-                                    : "nobody");
-                            logger.info(planetAttackMsg);
-                        }
-
-                    } //</editor-fold>
-                    // was shipgroup found
-                    //<editor-fold defaultstate="collapsed" desc="ShipGroup Found Section">
-                    else if (nearestShipGroup != null) {
-                        // ...check if left button click
-                        // TODO: move hasLost check to actionLib
-                        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
-                                && !Hub.getLocalPlayer().hasLost()) {
-                            repositMarker(nearestShipGroup, markerNode);
-                            // invoke ship redirect action
-                            actionLib.invokeShipAction(
-                                    null,
-                                    0,
-                                    nearestShipGroup,
-                                    Hub.getLocalPlayer(),
-                                    Gameplay.SHIP_SELECT);
-                            final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
-                            logger.info(sgSelectMsg);
-                        }
-                        //</editor-fold>
-                    }
-                }
-                return false;
-            }
-
-            /**
-             * Prints the results for a ray cast action ordered from nearest to
-             * farest.
-             */
-            private void printRaycastResults(CollisionResults results) {
-                // 4. Print the results
-                if (results.size() <= 0) {
-                    logger.log(Level.FINE, "Nothing was hit in raycasting!", results);
-                    return;
-                }
-                logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
-                String hits = "";
-                for (int i = 0; i < results.size(); i++) {
-                    // For each hit, we know distance, impact point, name of
-                    // geometry.
-                    float dist = results.getCollision(i).getDistance();
-                    Vector3f pt = results.getCollision(i).getContactPoint();
-                    String hit = results.getCollision(i).getGeometry().getName();
-                    hits += "* Collision #" + i;
-                    hits += " - You shot " + hit + " at " + pt
-                            + ", " + dist + " wu away.\n";
-                }
-                logger.log(Level.FINER, hits, results);
-            }
-
-            /**
-             * Is executed if a player ends mouse-dragging to collect the plantes
-             * that where selected. 
-             */
-            private boolean playerEndsDrag(String name) {
-                // if player was dragging and releases the mouse to select planets
-                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
-                        && startXZPlanePos != null
-                        && lastXZPlanePos != null) {
-                    //  rootNode.detachChild(startDrag);
-                    // calculate width and height of the drag rect
-                    float width = Math.abs(lastXZPlanePos.x - startXZPlanePos.x);
-                    float height = Math.abs(lastXZPlanePos.z - startXZPlanePos.z);
-                    // if the rect is big enough
-                    if (width > 0.2f && height > 0.2f) {
-                        // remove old marker of player
-                        removeMarker(markerNode);
-                        // get the left-top coordinate via 1337 confusing conditional assignment
-                        float leftX = (startXZPlanePos.x <= lastXZPlanePos.x) ? startXZPlanePos.x : lastXZPlanePos.x;
-                        float topY = (startXZPlanePos.z <= lastXZPlanePos.z) ? startXZPlanePos.z : lastXZPlanePos.z;
-                        // create the rectangle from it
-                        Rectangle2D rect = new Rectangle2D.Float(
-                                leftX, topY, width, height);
-                        if (!isControlPressed()) {
-                            // select all planets in rectangle
-                            selectPlanets(rect);
-
-                            MarkerNode markerNode = null;
-                            if (!planetSelection.isEmpty()) {
-                                for (AbstractPlanet planet : planetSelection) {
-
-                                    markerNode = new MarkerNode();
-                                    markerNodes.add(markerNode);
-                                    repositMarker(planet, markerNode);
-
-                                }
-                                actionLib.invokePlanetAction(
-                                        IsoControl.getInstance(),
-                                        0L,
-                                        null,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.PLANET_MULTI_SELECT);
-                                final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
-                                logger.info(multiSelectMsg);
-                            }
-                        } else {
-                            selectShipGroups(rect);
-
-                            MarkerNode markerNode = null;
-                            if (!shipGroupSelection.isEmpty()) {
-                                for (ShipGroup shipGroup : shipGroupSelection) {
-
-                                    markerNode = new MarkerNode();
-                                    markerNodes.add(markerNode);
-                                    repositMarker(shipGroup, markerNode);
-
-                                }
-                                actionLib.invokeShipAction(
-                                        IsoControl.getInstance(),
-                                        0L,
-                                        null,
-                                        Hub.getLocalPlayer(),
-                                        Gameplay.SHIP_MULTI_SELECT);
-                                final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
-                                logger.info(multiSelectMsg);
-                            }
-                        }
-                        //
-
-                        lastXZPlanePos = null;
-                        startScreenPos = null;
-                        startXZPlanePos = null;
-                        if (centerDrag != null) {
-                            gui.removeGUIElement(centerDrag);
-                            centerDrag = null;
-                        }
-                        if (leftDrag != null) {
-                            gui.removeGUIElement(leftDrag);
-                            leftDrag = null;
-                        }
-                        if (topDrag != null) {
-                            gui.removeGUIElement(topDrag);
-                            topDrag = null;
-                        }
-                        if (rightDrag != null) {
-                            gui.removeGUIElement(rightDrag);
-                            rightDrag = null;
-                        }
-                        if (bottomDrag != null) {
-                            gui.removeGUIElement(bottomDrag);
-                            bottomDrag = null;
-                        }
-                        return true;
-                    }
-                }
-                return false;
             }
         };
 
@@ -542,16 +227,381 @@ public class IsoControl {
             }
         };
 
+        touchListener = new TouchListener() {
+
+            @Override
+            public void onTouch(String name, TouchEvent event, float tpf) {
+                float x;
+                float y;
+                float pressure;
+                if (event.getType() == TouchEvent.Type.DOWN) {
+                    x = event.getX();
+                    y = event.getY();
+                    onDragSelectEntity(new Vector2f(x, y));
+                    pressure = event.getPressure();
+                } else if (event.getType() == TouchEvent.Type.UP) {
+                    x = event.getX();
+                    y = event.getY();
+                    onAttackOrSelect(new Vector2f(x, y), false);
+//                    onButtonDown(name);
+                } else if (event.getType() == TouchEvent.Type.DOUBLETAP) {
+                    x = event.getX();
+                    y = event.getY();
+                    onAttackOrSelect(new Vector2f(x, y), true);
+                } else if (event.getType() == TouchEvent.Type.SCROLL) {
+                    float deltaY = event.getDeltaY();
+                    boolean up = (deltaY >= 0) ? true : false;
+                    onPercentageChange(0.05f, up);
+                }
+
+//                Log.e("", "Event Type " + event.getType());
+                event.setConsumed();
+            }
+        };
+    }
+
+    /**
+     * Is executed if the player clicks on left or right mouse button
+     * but not on its hold.
+     */
+    private void onButtonDown(String name, Vector2f point) {
+        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
+            onDragSelectEntity(point);
+            final String mouseDownMsg = "Left mouse-button down @["
+                    + point.x + "/" + point.y + "]";
+            logger.log(Level.INFO, mouseDownMsg);
+        }
+    }
+
+    private void onDragSelectEntity(Vector2f point) {
+        Vector2f click2d = point;
+        Vector3f click3d = cam.getWorldCoordinates(
+                new Vector2f(click2d.x, click2d.y), 0f).clone();
+        Vector3f dir = cam.getWorldCoordinates(
+                new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+        Ray ray = new Ray(click3d, dir);
+        float t = -ray.getOrigin().y / ray.getDirection().y;
+        Vector3f currentXZPlanePos =
+                ray.getDirection().clone().
+                mult(t).addLocal(ray.getOrigin().clone());
+        if (!dragging) {
+            startXZPlanePos = currentXZPlanePos;
+            startScreenPos = click2d.clone();
+            planetSelection = new ArrayList<AbstractPlanet>();
+            shipGroupSelection = new ArrayList<ShipGroup>();
+            if (markerNodes != null && !markerNodes.isEmpty()) {
+                for (MarkerNode mn : markerNodes) {
+                    removeMarker(mn);
+                }
+                markerNodes.clear();
+            }
+            markerNodes = new ArrayList<MarkerNode>();
+            //                        startDrag = new Cross(assetManager);
+            //                        startDrag.setLocalTranslation(startXZPlanePos);
+            //                        rootNode.attachChild(startDrag);
+        }
+        dragging = true;
+    }
+
+    /**
+     * Is executed if the mouse-weel is scrolled.
+     */
+    private void onMouseWeel(String name) {
+        Player local = Hub.getLocalPlayer();
+        boolean up = (name.equals(InputMappings.MOUSE_WHEEL_DOWN)
+                && (name.equals(InputMappings.MOUSE_WHEEL_DOWN) || name.equals(InputMappings.MOUSE_WHEEL_UP)))
+                ? false : true;
+
+        float amount = 0.05f;
+        onPercentageChange(amount, up);
+        final String percentageChangeS = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
+        logger.log(Level.FINE, percentageChangeS);
+    }
+
+    private void onPercentageChange(float amount, boolean up) {
+        if (!up) {
+            amount *= -1.0f;
+        }
+        Hub.getLocalPlayer().refreshShipPercentage(amount);
+    }
+
+    /**
+     * Is executed if the left or right mouse button is released.
+     * This can end in a drag action that ended or a normal left click
+     * for selection or right click for attack.
+     */
+    private boolean onButtonUp(String name, Vector2f point) {
+        boolean attack = (name.equals(InputMappings.MOUSE_LEFT_CLICK)
+                && (name.equals(InputMappings.MOUSE_LEFT_CLICK) || name.equals(InputMappings.MOUSE_RIGHT_CLICK)))
+                ? false : true;
+        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
+                || name.equals(InputMappings.MOUSE_RIGHT_CLICK)) {
+            return onAttackOrSelect(point, attack);
+        }
+        return false;
+    }
+
+    /**
+     * Is executed if it is a normal left click
+     * for selection or right click for attack.
+     */
+    private boolean playerReleases(CollisionResults results, boolean attack) {
+        // use the results and check if there was something hit
+        if (results.size() > 0) {
+            CollisionResult actual = null;
+            ShipGroup nearestShipGroup = null;
+            AbstractPlanet nearestPlanet = null;
+            Node temp = null;
+            // order the collisions so that at 0 is the closest
+            results.getClosestCollision();
+            // iterate through collisions begin with the closest
+            for (int i = 0; i < results.size(); i++) {
+                // currently iterated collision
+                actual = results.getCollision(i);
+                // get the node that is parent of the node that holds
+                // the geometry, that is either a planet or a
+                // shipgroup
+                temp = actual.getGeometry().getParent().getParent();
+                // if that thing is not null
+                if (temp != null) {
+                    // check if its a planet
+                    if (temp instanceof AbstractPlanet) {
+                        nearestPlanet = (AbstractPlanet) temp;
+                        // if planet found first, break
+                        break;
+                    } else if (temp instanceof ShipGroup) {
+                        nearestShipGroup = (ShipGroup) temp;
+                    }
+                }
+            }
+            // was planet found
+            //<editor-fold defaultstate="collapsed" desc="Planet Found Section">
+            if (nearestPlanet != null) {
+                // ...check if left button click
+                if (!attack) {
+                    // invoke select action
+                    actionLib.invokePlanetAction(
+                            null,
+                            0L,
+                            nearestPlanet,
+                            Hub.getLocalPlayer(),
+                            Gameplay.PLANET_SELECT);
+                    final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
+                    logger.info(planetSelectMsg);
+                    // finally set marker
+                    repositMarker(nearestPlanet, markerNode);
+
+                } // ...check for reight botton click
+                // TODO: move hasLost check to actionLib
+                else if (attack && !Hub.getLocalPlayer().hasLost()) {
+                    // invoke attack action
+                    actionLib.invokePlanetAction(
+                            null,
+                            0L,
+                            nearestPlanet,
+                            Hub.getLocalPlayer(),
+                            Gameplay.PLANET_ATTACK);
+                    final String planetAttackMsg = "Player attacked/moved to planet id#"
+                            + nearestPlanet.getId() + ", owned by "
+                            + ((nearestPlanet.getOwner() != null)
+                            ? nearestPlanet.getOwner().getName()
+                            : "nobody");
+                    logger.info(planetAttackMsg);
+                }
+
+            } //</editor-fold>
+            // was shipgroup found
+            //<editor-fold defaultstate="collapsed" desc="ShipGroup Found Section">
+            else if (nearestShipGroup != null) {
+                // ...check if left button click
+                // TODO: move hasLost check to actionLib
+                if (!attack && !Hub.getLocalPlayer().hasLost()) {
+                    repositMarker(nearestShipGroup, markerNode);
+                    // invoke ship redirect action
+                    actionLib.invokeShipAction(
+                            null,
+                            0,
+                            nearestShipGroup,
+                            Hub.getLocalPlayer(),
+                            Gameplay.SHIP_SELECT);
+                    final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
+                    logger.info(sgSelectMsg);
+                }
+                //</editor-fold>
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Prints the results for a ray cast action ordered from nearest to
+     * farest.
+     */
+    private void printRaycastResults(CollisionResults results) {
+        // 4. Print the results
+        if (results.size() <= 0) {
+            logger.log(Level.FINE, "Nothing was hit in raycasting!", results);
+            return;
+        }
+        logger.log(Level.FINE, "There were " + results.size() + " hits! If logging FINER see below:", results);
+        String hits = "";
+        for (int i = 0; i < results.size(); i++) {
+            // For each hit, we know distance, impact point, name of
+            // geometry.
+            float dist = results.getCollision(i).getDistance();
+            Vector3f pt = results.getCollision(i).getContactPoint();
+            String hit = results.getCollision(i).getGeometry().getName();
+            hits += "* Collision #" + i;
+            hits += " - You shot " + hit + " at " + pt
+                    + ", " + dist + " wu away.\n";
+        }
+        logger.log(Level.FINER, hits, results);
+    }
+
+    /**
+     * Is executed if a player ends mouse-dragging to collect the plantes
+     * that where selected.
+     */
+    private boolean playerEndsDragEntities() {
+        // if player was dragging and releases the mouse to select planets
+        if (startXZPlanePos != null
+                && lastXZPlanePos != null) {
+            //  rootNode.detachChild(startDrag);
+            // calculate width and height of the drag rect
+            float width = Math.abs(lastXZPlanePos.x - startXZPlanePos.x);
+            float height = Math.abs(lastXZPlanePos.z - startXZPlanePos.z);
+            // if the rect is big enough
+            if (width > 0.2f && height > 0.2f) {
+                // remove old marker of player
+                removeMarker(markerNode);
+                // get the left-top coordinate via 1337 confusing conditional assignment
+                float leftX = (startXZPlanePos.x <= lastXZPlanePos.x) ? startXZPlanePos.x : lastXZPlanePos.x;
+                float topY = (startXZPlanePos.z <= lastXZPlanePos.z) ? startXZPlanePos.z : lastXZPlanePos.z;
+                // create the rectangle from it
+                Rectangle2D rect = new Rectangle2D.Float(
+                        leftX, topY, width, height);
+                if (!isControlPressed()) {
+                    // select all planets in rectangle
+                    selectPlanets(rect);
+
+                    MarkerNode markerNodeLoc = null;
+                    if (!planetSelection.isEmpty()) {
+                        for (AbstractPlanet planet : planetSelection) {
+
+                            markerNodeLoc = new MarkerNode();
+                            markerNodes.add(markerNodeLoc);
+                            repositMarker(planet, markerNodeLoc);
+
+                        }
+                        actionLib.invokePlanetAction(
+                                IsoControl.getInstance(),
+                                0L,
+                                null,
+                                Hub.getLocalPlayer(),
+                                Gameplay.PLANET_MULTI_SELECT);
+                        final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
+                        logger.info(multiSelectMsg);
+                    }
+                } else {
+                    selectShipGroups(rect);
+
+                    MarkerNode markerNodeLoc = null;
+                    if (!shipGroupSelection.isEmpty()) {
+                        for (ShipGroup shipGroup : shipGroupSelection) {
+
+                            markerNodeLoc = new MarkerNode();
+                            markerNodes.add(markerNodeLoc);
+                            repositMarker(shipGroup, markerNodeLoc);
+
+                        }
+                        actionLib.invokeShipAction(
+                                IsoControl.getInstance(),
+                                0L,
+                                null,
+                                Hub.getLocalPlayer(),
+                                Gameplay.SHIP_MULTI_SELECT);
+                        final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
+                        logger.info(multiSelectMsg);
+                    }
+                }
+                //
+
+                lastXZPlanePos = null;
+                startScreenPos = null;
+                startXZPlanePos = null;
+                if (centerDrag != null) {
+                    gui.removeGUIElement(centerDrag);
+                    centerDrag = null;
+                }
+                if (leftDrag != null) {
+                    gui.removeGUIElement(leftDrag);
+                    leftDrag = null;
+                }
+                if (topDrag != null) {
+                    gui.removeGUIElement(topDrag);
+                    topDrag = null;
+                }
+                if (rightDrag != null) {
+                    gui.removeGUIElement(rightDrag);
+                    rightDrag = null;
+                }
+                if (bottomDrag != null) {
+                    gui.removeGUIElement(bottomDrag);
+                    bottomDrag = null;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean onAttackOrSelect(Vector2f point, boolean attack) {
+        // reset drag flag
+        dragging = false;
+        // clear collision results
+        CollisionResults results = new CollisionResults();
+        // get 3d mouse position
+        Vector2f click2d = point;
+        Vector3f click3d = cam.getWorldCoordinates(
+                new Vector2f(click2d.x, click2d.y), 0f).clone();
+        Vector3f dir = cam.getWorldCoordinates(
+                new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+        // create ray for raycasting
+        Ray ray = new Ray(click3d, dir);
+        // check if play ended a drag and leave if so
+        if (playerEndsDragEntities()) {
+            return true;
+        }
+        // RAYCASTING
+        // Collect intersections between Ray and Shootables in results list.
+        shootablesNode.collideWith(ray, results);
+        // print if in debug
+        if (DEBUG_RAYCASTS) {
+            printRaycastResults(results);
+        }
+        // if player releases not having dragged before
+        if (playerReleases(results, attack)) {
+            return true;
+        }
+        return false;
     }
 
     public void addControlListener() {
-        inputManager.addListener(mouseActionListener,
-                InputMappings.MOUSE_LEFT_CLICK,
-                InputMappings.MOUSE_RIGHT_CLICK,
-                InputMappings.MOUSE_WHEEL_DOWN,
-                InputMappings.MOUSE_WHEEL_UP);
-        inputManager.addListener(keyActionListener,
-                InputMappings.KEYBOARD_CONTROL);
+        inputManager = SolarWarsApplication.getInstance().getInputManager();
+        if (inputManager != null) {
+            inputManager.addListener(mouseActionListener,
+                    InputMappings.MOUSE_LEFT_CLICK,
+                    InputMappings.MOUSE_RIGHT_CLICK,
+                    InputMappings.MOUSE_WHEEL_DOWN,
+                    InputMappings.MOUSE_WHEEL_UP);
+        }
+        if (inputManager != null) {
+            inputManager.addListener(keyActionListener,
+                    InputMappings.KEYBOARD_CONTROL);
+        }
+        if (inputManager != null) {
+            inputManager.addListener(touchListener, new String[]{"Touch"});
+        }
     }
 
     public void removeControlListener() {
@@ -879,6 +929,10 @@ public class IsoControl {
 //        }
 
         dragging = false;
+
+
+
+
     }
 
     /**

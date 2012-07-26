@@ -34,14 +34,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
 import gui.KeyInputMap;
 import gui.KeyboardListener;
-import solarwars.FontLoader;
 
 /**
  * The Class TextBox.
@@ -353,40 +351,41 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
          */
         public NumberBoxActionListener(InputManager inputManager, TextBox textBox) {
             this.textBox = textBox;
+            if (inputManager != null) {
+                //deleteMappings(inputManager);
+                if (!numericMappingsAdded) {
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0), new KeyTrigger(KeyInput.KEY_NUMPAD0));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1), new KeyTrigger(KeyInput.KEY_NUMPAD1));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2), new KeyTrigger(KeyInput.KEY_NUMPAD2));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3), new KeyTrigger(KeyInput.KEY_NUMPAD3));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4), new KeyTrigger(KeyInput.KEY_NUMPAD4));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5), new KeyTrigger(KeyInput.KEY_NUMPAD5));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6), new KeyTrigger(KeyInput.KEY_NUMPAD6));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7), new KeyTrigger(KeyInput.KEY_NUMPAD7));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8), new KeyTrigger(KeyInput.KEY_NUMPAD8));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9), new KeyTrigger(KeyInput.KEY_NUMPAD9));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT,
+                            new KeyTrigger(KeyInput.KEY_PERIOD),
+                            new KeyTrigger(KeyInput.KEY_NUMPADCOMMA));
 
-            //deleteMappings(inputManager);
-            if (!numericMappingsAdded) {
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_0, new KeyTrigger(KeyInput.KEY_0), new KeyTrigger(KeyInput.KEY_NUMPAD0));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_1, new KeyTrigger(KeyInput.KEY_1), new KeyTrigger(KeyInput.KEY_NUMPAD1));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_2, new KeyTrigger(KeyInput.KEY_2), new KeyTrigger(KeyInput.KEY_NUMPAD2));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_3, new KeyTrigger(KeyInput.KEY_3), new KeyTrigger(KeyInput.KEY_NUMPAD3));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_4, new KeyTrigger(KeyInput.KEY_4), new KeyTrigger(KeyInput.KEY_NUMPAD4));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_5, new KeyTrigger(KeyInput.KEY_5), new KeyTrigger(KeyInput.KEY_NUMPAD5));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_6, new KeyTrigger(KeyInput.KEY_6), new KeyTrigger(KeyInput.KEY_NUMPAD6));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_7, new KeyTrigger(KeyInput.KEY_7), new KeyTrigger(KeyInput.KEY_NUMPAD7));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_8, new KeyTrigger(KeyInput.KEY_8), new KeyTrigger(KeyInput.KEY_NUMPAD8));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_9, new KeyTrigger(KeyInput.KEY_9), new KeyTrigger(KeyInput.KEY_NUMPAD9));
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_POINT,
-                        new KeyTrigger(KeyInput.KEY_PERIOD),
-                        new KeyTrigger(KeyInput.KEY_NUMPADCOMMA));
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
+                    numericMappingsAdded = true;
+                }
 
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_BACKSPACE, new KeyTrigger(KeyInput.KEY_BACK), new KeyTrigger(KeyInput.KEY_DELETE));
-                numericMappingsAdded = true;
+                inputManager.addListener(this,
+                        KeyInputMap.INPUT_MAPPING_0,
+                        KeyInputMap.INPUT_MAPPING_1,
+                        KeyInputMap.INPUT_MAPPING_2,
+                        KeyInputMap.INPUT_MAPPING_3,
+                        KeyInputMap.INPUT_MAPPING_4,
+                        KeyInputMap.INPUT_MAPPING_5,
+                        KeyInputMap.INPUT_MAPPING_6,
+                        KeyInputMap.INPUT_MAPPING_7,
+                        KeyInputMap.INPUT_MAPPING_8,
+                        KeyInputMap.INPUT_MAPPING_9,
+                        KeyInputMap.INPUT_MAPPING_POINT,
+                        KeyInputMap.INPUT_MAPPING_BACKSPACE);
             }
-
-            inputManager.addListener(this,
-                    KeyInputMap.INPUT_MAPPING_0,
-                    KeyInputMap.INPUT_MAPPING_1,
-                    KeyInputMap.INPUT_MAPPING_2,
-                    KeyInputMap.INPUT_MAPPING_3,
-                    KeyInputMap.INPUT_MAPPING_4,
-                    KeyInputMap.INPUT_MAPPING_5,
-                    KeyInputMap.INPUT_MAPPING_6,
-                    KeyInputMap.INPUT_MAPPING_7,
-                    KeyInputMap.INPUT_MAPPING_8,
-                    KeyInputMap.INPUT_MAPPING_9,
-                    KeyInputMap.INPUT_MAPPING_POINT,
-                    KeyInputMap.INPUT_MAPPING_BACKSPACE);
         }
 
         /* (non-Javadoc)

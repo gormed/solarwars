@@ -41,6 +41,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.controls.TouchTrigger;
 
 /**
  * The singleton InputMappings for the solarwars game input mappings for keyboard
@@ -123,6 +124,8 @@ public class InputMappings {
         inputManager.addMapping(InputMappings.KEYBOARD_TABSCORE, new KeyTrigger(KeyInput.KEY_TAB));
         inputManager.addMapping(InputMappings.KEYBOARD_CONTROL, new KeyTrigger(KeyInput.KEY_LCONTROL), new KeyTrigger(KeyInput.KEY_RCONTROL));
         inputManager.addMapping(InputMappings.KEY_V, new KeyTrigger(KeyInput.KEY_V));
+        
+        inputManager.addMapping("Touch", new TouchTrigger(0));
 
     }
 }

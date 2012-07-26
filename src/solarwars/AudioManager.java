@@ -34,31 +34,31 @@ import java.util.Map;
 public class AudioManager {
 
     /** The Constant SOUND_BEEP. */
-    public static final String SOUND_BEEP = "/Sounds/beep.ogg";
+    public static final String SOUND_BEEP = "Sounds/beep.ogg";
     
     /** The Constant SOUND_CLICK. */
-    public static final String SOUND_CLICK = "/Sounds/click.ogg";
+    public static final String SOUND_CLICK = "Sounds/click.ogg";
     
     /** The Constant SOUND_CYBER. */
-    public static final String SOUND_CYBER = "/Sounds/cyber.ogg";
+    public static final String SOUND_CYBER = "Sounds/cyber.ogg";
     
     /** The Constant SOUND_ERROR. */
-    public static final String SOUND_ERROR = "/Sounds/error.ogg";
+    public static final String SOUND_ERROR = "Sounds/error.ogg";
     
     /** The Constant SOUND_EXPLOSION. */
-    public static final String SOUND_EXPLOSION = "/Sounds/explosion.ogg";
+    public static final String SOUND_EXPLOSION = "Sounds/explosion.ogg";
     
     /** The Constant SOUND_HELI. */
-    public static final String SOUND_HELI = "/Sounds/heli.ogg";
+    public static final String SOUND_HELI = "Sounds/heli.ogg";
     
     /** The Constant SOUND_LOAD. */
-    public static final String SOUND_LOAD = "/Sounds/load.ogg";
+    public static final String SOUND_LOAD = "Sounds/load.ogg";
     
     /** The Constant SOUND_ROCKET. */
-    public static final String SOUND_ROCKET = "/Sounds/rocket.ogg";
+    public static final String SOUND_ROCKET = "Sounds/rocket.ogg";
     
     /** The Constant SOUND_CAPTURE. */
-    public static final String SOUND_CAPTURE = "/Sounds/capture.ogg";
+    public static final String SOUND_CAPTURE = "Sounds/capture.ogg";
     
     /** The instance. */
     private static AudioManager instance;

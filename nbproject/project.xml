@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://www.netbeans.org/ns/project/1">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.java.j2seproject</type>
     <configuration>
         <buildExtensions xmlns="http://www.netbeans.org/ns/ant-build-extender/1">
@@ -18,6 +17,9 @@
             </extension>
             <extension file="linuxlauncher-impl.xml" id="linuxlauncher">
                 <dependency dependsOn="-linux-launcher" target="jar"/>
+            </extension>
+            <extension file="mobile-impl.xml" id="mobile">
+                <dependency dependsOn="-mobile-deployment" target="jar"/>
             </extension>
         </buildExtensions>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">

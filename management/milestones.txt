@@ -3,8 +3,8 @@
 //		SOLARWARS_ Milestones File
 //		
 //		Autor: Hans Ferchland
-//		Date: 23.04.2012
-//		Version: 1.1
+//		Date: 24.07.2012
+//		Version: 1.2
 //
 //======================================================
 
@@ -16,7 +16,8 @@
 		- half attack and faster
 	# balance ship speed
 	# balance ship generation speed
-	# get applet working
+	# get applet working...nearly, works as web start^^
+	# get damn android app working...
 * Alpha 0.9
 * Alpha 0.8
 * Alpha 0.7

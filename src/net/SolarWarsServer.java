@@ -31,12 +31,10 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
-import com.jme3.network.kernel.KernelException;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
 import java.io.IOException;
-import java.net.BindException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -114,11 +112,13 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(Player.class);
 
         try {
-            String fileName = SolarWarsApplication.getInstance().getClientLogFileName();
+            if (SolarWarsApplication.USE_LOG_FILES) {
+                String fileName = SolarWarsApplication.getInstance().getClientLogFileName();
 
-            serverLogFileHandler = new FileHandler(fileName + ".swsvrlog", true);
-            serverLogFileHandler.setLevel(Level.ALL);
-            logger.addHandler(serverLogFileHandler);
+                serverLogFileHandler = new FileHandler(fileName + ".swsvrlog", true);
+                serverLogFileHandler.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+                logger.addHandler(serverLogFileHandler);
+            }
             logger.setLevel(Level.ALL);
         } catch (IOException ex) {
             Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);

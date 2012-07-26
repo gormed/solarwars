@@ -47,55 +47,40 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
     /** The Constant COLOR_CHAT_BACKGROUND. */
     public static final ColorRGBA COLOR_CHAT_BACKGROUND = new ColorRGBA(0, 0, 1, 0.6f);
-    
     /** The Constant COLOR_CHAT_FONT. */
     public static final ColorRGBA COLOR_CHAT_FONT = new ColorRGBA(1, 0.5f, 0, 0.5f);
-    
     /** The Constant COLOR_CHAT_TEXTFIELD. */
     public static final ColorRGBA COLOR_CHAT_TEXTFIELD = new ColorRGBA(1, 1, 1, 0.4f);
-    
     /** The Constant PEEK_TIME. */
     public static final float PEEK_TIME = 5;
     /** The gui. */
     private GameGUI gui;
-    
     /** The chat module. */
     private ChatModule chatModule;
     /** The text area. */
     private Panel textArea;
-    
     /** The background. */
     private Panel background;
     /** The chat log. */
     private ArrayList<String> chatLog;
-    
     /** The max messages displayed. */
     private int maxMessagesDisplayed = 12;
-    
     /** The text lines. */
     private ArrayList<TextLine> textLines;
-    
     /** The chat input. */
     private ChatInput chatInput;
-    
     /** The fade max. */
     private float fadeMax;
-    
     /** The fade current. */
     private float fadeCurrent = 0;
-    
     /** The peek fade. */
     private float peekFade = 0;
-    
     /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 3500;
-    
     /** The fadeing. */
     private boolean fadeing = false;
-    
     /** The fade direction. */
     private boolean fadeDirection = true;
-    
     /** The peek. */
     private boolean peek = false;
 
@@ -429,9 +414,11 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
              */
             public ChatInputListener(InputManager inputManager, TextBox textBox) {
                 super(inputManager, textBox);
-                inputManager.addMapping(KeyInputMap.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
+                if (inputManager != null) {
+                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
 
-                inputManager.addListener(this, KeyInputMap.INPUT_MAPPING_ENTER);
+                    inputManager.addListener(this, KeyInputMap.INPUT_MAPPING_ENTER);
+                }
             }
 
             /* (non-Javadoc)
@@ -470,7 +457,6 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
         /** The line. */
         private Label line;
-        
         /** The line text. */
         private String lineText;
 

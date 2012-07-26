@@ -58,6 +58,7 @@ import net.NetworkManager;
  */
 public class SolarWarsApplication extends Application {
 
+    public static final boolean USE_LOG_FILES = false;
     public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
     /** The instance. */
     private static SolarWarsApplication instance;
@@ -72,7 +73,7 @@ public class SolarWarsApplication extends Application {
         if (instance != null) {
             return instance;
         }
-        return instance = new SolarWarsApplication();
+        return instance = new SolarWarsApplication(true);
     }
     /** The root node. */
     protected Node rootNode = new Node("Root Node");
@@ -96,6 +97,7 @@ public class SolarWarsApplication extends Application {
     protected IsoControl isoControl;
     /** The show settings. */
     protected boolean showSettings = true;
+    private boolean bloomEnabled = false;
     private String pingString = "";
     /** The show fps. */
     private boolean showFps = true;
@@ -121,7 +123,6 @@ public class SolarWarsApplication extends Application {
     private float correctedTimePerFrame;
     private FileHandler logFileHandler;
     private String fileName;
-    
     /** The logger for the complete client, called 'solarwars'*/
     private static final Logger clientLogger =
             Logger.getLogger(SolarWarsApplication.class.getPackage().getName() /* solarwars */);
@@ -151,16 +152,19 @@ public class SolarWarsApplication extends Application {
     /**
      * Instantiates a new solar wars application.
      */
-    private SolarWarsApplication() {
+    private SolarWarsApplication(boolean noUse) {
         super();
         try {
-            fileName = new Date(System.currentTimeMillis()).toString();
-            fileName = removeSpaces(fileName);
-            logFileHandler = new FileHandler(fileName + ".swlog", true);
-            logFileHandler.setLevel(Level.ALL);
-            clientLogger.addHandler(logFileHandler);
-            clientLogger.setLevel(Level.ALL);
-            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(Level.ALL);
+            if (USE_LOG_FILES) {
+                fileName = new Date(System.currentTimeMillis()).toString();
+                fileName = removeSpaces(fileName);
+                logFileHandler = new FileHandler(fileName + ".swlog", true);
+                logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
+                clientLogger.addHandler(logFileHandler);
+
+            }
+            clientLogger.setLevel(GLOBAL_LOGGING_LEVEL);
+            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(GLOBAL_LOGGING_LEVEL);
 
         } catch (IOException ex) {
             clientLogger.log(Level.SEVERE, null, ex);
@@ -168,6 +172,11 @@ public class SolarWarsApplication extends Application {
             clientLogger.log(Level.SEVERE, null, ex);
         }
         assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
+    }
+
+    public SolarWarsApplication() {
+        super();
+        bloomEnabled = true;
     }
 
     /**
@@ -334,6 +343,7 @@ public class SolarWarsApplication extends Application {
             settings.put("VSync", false);
             settings.put("FrameRate", 100);
             settings.put("SettingsDialogImage", "/Interface/solarwars_v2.png");
+            settings.put("USE_VA", false);
         }
     }
 
@@ -416,12 +426,15 @@ public class SolarWarsApplication extends Application {
      * Setup post effects.
      */
     private void setupPostEffects() {
+
         // setup post effects
         postProcessor = new FilterPostProcessor(assetManager);
-        bloomFilter.setDownSamplingFactor(2);
-        bloomFilter.setBloomIntensity(0.75f);
-        postProcessor.addFilter(bloomFilter);
-        viewPort.addProcessor(postProcessor);
+        if (bloomEnabled) {
+            bloomFilter.setDownSamplingFactor(2);
+            bloomFilter.setBloomIntensity(0.75f);
+            postProcessor.addFilter(bloomFilter);
+            viewPort.addProcessor(postProcessor);
+        }
     }
 
     /**
@@ -575,8 +588,9 @@ public class SolarWarsApplication extends Application {
             NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             clientLogger.log(Level.INFO, "Connections closed!");
         }
-
-        logFileHandler.close();
+        if (USE_LOG_FILES) {
+            logFileHandler.close();
+        }
         super.destroy();
     }
 

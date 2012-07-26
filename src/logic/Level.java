@@ -454,21 +454,20 @@ public class Level {
         return shipList.get(id);
     }
 
-
     /**
      * Updates the level.
      *
      * @param tpf the tpf
      */
     public void updateLevel(float tpf) {
-        
+
         if (!levelLoaded || gameOver) {
             GameOverGUI.getInstance().display();
             return;
         }
-        
+
         Gameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
-        
+
         if (Hub.getLocalPlayer().hasLost()) {
             Player.localPlayerLooses();
         } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1 || Player.lastPlayer()) {
@@ -584,15 +583,20 @@ public class Level {
          */
         private void getCorners() {
 
-            Vector2f leftBottom = new Vector2f(0, 0);
-            Vector2f leftTop = new Vector2f(0, gui.getHeight());
-            Vector2f rightTop = new Vector2f(gui.getWidth(), gui.getHeight());
-            Vector2f rightBottom = new Vector2f(gui.getWidth(), 0);
+//            final Vector2f leftBottom = new Vector2f(0, 0);
+//            final Vector2f leftTop = new Vector2f(0, gui.getHeight());
+//            final Vector2f rightTop = new Vector2f(gui.getWidth(), gui.getHeight());
+//            final Vector2f rightBottom = new Vector2f(gui.getWidth(), 0);
 
-            corners[0] = getWorldCoordsOnXZPlane(leftBottom, 0);
-            corners[1] = getWorldCoordsOnXZPlane(leftTop, 0);
-            corners[2] = getWorldCoordsOnXZPlane(rightTop, 0);
-            corners[3] = getWorldCoordsOnXZPlane(rightBottom, 0);
+//            corners[0] = getWorldCoordsOnXZPlane(leftBottom, 0);
+//            corners[1] = getWorldCoordsOnXZPlane(leftTop, 0);
+//            corners[2] = getWorldCoordsOnXZPlane(rightTop, 0);
+//            corners[3] = getWorldCoordsOnXZPlane(rightBottom, 0);
+
+            corners[0] = Vector3f.UNIT_XYZ.clone();
+            corners[1] = Vector3f.UNIT_XYZ.clone();
+            corners[2] = Vector3f.UNIT_XYZ.clone();
+            corners[3] = Vector3f.UNIT_XYZ.clone();
         }
 
         /**
@@ -804,10 +808,10 @@ public class Level {
             level.seed = seed;
             randomizer = new Random(seed);
 
-            int leftBottomX = Math.round(corners[0].x);
-            int leftBottomZ = Math.round(corners[0].z);
-            int topRightX = Math.round(corners[2].x);
-            int topRightZ = Math.round(corners[2].z);
+//            int leftBottomX = Math.round(corners[0].x);
+//            int leftBottomZ = Math.round(corners[0].z);
+//            int topRightX = Math.round(corners[2].x);
+//            int topRightZ = Math.round(corners[2].z);
 
             int playerCount = level.playersByID.size();
             int pointerX = 0;
