@@ -97,7 +97,7 @@ public class SolarWarsApplication extends Application {
     protected IsoControl isoControl;
     /** The show settings. */
     protected boolean showSettings = true;
-    private boolean bloomEnabled = false;
+    private boolean bloomEnabled = true;
     private String pingString = "";
     /** The show fps. */
     private boolean showFps = true;

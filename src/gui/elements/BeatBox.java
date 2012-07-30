@@ -342,13 +342,12 @@ public class BeatBox {
      * Play.
      */
     public void play() {
-//        if (baseSound != null) {
-//            baseSound.play();
-//            for (Beat beat : timerTasks) {
-//                globalTimer.schedule(beat, beat.layback, beat.period);
-//            }
-//        }
-
+        if (baseSound != null) {
+            baseSound.play();
+            for (Beat beat : timerTasks) {
+                globalTimer.schedule(beat, beat.layback, beat.period);
+            }
+        }
 
     }
 
@@ -356,14 +355,14 @@ public class BeatBox {
      * Stop.
      */
     public void stop() {
-//        if (baseSound != null) {
-//        baseSound.stop();
-//        for (Beat beat : timerTasks) {
-//            beat.cancel();
-//        }
-//        globalTimer.cancel();
-//        globalTimer = null;
-//        }
+        if (baseSound != null) {
+            baseSound.stop();
+            for (Beat beat : timerTasks) {
+                beat.cancel();
+            }
+            globalTimer.cancel();
+            globalTimer = null;
+        }
     }
 
     /**
