@@ -317,7 +317,9 @@ public class SolarWarsServer extends SimpleApplication {
         long t1 = System.currentTimeMillis();
 
         super.stop(waitFor);
-        serverLogFileHandler.close();
+        if (SolarWarsApplication.USE_LOG_FILES) {
+            serverLogFileHandler.close();
+        }
 
         long t2 = System.currentTimeMillis();
         final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
@@ -424,7 +426,7 @@ public class SolarWarsServer extends SimpleApplication {
      * @param hc the hc
      * @param classes the classes
      */
-    public void removeClientMessageListener(MessageListener hc) {
+    public void removeClientMessageListener(MessageListener<? super HostedConnection> hc) {
         gameServer.removeMessageListener(hc);
     }
 
@@ -614,13 +616,13 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getRecieverState());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
-                final String generalMsg =
-                        clientMessage.getActionName() + " from #"
-                        + clientMessage.getSender()
-                        + "/" + clientMessage.getSenderState().name
-                        + " to #" + clientMessage.getReciever()
-                        + "/" + clientMessage.getRecieverState().name;
-                logger.log(Level.INFO, generalMsg, serverMessage);
+//                final String generalMsg =
+//                        clientMessage.getActionName() + " from #"
+//                        + clientMessage.getSender()
+//                        + "/" + clientMessage.getSenderState().name
+//                        + " to #" + clientMessage.getReciever()
+//                        + "/" + clientMessage.getRecieverState().name;
+                logger.log(Level.INFO, serverMessage.getActionName(), serverMessage);
             }
         }
     }

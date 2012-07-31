@@ -229,15 +229,15 @@ public class MultiplayerGameplay {
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
                 
-                Player a = Hub.getPlayers().get(serverMessage.getSender());
-                Player b = Hub.getPlayers().get(serverMessage.getReciever());
-                a.applyState(serverMessage.getSenderState());
-                b.applyState(serverMessage.getRecieverState());
-                
-                actionLib.invokeGeneralAction(
-                        MultiplayerGameplay.getInstance(), 
-                        a, b, 
-                        serverMessage.getActionName());
+//                Player a = Hub.getPlayers().get(serverMessage.getSender());
+//                Player b = Hub.getPlayers().get(serverMessage.getReciever());
+//                a.applyState(serverMessage.getSenderState());
+//                b.applyState(serverMessage.getRecieverState());
+//                
+//                actionLib.invokeGeneralAction(
+//                        MultiplayerGameplay.getInstance(), 
+//                        a, b, 
+//                        serverMessage.getActionName());
             } else if (m instanceof LevelActionMessage) {
                 LevelActionMessage actionMessage = (LevelActionMessage) m;
                 syncronizeClient(actionMessage);

@@ -58,7 +58,7 @@ import net.NetworkManager;
  */
 public class SolarWarsApplication extends Application {
 
-    public static final boolean USE_LOG_FILES = false;
+    public static final boolean USE_LOG_FILES = true;
     public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
     /** The instance. */
     private static SolarWarsApplication instance;
