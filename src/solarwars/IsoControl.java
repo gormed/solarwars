@@ -308,18 +308,20 @@ public class IsoControl {
      */
     private void onMouseWeel(String name) {
         Player local = Hub.getLocalPlayer();
-        boolean up = (name.equals(InputMappings.MOUSE_WHEEL_DOWN)
-                && (name.equals(InputMappings.MOUSE_WHEEL_DOWN) || name.equals(InputMappings.MOUSE_WHEEL_UP)))
-                ? false : true;
+        if (!(name.equals(InputMappings.MOUSE_WHEEL_DOWN)
+                || name.equals(InputMappings.MOUSE_WHEEL_UP))) {
+            return;
+        }
+        boolean down = (name.equals(InputMappings.MOUSE_WHEEL_DOWN)) ? true : false;
 
         float amount = 0.05f;
-        onPercentageChange(amount, up);
+        onPercentageChange(amount, down);
         final String percentageChangeS = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
         logger.log(Level.FINE, percentageChangeS);
     }
 
-    private void onPercentageChange(float amount, boolean up) {
-        if (!up) {
+    private void onPercentageChange(float amount, boolean down) {
+        if (!down) {
             amount *= -1.0f;
         }
         Hub.getLocalPlayer().refreshShipPercentage(amount);
