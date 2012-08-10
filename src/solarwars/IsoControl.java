@@ -80,41 +80,10 @@ public class IsoControl {
      */
     private IsoControl() {
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-
-//        this.rootNode = application.getRootNode();
-//        this.cam = application.getCamera();
         this.actionLib = ActionLib.getInstance();
-
         this.markerNode = new MarkerNode();
-
-        // /** Explosion effect. Uses Texture from jme3-test-data library! */
-        // marker = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle,
-        // 1);
-        // Material debris_mat = new Material(assetManager,
-        // "Common/MatDefs/Misc/Particle.j3md");
-        // debris_mat.setTexture("Texture",
-        // assetManager.loadTexture("Textures/Effects/marker.png"));
-        // marker.setMaterial(debris_mat);
-        // marker.setImagesX(1);
-        // marker.setImagesY(1); // 3x3 texture animation
-        // marker.setStartSize(0.5f);
-        // marker.setEndSize(0.5f);
-        // marker.setLowLife(0.18f);
-        // marker.setHighLife(0.18f);
-        //
-        // // marker.setLowLife(0.55f);
-        // // marker.setHighLife(0.6f);
-        //
-        // marker.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 0,
-        // 0));
-        // marker.setStartColor(new ColorRGBA(0.1f, 0.1f, 1f, 1f));
-        // marker.setEndColor(new ColorRGBA(0.1f, 0.1f, 1f, 0.3f));
-        // //debris.getParticleInfluencer().setGravity(6f);
-        // //marker.getParticleInfluencer().setVelocityVariation(.60f);
-        // markerNode.attachChild(marker);
-        // marker.emitAllParticles();
-
         initialize(rootNode);
+        createDragRectGeometry(0, 0, new Vector2f(10, 10));
     }
 
     /**
@@ -147,7 +116,7 @@ public class IsoControl {
     /** The start xz plane pos. */
     private Vector3f startXZPlanePos;
     /** The start screen pos. */
-    private Vector2f startScreenPos;
+    private Vector2f startScreenPos = Vector2f.ZERO.clone();
     // planet & shipgroup selection
     /** The planet selection. */
     private ArrayList<AbstractPlanet> planetSelection;
@@ -189,6 +158,110 @@ public class IsoControl {
     //==========================================================================
 
     /**
+     * Creates the dragging raectangle for selection geometry.
+     * @param width
+     * @param height
+     * @param click2d 
+     */
+    private void createDragRectGeometry(float width, float height, Vector2f click2d) {
+        ColorRGBA frame = ColorRGBA.Orange.clone();
+        frame.a = 0.35f;
+        ColorRGBA center = ColorRGBA.Orange.clone();
+        center.a = 0.09f;
+        centerDrag = new Panel(
+                "centerSel",
+                new Vector3f(0, 0, 0),
+                new Vector2f(10, 10),
+                center);
+
+        leftDrag = new Panel(
+                "leftSel",
+                new Vector3f(0, 0, 0),
+                new Vector2f(10, 10),
+                frame);
+
+        topDrag = new Panel(
+                "topSel",
+                new Vector3f(0, 0, 0),
+                new Vector2f(10, 10),
+                frame);
+
+        rightDrag = new Panel(
+                "rightSel",
+                new Vector3f(0, 0, 0),
+                new Vector2f(10, 10),
+                frame);
+
+        bottomDrag = new Panel(
+                "bottomSel",
+                new Vector3f(0, 0, 0),
+                new Vector2f(10, 10),
+                frame);
+
+//        centerDrag = new Panel(
+//                "centerSel",
+//                new Vector3f(
+//                startScreenPos.x + (width) * 0.5f,
+//                startScreenPos.y + (height) * 0.5f,
+//                0),
+//                new Vector2f(
+//                Math.abs(width / 2),
+//                Math.abs(height / 2)),
+//                center);
+//
+//        leftDrag = new Panel(
+//                "leftSel",
+//                new Vector3f(
+//                startScreenPos.x,
+//                startScreenPos.y + (height) * 0.5f,
+//                0),
+//                new Vector2f(
+//                1,
+//                Math.abs(height / 2)),
+//                frame);
+//
+//        topDrag = new Panel(
+//                "topSel",
+//                new Vector3f(
+//                startScreenPos.x + (width) * 0.5f,
+//                startScreenPos.y,
+//                0),
+//                new Vector2f(
+//                Math.abs(width / 2),
+//                1),
+//                frame);
+//
+//        rightDrag = new Panel(
+//                "rightSel",
+//                new Vector3f(
+//                click2d.x,
+//                startScreenPos.y + (height) * 0.5f,
+//                0),
+//                new Vector2f(
+//                1,
+//                Math.abs(height / 2)),
+//                frame);
+//
+//        bottomDrag = new Panel(
+//                "bottomSel",
+//                new Vector3f(
+//                startScreenPos.x + (width) * 0.5f,
+//                click2d.y,
+//                0),
+//                new Vector2f(
+//                Math.abs(width / 2),
+//                1),
+//                frame);
+
+        centerDrag.setVisible(false);
+        leftDrag.setVisible(false);
+        topDrag.setVisible(false);
+        rightDrag.setVisible(false);
+        bottomDrag.setVisible(false);
+
+    }
+
+    /**
      * Initializes the players main controls.
      *
      * @param rootNode the root node
@@ -204,6 +277,12 @@ public class IsoControl {
             public void onAction(String name, boolean keyPressed, float tpf) {
 
                 gui = Gameplay.getCurrentLevel().getGUI();
+
+                gui.addGUIElement(rightDrag);
+                gui.addGUIElement(leftDrag);
+                gui.addGUIElement(topDrag);
+                gui.addGUIElement(bottomDrag);
+                gui.addGUIElement(centerDrag);
                 Vector2f point = inputManager.getCursorPosition();
                 if (keyPressed) {
                     onButtonDown(name, point);
@@ -295,6 +374,12 @@ public class IsoControl {
                 }
                 markerNodes.clear();
             }
+            updateDragRect(click2d);
+            centerDrag.setVisible(true);
+            leftDrag.setVisible(true);
+            topDrag.setVisible(true);
+            rightDrag.setVisible(true);
+            bottomDrag.setVisible(true);
             markerNodes = new ArrayList<MarkerNode>();
             //                        startDrag = new Cross(assetManager);
             //                        startDrag.setLocalTranslation(startXZPlanePos);
@@ -531,26 +616,13 @@ public class IsoControl {
                 lastXZPlanePos = null;
                 startScreenPos = null;
                 startXZPlanePos = null;
-                if (centerDrag != null) {
-                    gui.removeGUIElement(centerDrag);
-                    centerDrag = null;
-                }
-                if (leftDrag != null) {
-                    gui.removeGUIElement(leftDrag);
-                    leftDrag = null;
-                }
-                if (topDrag != null) {
-                    gui.removeGUIElement(topDrag);
-                    topDrag = null;
-                }
-                if (rightDrag != null) {
-                    gui.removeGUIElement(rightDrag);
-                    rightDrag = null;
-                }
-                if (bottomDrag != null) {
-                    gui.removeGUIElement(bottomDrag);
-                    bottomDrag = null;
-                }
+
+                centerDrag.setVisible(false);
+                leftDrag.setVisible(false);
+                topDrag.setVisible(false);
+                rightDrag.setVisible(false);
+                bottomDrag.setVisible(false);
+
                 return true;
             }
         }
@@ -749,22 +821,21 @@ public class IsoControl {
      * @param tpf the tpf
      */
     void updateSelection(float tpf) {
-        if (centerDrag != null) {
-            gui.removeGUIElement(centerDrag);
-            centerDrag = null;
-        }
-        if (leftDrag != null) {
-            gui.removeGUIElement(leftDrag);
-        }
-        if (topDrag != null) {
-            gui.removeGUIElement(topDrag);
-        }
-        if (rightDrag != null) {
-            gui.removeGUIElement(rightDrag);
-        }
-        if (bottomDrag != null) {
-            gui.removeGUIElement(bottomDrag);
-        }
+//        if (centerDrag != null) {
+//            gui.removeGUIElement(centerDrag);
+//        }
+//        if (leftDrag != null) {
+//            gui.removeGUIElement(leftDrag);
+//        }
+//        if (topDrag != null) {
+//            gui.removeGUIElement(topDrag);
+//        }
+//        if (rightDrag != null) {
+//            gui.removeGUIElement(rightDrag);
+//        }
+//        if (bottomDrag != null) {
+//            gui.removeGUIElement(bottomDrag);
+//        }
         if (markerNode != null) {
             markerNode.updateMarker(tpf);
         }
@@ -775,12 +846,11 @@ public class IsoControl {
         }
 
         if (!dragging || startScreenPos == null) {
-//            if (startDrag != null) {
-//                rootNode.detachChild(startDrag);
-//            }
-//            if (endDrag != null) {
-//                rootNode.detachChild(endDrag);
-//            }
+//            centerDrag.setVisible(false);
+//            leftDrag.setVisible(false);
+//            topDrag.setVisible(false);
+//            rightDrag.setVisible(false);
+//            bottomDrag.setVisible(false);
             return;
         }
         Vector2f click2d = inputManager.getCursorPosition();
@@ -794,88 +864,65 @@ public class IsoControl {
         Vector3f currentXZPlanePos =
                 ray.getDirection().clone().
                 mult(t).addLocal(ray.getOrigin().clone());
-        float width = click2d.x - startScreenPos.x;
-        float height = click2d.y - startScreenPos.y;
 
-        ColorRGBA frame = ColorRGBA.Orange.clone();
-        frame.a = 0.35f;
-        ColorRGBA center = ColorRGBA.Orange.clone();
-        center.a = 0.09f;
-//        if (endDrag != null) {
-//            rootNode.detachChild(endDrag);
-//        }
-//        endDrag = new Cross(assetManager);
-//        endDrag.setLocalTranslation(currentXZPlanePos);
-//        rootNode.attachChild(endDrag);
+        updateDragRect(click2d);
 
-        //Vector2f centerDragPos = click2d.clone();
-
-        centerDrag = new Panel(
-                "centerSel",
-                new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                startScreenPos.y + (height) * 0.5f,
-                0),
-                new Vector2f(
-                Math.abs(width / 2),
-                Math.abs(height / 2)),
-                center);
-
-        leftDrag = new Panel(
-                "leftSel",
-                new Vector3f(
-                startScreenPos.x,
-                startScreenPos.y + (height) * 0.5f,
-                0),
-                new Vector2f(
-                1,
-                Math.abs(height / 2)),
-                frame);
-
-        topDrag = new Panel(
-                "topSel",
-                new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                startScreenPos.y,
-                0),
-                new Vector2f(
-                Math.abs(width / 2),
-                1),
-                frame);
-
-        rightDrag = new Panel(
-                "rightSel",
-                new Vector3f(
-                click2d.x,
-                startScreenPos.y + (height) * 0.5f,
-                0),
-                new Vector2f(
-                1,
-                Math.abs(height / 2)),
-                frame);
-
-        bottomDrag = new Panel(
-                "bottomSel",
-                new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                click2d.y,
-                0),
-                new Vector2f(
-                Math.abs(width / 2),
-                1),
-                frame);
-
-        gui.addGUIElement(centerDrag);
-        gui.addGUIElement(leftDrag);
-        gui.addGUIElement(topDrag);
-        gui.addGUIElement(rightDrag);
-        gui.addGUIElement(bottomDrag);
+        centerDrag.updateGUI(tpf);
+        leftDrag.updateGUI(tpf);
+        topDrag.updateGUI(tpf);
+        rightDrag.updateGUI(tpf);
+        bottomDrag.updateGUI(tpf);
 
         for (MarkerNode marker : markerNodes) {
             removeMarker(marker);
         }
         markerNodes.clear();
         lastXZPlanePos = currentXZPlanePos;
+    }
+
+    private void updateDragRect(Vector2f click2d) {
+        float width = click2d.x - startScreenPos.x;
+        float height = click2d.y - startScreenPos.y;
+
+        centerDrag.setScreenPosition(new Vector3f(
+                startScreenPos.x + (width) * 0.5f,
+                startScreenPos.y + (height) * 0.5f,
+                0));
+        centerDrag.setSize(new Vector2f(
+                Math.abs(width / 2),
+                Math.abs(height / 2)));
+
+        leftDrag.setScreenPosition(new Vector3f(
+                startScreenPos.x,
+                startScreenPos.y + (height) * 0.5f,
+                0));
+        leftDrag.setSize(new Vector2f(
+                1,
+                Math.abs(height / 2)));
+
+        topDrag.setScreenPosition(new Vector3f(
+                startScreenPos.x + (width) * 0.5f,
+                startScreenPos.y,
+                0));
+        topDrag.setSize(new Vector2f(
+                Math.abs(width / 2),
+                1));
+
+        rightDrag.setScreenPosition(new Vector3f(
+                click2d.x,
+                startScreenPos.y + (height) * 0.5f,
+                0));
+        rightDrag.setSize(new Vector2f(
+                1,
+                Math.abs(height / 2)));
+
+        bottomDrag.setScreenPosition(new Vector3f(
+                startScreenPos.x + (width) * 0.5f,
+                click2d.y,
+                0));
+        bottomDrag.setSize(new Vector2f(
+                Math.abs(width / 2),
+                1));
     }
 
     /**

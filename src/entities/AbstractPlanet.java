@@ -41,6 +41,7 @@ import logic.Player;
 import solarwars.FontLoader;
 import solarwars.Hub;
 import solarwars.IsoCamera;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class AbstractPlanet.
@@ -50,9 +51,9 @@ public abstract class AbstractPlanet extends Node {
     /** The Constant SHIP_REFRESH_MULTIPILER. */
     private static final int SHIP_REFRESH_MULTIPILER = 1;
     /** The Constant SPHERE_Z_SAMPLES. */
-    public static final int SPHERE_Z_SAMPLES = 20;
+    public static final int SPHERE_Z_SAMPLES = 10;
     /** The Constant SPHERE_RADIAL_SAMPLES. */
-    public static final int SPHERE_RADIAL_SAMPLES = 20;
+    public static final int SPHERE_RADIAL_SAMPLES = 10;
     /** The asset manager. */
     protected AssetManager assetManager;
     /** The geometry. */
@@ -303,8 +304,14 @@ public abstract class AbstractPlanet extends Node {
         owner = p;
         label.setColor(ColorRGBA.Black.clone());
         material.setColor("Specular", owner.getColor());
-        material.setColor("Diffuse", ColorRGBA.LightGray);
-        material.setColor("GlowColor", owner.getColor());
+        if (SolarWarsApplication.TOON_ENABLED) {
+            material.setColor("Diffuse", ColorRGBA.LightGray);
+        } else {
+            material.setColor("Diffuse", owner.getColor());
+        }
+        if (SolarWarsApplication.BLOOM_ENABLED) {
+            material.setColor("GlowColor", owner.getColor());
+        }
     }
 
     /**
@@ -461,10 +468,10 @@ public abstract class AbstractPlanet extends Node {
             if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
 //                while (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
 //                    shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER * shipIncrement);
-                    ships++;
+                ships++;
 //                }
 //                if (shipGainTime < 0) {
-                    shipGainTime = 0;
+                shipGainTime = 0;
 //                }
             }
         }

@@ -39,16 +39,12 @@ public class Panel extends GUIElement {
 
     /** The screen position. */
     protected Vector3f screenPosition;
-    
     /** The geometry. */
     protected Geometry geometry;
-    
     /** The material. */
     protected Material material;
-    
     /** The color. */
     protected ColorRGBA color;
-    
     /** The size. */
     protected Vector2f size;
 
@@ -75,14 +71,15 @@ public class Panel extends GUIElement {
     private void createPanel() {
         AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
 
-        Box b = new Box(Vector3f.ZERO, size.x, size.y, 1);
+        Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         geometry = new Geometry(name + "_Geometry", b);
         material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", color);
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         geometry.setMaterial(material);
-        
+
         geometry.setLocalTranslation(screenPosition);
+        geometry.setLocalScale(size.x, size.y, 1);
         attachChild(geometry);
     }
 
@@ -91,6 +88,8 @@ public class Panel extends GUIElement {
      */
     @Override
     public void updateGUI(float tpf) {
+        geometry.setLocalTranslation(screenPosition);
+        geometry.setLocalScale(size.x, size.y, 1);
     }
 
     /* (non-Javadoc)
@@ -127,5 +126,13 @@ public class Panel extends GUIElement {
      */
     public Vector2f getSize() {
         return size;
+    }
+
+    public void setScreenPosition(Vector3f screenPosition) {
+        this.screenPosition = screenPosition;
+    }
+
+    public void setSize(Vector2f size) {
+        this.size = size;
     }
 }

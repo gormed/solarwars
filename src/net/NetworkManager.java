@@ -28,6 +28,7 @@ import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.ErrorListener;
+import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
@@ -91,7 +92,7 @@ public class NetworkManager {
      */
     public static boolean checkIP(String sip) {
         String[] parts = sip.split("\\.");
-        if (parts.length < 1 || parts.length > 4 || (parts.length > 0 && parts[0].equals(""))) {
+        if (parts.length != 4 || (parts.length > 0 && parts[0].equals(""))) {
             return false;
         }
         try {
@@ -225,7 +226,7 @@ public class NetworkManager {
         thisClient.removeClientStateListener(csl);
     }
 
-    public void clientRemoveErrorListener(ErrorListener el) {
+    public void clientRemoveErrorListener(ErrorListener<? super Client> el) {
         thisClient.removeErrorListener(el);
     }
 
@@ -233,7 +234,7 @@ public class NetworkManager {
         thisClient.removeMessageListener(listener);
     }
 
-    public void serverRemoveClientMessageListener(MessageListener listener) {
+    public void serverRemoveClientMessageListener(MessageListener<? super HostedConnection> listener) {
         thisServer.removeClientMessageListener(listener);
     }
 

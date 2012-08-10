@@ -32,8 +32,8 @@ import com.jme3.math.Vector3f;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
-import gui.KeyInputMap;
-import gui.KeyboardListener;
+import input.KeyInputManager;
+import input.KeyboardListener;
 import java.util.ArrayList;
 import logic.Player;
 import net.ChatModule;
@@ -415,9 +415,9 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
             public ChatInputListener(InputManager inputManager, TextBox textBox) {
                 super(inputManager, textBox);
                 if (inputManager != null) {
-                    inputManager.addMapping(KeyInputMap.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
+                    inputManager.addMapping(KeyInputManager.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
 
-                    inputManager.addListener(this, KeyInputMap.INPUT_MAPPING_ENTER);
+                    inputManager.addListener(this, KeyInputManager.INPUT_MAPPING_ENTER);
                 }
             }
 
@@ -436,13 +436,13 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
 
                 if (!isPressed && activeTextBox.equals(textBox)) {
 
-                    if (name.equals(KeyInputMap.INPUT_MAPPING_ENTER) && !"".equals(caption)) {
+                    if (name.equals(KeyInputManager.INPUT_MAPPING_ENTER) && !"".equals(caption)) {
                         localPlayerSays(getCaption());
                         //playerSays(Hub.getLocalPlayer(), getCaption());
                         setCaption("");
-                    } else if (name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
+                    } else if (name.equals(KeyInputManager.INPUT_MAPPING_BACKSPACE) && caption.length() > 0) {
                         caption = caption.substring(0, caption.length() - 1);
-                    } else if (!name.equals(KeyInputMap.INPUT_MAPPING_BACKSPACE) && !name.equals(KeyInputMap.INPUT_MAPPING_ENTER)) {
+                    } else if (!name.equals(KeyInputManager.INPUT_MAPPING_BACKSPACE) && !name.equals(KeyInputManager.INPUT_MAPPING_ENTER)) {
                         caption += name;
                     }
                 }

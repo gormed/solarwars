@@ -57,13 +57,56 @@ import net.NetworkManager;
  * The Class SolarWarsApplication.
  */
 public class SolarWarsApplication extends Application {
+    //==========================================================================
+    //      MAIN METHOD
+    //==========================================================================
 
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
+        getInstance().initSettings();
+        getInstance().start();
+    }
+    //==========================================================================
+    //      Static Fields
+    //==========================================================================
     public static final boolean USE_LOG_FILES = true;
     public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
-    /** The instance. */
-    private static SolarWarsApplication instance;
-    //private static AppSettings settings;
+    public static boolean TOON_ENABLED = true;
+    /** Flag for Bloom-Effect */
+    public static boolean BLOOM_ENABLED = true;
+    /** The logger for the complete client, called 'solarwars'*/
+    private static final Logger clientLogger =
+            Logger.getLogger(
+            SolarWarsApplication.class.getPackage().getName() /* solarwars */);
 
+    //==========================================================================
+    //      Static Methods
+    //==========================================================================
+    public static String removeSpaces(String s) {
+        StringTokenizer st = new StringTokenizer(s, " ", false);
+        String t = "";
+        while (st.hasMoreElements()) {
+            t += st.nextElement();
+        }
+        StringTokenizer st2 = new StringTokenizer(t, ":", false);
+        t = "";
+        while (st2.hasMoreElements()) {
+            t += st2.nextElement();
+        }
+        return t;
+    }
+
+    public static Logger getClientLogger() {
+        return clientLogger;
+    }
+
+    //==========================================================================
+    //      Singleton
+    //==========================================================================
     /**
      * Gets the single instance of SolarWarsApplication.
      *
@@ -75,6 +118,45 @@ public class SolarWarsApplication extends Application {
         }
         return instance = new SolarWarsApplication(true);
     }
+
+    /**
+     * Instantiates a new solar wars application.
+     * @param thisHasNoUse Only here because we need a empty public 
+     * constructor for Android.
+     */
+    private SolarWarsApplication(boolean thisHasNoUse) {
+        super();
+        try {
+            if (USE_LOG_FILES) {
+                fileName = new Date(System.currentTimeMillis()).toString();
+                fileName = removeSpaces(fileName);
+                logFileHandler = new FileHandler(fileName + ".swlog", true);
+                logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
+                clientLogger.addHandler(logFileHandler);
+
+            }
+            clientLogger.setLevel(GLOBAL_LOGGING_LEVEL);
+            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(GLOBAL_LOGGING_LEVEL);
+
+        } catch (IOException ex) {
+            clientLogger.log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            clientLogger.log(Level.SEVERE, null, ex);
+        }
+        assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
+    }
+
+    /**
+     * Public constructor for android harness or so, Do not use!
+     */
+    public SolarWarsApplication() {
+        super();
+    }
+    /** The instance. */
+    private static SolarWarsApplication instance;
+    //==========================================================================
+    //      Protected & Private Fields
+    //==========================================================================
     /** The root node. */
     protected Node rootNode = new Node("Root Node");
     /** The gui node. */
@@ -97,7 +179,6 @@ public class SolarWarsApplication extends Application {
     protected IsoControl isoControl;
     /** The show settings. */
     protected boolean showSettings = true;
-    private boolean bloomEnabled = true;
     private String pingString = "";
     /** The show fps. */
     private boolean showFps = true;
@@ -123,71 +204,9 @@ public class SolarWarsApplication extends Application {
     private float correctedTimePerFrame;
     private FileHandler logFileHandler;
     private String fileName;
-    /** The logger for the complete client, called 'solarwars'*/
-    private static final Logger clientLogger =
-            Logger.getLogger(SolarWarsApplication.class.getPackage().getName() /* solarwars */);
-
-    public static String removeSpaces(String s) {
-        StringTokenizer st = new StringTokenizer(s, " ", false);
-        String t = "";
-        while (st.hasMoreElements()) {
-            t += st.nextElement();
-        }
-        StringTokenizer st2 = new StringTokenizer(t, ":", false);
-        t = "";
-        while (st2.hasMoreElements()) {
-            t += st2.nextElement();
-        }
-        return t;
-    }
-
-    public static Logger getClientLogger() {
-        return clientLogger;
-    }
-
-    public String getClientLogFileName() {
-        return fileName;
-    }
-
-    /**
-     * Instantiates a new solar wars application.
-     */
-    private SolarWarsApplication(boolean noUse) {
-        super();
-        try {
-            if (USE_LOG_FILES) {
-                fileName = new Date(System.currentTimeMillis()).toString();
-                fileName = removeSpaces(fileName);
-                logFileHandler = new FileHandler(fileName + ".swlog", true);
-                logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
-                clientLogger.addHandler(logFileHandler);
-
-            }
-            clientLogger.setLevel(GLOBAL_LOGGING_LEVEL);
-            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(GLOBAL_LOGGING_LEVEL);
-
-        } catch (IOException ex) {
-            clientLogger.log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            clientLogger.log(Level.SEVERE, null, ex);
-        }
-        assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
-    }
-
-    public SolarWarsApplication() {
-        super();
-        bloomEnabled = true;
-    }
-
-    /**
-     * The main method.
-     *
-     * @param args the arguments
-     */
-    public static void main(String[] args) {
-        getInstance().initSettings();
-        getInstance().start();
-    }
+    //==========================================================================
+    //      Methods
+    //==========================================================================
 
     /**
      * Gets the iso cam.
@@ -196,6 +215,14 @@ public class SolarWarsApplication extends Application {
      */
     public IsoCamera getIsoCam() {
         return isoCam;
+    }
+
+    /**
+     * Gets the name of the currently used log-file.
+     * @return 
+     */
+    public String getClientLogFileName() {
+        return fileName;
     }
 
     /**
@@ -323,10 +350,6 @@ public class SolarWarsApplication extends Application {
         if (settings == null) {
             settings = new AppSettings(false);
 
-//            settings.setBitsPerPixel(24);
-//            settings.setWidth(1024);
-//
-//            settings.setHeight(768);
             settings.put("Width", 1024);
             settings.put("Height", 768);
             settings.put("BitsPerPixel", 24);
@@ -340,10 +363,10 @@ public class SolarWarsApplication extends Application {
             settings.put("AudioRenderer", AppSettings.LWJGL_OPENAL);
             settings.put("DisableJoysticks", true);
             settings.put("UseInput", true);
-            settings.put("VSync", false);
+            settings.put("VSync", true);
             settings.put("FrameRate", 100);
             settings.put("SettingsDialogImage", "/Interface/solarwars_v2.png");
-            settings.put("USE_VA", false);
+            settings.put("USE_VA", true);
         }
     }
 
@@ -412,14 +435,11 @@ public class SolarWarsApplication extends Application {
         game = SolarWarsGame.getInstance();
         game.initialize(this);
         game.start();
-        attachLogger();
-    }
 
-    private void attachLogger() {
+        // Attach the logger of input to the client logger.
         Logger inputLogger = Logger.getLogger(InputManager.class.getName());
         inputLogger.setUseParentHandlers(true);
         inputLogger.setParent(clientLogger);
-
     }
 
     /**
@@ -429,7 +449,7 @@ public class SolarWarsApplication extends Application {
 
         // setup post effects
         postProcessor = new FilterPostProcessor(assetManager);
-        if (bloomEnabled) {
+        if (BLOOM_ENABLED) {
             bloomFilter.setDownSamplingFactor(2);
             bloomFilter.setBloomIntensity(0.75f);
             postProcessor.addFilter(bloomFilter);
@@ -594,12 +614,19 @@ public class SolarWarsApplication extends Application {
         super.destroy();
     }
 
+    /**
+     * Reset the delay counter for network delay.
+     */
     private void resetSync() {
         this.tempDelay = 0;
         this.syncronized = false;
 
     }
 
+    /**
+     * Syncs the client to the server with the current delay.
+     * @param delay the delay between server and this client.
+     */
     public void syncronize(float delay) {
 //        if (Hub.getLocalPlayer().isHost()) {
 //            this.tempDelay = 0;
@@ -614,23 +641,44 @@ public class SolarWarsApplication extends Application {
         this.syncronized = true;
     }
 
+    /**
+     * Finishes the syncronisation.
+     */
     private void endSync() {
         this.lastDelay = currentDelay;
         this.currentDelay = tempDelay;
     }
 
+    /**
+     * Checks if the client is already synced in this frame. 
+     * Will be reset on frame-end.
+     * @return 
+     */
     public boolean isSyncronized() {
         return syncronized;
     }
 
+    /**
+     * Checks if paused.
+     * @return 
+     */
     public boolean isPaused() {
         return paused;
     }
 
+    /**
+     * Gets the corrected time, according to the delay to the server.
+     * correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame
+     * @return 
+     */
     public float getCorrectedTimePerFrame() {
         return correctedTimePerFrame;
     }
 
+    /**
+     * The time on this client needed for the frame.
+     * @return 
+     */
     public float getRealTimePerFrame() {
         return realTimePerFrame;
     }

@@ -30,6 +30,7 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.util.TangentBinormalGenerator;
 import logic.Level;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class BasePlanet.
@@ -68,13 +69,15 @@ public class BasePlanet extends AbstractPlanet {
         material.setColor("Specular", new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));//new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
         material.setTexture("DiffuseMap", 
                 assetManager.loadTexture("Textures/Planets/noise.png"));
+        material.setColor("Diffuse", new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
         
-        if (material.getMaterialDef().getName().equals("Phong Lighting")) {
+        if (material.getMaterialDef().getName().equals("Phong Lighting")
+                && SolarWarsApplication.TOON_ENABLED) {
             Texture t = assetManager.loadTexture("Textures/Shader/toon.png");
             //t.setMinFilter(Texture.MinFilter.NearestNoMipMaps);
             //t.setMagFilter(Texture.MagFilter.Nearest);
             material.setTexture("ColorRamp", t);
-            material.setColor("Diffuse", new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
+            
             material.setBoolean("VertexLighting", true);
         }
 

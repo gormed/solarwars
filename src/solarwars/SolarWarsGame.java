@@ -31,7 +31,7 @@ import gamestates.lib.MultiplayerState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
-import java.util.logging.Level;
+import input.KeyInputManager;
 import java.util.logging.Logger;
 import logic.ActionLib;
 import net.NetworkManager;
@@ -90,6 +90,9 @@ public class SolarWarsGame {
     private ActionLib actionLib;
     /** The audio manager. */
     private AudioManager audioManager;
+    /** The KeyInputManager refecrence */
+    private KeyInputManager keyInputManager;
+    /** The Logger for the client game */
     private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
 
     /**
@@ -111,6 +114,7 @@ public class SolarWarsGame {
         fontLoader = FontLoader.getInstance();
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
+        keyInputManager = KeyInputManager.getInstance();
         logger.info("SolarWarsGame initialized!");
 
     }
