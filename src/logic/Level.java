@@ -29,6 +29,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial.CullHint;
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.BasePlanet;
@@ -206,15 +207,6 @@ public class Level {
     }
 
     /**
-     * Gets the gUI.
-     *
-     * @return the gUI
-     */
-    public GameGUI getGUI() {
-        return gui;
-    }
-
-    /**
      * 
      * Retruns the loading state of the level. 
      * Do not update the level while not loaded properly.
@@ -316,7 +308,7 @@ public class Level {
             this.allShipsNode.attachChild(n);
         }
 
-        batchManager = ShipBatchManager.getInstance();
+        batchManager = new ShipBatchManager(this);
         batchManager.initialize(Hub.playersByID.size() * 100);
 
     }
@@ -347,8 +339,9 @@ public class Level {
      * @param s the s
      */
     public void addShip(Player p, AbstractShip s) {
-        Node shipNode = shipNodes.get(p);
-        shipNode.attachChild(s);
+//        Node shipNode = shipNodes.get(p);
+//        shipNode.attachChild(s);
+        
         shipList.put(s.getId(), s);
     }
 
@@ -371,8 +364,9 @@ public class Level {
      * @param s the s
      */
     public void removeShip(Player p, AbstractShip s) {
-        Node shipNode = shipNodes.get(p);
-        shipNode.detachChild(s);
+//        Node shipNode = shipNodes.get(p);
+//        shipNode.detachChild(s);
+        
         removeShipsList.add(s);
     }
 
@@ -454,6 +448,10 @@ public class Level {
         return shipList.get(id);
     }
 
+    public ShipBatchManager getBatchManager() {
+        return batchManager;
+    }
+    
     /**
      * Updates the level.
      *
@@ -517,8 +515,10 @@ public class Level {
         this.levelNode = null;
         this.freePlanetsNode = null;
         this.allShipsNode = null;
+        this.batchManager.destroy();
+        this.batchManager = null;
 
-        // Init lists
+        // free lists
         this.planetList.clear();
         this.shipList.clear();
         this.shipGroupList.clear();

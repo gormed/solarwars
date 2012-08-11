@@ -108,6 +108,7 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        gui = GameGUI.getInstance();
         lostConnection = false;
         hub = Hub.getInstance();
         this.game = game;
@@ -187,7 +188,6 @@ public class MultiplayerMatchState extends Gamestate {
      * Setup gui.
      */
     private void setupGUI() {
-        gui = new GameGUI(game);
         gui.addGUIElement(new Percentage(gui));
         pause = new PauseGUI(game, gui);
 

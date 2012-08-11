@@ -77,7 +77,7 @@ public class TutorialState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
-        gui = new GameGUI(game);
+        gui = GameGUI.getInstance();
         tutorialLabel = new Label(
                 "Tutorial",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),

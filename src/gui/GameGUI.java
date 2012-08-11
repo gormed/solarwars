@@ -51,52 +51,17 @@ import solarwars.SolarWarsGame;
  */
 public class GameGUI {
 
-    /** The game. */
-    SolarWarsGame game;
-    /** The gui elemetns. */
-    private ArrayList<GUIElement> guiElements;
-    private InputManager inputManager;
-    /** The width. */
-    private float width;
-    /** The action listener. */
-    private ActionListener clickActionListener;
-    private ActionListener keyActionListener;
-    private TouchListener touchListener;
-    /** The focus. */
-    private GUIElement focus;
-    /** The height. */
-    private float height;
-    /** The clickable node. */
-    private final Node clickableNode = new Node("ClickableGUI");
-    /** The deco node. */
-    private Node decoNode;
-    private static final Logger logger = Logger.getLogger(GameGUI.class.getName());
+    private static GameGUI currentGUI = null;
 
-    /**
-     * Gets the height.
-     *
-     * @return the height
-     */
-    public float getHeight() {
-        return height;
+    private void applyGUI() {
+        currentGUI = this;
     }
 
-    /**
-     * Gets the width.
-     *
-     * @return the width
-     */
-    public float getWidth() {
-        return width;
-    }
-
-    /**
-     * Gets the focus element.
-     *
-     * @return the focus element
-     */
-    public GUIElement getFocusElement() {
-        return focus;
+    public static GameGUI getInstance() {
+        if (currentGUI != null) {
+            return currentGUI;
+        }
+        return currentGUI = new GameGUI(SolarWarsGame.getInstance());
     }
 
     /**
@@ -104,7 +69,7 @@ public class GameGUI {
      *
      * @param game the game
      */
-    public GameGUI(SolarWarsGame game) {
+    private GameGUI(SolarWarsGame game) {
 
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
         this.game = game;
@@ -215,6 +180,55 @@ public class GameGUI {
             inputManager.addListener(keyActionListener,
                     InputMappings.KEYBOARD_CONTROL, InputMappings.KEY_V);
         }
+
+        applyGUI();
+    }
+    /** The game. */
+    SolarWarsGame game;
+    /** The gui elemetns. */
+    private ArrayList<GUIElement> guiElements;
+    private InputManager inputManager;
+    /** The width. */
+    private float width;
+    /** The action listener. */
+    private ActionListener clickActionListener;
+    private ActionListener keyActionListener;
+    private TouchListener touchListener;
+    /** The focus. */
+    private GUIElement focus;
+    /** The height. */
+    private float height;
+    /** The clickable node. */
+    private final Node clickableNode = new Node("ClickableGUI");
+    /** The deco node. */
+    private Node decoNode;
+    private static final Logger logger = Logger.getLogger(GameGUI.class.getName());
+
+    /**
+     * Gets the height.
+     *
+     * @return the height
+     */
+    public float getHeight() {
+        return height;
+    }
+
+    /**
+     * Gets the width.
+     *
+     * @return the width
+     */
+    public float getWidth() {
+        return width;
+    }
+
+    /**
+     * Gets the focus element.
+     *
+     * @return the focus element
+     */
+    public GUIElement getFocusElement() {
+        return focus;
     }
 
     private void onClick(boolean isPressed, float tpf, Vector2f point) {

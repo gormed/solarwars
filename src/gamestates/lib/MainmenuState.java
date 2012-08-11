@@ -82,8 +82,7 @@ public class MainmenuState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame swgame) {
-        gui = new GameGUI(swgame);
-
+        gui = GameGUI.getInstance();
         solarwars = new Label("SOLARWARS", new Vector3f(gui.getWidth() / 2,
                 9 * gui.getHeight() / 10, 4), new Vector3f(2, 2, 1), ColorRGBA.White, gui) {
 

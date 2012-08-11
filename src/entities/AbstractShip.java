@@ -34,6 +34,7 @@ import logic.ActionLib;
 import logic.Gameplay;
 import logic.Player;
 import solarwars.Hub;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class AbstractShip.
@@ -43,13 +44,14 @@ public abstract class AbstractShip extends Node {
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.2f;
     /** The asset manager. */
-    protected static AssetManager assetManager;
+    protected static AssetManager assetManager = 
+            SolarWarsApplication.getInstance().getAssetManager();
     /** The geometry. */
     protected Geometry geometry;
     /** The material. */
     protected Material material;
     /** The transform node. */
-    protected Node transformNode;
+//    protected Node transformNode;
     /** The level. */
     protected Level level;
     /** The id. */
@@ -67,7 +69,7 @@ public abstract class AbstractShip extends Node {
     protected Spatial shipBatchSpatial;
     
     /** The batch manager. */
-    protected ShipBatchManager batchManager = ShipBatchManager.getInstance();
+    protected ShipBatchManager batchManager;
 
     /**
      * Instantiates a new abstract ship.
@@ -82,13 +84,13 @@ public abstract class AbstractShip extends Node {
         super();
         this.id = Level.getContiniousPlanetID();
         this.owner = p;
-        this.assetManager = assetManager;
         this.level = level;
+        this.batchManager = level.getBatchManager();
         this.position = position;
         this.shipGroup = g;
 
-        this.transformNode = new Node("Ship Transform Node " + id);
-        this.attachChild(transformNode);
+//        this.transformNode = new Node("Ship Transform Node " + id);
+//        this.attachChild(transformNode);
     }
 
     /**
@@ -168,7 +170,7 @@ public abstract class AbstractShip extends Node {
         Matrix3f mat = new Matrix3f();
         mat.fromAxes(dir, Vector3f.UNIT_Y, left);
 
-        transformNode.setLocalRotation(mat);
+        shipBatchSpatial.setLocalRotation(mat);
     }
 
     /**
@@ -211,7 +213,7 @@ public abstract class AbstractShip extends Node {
                 dir.multLocal(tpf);
 //                System.out.println("Time: " + tpf);
                 position.addLocal(dir);
-                transformNode.setLocalTranslation(position);
+                shipBatchSpatial.setLocalTranslation(position);
 
             }
         }

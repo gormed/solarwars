@@ -472,6 +472,7 @@ public class SolarWarsApplication extends Application {
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
             isoControl.addControlListener();
+            isoControl.createDragRectGeometry();
 
         }
         isoCam.reset();

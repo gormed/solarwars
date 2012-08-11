@@ -78,6 +78,7 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     protected void loadContent(solarwars.SolarWarsGame game) {
+        gui = GameGUI.getInstance();
         hub = Hub.getInstance();
         setupSingleplayer();
         application.attachIsoCameraControl();
@@ -137,7 +138,6 @@ public class SingleplayerState extends Gamestate {
      * Setup gui.
      */
     private void setupGUI() {
-        gui = new GameGUI(game);
         gui.addGUIElement(new Percentage(gui));
         pause = new PauseGUI(game, gui);
 

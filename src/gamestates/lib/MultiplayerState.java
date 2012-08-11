@@ -83,7 +83,7 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
-        gui = new GameGUI(game);
+        gui = GameGUI.getInstance();
         networkManager = NetworkManager.getInstance();
         playerName = new TextBox(
                 ColorRGBA.Blue.clone(),

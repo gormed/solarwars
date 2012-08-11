@@ -79,8 +79,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private Label serverName;
     /** The gui. */
     private GameGUI gui;
-    /** The hub. */
-    private Hub hub;
     /** The client player name. */
     private String clientPlayerName;
     /** The client player color. */
@@ -216,12 +214,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        gui = GameGUI.getInstance();
         gameStarted = false;
         clientState = ClientConnectionState.CONNECTING;
         playersChanged = false;
-        gui = new GameGUI(game);
         game.getApplication().setPauseOnLostFocus(false);
-        hub = Hub.getInstance();
 
         networkManager = NetworkManager.getInstance();
 
@@ -396,8 +393,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-
-        this.hub = null;
+        
         this.networkManager = null;
         this.clientState = ClientConnectionState.DISCONNECTED;
         this.playerLabelIdx = null;
@@ -480,7 +476,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     }
 
     @Override
-    public MessageListener getMessageListener() {
+    public MessageListener<Client> getMessageListener() {
         return playerConnectionListener;
     }
 

@@ -89,7 +89,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
         return instance =
                 new GameOverGUI(
                 SolarWarsGame.getInstance(),
-                Gameplay.getCurrentLevel().getGUI(),
+                GameGUI.getInstance(),
                 GameOverState.WON);
     }
 

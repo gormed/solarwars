@@ -230,9 +230,8 @@ public class CreateServerState extends Gamestate
      */
     @Override
     protected void loadContent(SolarWarsGame game) {
+        gui = GameGUI.getInstance();
         gameStarted = false;
-        gui = new GameGUI(game);
-
         game.getApplication().setPauseOnLostFocus(false);
         networkManager = NetworkManager.getInstance();
         serverHub = ServerHub.getInstance();
@@ -698,7 +697,7 @@ public class CreateServerState extends Gamestate
     }
 
     @Override
-    public MessageListener getMessageListener() {
+    public MessageListener<HostedConnection> getMessageListener() {
         return serverMessageListener;
     }
 

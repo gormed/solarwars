@@ -27,10 +27,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Line;
 import java.util.ArrayList;
 import java.util.Map;
 import jme3tools.optimize.GeometryBatchFactory;
+import logic.Level;
 import logic.Player;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -42,29 +44,17 @@ import solarwars.SolarWarsApplication;
  */
 public class ShipBatchManager {
 
-    /** The instance. */
-    private static ShipBatchManager instance;
     /** The asset manager. */
-    private static AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
-
-    /**
-     * Gets the single instance of ShipBatchManager.
-     *
-     * @return single instance of ShipBatchManager
-     */
-    public static ShipBatchManager getInstance() {
-        if (instance != null) {
-            return instance;
-        }
-        return instance = new ShipBatchManager();
-    }
+    private AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
+    private Node shipBatchNode = new Node("ShipBatchNode");
     /** The update timer. */
     private float updateTimer;
 
     /**
      * Instantiates a new ship batch manager.
      */
-    private ShipBatchManager() {
+    public ShipBatchManager(Level level) {
+        level.getLevelNode().attachChild(shipBatchNode);
     }
 
     /**
@@ -80,8 +70,15 @@ public class ShipBatchManager {
         unusedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
         usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
         for (int i = 0; i < shipCount; i++) {
-            unusedBatches.add(createNextBatch());
+            Spatial s = createNextBatch();
+            s.setCullHint(CullHint.Always);
+            unusedBatches.add(s);
         }
+    }
+
+    public void destroy() {
+        usedBatches.clear();
+        unusedBatches.clear();        
     }
 
     /**
@@ -103,13 +100,17 @@ public class ShipBatchManager {
         Geometry line1 = new Geometry("Line2", l2);
         Geometry line2 = new Geometry("Line3", l3);
 
-
         shipBatchGeometry.attachChild(line0);
         shipBatchGeometry.attachChild(line1);
         shipBatchGeometry.attachChild(line2);
-        Spatial shipBatchSpatial = GeometryBatchFactory.optimize(shipBatchGeometry);
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        Spatial shipBatchSpatial =
+                GeometryBatchFactory.optimize(shipBatchGeometry);
+        Material mat =
+                new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         shipBatchSpatial.setMaterial(mat);
+
+        shipBatchNode.attachChild(shipBatchSpatial);
+
 
         return shipBatchSpatial;
     }
@@ -133,14 +134,15 @@ public class ShipBatchManager {
             usedBatches.add(s);
             System.out.println("Created new Batch");
             System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
+            s.setCullHint(CullHint.Never);
             return s;
         }
         Spatial s = unusedBatches.get(unusedBatches.size() - 1);
         unusedBatches.remove(s);
         usedBatches.add(s);
-
 //        System.out.println("Activated unused Batch");
 //        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
+        s.setCullHint(CullHint.Never);
         return s;
     }
 
@@ -149,10 +151,10 @@ public class ShipBatchManager {
      *
      * @param b the b
      */
-    void freeShipBatch(Spatial b) {
-        unusedBatches.add(b);
-        usedBatches.remove(b);
-
+    void freeShipBatch(Spatial s) {
+        unusedBatches.add(s);
+        usedBatches.remove(s);
+        s.setCullHint(CullHint.Always);
 //        System.out.println("Freed Active Batch");
 //        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
     }

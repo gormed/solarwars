@@ -82,8 +82,7 @@ public class IsoControl {
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
         this.actionLib = ActionLib.getInstance();
         this.markerNode = new MarkerNode();
-        initialize(rootNode);
-        createDragRectGeometry(0, 0, new Vector2f(10, 10));
+        initialize();
     }
 
     /**
@@ -163,7 +162,7 @@ public class IsoControl {
      * @param height
      * @param click2d 
      */
-    private void createDragRectGeometry(float width, float height, Vector2f click2d) {
+    public void createDragRectGeometry() {
         ColorRGBA frame = ColorRGBA.Orange.clone();
         frame.a = 0.35f;
         ColorRGBA center = ColorRGBA.Orange.clone();
@@ -198,67 +197,17 @@ public class IsoControl {
                 new Vector2f(10, 10),
                 frame);
 
-//        centerDrag = new Panel(
-//                "centerSel",
-//                new Vector3f(
-//                startScreenPos.x + (width) * 0.5f,
-//                startScreenPos.y + (height) * 0.5f,
-//                0),
-//                new Vector2f(
-//                Math.abs(width / 2),
-//                Math.abs(height / 2)),
-//                center);
-//
-//        leftDrag = new Panel(
-//                "leftSel",
-//                new Vector3f(
-//                startScreenPos.x,
-//                startScreenPos.y + (height) * 0.5f,
-//                0),
-//                new Vector2f(
-//                1,
-//                Math.abs(height / 2)),
-//                frame);
-//
-//        topDrag = new Panel(
-//                "topSel",
-//                new Vector3f(
-//                startScreenPos.x + (width) * 0.5f,
-//                startScreenPos.y,
-//                0),
-//                new Vector2f(
-//                Math.abs(width / 2),
-//                1),
-//                frame);
-//
-//        rightDrag = new Panel(
-//                "rightSel",
-//                new Vector3f(
-//                click2d.x,
-//                startScreenPos.y + (height) * 0.5f,
-//                0),
-//                new Vector2f(
-//                1,
-//                Math.abs(height / 2)),
-//                frame);
-//
-//        bottomDrag = new Panel(
-//                "bottomSel",
-//                new Vector3f(
-//                startScreenPos.x + (width) * 0.5f,
-//                click2d.y,
-//                0),
-//                new Vector2f(
-//                Math.abs(width / 2),
-//                1),
-//                frame);
-
         centerDrag.setVisible(false);
         leftDrag.setVisible(false);
         topDrag.setVisible(false);
         rightDrag.setVisible(false);
         bottomDrag.setVisible(false);
 
+        gui.addGUIElement(rightDrag);
+        gui.addGUIElement(leftDrag);
+        gui.addGUIElement(topDrag);
+        gui.addGUIElement(bottomDrag);
+        gui.addGUIElement(centerDrag);
     }
 
     /**
@@ -266,9 +215,11 @@ public class IsoControl {
      *
      * @param rootNode the root node
      */
-    private void initialize(final Node rootNode) {
+    private void initialize() {
+        gui = GameGUI.getInstance();
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
+        
         // register action listener for right and left clicks 
         // and the mouse-weel
         mouseActionListener = new ActionListener() {
@@ -276,13 +227,6 @@ public class IsoControl {
             @Override
             public void onAction(String name, boolean keyPressed, float tpf) {
 
-                gui = Gameplay.getCurrentLevel().getGUI();
-
-                gui.addGUIElement(rightDrag);
-                gui.addGUIElement(leftDrag);
-                gui.addGUIElement(topDrag);
-                gui.addGUIElement(bottomDrag);
-                gui.addGUIElement(centerDrag);
                 Vector2f point = inputManager.getCursorPosition();
                 if (keyPressed) {
                     onButtonDown(name, point);
