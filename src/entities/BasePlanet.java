@@ -36,7 +36,7 @@ import solarwars.SolarWarsApplication;
  * The Class BasePlanet.
  */
 public class BasePlanet extends AbstractPlanet {
-
+    
     /**
      * Instantiates a new base planet.
      *
@@ -47,6 +47,7 @@ public class BasePlanet extends AbstractPlanet {
      */
     public BasePlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
         super(assetManager, level, position, sizeID);
+        this.range = 3.0f;
     }
 
     /* (non-Javadoc)

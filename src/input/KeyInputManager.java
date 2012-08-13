@@ -50,7 +50,7 @@ public class KeyInputManager {
     //==========================================================================
     //      Static Fields
     //==========================================================================
-    public static final boolean ANDROID_BUILD = false;
+    public static final boolean ANDROID_BUILD = true;
     //<editor-fold defaultstate="collapsed" desc="Mapping Strings">
     /** The Constant INPUT_MAPPING_A. */
     public static final String INPUT_MAPPING_A = "A";

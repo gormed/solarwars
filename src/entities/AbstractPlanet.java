@@ -46,7 +46,7 @@ import solarwars.SolarWarsApplication;
 /**
  * The Class AbstractPlanet.
  */
-public abstract class AbstractPlanet extends Node {
+public abstract class AbstractPlanet extends Node implements Ranged {
 
     /** The Constant SHIP_REFRESH_MULTIPILER. */
     private static final int SHIP_REFRESH_MULTIPILER = 1;
@@ -86,6 +86,8 @@ public abstract class AbstractPlanet extends Node {
     private ParticleEmitter impact;
     /** The capture. */
     private ParticleEmitter capture;
+    
+    protected float range = 1.5f;
 
     /**
      * Creates the impact emitter.
@@ -244,10 +246,8 @@ public abstract class AbstractPlanet extends Node {
         label.setCullHint(CullHint.Never);
         // algins position of the font
         refreshFont();
-
-
     }
-
+    
     /**
      * Refresh font.
      */
@@ -364,6 +364,10 @@ public abstract class AbstractPlanet extends Node {
         return ships;
     }
 
+    public float getRange() {
+        return range;
+    }    
+    
     /**
      * Sets the ship count.
      *
@@ -401,6 +405,7 @@ public abstract class AbstractPlanet extends Node {
      * Increment ships.
      */
     public void incrementShips() {
+        
         ships++;
     }
 

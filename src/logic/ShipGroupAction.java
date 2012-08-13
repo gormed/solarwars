@@ -56,5 +56,5 @@ public abstract class ShipGroupAction {
      * @param shipGroup the ship group
      * @param p the p
      */
-    abstract void doAction(Object sender, ShipGroup shipGroup, Player p);
+    abstract boolean doAction(Object sender, ShipGroup shipGroup, Player p);
 }

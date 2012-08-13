@@ -13,46 +13,21 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: GeneralAction.java
- * Type: logic.GeneralAction
+ * File: Ranged.java
+ * Type: entities.Ranged
  * 
  * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package logic;
+package entities;
+
+import com.jme3.math.Vector3f;
 
 /**
- * The Class GeneralAction.
+ * Interface for objects that can have a distance/range to others.
+ * @author Ferchland
  */
-public abstract class GeneralAction {
-    
-    /** The name. */
-    private final String name;
-
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-    
-    /**
-     * Instantiates a new general action.
-     *
-     * @param name the name
-     */
-    public GeneralAction(String name) {
-        this.name = name;
-    }
-    
-    /**
-     * Do action.
-     *
-     * @param sender the sender
-     * @param a the a
-     * @param b the b
-     */
-    abstract boolean doAction(Object sender, Player a, Player b);
+public interface Ranged {
+    public float getRange();
+    public Vector3f getPosition();
 }

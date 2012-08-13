@@ -40,7 +40,7 @@ import logic.Player;
 /**
  * The Class ShipGroup.
  */
-public class ShipGroup extends Node {
+public class ShipGroup extends Node implements Ranged {
 
     /** The ships. */
     private ArrayList<AbstractShip> ships;
@@ -60,6 +60,14 @@ public class ShipGroup extends Node {
     private Level level;
     /** The size. */
     private float size;
+    
+    private float range;
+    
+    private float speed = 1;
+    
+    private float fuel = 30;
+    
+    private float consumption = 10;
 
     /**
      * Instantiates a new ship group.
@@ -75,6 +83,7 @@ public class ShipGroup extends Node {
         this.owner = p;
         this.order = target;
         this.level = level;
+        this.range = fuel / consumption;
         this.ships = new ArrayList<AbstractShip>();
         this.transformNode = new Node("ShipGroup Transform Node " + id);
         this.attachChild(transformNode);
@@ -218,7 +227,9 @@ public class ShipGroup extends Node {
             if (dir.length() < 0.001f) {
             } else {
                 dir.normalizeLocal();
-                dir.multLocal(tpf);
+                dir.multLocal(tpf * speed);
+                fuel -= consumption * tpf;
+                range = fuel / consumption;
                 position.addLocal(dir);
                 transformNode.setLocalTranslation(position);
             }
@@ -259,6 +270,10 @@ public class ShipGroup extends Node {
      */
     public float getSize() {
         return size;
+    }
+
+    public float getRange() {
+        return range;
     }
 
     /**

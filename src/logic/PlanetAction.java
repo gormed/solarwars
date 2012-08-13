@@ -58,5 +58,5 @@ public abstract class PlanetAction {
      * @param planet the planet
      * @param p the p
      */
-    abstract void doAction(Object sender, long delay, AbstractPlanet planet, Player p);
+    abstract boolean doAction(Object sender, long delay, AbstractPlanet planet, Player p);
 }

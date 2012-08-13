@@ -40,6 +40,7 @@ import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
@@ -219,7 +220,7 @@ public class IsoControl {
         gui = GameGUI.getInstance();
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
-        
+
         // register action listener for right and left clicks 
         // and the mouse-weel
         mouseActionListener = new ActionListener() {
@@ -417,14 +418,16 @@ public class IsoControl {
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             Gameplay.PLANET_SELECT);
-                    final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
-                    logger.info(planetSelectMsg);
+//                    final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
+//                    logger.info(planetSelectMsg);
                     // finally set marker
                     repositMarker(nearestPlanet, markerNode);
 
-                } // ...check for reight botton click
+                } // ...check for right botton click
                 // TODO: move hasLost check to actionLib
                 else if (attack && !Hub.getLocalPlayer().hasLost()) {
+
+
                     // invoke attack action
                     actionLib.invokePlanetAction(
                             null,
@@ -432,12 +435,12 @@ public class IsoControl {
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             Gameplay.PLANET_ATTACK);
-                    final String planetAttackMsg = "Player attacked/moved to planet id#"
-                            + nearestPlanet.getId() + ", owned by "
-                            + ((nearestPlanet.getOwner() != null)
-                            ? nearestPlanet.getOwner().getName()
-                            : "nobody");
-                    logger.info(planetAttackMsg);
+//                    final String planetAttackMsg = "Player attacked/moved to planet id#"
+//                            + nearestPlanet.getId() + ", owned by "
+//                            + ((nearestPlanet.getOwner() != null)
+//                            ? nearestPlanet.getOwner().getName()
+//                            : "nobody");
+//                    logger.info(planetAttackMsg);
                 }
 
             } //</editor-fold>
@@ -447,7 +450,7 @@ public class IsoControl {
                 // ...check if left button click
                 // TODO: move hasLost check to actionLib
                 if (!attack && !Hub.getLocalPlayer().hasLost()) {
-                    repositMarker(nearestShipGroup, markerNode);
+
                     // invoke ship redirect action
                     actionLib.invokeShipAction(
                             null,
@@ -455,8 +458,9 @@ public class IsoControl {
                             nearestShipGroup,
                             Hub.getLocalPlayer(),
                             Gameplay.SHIP_SELECT);
-                    final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
-                    logger.info(sgSelectMsg);
+//                    final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
+//                    logger.info(sgSelectMsg);
+                    repositMarker(nearestShipGroup, markerNode);
                 }
                 //</editor-fold>
             }
@@ -649,8 +653,7 @@ public class IsoControl {
     private void repositMarker(AbstractPlanet planet, MarkerNode markerNode) {
         removeMarker(markerNode);
         planet.getTransformNode().attachChild(markerNode);
-        float s = planet.getSize() * 2.6f;
-        markerNode.setScale(s);
+        markerNode.setPlanet(planet);
     }
 
     /**
@@ -675,8 +678,7 @@ public class IsoControl {
     private void repositMarker(ShipGroup shipGroup, MarkerNode markerNode) {
         removeMarker(markerNode);
         shipGroup.getTransformNode().attachChild(markerNode);
-        float s = shipGroup.getSize() * 2.0f;
-        markerNode.setScale(s);
+        markerNode.setShipGroup(shipGroup);
     }
 
     /**
@@ -942,9 +944,9 @@ public class IsoControl {
         /** The running. */
         private float running;
         /** The material. */
-        private Material material;
+        private Material markerMaterial;
         /** The geometry. */
-        private Geometry geometry;
+        private Geometry markerGeometry;
         /** The start. */
         private ColorRGBA start = ColorRGBA.Orange.clone();
         /** The end. */
@@ -955,6 +957,11 @@ public class IsoControl {
         private boolean fadeDir = true;
         /** The tick. */
         private float tick = 0f;
+        private float range = 1;
+        private Material collisionMaterial;
+        private Geometry collisionCylinder;
+        private ShipGroup shipGroup;
+        private AbstractPlanet planet;
 
         /**
          * Instantiates a new marker node.
@@ -962,34 +969,69 @@ public class IsoControl {
         public MarkerNode() {
             super("Marker Transform");
 
+            createMarker();
+            createCollision();
+        }
+
+        private void createMarker() {
             Quad q = new Quad(1, 1);
 
-            geometry = new Geometry("MarkerGeometry", q);
-            material = new Material(assetManager,
+            markerGeometry = new Geometry("MarkerGeometry", q);
+            markerMaterial = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
-            material.setTexture("ColorMap",
+            markerMaterial.setTexture("ColorMap",
                     assetManager.loadTexture("Textures/gui/marker.png"));
-            material.setColor("Color", start);
+            markerMaterial.setColor("Color", start);
             currentFadeColor = start;
-            material.setColor("GlowColor", ColorRGBA.White);
+            markerMaterial.setColor("GlowColor", ColorRGBA.White);
 
-            material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+            markerMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
-            geometry.setMaterial(material);
+            markerGeometry.setMaterial(markerMaterial);
 
             /**
              * Objects with transparency need to be in the render bucket for
              * transparent objects:
              */
-            geometry.setQueueBucket(Bucket.Translucent);
+            markerGeometry.setQueueBucket(Bucket.Translucent);
 
             float angles[] = {(float) -Math.PI / 2, (float) -Math.PI / 2, 0};
 
             // geometry.setLocalTranslation(-0.5f, 0, -0.5f);
-            geometry.setLocalRotation(new Quaternion(angles));
+            markerGeometry.setLocalRotation(new Quaternion(angles));
 
-            this.attachChild(geometry);
+            this.attachChild(markerGeometry);
+        }
 
+        /**
+         * Creates the bounding-volume for the range-checks.
+         * @param game the MazeTDGame singleton
+         */
+        private void createCollision() {
+
+            Cylinder c = new Cylinder(
+                    2,
+                    15,
+                    1,
+                    0.1f,
+                    true);
+
+            collisionMaterial = new Material(assetManager,
+                    "Common/MatDefs/Misc/Unshaded.j3md");
+            collisionMaterial.setColor("Color", new ColorRGBA(1, 1, 1, 0.05f));
+            collisionMaterial.getAdditionalRenderState().
+                    setBlendMode(BlendMode.AlphaAdditive);
+
+            float[] angles = {(float) Math.PI / 2, 0, 0};
+
+            collisionCylinder = new Geometry("CollisionCylinderGeometry", c);
+            collisionCylinder.setMaterial(collisionMaterial);
+            collisionCylinder.setLocalTranslation(0, -0.1f, 0);
+            collisionCylinder.setLocalRotation(new Quaternion(angles));
+
+            collisionCylinder.setQueueBucket(Bucket.Transparent);
+
+            this.attachChild(collisionCylinder);
         }
 
         /**
@@ -998,33 +1040,48 @@ public class IsoControl {
          * @param tpf the tpf
          */
         public void updateMarker(float tpf) {
+            updateScaleFade(tpf);
+            updateColorFade(tpf);
+            if (planet != null) {
+                range = planet.getRange();
+            } else if (shipGroup != null) {
+                range = shipGroup.getRange();
+            }
+            collisionCylinder.setLocalScale(range);
+        }
+
+        private void updateScaleFade(float tpf) {
             running += tpf;
+
             if (running > 2 * Math.PI) {
                 running = 0;
             }
             // size
             fadeScale = 0.05f * (float) Math.sin((double) running * SELECTION_ANIMATION_SPEED) + scale + 0.02f;
-            geometry.setLocalScale(fadeScale);
-            geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
-//            if (fadeScale > scale + 0.1f) {
-//
-//                // size
-//                fadeScale = 0.1f * (float) Math.sin((double) running);
-//                geometry.setLocalScale(fadeScale);
-//                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
-//            } else if (fadeScale < scale - 0.1f) {
-//                // size
-//                fadeScale += 0.001f;
-//                geometry.setLocalScale(fadeScale);
-//                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
-//            }
+            markerGeometry.setLocalScale(fadeScale);
+            markerGeometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+        }
+
+        private void updateColorFade(float tpf) {
+            //            if (fadeScale > scale + 0.1f) {
+            //
+            //                // size
+            //                fadeScale = 0.1f * (float) Math.sin((double) running);
+            //                geometry.setLocalScale(fadeScale);
+            //                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+            //            } else if (fadeScale < scale - 0.1f) {
+            //                // size
+            //                fadeScale += 0.001f;
+            //                geometry.setLocalScale(fadeScale);
+            //                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
+            //            }
             if (tick > 0.005f) {
                 if (fadeDir) {
 
                     // color
                     currentFadeColor = currentFadeColor.add(
                             new ColorRGBA(0.01f, 0.01f, 0.01f, 0));
-                    material.setColor("Color", currentFadeColor);
+                    markerMaterial.setColor("Color", currentFadeColor);
                     if (currentFadeColor.r >= 1f && currentFadeColor.g >= 1f && currentFadeColor.b >= 1) {
                         fadeDir = false;
                     }
@@ -1036,7 +1093,7 @@ public class IsoControl {
                     if (currentFadeColor.b > start.b) {
                         currentFadeColor.b -= 0.01f;
                     }
-                    material.setColor("Color", currentFadeColor);
+                    markerMaterial.setColor("Color", currentFadeColor);
                     if (currentFadeColor.g <= 0.5 && currentFadeColor.b <= 0) {
                         currentFadeColor = start.clone();
                         fadeDir = true;
@@ -1048,23 +1105,38 @@ public class IsoControl {
             }
 
             tick += tpf;
-
         }
 
         /**
          * Sets the scale.
          *
-         * @param s the new scale
+         * @param scale the new scale
          */
-        public void setScale(float s) {
-            scale = s;
-            material.setColor("Color", start);
+        private void setScaleAndRange(float scale, float range) {
+            this.scale = scale;
+            this.range = range;
+            markerMaterial.setColor("Color", start);
             currentFadeColor = start.clone();
             fadeScale = 0;
             tick = 0;
             fadeDir = true;
-            geometry.setLocalScale(scale);
-            geometry.setLocalTranslation(-scale / 2, 0, -scale / 2);
+            markerGeometry.setLocalScale(scale);
+//            collisionCylinder.setLocalScale(range);
+            markerGeometry.setLocalTranslation(-scale / 2, 0, -scale / 2);
+        }
+
+        public void setPlanet(AbstractPlanet abstractPlanet) {
+            this.shipGroup = null;
+            this.planet = abstractPlanet;
+            float s = planet.getSize() * 2.6f;
+            setScaleAndRange(s, planet.getRange());
+        }
+
+        public void setShipGroup(ShipGroup group) {
+            this.planet = null;
+            this.shipGroup = group;
+            float s = shipGroup.getSize() * 2.0f;
+            setScaleAndRange(s, shipGroup.getRange());
         }
     }
 }
