@@ -54,6 +54,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3tools.optimize.GeometryBatchFactory;
 import logic.ActionLib;
 import logic.Gameplay;
 import logic.Player;
@@ -958,8 +959,10 @@ public class IsoControl {
         /** The tick. */
         private float tick = 0f;
         private float range = 1;
-        private Material collisionMaterial;
-        private Geometry collisionCylinder;
+        private Spatial rangeBatch;
+        private Node rangeNode;
+        private Material rangeMaterial;
+        private Geometry rangeCylinder;
         private ShipGroup shipGroup;
         private AbstractPlanet planet;
 
@@ -1008,7 +1011,7 @@ public class IsoControl {
          * @param game the MazeTDGame singleton
          */
         private void createCollision() {
-
+            rangeNode = new Node("RangeNode");
             Cylinder c = new Cylinder(
                     2,
                     15,
@@ -1016,22 +1019,28 @@ public class IsoControl {
                     0.1f,
                     true);
 
-            collisionMaterial = new Material(assetManager,
+            rangeMaterial = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
-            collisionMaterial.setColor("Color", new ColorRGBA(1, 1, 1, 0.05f));
-            collisionMaterial.getAdditionalRenderState().
+            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.05f));
+            rangeMaterial.getAdditionalRenderState().
                     setBlendMode(BlendMode.AlphaAdditive);
+//            rangeMaterial.getAdditionalRenderState().setWireframe(true);
 
             float[] angles = {(float) Math.PI / 2, 0, 0};
 
-            collisionCylinder = new Geometry("CollisionCylinderGeometry", c);
-            collisionCylinder.setMaterial(collisionMaterial);
-            collisionCylinder.setLocalTranslation(0, -0.1f, 0);
-            collisionCylinder.setLocalRotation(new Quaternion(angles));
+            rangeCylinder = new Geometry("CollisionCylinderGeometry", c);
 
-            collisionCylinder.setQueueBucket(Bucket.Transparent);
+            rangeCylinder.setLocalTranslation(0, -0.1f, 0);
+            rangeCylinder.setLocalRotation(new Quaternion(angles));
 
-            this.attachChild(collisionCylinder);
+            rangeCylinder.setQueueBucket(Bucket.Transparent);
+
+            rangeNode.attachChild(rangeCylinder);
+
+            rangeBatch = GeometryBatchFactory.optimize(rangeNode);
+            rangeBatch.setMaterial(rangeMaterial);
+
+            this.attachChild(rangeBatch);
         }
 
         /**
@@ -1042,12 +1051,17 @@ public class IsoControl {
         public void updateMarker(float tpf) {
             updateScaleFade(tpf);
             updateColorFade(tpf);
+            updateRange();
+        }
+
+        private void updateRange() {
             if (planet != null) {
                 range = planet.getRange();
+
             } else if (shipGroup != null) {
                 range = shipGroup.getRange();
             }
-            collisionCylinder.setLocalScale(range);
+            rangeBatch.setLocalScale(range);
         }
 
         private void updateScaleFade(float tpf) {
@@ -1121,7 +1135,6 @@ public class IsoControl {
             tick = 0;
             fadeDir = true;
             markerGeometry.setLocalScale(scale);
-//            collisionCylinder.setLocalScale(range);
             markerGeometry.setLocalTranslation(-scale / 2, 0, -scale / 2);
         }
 
@@ -1130,6 +1143,13 @@ public class IsoControl {
             this.planet = abstractPlanet;
             float s = planet.getSize() * 2.6f;
             setScaleAndRange(s, planet.getRange());
+            rangeBatch.setCullHint(
+                    (planet.getOwner() == null) ? CullHint.Always : CullHint.Never);
+            if (planet.getOwner() != null) {
+                ColorRGBA c = planet.getOwner().getColor().clone();
+                c.a = 0.05f;
+                rangeMaterial.setColor("Color", c);
+            }
         }
 
         public void setShipGroup(ShipGroup group) {
@@ -1137,6 +1157,11 @@ public class IsoControl {
             this.shipGroup = group;
             float s = shipGroup.getSize() * 2.0f;
             setScaleAndRange(s, shipGroup.getRange());
+            if (shipGroup.getOwner() != null) {
+                ColorRGBA c = shipGroup.getOwner().getColor().clone();
+                c.a = 0.05f;
+                rangeMaterial.setColor("Color", c);
+            }
         }
     }
 }
