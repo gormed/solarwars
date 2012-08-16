@@ -67,7 +67,6 @@ import logic.Player;
  */
 public class IsoControl {
 
-    /** The Constant DEBUG_RAYCASTS. */
     private static final boolean DEBUG_RAYCASTS = true;
     //==========================================================================
     //      Singleton
@@ -101,60 +100,40 @@ public class IsoControl {
     //      Private Fields
     //==========================================================================
     // general
-    /** The root node. */
-    private Node rootNode = SolarWarsApplication.getInstance().getRootNode();
-    /** The shootables node. */
-    private Node shootablesNode;
-    /** inner ref to the asset manager. */
-    private final AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
-    /** The marker node. */
-    private MarkerNode markerNode;
-    // Dragging
-    /** The dragg ing flag indicates if currently dragging. */
-    private boolean dragging = false;
-    /** The last xz plane pos. */
-    private Vector3f lastXZPlanePos;
-    /** The start xz plane pos. */
-    private Vector3f startXZPlanePos;
-    /** The start screen pos. */
-    private Vector2f startScreenPos = Vector2f.ZERO.clone();
-    // planet & shipgroup selection
-    /** The planet selection. */
-    private ArrayList<AbstractPlanet> planetSelection;
-    /** The shipgroup selection. */
-    private ArrayList<ShipGroup> shipGroupSelection;
-    /** The marker nodes. */
-    private ArrayList<MarkerNode> markerNodes;
-    private boolean controlPressed = false;
+	private Node						rootNode		= SolarWarsApplication.getInstance().getRootNode();
+	private Node						shootablesNode;
+	private final AssetManager			assetManager	= SolarWarsApplication.getInstance().getAssetManager();
+	private MarkerNode					markerNode;
+	// Dragging
+	private boolean						dragging		= false;
+	private Vector3f					lastXZPlanePos;
+	private Vector3f					startXZPlanePos;
+	private Vector2f					startScreenPos	= Vector2f.ZERO.clone();
+	// planet & shipgroup selection
+	private ArrayList<AbstractPlanet>	planetSelection;
+	private ArrayList<ShipGroup>		shipGroupSelection;
+	private ArrayList<MarkerNode>		markerNodes;
+	private boolean						controlPressed	= false;
     // Panels for rect
-    /** The left drag. */
     private Panel leftDrag;
-    /** The top drag. */
     private Panel topDrag;
-    /** The right drag. */
     private Panel rightDrag;
-    /** The bottom drag. */
     private Panel bottomDrag;
-    /** The center drag. */
     private Panel centerDrag;
     // debug
 //    private Cross startDrag;
 //    private Cross endDrag;
-    /** The cam. */
-    private Camera cam = SolarWarsApplication.getInstance().getCamera();
-    /** The mouse action listener. */
-    private ActionListener mouseActionListener;
-    /** The key action listener. */
-    private ActionListener keyActionListener;
-    private TouchListener touchListener;
-    /** The input manager. */
-    private InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
-    /** The action lib. */
-    private ActionLib actionLib;
-    /** inner ref to the games gui. */
-    private GameGUI gui;
-    private static final Logger logger = Logger.getLogger(IsoControl.class.getName());
-    //==========================================================================
+	private Camera						cam				= SolarWarsApplication.getInstance().getCamera();
+	private ActionListener				mouseActionListener;
+	private ActionListener				keyActionListener;
+	
+	private TouchListener				touchListener; // kommt von Android
+	private InputManager				inputManager	= SolarWarsApplication.getInstance().getInputManager();
+	private ActionLib					actionLib;
+	private GameGUI						gui;
+	private static final Logger			logger			= Logger.getLogger(IsoControl.class.getName());
+
+	// ==========================================================================
     //      Methods
     //==========================================================================
 
@@ -306,9 +285,7 @@ public class IsoControl {
                 new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
         Ray ray = new Ray(click3d, dir);
         float t = -ray.getOrigin().y / ray.getDirection().y;
-        Vector3f currentXZPlanePos =
-                ray.getDirection().clone().
-                mult(t).addLocal(ray.getOrigin().clone());
+		Vector3f currentXZPlanePos = ray.getDirection().clone().mult(t).addLocal(	ray.getOrigin().clone());
         if (!dragging) {
             startXZPlanePos = currentXZPlanePos;
             startScreenPos = click2d.clone();
@@ -350,7 +327,7 @@ public class IsoControl {
         final String percentageChangeS = local.getName() + " changed percentage to " + String.format("%3.0f", local.getShipPercentage() * 100f) + "%";
         logger.log(Level.FINE, percentageChangeS);
     }
-
+    //TODO MB Auslagern
     private void onPercentageChange(float amount, boolean down) {
         if (!down) {
             amount *= -1.0f;
@@ -765,24 +742,9 @@ public class IsoControl {
     /**
      * Updates the drag-rectangle and/or marker-animation.
      *
-     * @param tpf the tpf
+     * @param tpf (the Time per Frame)
      */
     void updateSelection(float tpf) {
-//        if (centerDrag != null) {
-//            gui.removeGUIElement(centerDrag);
-//        }
-//        if (leftDrag != null) {
-//            gui.removeGUIElement(leftDrag);
-//        }
-//        if (topDrag != null) {
-//            gui.removeGUIElement(topDrag);
-//        }
-//        if (rightDrag != null) {
-//            gui.removeGUIElement(rightDrag);
-//        }
-//        if (bottomDrag != null) {
-//            gui.removeGUIElement(bottomDrag);
-//        }
         if (markerNode != null) {
             markerNode.updateMarker(tpf);
         }
@@ -793,11 +755,6 @@ public class IsoControl {
         }
 
         if (!dragging || startScreenPos == null) {
-//            centerDrag.setVisible(false);
-//            leftDrag.setVisible(false);
-//            topDrag.setVisible(false);
-//            rightDrag.setVisible(false);
-//            bottomDrag.setVisible(false);
             return;
         }
         Vector2f click2d = inputManager.getCursorPosition();

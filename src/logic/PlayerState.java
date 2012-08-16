@@ -48,31 +48,23 @@ public class PlayerState {
      * @param color the color
      */
     public PlayerState(int selectedPlanetId, int selectedShipGroupId, String name, ColorRGBA color) {
-        this.selectedPlanetId = selectedPlanetId;
+        this.selectedPlanetId 	 = selectedPlanetId;
         this.selectedShipGroupId = selectedShipGroupId;
-        this.name = name;
-        this.color = color;
+        this.name 	= name;
+        this.color 	= color;
     }
-    /** The selected planet. */
-    public int selectedPlanetId;
-    /** The selected ship group. */
-    public int selectedShipGroupId;
-    /** The ship percentage. */
-    public float shipPercentage = 0.5f;
-    /** The ship count. */
-    public int shipCount = 0;
-    /** The name. */
-    public String name;
-    /** The color. */
-    public ColorRGBA color;
-    /** The lost. */
-    public boolean lost;
+    public int 		selectedPlanetId;
+    public int 		selectedShipGroupId;
+    public int 		defeatedPlayerID = -1;
+    public int 		shipCount = 0;
+    public float 	shipPercentage = 0.5f;
     
+    public String 	name;
+    public ColorRGBA color;
+
+    public boolean 	hasLost;
     public boolean leaver = false;
-    /** The defeated player id. */
-    public int defeatedPlayerID = -1;
-    /** The multi selected planets. */
-    public ArrayList<Integer> multiSelectedPlanets = new ArrayList<Integer>();
-    /** The multi selected shipgroups. */
+    
+    public ArrayList<Integer> multiSelectedPlanets 	  = new ArrayList<Integer>();
     public ArrayList<Integer> multiSelectedShipGroups = new ArrayList<Integer>();
 }

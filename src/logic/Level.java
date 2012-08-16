@@ -53,9 +53,7 @@ import solarwars.SolarWarsApplication;
  */
 public class Level {
 
-    /** The Constant PLAYER_START_SHIP_COUNT. */
     public static final int PLAYER_START_SHIP_COUNT = 100;
-    /** The Constant LEVEL_SIZE_NAME. */
     public static final String[] LEVEL_SIZE_NAME = {
         "NONE",
         "ONE PLAYER",
@@ -67,7 +65,6 @@ public class Level {
         "SEVEN PLAYER",
         "EIGHT PLAYER"
     };
-    /** The PLAYER s_ camer a_ height. */
     public static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
         10,
@@ -79,11 +76,9 @@ public class Level {
         16,
         16
     };
-    /** The PLANE t_ incremen t_ time. */
     public static float[] PLANET_INCREMENT_TIME = {
         2f, 1.5f, 1.2f, 1.0f, 0.9f,
         0.8f, 0.7f, 0.6f, 0.50f, 0.50f};
-    /** The PLANE t_ sizes. */
     public static float[] PLANET_SIZES = {
         0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
         0.325f, 0.35f, 0.375f, 0.4f, 0.425f};

@@ -28,35 +28,18 @@ import entities.AbstractPlanet;
  */
 public abstract class PlanetAction {
 
-    /** The name. */
     private final String name;
 
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Instantiates a new planet action.
-     *
-     * @param name the name
-     */
     public PlanetAction(String name) {
         this.name = name;
     }
 
     //public abstract void doAction(Object sender, AbstractPlanet planet, Player p);
 
-    /**
-     * Do action.
-     *
-     * @param sender the sender
-     * @param planet the planet
-     * @param p the p
-     */
+   
     abstract boolean doAction(Object sender, long delay, AbstractPlanet planet, Player p);
 }

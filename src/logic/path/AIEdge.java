@@ -28,14 +28,11 @@ import com.jme3.math.Vector3f;
  */
 public class AIEdge {
     
-    /** The from. */
     private AINode from;
     
-    /** The to. */
     private AINode to;
     
-    /** The length. */
-    private float length;
+    private float length;  //TODO Matthias 
 
     /**
      * Instantiates a new aI edge.
@@ -52,7 +49,7 @@ public class AIEdge {
     /**
      * Calculate length.
      */
-    private void calculateLength() {
+    private void calculateLength() {  //TODO MB  distance  (vom Planeten...)
         Vector3f l;
         
         l = to.getPlanet().getPosition().subtract(from.getPlanet().getPosition());

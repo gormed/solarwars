@@ -59,7 +59,7 @@ public class Player {
                     continue;
                 }
             }
-            break;
+            break;  
         }
 
         return color;
@@ -230,14 +230,14 @@ public class Player {
      * @return true if player lost, false if still playing.
      */
     public boolean hasLost() {
-        return state.lost;
+        return state.hasLost;
     }
 
     /**
      * Sets the lost.
      */
     void setLost() {
-        state.lost = true;
+        state.hasLost = true;
     }
 
     /**

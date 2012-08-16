@@ -41,7 +41,6 @@ import net.NetworkManager;
  */
 public class SolarWarsGame {
 
-    /** The instance. */
     private static SolarWarsGame instance;
 
     /**
@@ -74,25 +73,16 @@ public class SolarWarsGame {
     public SolarWarsApplication getApplication() {
         return application;
     }
-    /** The asset manager. */
-    private AssetManager assetManager;
-    /** The gamestate manager. */
-    private GamestateManager gamestateManager;
-    /** The network manager. */
-    private NetworkManager networkManager;
-    /** The iso control. */
-    private IsoControl isoControl;
-    /** The input manager. */
-    private InputManager inputManager;
-    /** The font loader. */
-    private FontLoader fontLoader;
-    /** The action lib. */
-    private ActionLib actionLib;
-    /** The audio manager. */
-    private AudioManager audioManager;
-    /** The KeyInputManager refecrence */
-    private KeyInputManager keyInputManager;
-    /** The Logger for the client game */
+
+	private AssetManager		assetManager;
+	private GamestateManager	gamestateManager;
+	private NetworkManager		networkManager;
+	private IsoControl			isoControl;
+	private InputManager		inputManager;
+	private FontLoader			fontLoader;
+	private ActionLib			actionLib;
+	private AudioManager		audioManager;
+	private KeyInputManager		keyInputManager;
     private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
 
     /**
@@ -101,13 +91,16 @@ public class SolarWarsGame {
      * @param app the app
      */
     public void initialize(SolarWarsApplication app) {
-        application = app;
-        assetManager = app.getAssetManager();
-        isoControl = IsoControl.getInstance();
-        audioManager = AudioManager.getInstance();
-        audioManager.initialize();
-        gamestateManager = GamestateManager.getInstance();
-        networkManager = NetworkManager.getInstance();
+		application 	= app;
+		assetManager 	= app.getAssetManager();
+		
+		isoControl		= IsoControl.getInstance();
+		
+		audioManager 	= AudioManager.getInstance();
+		audioManager.initialize();
+		
+		gamestateManager 	= GamestateManager.getInstance();
+		networkManager 		= NetworkManager.getInstance();
 
         actionLib = ActionLib.getInstance();
         // Init fonts
@@ -177,11 +170,9 @@ public class SolarWarsGame {
     }
 
     /**
-     * Updates the.
-     *
-     * @param tpf the tpf
+     * @param timePerFrame
      */
-    void update(float tpf) {
-        gamestateManager.update(tpf);
+    void update(float timePerFrame) {
+        gamestateManager.update(timePerFrame);
     }
 }

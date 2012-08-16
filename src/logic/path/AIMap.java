@@ -33,7 +33,6 @@ import logic.Level;
  */
 public class AIMap {
 
-    /** The map. */
     private HashMap<Integer, AINode> map;
 
     /**
@@ -44,7 +43,7 @@ public class AIMap {
     }
 
     /**
-     * Generate map.
+     * Generates an new map.
      *
      * @param level the level
      */

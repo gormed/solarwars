@@ -56,11 +56,10 @@ import solarwars.SolarWarsApplication;
  */
 public class NetworkManager {
 
-    public static final boolean WAIT_FOR_CLIENTS = true;
-    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 5;
+	public static final boolean	WAIT_FOR_CLIENTS			= true;
+	public static final int		MAXIMUM_DISCONNECT_TIMEOUT	= 5;
 
     public enum ClientConnectionState {
-
         CONNECTING,
         CONNECTED,
         ERROR,
@@ -68,7 +67,7 @@ public class NetworkManager {
         JOINED
     }
     /** The Constant DEFAULT_PORT. */
-    public static final int DEFAULT_PORT = 6142;
+    public static final int DEFAULT_PORT = 27960;
     /** The instance. */
     private static NetworkManager instance;
 

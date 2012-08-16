@@ -72,10 +72,10 @@ public class GameGUI {
     private GameGUI(SolarWarsGame game) {
 
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-        this.game = game;
-        this.width = game.getApplication().getCamera().getWidth();
-        this.height = game.getApplication().getCamera().getHeight();
-        this.guiElements = new ArrayList<GUIElement>();
+		this.game = game;
+		this.width = game.getApplication().getCamera().getWidth();
+		this.height = game.getApplication().getCamera().getHeight();
+		this.guiElements = new ArrayList<GUIElement>();
 
         this.decoNode = new Node("DecoNode");
         inputManager = game.getApplication().getInputManager();

@@ -46,440 +46,474 @@ import solarwars.SolarWarsApplication;
 /**
  * The Class AbstractPlanet.
  */
-public abstract class AbstractPlanet extends Node implements Ranged {
+public abstract class AbstractPlanet extends Node implements Ranged
+{
+	private static final int	SHIP_REFRESH_MULTIPILER	= 1;
+	
+	public static final int		SPHERE_Z_SAMPLES		= 10;
+	public static final int		SPHERE_RADIAL_SAMPLES	= 10;
+	
+	protected AssetManager		assetManager;
+	protected Material			material;
+	protected Geometry			geometry;
+	protected Node				transformNode;
+	
+	protected float				size;
+	protected int				sizeID;
+	
+	protected Level				level;
+	protected int				id;
+	protected Vector3f			position;
+	protected BitmapText		label;
 
-    /** The Constant SHIP_REFRESH_MULTIPILER. */
-    private static final int SHIP_REFRESH_MULTIPILER = 1;
-    /** The Constant SPHERE_Z_SAMPLES. */
-    public static final int SPHERE_Z_SAMPLES = 10;
-    /** The Constant SPHERE_RADIAL_SAMPLES. */
-    public static final int SPHERE_RADIAL_SAMPLES = 10;
-    /** The asset manager. */
-    protected AssetManager assetManager;
-    /** The geometry. */
-    protected Geometry geometry;
-    /** The material. */
-    protected Material material;
-    /** The transform node. */
-    protected Node transformNode;
-    /** The size. */
-    protected float size;
-    /** The size id. */
-    protected int sizeID;
-    /** The level. */
-    protected Level level;
-    /** The id. */
-    protected int id;
-    /** The position. */
-    protected Vector3f position;
-    /** The label. */
-    protected BitmapText label;
-    /** The ship increment. */
-    protected float shipIncrement;
-    /** The ships. */
-    protected int ships = 0;
-    /** The shipGainTime. */
-    protected float shipGainTime;
-    /** The owner. */
-    protected Player owner;
-    /** The impact. */
-    private ParticleEmitter impact;
-    /** The capture. */
-    private ParticleEmitter capture;
-    
-    protected float range = 1.5f;
+	protected float				shipIncrement;
+	protected int				ships					= 0;
+	protected float				shipGainTime;
+	
+	protected Player			owner;
+	private ParticleEmitter		impact;
+	private ParticleEmitter		capture;
 
-    /**
-     * Creates the impact emitter.
-     */
-    private void createImpactEmitter() {
-        if (impact == null) {
-            impact = new ParticleEmitter("ShipImpactEffect ", ParticleMesh.Type.Triangle, 15);
-            Material impact_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
-            impact_mat.setTexture("Texture", assetManager.loadTexture("Textures/Effects/blob.png"));
-            impact.setMaterial(impact_mat);
-            impact.setImagesX(1);
-            impact.setImagesY(1);
-            impact.setRotateSpeed(1);
-            impact.setLowLife(0.3f);
-            impact.setHighLife(1.1f);
-            impact.setStartSize(0.1f);
-            impact.setEndSize(0.2f);
-            impact.setSelectRandomImage(true);
+	protected float				range					= 1.5f;
 
-            impact.setGravity(0, 0, 0);
-            impact.getParticleInfluencer().setVelocityVariation(.10f);
+	private void createImpactEmitter ()
+	{
+		if (impact == null)
+		{
+			impact = new ParticleEmitter("ShipImpactEffect ",
+					ParticleMesh.Type.Triangle, 15);
+			Material impact_mat = new Material(assetManager,
+					"Common/MatDefs/Misc/Particle.j3md");
+			impact_mat.setTexture("Texture", assetManager
+					.loadTexture("Textures/Effects/blob.png"));
+			impact.setMaterial(impact_mat);
+			impact.setImagesX(1);
+			impact.setImagesY(1);
+			impact.setRotateSpeed(1);
+			impact.setLowLife(0.3f);
+			impact.setHighLife(1.1f);
+			impact.setStartSize(0.1f);
+			impact.setEndSize(0.2f);
+			impact.setSelectRandomImage(true);
 
-            impact.setEnabled(false);
+			impact.setGravity(0, 0, 0);
+			impact.getParticleInfluencer().setVelocityVariation(.10f);
 
-            level.addParticleEmitter(impact);
-        }
-    }
+			impact.setEnabled(false);
 
-    /**
-     * Emit impact particles.
-     *
-     * @param start the start
-     * @param end the end
-     * @param pos the pos
-     * @param dir the dir
-     */
-    void emitImpactParticles(ColorRGBA start, ColorRGBA end, Vector3f pos, Vector3f dir) {
+			level.addParticleEmitter(impact);
+		}
+	}
 
-        impact.setLowLife(0.3f);
-        impact.setHighLife(1.1f);
-        impact.getParticleInfluencer().setVelocityVariation(.10f);
-        impact.getParticleInfluencer().setInitialVelocity(dir.normalizeLocal().negateLocal().mult(0.23f));
+	/**
+	 * Emit impact particles.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param pos
+	 *            the pos
+	 * @param dir
+	 *            the dir
+	 */
+	void emitImpactParticles (ColorRGBA start, ColorRGBA end, Vector3f pos,
+								Vector3f dir)
+	{
 
-        impact.setEnabled(true);
+		impact.setLowLife(0.3f);
+		impact.setHighLife(1.1f);
+		impact.getParticleInfluencer().setVelocityVariation(.10f);
+		impact.getParticleInfluencer()
+				.setInitialVelocity(dir.normalizeLocal().negateLocal()
+											.mult(0.23f));
 
-        impact.setParticlesPerSec(200);
+		impact.setEnabled(true);
 
-        impact.setStartColor(start);
-        impact.setEndColor(end);
+		impact.setParticlesPerSec(200);
 
-        impact.setShape(new EmitterPointShape(pos));
+		impact.setStartColor(start);
+		impact.setEndColor(end);
 
-        impact.emitAllParticles();
+		impact.setShape(new EmitterPointShape(pos));
 
-        impact.setParticlesPerSec(0);
-    }
+		impact.emitAllParticles();
 
-    /**
-     * Creates the capture emitter.
-     */
-    private void createCaptureEmitter() {
-        if (capture == null) {
-            capture = new ParticleEmitter(
-                    "PlanetCaptureEffect ",
-                    ParticleMesh.Type.Triangle,
-                    5);
-            Material capture_mat =
-                    new Material(
-                    assetManager,
-                    "Common/MatDefs/Misc/Particle.j3md");
-            capture_mat.setTexture(
-                    "Texture",
-                    assetManager.loadTexture("Textures/Effects/shockwave.png"));
-            capture.setMaterial(capture_mat);
-            capture.setImagesX(1);
-            capture.setImagesY(1);
-            capture.setRotateSpeed(1);
-            capture.setLowLife(0.6f);
-            capture.setHighLife(0.8f);
-            capture.setStartSize(getSize() - 0.1f);
-            capture.setEndSize(2 * getSize() + 0.1f);
-            capture.setSelectRandomImage(true);
+		impact.setParticlesPerSec(0);
+	}
 
-            capture.setGravity(0, 0, 0);
-//            capture.getParticleInfluencer().
-//                    setVelocityVariation(.90f);
-            capture.getParticleInfluencer().
-                    setInitialVelocity(new Vector3f(0, 0, 0));
+	/**
+	 * Creates the capture emitter.
+	 */
+	private void createCaptureEmitter ()
+	{
+		if (capture == null)
+		{
+			capture = new ParticleEmitter("PlanetCaptureEffect ",
+					ParticleMesh.Type.Triangle, 5);
+			Material capture_mat = new Material(assetManager,
+					"Common/MatDefs/Misc/Particle.j3md");
+			capture_mat.setTexture("Texture", assetManager
+					.loadTexture("Textures/Effects/shockwave.png"));
+			capture.setMaterial(capture_mat);
+			capture.setImagesX(1);
+			capture.setImagesY(1);
+			capture.setRotateSpeed(1);
+			capture.setLowLife(0.6f);
+			capture.setHighLife(0.8f);
+			capture.setStartSize(getSize() - 0.1f);
+			capture.setEndSize(2 * getSize() + 0.1f);
+			capture.setSelectRandomImage(true);
 
-            capture.setEnabled(false);
+			capture.setGravity(0, 0, 0);
+			// capture.getParticleInfluencer().
+			// setVelocityVariation(.90f);
+			capture.getParticleInfluencer().setInitialVelocity(	new Vector3f(0,
+																		0, 0));
 
-            level.addParticleEmitter(capture);
-        }
-    }
+			capture.setEnabled(false);
 
-    /**
-     * Emit capture particles.
-     */
-    public void emitCaptureParticles() {
+			level.addParticleEmitter(capture);
+		}
+	}
 
-        capture.killAllParticles();
-        capture.setEnabled(true);
+	/**
+	 * Emit capture particles.
+	 */
+	public void emitCaptureParticles ()
+	{
 
-        capture.setParticlesPerSec(500);
+		capture.killAllParticles();
+		capture.setEnabled(true);
 
-        capture.setStartColor(owner.getColor());
-        capture.setEndColor(ColorRGBA.BlackNoAlpha);
+		capture.setParticlesPerSec(500);
 
-        capture.setShape(new EmitterPointShape(position));
+		capture.setStartColor(owner.getColor());
+		capture.setEndColor(ColorRGBA.BlackNoAlpha);
 
-        capture.emitAllParticles();
+		capture.setShape(new EmitterPointShape(position));
 
-        capture.setParticlesPerSec(0);
-    }
+		capture.emitAllParticles();
 
-    /**
-     * Instantiates a new abstract planet.
-     *
-     * @param assetManager the asset manager
-     * @param level the level
-     * @param position the position
-     * @param sizeID the size id
-     */
-    public AbstractPlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
-        this.id = Level.getContiniousPlanetID();
-        this.size = Level.PLANET_SIZES[sizeID];
-        this.sizeID = sizeID;
-        this.level = level;
-        this.position = position;
-        this.transformNode = new Node("Planet Transform Node " + id);
-        this.transformNode.setLocalTranslation(position);
-        this.assetManager = assetManager;
-        this.createImpactEmitter();
-        this.createCaptureEmitter();
-        this.owner = null;
-        createLabel();
+		capture.setParticlesPerSec(0);
+	}
 
-        this.attachChild(transformNode);
-        level.getLabelNode().attachChild(label);
-        //this.attachChild(label);
-        this.shipIncrement = Level.PLANET_INCREMENT_TIME[sizeID];
-    }
+	/**
+	 * Instantiates a new abstract planet.
+	 * 
+	 * @param assetManager
+	 *            the asset manager
+	 * @param level
+	 *            the level
+	 * @param position
+	 *            the position
+	 * @param sizeID
+	 *            the size id
+	 */
+	public AbstractPlanet(	AssetManager assetManager,
+							Level level,
+							Vector3f position,
+							int sizeID)
+	{
+		this.id = Level.getContiniousPlanetID();
+		this.size = Level.PLANET_SIZES[sizeID];
+		this.sizeID = sizeID;
+		this.level = level;
+		this.position = position;
+		this.transformNode = new Node("Planet Transform Node " + id);
+		this.transformNode.setLocalTranslation(position);
+		this.assetManager = assetManager;
+		this.createImpactEmitter();
+		this.createCaptureEmitter();
+		this.owner = null;
+		createLabel();
 
-    /**
-     * Creates the label.
-     */
-    private void createLabel() {
-        BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont64");
-        label = new BitmapText(f, false);
-        label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
-        //label.setQueueBucket(Bucket.Transparent);
-        label.setSize(0.3f);
-        label.setColor(ColorRGBA.Orange);
-        label.setText(shipIncrement + "");
-        label.setAlignment(Align.Center);
-        label.setCullHint(CullHint.Never);
-        // algins position of the font
-        refreshFont();
-    }
-    
-    /**
-     * Refresh font.
-     */
-    private void refreshFont() {
-        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
-        Vector3f fontPos = position.clone();
+		this.attachChild(transformNode);
+		level.getLabelNode().attachChild(label);
+		// this.attachChild(label);
+		this.shipIncrement = Level.PLANET_INCREMENT_TIME[sizeID];
+	}
 
-        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
-        Vector3f dir = camPos.subtract(fontPos);
+	/**
+	 * Creates the label.
+	 */
+	private void createLabel ()
+	{
+		BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont64");
+		label = new BitmapText(f, false);
+		label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
+		// label.setQueueBucket(Bucket.Transparent);
+		label.setSize(0.3f);
+		label.setColor(ColorRGBA.Orange);
+		label.setText(shipIncrement + "");
+		label.setAlignment(Align.Center);
+		label.setCullHint(CullHint.Never);
+		// algins position of the font
+		refreshFont();
+	}
 
-        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
-        dir.normalizeLocal();
-        left.normalizeLocal();
-        left.negateLocal();
+	/**
+	 * Refresh font.
+	 */
+	private void refreshFont ()
+	{
+		Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
+		Vector3f fontPos = position.clone();
 
-        Quaternion look = new Quaternion();
-        look.fromAxes(left, up, dir);
+		Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
+		Vector3f dir = camPos.subtract(fontPos);
 
-        Vector3f newPos = dir.clone();
-        newPos.normalizeLocal();
-        newPos.mult(size);
+		Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
+		dir.normalizeLocal();
+		left.normalizeLocal();
+		left.negateLocal();
 
-        newPos = position.add(newPos);
+		Quaternion look = new Quaternion();
+		look.fromAxes(left, up, dir);
 
-        Transform t = new Transform(newPos, look);
+		Vector3f newPos = dir.clone();
+		newPos.normalizeLocal();
+		newPos.mult(size);
 
-        label.setLocalTransform(t);
-    }
+		newPos = position.add(newPos);
 
-    /**
-     * Checks for owner.
-     *
-     * @return true, if successful
-     */
-    public boolean hasOwner() {
-        return owner != null;
-    }
+		Transform t = new Transform(newPos, look);
 
-    /**
-     * Gets the owner.
-     *
-     * @return the owner
-     */
-    public Player getOwner() {
-        return owner;
-    }
+		label.setLocalTransform(t);
+	}
 
-    /**
-     * Sets the owner.
-     *
-     * @param p the new owner
-     */
-    public void setOwner(Player p) {
-        owner = p;
-        label.setColor(ColorRGBA.Black.clone());
-        material.setColor("Specular", owner.getColor());
-        if (SolarWarsApplication.TOON_ENABLED) {
-            material.setColor("Diffuse", ColorRGBA.LightGray);
-        } else {
-            material.setColor("Diffuse", owner.getColor());
-        }
-        if (SolarWarsApplication.BLOOM_ENABLED) {
-            material.setColor("GlowColor", owner.getColor());
-        }
-    }
+	/**
+	 * Checks for owner.
+	 * 
+	 * @return true, if successful
+	 */
+	public boolean hasOwner ()
+	{
+		return owner != null;
+	}
 
-    /**
-     * Creates the planet.
-     */
-    public abstract void createPlanet();
+	/**
+	 * Gets the owner.
+	 * 
+	 * @return the owner
+	 */
+	public Player getOwner ()
+	{
+		return owner;
+	}
 
-    /**
-     * Gets the id.
-     *
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
+	/**
+	 * Sets the owner.
+	 * 
+	 * @param p
+	 *            the new owner
+	 */
+	public void setOwner (Player p)
+	{
+		owner = p;
+		label.setColor(ColorRGBA.Black.clone());
+		material.setColor("Specular", owner.getColor());
+		if (SolarWarsApplication.TOON_ENABLED)
+		{
+			material.setColor("Diffuse", ColorRGBA.LightGray);
+		}
+		else
+		{
+			material.setColor("Diffuse", owner.getColor());
+		}
+		if (SolarWarsApplication.BLOOM_ENABLED)
+		{
+			material.setColor("GlowColor", owner.getColor());
+		}
+	}
 
-    /**
-     * Gets the size.
-     *
-     * @return the size
-     */
-    public float getSize() {
-        return size;
-    }
+	/**
+	 * Creates the planet.
+	 */
+	public abstract void createPlanet ();
 
-    /**
-     * Gets the size id.
-     *
-     * @return the size id
-     */
-    public int getSizeID() {
-        return sizeID;
-    }
+	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 */
+	public int getId ()
+	{
+		return id;
+	}
 
-    /**
-     * Gets the geometry.
-     *
-     * @return the geometry
-     */
-    public Geometry getGeometry() {
-        return geometry;
-    }
+	/**
+	 * Gets the size.
+	 * 
+	 * @return the size
+	 */
+	public float getSize ()
+	{
+		return size;
+	}
 
-    /**
-     * Gets the ships.
-     *
-     * @return the ships
-     */
-    public int getShipCount() {
-        return ships;
-    }
+	/**
+	 * Gets the size id.
+	 * 
+	 * @return the size id
+	 */
+	public int getSizeID ()
+	{
+		return sizeID;
+	}
 
-    public float getRange() {
-        return range;
-    }    
-    
-    /**
-     * Sets the ship count.
-     *
-     * @param c the new ship count
-     */
-    public void setShipCount(int c) {
-        ships = c;
-    }
+	/**
+	 * Gets the geometry.
+	 * 
+	 * @return the geometry
+	 */
+	public Geometry getGeometry ()
+	{
+		return geometry;
+	}
 
-//    public void setShipCount(int c, long delay) {
-//        //ships = c;
-//        if (owner != null && !level.isGameOver()) {
-//            float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
-//            float gap = delay / 10f;
-//
-//            while (gap > 0) {
-//                ships += 1;
-//                gap -= peek;
-//            }
-//
-//        }
-//        if (ships > c)
-//            ships = c;
-//    }
-    /**
-     * Decrement ships.
-     */
-    public void decrementShips() {
-        if (ships > 0) {
-            ships--;
-        }
-    }
+	/**
+	 * Gets the ships.
+	 * 
+	 * @return the ships
+	 */
+	public int getShipCount ()
+	{
+		return ships;
+	}
 
-    /**
-     * Increment ships.
-     */
-    public void incrementShips() {
-        
-        ships++;
-    }
+	public float getRange ()
+	{
+		return range;
+	}
 
-    /**
-     * Gets the position.
-     *
-     * @return the position
-     */
-    public Vector3f getPosition() {
-        return position;
-    }
+	/**
+	 * Sets the ship count.
+	 * 
+	 * @param c
+	 *            the new ship count
+	 */
+	public void setShipCount (int c)
+	{
+		ships = c;
+	}
 
-    /**
-     * Gets the transform node.
-     *
-     * @return the transform node
-     */
-    public Node getTransformNode() {
-        return transformNode;
-    }
+	// public void setShipCount(int c, long delay) {
+	// //ships = c;
+	// if (owner != null && !level.isGameOver()) {
+	// float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
+	// float gap = delay / 10f;
+	//
+	// while (gap > 0) {
+	// ships += 1;
+	// gap -= peek;
+	// }
+	//
+	// }
+	// if (ships > c)
+	// ships = c;
+	// }
+	/**
+	 * Decrement ships.
+	 */
+	public void decrementShips ()
+	{
+		if (ships > 0)
+		{
+			ships--;
+		}
+	}
 
-    /**
-     * Updates the label.
-     *
-     * @param tpf the tpf
-     */
-    private void updateLabel(float tpf) {
-        boolean visible = (owner == null
-                || owner.equals(Hub.getLocalPlayer())
-                || Hub.getLocalPlayer().hasLost());
-        label.setCullHint(visible ? CullHint.Never : CullHint.Always);
-        if (visible) {
-            refreshFont();
-            label.setText(ships + "");
-        }
-    }
+	/**
+	 * Increment ships.
+	 */
+	public void incrementShips ()
+	{
 
-//    public void syncronize(long delay) {
-//        float secDelay = delay * .001f;
-//        if (secDelay >= shipGainTime) {
-//            float remains = secDelay - shipGainTime;
-//            if (ships >= 1) {
-//                ships--;
-//            }
-//            while (remains >= shipIncrement) {
-//                remains -= shipIncrement;
-//                if (ships >= 1) {
-//                    ships--;
-//                }
-//            }
-//            shipGainTime = shipIncrement - remains;
-//        } else {
-//            shipGainTime -= secDelay;
-//        }
-//    }
-    /**
-     * Updates the label.
-     *
-     * @param tpf the tpf
-     */
-    public void updatePlanet(float tpf) {
-        shipGainTime += tpf;
-        if (owner != null && !level.isGameOver()) {
+		ships++;
+	}
 
-            if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
-//                while (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement) {
-//                    shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER * shipIncrement);
-                ships++;
-//                }
-//                if (shipGainTime < 0) {
-                shipGainTime = 0;
-//                }
-            }
-        }
-        updateLabel(tpf);
-    }
+	/**
+	 * Gets the position.
+	 * 
+	 * @return the position
+	 */
+	public Vector3f getPosition ()
+	{
+		return position;
+	}
+
+	/**
+	 * Gets the transform node.
+	 * 
+	 * @return the transform node
+	 */
+	public Node getTransformNode ()
+	{
+		return transformNode;
+	}
+
+	/**
+	 * Updates the label.
+	 * 
+	 * @param tpf
+	 *            the tpf
+	 */
+	private void updateLabel (float tpf)
+	{
+		boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()) || Hub
+				.getLocalPlayer().hasLost());
+		label.setCullHint(visible ? CullHint.Never : CullHint.Always);
+		if (visible)
+		{
+			refreshFont();
+			label.setText(ships + "");
+		}
+	}
+
+	// public void syncronize(long delay) {
+	// float secDelay = delay * .001f;
+	// if (secDelay >= shipGainTime) {
+	// float remains = secDelay - shipGainTime;
+	// if (ships >= 1) {
+	// ships--;
+	// }
+	// while (remains >= shipIncrement) {
+	// remains -= shipIncrement;
+	// if (ships >= 1) {
+	// ships--;
+	// }
+	// }
+	// shipGainTime = shipIncrement - remains;
+	// } else {
+	// shipGainTime -= secDelay;
+	// }
+	// }
+	/**
+	 * Updates the label.
+	 * 
+	 * @param tpf
+	 *            the tpf
+	 */
+	public void updatePlanet (float tpf)
+	{
+		shipGainTime += tpf;
+		if (owner != null && !level.isGameOver())
+		{
+
+			if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement)
+			{
+				// while (shipGainTime > SHIP_REFRESH_MULTIPILER *
+				// shipIncrement) {
+				// shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER *
+				// shipIncrement);
+				ships++;
+				// }
+				// if (shipGainTime < 0) {
+				shipGainTime = 0;
+				// }
+			}
+		}
+		updateLabel(tpf);
+	}
 }
