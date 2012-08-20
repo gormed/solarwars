@@ -33,7 +33,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Random;
-import logic.Gameplay;
+import logic.AbstractGameplay;
 import logic.Level;
 import logic.Player;
 
@@ -63,7 +63,7 @@ public class ShipGroup extends Node implements Ranged {
     
     private float range;
     
-    private float speed = 1;
+    private float speed = AbstractGameplay.SHIP_SPEED;
     
     private float fuel = 30;
     
@@ -207,7 +207,7 @@ public class ShipGroup extends Node implements Ranged {
      * @param p the p
      */
     public void moveToPlanet(AbstractPlanet p) {
-        //if (!owner.hasLost() && !Gameplay.getCurrentLevel().isGameOver()) {
+        //if (!owner.hasLost() && !DeathmatchGameplay.getCurrentLevel().isGameOver()) {
         order = p;
         for (AbstractShip s : ships) {
             s.moveToPlanet(p);
@@ -221,7 +221,7 @@ public class ShipGroup extends Node implements Ranged {
      * @param tpf the tpf
      */
     public void updateShipGroup(float tpf) {
-        if (order != null && !Gameplay.getCurrentLevel().isGameOver()) {
+        if (order != null && !level.isGameOver()) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
             if (dir.length() < 0.001f) {

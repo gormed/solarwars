@@ -305,7 +305,6 @@ public class Level {
 
         batchManager = new ShipBatchManager(this);
         batchManager.initialize(Hub.playersByID.size() * 100);
-
     }
 
     /**
@@ -336,7 +335,7 @@ public class Level {
     public void addShip(Player p, AbstractShip s) {
 //        Node shipNode = shipNodes.get(p);
 //        shipNode.attachChild(s);
-        
+
         shipList.put(s.getId(), s);
     }
 
@@ -361,7 +360,7 @@ public class Level {
     public void removeShip(Player p, AbstractShip s) {
 //        Node shipNode = shipNodes.get(p);
 //        shipNode.detachChild(s);
-        
+
         removeShipsList.add(s);
     }
 
@@ -446,7 +445,7 @@ public class Level {
     public ShipBatchManager getBatchManager() {
         return batchManager;
     }
-    
+
     /**
      * Updates the level.
      *
@@ -459,7 +458,7 @@ public class Level {
             return;
         }
 
-        Gameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
+        DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
 
         if (Hub.getLocalPlayer().hasLost()) {
             Player.localPlayerLooses();

@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
 import net.NetworkManager;
@@ -117,7 +117,7 @@ public class MultiplayerMatchState extends Gamestate {
         client.addClientStateListener(playerStateListener);
         gameplay = MultiplayerGameplay.getInstance();
         setupGUI();
-        currentLevel = Gameplay.getCurrentLevel();
+        currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
         currentLevel.generateLevel();
         //currentLevel.setupPlayers(Hub.playersByID);
 
@@ -144,7 +144,7 @@ public class MultiplayerMatchState extends Gamestate {
 
         try {
             Thread diconnector = fut.get(
-                    NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT, 
+                    NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT,
                     TimeUnit.SECONDS);
             diconnector.interrupt();
         } catch (InterruptedException ex) {
@@ -161,7 +161,7 @@ public class MultiplayerMatchState extends Gamestate {
                     "Server did not shut down in time: {0} {1}",
                     new Object[]{ex.getMessage(), ex});
         }
- 
+
         GameOverGUI.getInstance().hide();
         application.getInputManager().removeListener(pauseListener);
         pauseListener = null;

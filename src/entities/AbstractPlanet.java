@@ -36,6 +36,7 @@ import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import logic.AbstractGameplay;
 import logic.Level;
 import logic.Player;
 import solarwars.FontLoader;
@@ -48,33 +49,29 @@ import solarwars.SolarWarsApplication;
  */
 public abstract class AbstractPlanet extends Node implements Ranged
 {
-	private static final int	SHIP_REFRESH_MULTIPILER	= 1;
-	
-	public static final int		SPHERE_Z_SAMPLES		= 10;
-	public static final int		SPHERE_RADIAL_SAMPLES	= 10;
-	
-	protected AssetManager		assetManager;
-	protected Material			material;
-	protected Geometry			geometry;
-	protected Node				transformNode;
-	
-	protected float				size;
-	protected int				sizeID;
-	
-	protected Level				level;
-	protected int				id;
-	protected Vector3f			position;
-	protected BitmapText		label;
-
-	protected float				shipIncrement;
-	protected int				ships					= 0;
-	protected float				shipGainTime;
-	
-	protected Player			owner;
-	private ParticleEmitter		impact;
-	private ParticleEmitter		capture;
-
-	protected float				range					= 1.5f;
+    
+    public static final int SPHERE_Z_SAMPLES = 10;
+    public static final int SPHERE_RADIAL_SAMPLES = 10;
+    
+    protected AssetManager assetManager;
+    protected Material material;
+    protected Geometry geometry;
+    protected Node transformNode;
+    
+    protected float size;
+    protected int sizeID;
+    protected Level level;
+    protected int id;
+    protected Vector3f position;
+    protected BitmapText label;
+    protected float shipIncrement;
+    protected int ships = 0;
+    protected float shipGainTime;
+    protected Player owner;
+    
+    private ParticleEmitter impact;
+    private ParticleEmitter capture;
+    protected float range = AbstractGameplay.PLANET_RANGE;
 
 	private void createImpactEmitter ()
 	{
@@ -401,7 +398,7 @@ public abstract class AbstractPlanet extends Node implements Ranged
 	// public void setShipCount(int c, long delay) {
 	// //ships = c;
 	// if (owner != null && !level.isGameOver()) {
-	// float peek = SHIP_REFRESH_MULTIPILER * shipIncrement;
+	// float peek = PLANET_REFRESH_MULTIPILER * shipIncrement;
 	// float gap = delay / 10f;
 	//
 	// while (gap > 0) {
@@ -501,11 +498,12 @@ public abstract class AbstractPlanet extends Node implements Ranged
 		if (owner != null && !level.isGameOver())
 		{
 
-			if (shipGainTime > SHIP_REFRESH_MULTIPILER * shipIncrement)
+			if (shipGainTime > 
+                                AbstractGameplay.PLANET_REFRESH_MULTIPILER * shipIncrement)
 			{
-				// while (shipGainTime > SHIP_REFRESH_MULTIPILER *
+				// while (shipGainTime > PLANET_REFRESH_MULTIPILER *
 				// shipIncrement) {
-				// shipGainTime = shipGainTime - (SHIP_REFRESH_MULTIPILER *
+				// shipGainTime = shipGainTime - (PLANET_REFRESH_MULTIPILER *
 				// shipIncrement);
 				ships++;
 				// }

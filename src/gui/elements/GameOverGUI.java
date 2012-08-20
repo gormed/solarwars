@@ -28,7 +28,7 @@ import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 

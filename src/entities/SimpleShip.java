@@ -57,7 +57,7 @@ public class SimpleShip extends AbstractShip {
         material.setColor("GlowColor", owner.getColor());
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         
-        shipBatchSpatial = batchManager.getShipBatch();
+        shipBatchSpatial = level.getBatchManager().getShipBatch();
         shipBatchSpatial.setMaterial(material);
         
 //        transformNode.attachChild(shipBatchSpatial);

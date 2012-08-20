@@ -31,7 +31,7 @@ import gui.GameGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Level;
 import logic.Player;
 import solarwars.Hub;
@@ -84,6 +84,8 @@ public class ScoresGUI extends GUIElement {
     private Label headColorLabel;
     /** The background frame. */
     private Panel backgroundFrame;
+    
+    private Level level;
 
     /**
      * Instantiates a new scores gui.
@@ -92,6 +94,7 @@ public class ScoresGUI extends GUIElement {
      */
     public ScoresGUI(GameGUI gui) {
         this.gui = gui;
+        this.level = SolarWarsGame.getInstance().getCurrentLevel();
         fadeMax = -(2 * gui.getWidth() / 3) + 10;
         this.setLocalTranslation(fadeMax, 0, 0);
 
@@ -266,8 +269,6 @@ public class ScoresGUI extends GUIElement {
         background.updateGUI(tpf);
         scoresLabel.updateGUI(tpf);
 
-        Level l = Gameplay.getCurrentLevel();
-
         for (ScoresLine line : playerLabels) {
             line.updateGUI(tpf);
         }
@@ -406,11 +407,10 @@ public class ScoresGUI extends GUIElement {
 
             this.player = p;
             float percent = 0;
-            Level l = Gameplay.getCurrentLevel();
-            if (l != null) {
+            if (level != null) {
                 percent =
                         (float) p.getPlanetCount()
-                        / (float) l.getPlanetSet().size();
+                        / (float) level.getPlanetSet().size();
                 percent *= 100;
             }
 
@@ -548,8 +548,7 @@ public class ScoresGUI extends GUIElement {
         public void updateGUI(float tpf) {
             float percent = 0;
             float growth = 0;
-            Level l = Gameplay.getCurrentLevel();
-            if (l != null) {
+            if (level != null) {
                 calculateGrowthAndGain();
 //                percent = 
 //                        (float) player.getPlanetCount()
@@ -610,14 +609,14 @@ public class ScoresGUI extends GUIElement {
             avgGrowth = growth / (float) player.getPlanets().size();
             float times = 1.0f / avgGrowth;
             growthPerSecond = times * (float) player.getPlanets().size();
-            for (Entry<Integer, AbstractPlanet> e : Gameplay.getCurrentLevel().getPlanetSet()) {
+            for (Entry<Integer, AbstractPlanet> e : level.getPlanetSet()) {
                 size = e.getValue().getSizeID();
                 globalSize += size;
 
             }
 
 //            avgSize /= (float) player.getPlanetCount();
-//            globalSize /= (float) Gameplay.getCurrentLevel().getPlanetSet().size();
+//            globalSize /= (float) DeathmatchGameplay.getCurrentLevel().getPlanetSet().size();
         }
 
         private float getPercentageOfGain() {

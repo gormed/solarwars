@@ -33,6 +33,7 @@ import net.messages.LevelActionMessage;
 import net.messages.PlanetActionMessage;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class MultiplayerGameplay.
@@ -44,6 +45,7 @@ public class MultiplayerGameplay {
     public static final boolean MULTIPLAYER_GAMEPLAY_DEBUG = true;
     /** The instance. */
     private static MultiplayerGameplay instance;
+    private static Level currentLevel;
 
     /**
      * Instantiates a new multiplayer gameplay.
@@ -55,6 +57,9 @@ public class MultiplayerGameplay {
                 PlanetActionMessage.class,
                 GeneralActionMessage.class,
                 LevelActionMessage.class);
+
+        currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
+
     }
 
     /**
@@ -86,7 +91,7 @@ public class MultiplayerGameplay {
     /** The action lib. */
     private ActionLib actionLib = ActionLib.getInstance();
     /** The recieved messages. */
-    private volatile Queue<Message> recievedMessages =
+    private final Queue<Message> recievedMessages =
             new LinkedList<Message>();
     private double currentTickDiff = 0;
     private double lastTickDiff = 0;
@@ -97,7 +102,6 @@ public class MultiplayerGameplay {
     public void destroy() {
         synchronized (recievedMessages) {
             recievedMessages.clear();
-            recievedMessages = null;
         }
         removeGameplayListener();
         gameplayListener = null;
@@ -126,12 +130,15 @@ public class MultiplayerGameplay {
     //==========================================================================
     //          SEND MESSAGES OVER NETWORK TO OTHER PLAYERS
     //==========================================================================
+
     /**
      * Checks if game still needs to send messages to other players via network.
      * @return true if still running a game, false otherwise
      */
     private boolean gameIsNotRunning() {
-        return client == null || !client.isConnected() || Gameplay.getCurrentLevel().isGameOver();
+        return client == null
+                || !client.isConnected()
+                || currentLevel.isGameOver();
     }
 
     /**
@@ -190,11 +197,10 @@ public class MultiplayerGameplay {
         }
         client.send(generalActionMessage);
     }
-    
+
     //==========================================================================
     //          RECIEVE MESSAGES FROM OTHER OVER NETWORK
     //==========================================================================
-
     /**
      * Updates the MultiplayerGameplay by polling the next network message 
      * from the queque.
@@ -215,8 +221,7 @@ public class MultiplayerGameplay {
                 Player p = Hub.getInstance().getPlayer(serverMessage.getPlayerID());
                 p.applyState(serverMessage.getPlayerState());
                 AbstractPlanet planet =
-                        Gameplay.getCurrentLevel().
-                        getPlanet(serverMessage.getPlanetID());
+                        currentLevel.getPlanet(serverMessage.getPlanetID());
                 //TODO: Clean up the mess, nobody needs this anymore!
                 long delay = 0;
 
@@ -228,7 +233,7 @@ public class MultiplayerGameplay {
                         serverMessage.getActionName());
             } else if (m instanceof GeneralActionMessage) {
                 GeneralActionMessage serverMessage = (GeneralActionMessage) m;
-                
+
 //                Player a = Hub.getPlayers().get(serverMessage.getSender());
 //                Player b = Hub.getPlayers().get(serverMessage.getReciever());
 //                a.applyState(serverMessage.getSenderState());
@@ -255,7 +260,7 @@ public class MultiplayerGameplay {
      * @param actionMessage 
      */
     private void syncronizeClient(LevelActionMessage actionMessage) {
-        double tick = Gameplay.getGameTick();
+        double tick = DeathmatchGameplay.getGameTick();
         double serverTick = actionMessage.getGameTick();
         double tickDiff = tick - serverTick;
         currentTickDiff = tickDiff;
@@ -271,10 +276,9 @@ public class MultiplayerGameplay {
                     + " - tickDiff: " + String.format("%1.3f", (float) tickDiff));
         }
         SolarWarsApplication.getInstance().syncronize((float) (tickDelay));
-        Gameplay.GAMETICK += (currentTickDiff - lastTickDiff) * 0.5f;
+        DeathmatchGameplay.GAMETICK += (currentTickDiff - lastTickDiff) * 0.5f;
         lastTickDiff = currentTickDiff;
     }
-
 
     /**
      * The listener interface for receiving clientGameplay events.

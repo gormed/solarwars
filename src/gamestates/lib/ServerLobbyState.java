@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
@@ -206,7 +206,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 SolarWarsApplication.getInstance().getIsoControl(),
                 gui,
                 Hub.playersByID, clientSeed);
-        Gameplay.initialize(mpLevel);
+        game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }
 
     /* (non-Javadoc)

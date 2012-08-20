@@ -33,7 +33,11 @@ import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
 import input.KeyInputManager;
 import java.util.logging.Logger;
+import logic.AbstractGameplay;
 import logic.ActionLib;
+import logic.DeathmatchGameplay;
+import logic.GameplayException;
+import logic.Level;
 import net.NetworkManager;
 
 /**
@@ -73,16 +77,16 @@ public class SolarWarsGame {
     public SolarWarsApplication getApplication() {
         return application;
     }
-
-	private AssetManager		assetManager;
-	private GamestateManager	gamestateManager;
-	private NetworkManager		networkManager;
-	private IsoControl			isoControl;
-	private InputManager		inputManager;
-	private FontLoader			fontLoader;
-	private ActionLib			actionLib;
-	private AudioManager		audioManager;
-	private KeyInputManager		keyInputManager;
+    private AssetManager assetManager;
+    private GamestateManager gamestateManager;
+    private NetworkManager networkManager;
+    private IsoControl isoControl;
+    private InputManager inputManager;
+    private FontLoader fontLoader;
+    private ActionLib actionLib;
+    private AudioManager audioManager;
+    private KeyInputManager keyInputManager;
+    private static AbstractGameplay currentGameplay;
     private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
 
     /**
@@ -91,18 +95,20 @@ public class SolarWarsGame {
      * @param app the app
      */
     public void initialize(SolarWarsApplication app) {
-		application 	= app;
-		assetManager 	= app.getAssetManager();
-		
-		isoControl		= IsoControl.getInstance();
-		
-		audioManager 	= AudioManager.getInstance();
-		audioManager.initialize();
-		
-		gamestateManager 	= GamestateManager.getInstance();
-		networkManager 		= NetworkManager.getInstance();
+        application = app;
+        assetManager = app.getAssetManager();
+
+        isoControl = IsoControl.getInstance();
+
+        audioManager = AudioManager.getInstance();
+        audioManager.initialize();
+
+        gamestateManager = GamestateManager.getInstance();
+        networkManager = NetworkManager.getInstance();
 
         actionLib = ActionLib.getInstance();
+        currentGameplay = new DeathmatchGameplay();
+
         // Init fonts
         fontLoader = FontLoader.getInstance();
         fontLoader.initialize(assetManager);
@@ -174,5 +180,29 @@ public class SolarWarsGame {
      */
     void update(float timePerFrame) {
         gamestateManager.update(timePerFrame);
+    }
+
+    public static AbstractGameplay getCurrentGameplay() {
+        if (currentGameplay != null) {
+            return currentGameplay;
+        }
+        return new DeathmatchGameplay();
+    }
+
+    public void setupGameplay(AbstractGameplay gameplay,
+            Level level) {
+        currentGameplay = gameplay;
+        currentGameplay.initialize(level);
+    }
+
+    public Level getCurrentLevel() {
+        try {
+            return currentGameplay.getCurrentLevel();
+        } catch (GameplayException ex) {
+            Logger.getLogger(SolarWarsGame.class.getName()).
+                    log(java.util.logging.Level.SEVERE, null, ex);
+            gamestateManager.enterState(GamestateManager.MAINMENU_STATE);
+            return null;
+        }
     }
 }

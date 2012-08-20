@@ -29,9 +29,10 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import logic.AbstractGameplay;
 import logic.Level;
 import logic.ActionLib;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -58,6 +59,8 @@ public abstract class AbstractShip extends Node {
     protected int id;
     /** The position. */
     protected Vector3f position;
+    
+    protected float speed = AbstractGameplay.SHIP_SPEED;
     /** The ship group. */
     protected ShipGroup shipGroup;
     /** The owner. */
@@ -146,7 +149,7 @@ public abstract class AbstractShip extends Node {
                     0,
                     shipGroup, 
                     owner, 
-                    Gameplay.SHIP_ARRIVES);
+                    DeathmatchGameplay.SHIP_ARRIVES);
         }
         batchManager.freeShipBatch(shipBatchSpatial);
         level.removeShip(owner, this);
@@ -179,7 +182,7 @@ public abstract class AbstractShip extends Node {
      * @param tpf the tpf
      */
     public void updateShip(float tpf) {
-        if (order != null && !Gameplay.getCurrentLevel().isGameOver()) {
+        if (order != null && !level.isGameOver()) {
             Vector3f planetLoc = order.getPosition();
             Vector3f dir = planetLoc.subtract(position);
 
@@ -199,7 +202,7 @@ public abstract class AbstractShip extends Node {
                             0L,
                             order, 
                             owner, 
-                            Gameplay.PLANET_CAPTURE);
+                            DeathmatchGameplay.PLANET_CAPTURE);
 
                 }
 
@@ -210,7 +213,7 @@ public abstract class AbstractShip extends Node {
 
             } else {
                 dir.normalizeLocal();
-                dir.multLocal(tpf);
+                dir.multLocal(tpf * speed);
 //                System.out.println("Time: " + tpf);
                 position.addLocal(dir);
                 shipBatchSpatial.setLocalTranslation(position);

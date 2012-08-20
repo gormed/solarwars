@@ -30,6 +30,7 @@ public abstract class Gamestate {
 
     /** The name. */
     private String name;
+    protected SolarWarsGame game;
 
     /**
      * Instantiates a new gamestate.
@@ -53,7 +54,8 @@ public abstract class Gamestate {
      * Enter.
      */
     void enter() {
-        loadContent(SolarWarsGame.getInstance());
+        game = SolarWarsGame.getInstance();
+        loadContent(game);
     }
 
     /**

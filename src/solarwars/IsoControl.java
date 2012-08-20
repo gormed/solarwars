@@ -56,7 +56,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3tools.optimize.GeometryBatchFactory;
 import logic.ActionLib;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 
 /**
@@ -133,14 +133,14 @@ public class IsoControl {
 	private GameGUI						gui;
 	private static final Logger			logger			= Logger.getLogger(IsoControl.class.getName());
 
-	// ==========================================================================
+    // ==========================================================================
     //      Methods
     //==========================================================================
 
     /**
      * Creates the dragging raectangle for selection geometry.
-     * @param width
-     * @param height
+     * @param width 
+     * @param height 
      * @param click2d 
      */
     public void createDragRectGeometry() {
@@ -395,7 +395,7 @@ public class IsoControl {
                             0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
-                            Gameplay.PLANET_SELECT);
+                            DeathmatchGameplay.PLANET_SELECT);
 //                    final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
 //                    logger.info(planetSelectMsg);
                     // finally set marker
@@ -412,7 +412,7 @@ public class IsoControl {
                             0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
-                            Gameplay.PLANET_ATTACK);
+                            DeathmatchGameplay.PLANET_ATTACK);
 //                    final String planetAttackMsg = "Player attacked/moved to planet id#"
 //                            + nearestPlanet.getId() + ", owned by "
 //                            + ((nearestPlanet.getOwner() != null)
@@ -435,7 +435,7 @@ public class IsoControl {
                             0,
                             nearestShipGroup,
                             Hub.getLocalPlayer(),
-                            Gameplay.SHIP_SELECT);
+                            DeathmatchGameplay.SHIP_SELECT);
 //                    final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
 //                    logger.info(sgSelectMsg);
                     repositMarker(nearestShipGroup, markerNode);
@@ -511,7 +511,7 @@ public class IsoControl {
                                 0L,
                                 null,
                                 Hub.getLocalPlayer(),
-                                Gameplay.PLANET_MULTI_SELECT);
+                                DeathmatchGameplay.PLANET_MULTI_SELECT);
                         final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
                         logger.info(multiSelectMsg);
                     }
@@ -532,7 +532,7 @@ public class IsoControl {
                                 0L,
                                 null,
                                 Hub.getLocalPlayer(),
-                                Gameplay.SHIP_MULTI_SELECT);
+                                DeathmatchGameplay.SHIP_MULTI_SELECT);
                         final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
                         logger.info(multiSelectMsg);
                     }
@@ -666,8 +666,9 @@ public class IsoControl {
      * @param rectangle the rectangle
      */
     private void selectPlanets(Rectangle2D rectangle) {
+
         // gets the set of plantes as a ref
-        Set<Entry<Integer, AbstractPlanet>> planetSet = Gameplay.getCurrentLevel().getPlanetSet();
+        Set<Entry<Integer, AbstractPlanet>> planetSet = SolarWarsGame.getInstance().getCurrentLevel().getPlanetSet();
         // iterate through the sets planets each
         for (Map.Entry<Integer, AbstractPlanet> entry : planetSet) {
             // get planet pos
@@ -696,7 +697,7 @@ public class IsoControl {
      */
     private void selectShipGroups(Rectangle2D rectangle) {
         // gets the set of plantes as a ref
-        Set<Entry<Integer, ShipGroup>> planetSet = Gameplay.getCurrentLevel().getShipGroupSet();
+        Set<Entry<Integer, ShipGroup>> planetSet = SolarWarsGame.getInstance().getCurrentLevel().getShipGroupSet();
         // iterate through the sets planets each
         for (Map.Entry<Integer, ShipGroup> entry : planetSet) {
             // get planet pos

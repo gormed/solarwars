@@ -31,13 +31,14 @@ import gui.GameGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import gui.elements.ScoresGUI;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 import logic.Level;
 import net.ServerHub;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.InputMappings;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class SingleplayerState.
@@ -82,15 +83,16 @@ public class SingleplayerState extends Gamestate {
         hub = Hub.getInstance();
         setupSingleplayer();
         application.attachIsoCameraControl();
-        setupGUI();
+        
         currentLevel = new Level(
                 application.getRootNode(),
                 application.getAssetManager(),
                 application.getIsoControl(),
                 gui, Hub.playersByID);
-        Gameplay.initialize(currentLevel);
+        game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
         //currentLevel.setupPlayers(Hub.playersByID);
+        setupGUI();
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
     }

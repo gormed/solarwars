@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
@@ -201,7 +201,7 @@ public class CreateServerState extends Gamestate implements
 				SolarWarsApplication.getInstance().getAssetManager(),
 				SolarWarsApplication.getInstance().getIsoControl(), gui,
 				Hub.playersByID, clientSeed);
-		Gameplay.initialize(mpLevel);
+		game.setupGameplay(new DeathmatchGameplay(), mpLevel);
 	}
 
 	/*
@@ -212,6 +212,7 @@ public class CreateServerState extends Gamestate implements
 	@Override
 	protected void loadContent (SolarWarsGame game)
 	{
+                
 		gui = GameGUI.getInstance();
 		gameStarted = false;
 		game.getApplication().setPauseOnLostFocus(false);

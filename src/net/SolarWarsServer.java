@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logic.Gameplay;
+import logic.DeathmatchGameplay;
 import logic.Player;
 import logic.PlayerState;
 import net.messages.ChatMessage;
@@ -232,7 +232,7 @@ public class SolarWarsServer extends SimpleApplication {
         LevelActionMessage message = new LevelActionMessage(
                 seed,
                 System.currentTimeMillis(),
-                Gameplay.getGameTick());
+                DeathmatchGameplay.getGameTick());
         this.gameServer.broadcast(Filters.notEqualTo(host), message);
 
     }

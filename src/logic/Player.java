@@ -29,6 +29,7 @@ import gui.elements.GameOverGUI;
 import java.util.ArrayList;
 import java.util.Map;
 import solarwars.Hub;
+import solarwars.SolarWarsGame;
 
 /**
  * The Class Player.
@@ -59,7 +60,7 @@ public class Player {
                     continue;
                 }
             }
-            break;  
+            break;
         }
 
         return color;
@@ -75,7 +76,7 @@ public class Player {
         if (defeated != null && !defeated.hasShips() && !defeated.hasLost()) {
 
             ActionLib.getInstance().
-                    invokeGeneralAction(null, victorious, defeated, Gameplay.GAME_OVER);
+                    invokeGeneralAction(null, victorious, defeated, DeathmatchGameplay.GAME_OVER);
         }
     }
 
@@ -102,7 +103,7 @@ public class Player {
      */
     static void localPlayerWins() {
         if (lastPlayer()) {
-            Gameplay.getCurrentLevel().setGameOver(true);
+            SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
             GameOverGUI gameOverGUI = GameOverGUI.getInstance();
             gameOverGUI.setGameOverState(GameOverGUI.GameOverState.WON);
 
@@ -118,7 +119,7 @@ public class Player {
      */
     static void localPlayerLooses() {
         if (lastPlayer()) {
-            Gameplay.getCurrentLevel().setGameOver(true);
+            SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         }
 
         GameOverGUI gameOverGUI = GameOverGUI.getInstance();
@@ -128,7 +129,6 @@ public class Player {
             gameOverGUI.display();
         }
     }
-    
     private static boolean hostSet = false;
     /** The id. */
     private int id;
@@ -322,10 +322,10 @@ public class Player {
      * @return the multi select planets
      */
     ArrayList<AbstractPlanet> getMultiSelectPlanets() {
+        Level current = SolarWarsGame.getInstance().getCurrentLevel();
         ArrayList<AbstractPlanet> aps = new ArrayList<AbstractPlanet>();
-
         for (Integer i : state.multiSelectedPlanets) {
-            aps.add(Gameplay.getCurrentLevel().getPlanet(i));
+            aps.add(current.getPlanet(i));
         }
         return aps;
     }
@@ -357,7 +357,8 @@ public class Player {
      * @return the selected planet
      */
     AbstractPlanet getSelectedPlanet() {
-        return Gameplay.getCurrentLevel().getPlanet(state.selectedPlanetId);
+        return SolarWarsGame.getInstance().
+                getCurrentLevel().getPlanet(state.selectedPlanetId);
     }
 
     /**
@@ -427,11 +428,11 @@ public class Player {
 
         return ships;
     }
-    
+
     public boolean isLeaver() {
         return state.leaver;
     }
-    
+
     public void setLeaver(boolean value) {
         state.leaver = value;
     }
@@ -496,9 +497,9 @@ public class Player {
      */
     ArrayList<ShipGroup> getMultiSelectShipGroups() {
         ArrayList<ShipGroup> sgs = new ArrayList<ShipGroup>();
-
+        Level current = SolarWarsGame.getInstance().getCurrentLevel();
         for (Integer i : state.multiSelectedShipGroups) {
-            sgs.add(Gameplay.getCurrentLevel().getShipGroup(i));
+            sgs.add(current.getShipGroup(i));
         }
         return sgs;
     }
@@ -530,7 +531,8 @@ public class Player {
      * @return the selected ship group
      */
     ShipGroup getSelectedShipGroup() {
-        return Gameplay.getCurrentLevel().getShipGroup(state.selectedShipGroupId);
+        return SolarWarsGame.getInstance().
+                getCurrentLevel().getShipGroup(state.selectedShipGroupId);
     }
 
     /**
