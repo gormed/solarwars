@@ -100,20 +100,20 @@ public class IsoControl {
     //      Private Fields
     //==========================================================================
     // general
-	private Node						rootNode		= SolarWarsApplication.getInstance().getRootNode();
-	private Node						shootablesNode;
-	private final AssetManager			assetManager	= SolarWarsApplication.getInstance().getAssetManager();
-	private MarkerNode					markerNode;
-	// Dragging
-	private boolean						dragging		= false;
-	private Vector3f					lastXZPlanePos;
-	private Vector3f					startXZPlanePos;
-	private Vector2f					startScreenPos	= Vector2f.ZERO.clone();
-	// planet & shipgroup selection
-	private ArrayList<AbstractPlanet>	planetSelection;
-	private ArrayList<ShipGroup>		shipGroupSelection;
-	private ArrayList<MarkerNode>		markerNodes;
-	private boolean						controlPressed	= false;
+    private Node rootNode = SolarWarsApplication.getInstance().getRootNode();
+    private Node shootablesNode;
+    private final AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
+    private MarkerNode markerNode;
+    // Dragging
+    private boolean dragging = false;
+    private Vector3f lastXZPlanePos;
+    private Vector3f startXZPlanePos;
+    private Vector2f startScreenPos = Vector2f.ZERO.clone();
+    // planet & shipgroup selection
+    private ArrayList<AbstractPlanet> planetSelection;
+    private ArrayList<ShipGroup> shipGroupSelection;
+    private ArrayList<MarkerNode> markerNodes;
+    private boolean controlPressed = false;
     // Panels for rect
     private Panel leftDrag;
     private Panel topDrag;
@@ -123,15 +123,14 @@ public class IsoControl {
     // debug
 //    private Cross startDrag;
 //    private Cross endDrag;
-	private Camera						cam				= SolarWarsApplication.getInstance().getCamera();
-	private ActionListener				mouseActionListener;
-	private ActionListener				keyActionListener;
-	
-	private TouchListener				touchListener; // kommt von Android
-	private InputManager				inputManager	= SolarWarsApplication.getInstance().getInputManager();
-	private ActionLib					actionLib;
-	private GameGUI						gui;
-	private static final Logger			logger			= Logger.getLogger(IsoControl.class.getName());
+    private Camera cam = SolarWarsApplication.getInstance().getCamera();
+    private ActionListener mouseActionListener;
+    private ActionListener keyActionListener;
+    private TouchListener touchListener; // kommt von Android
+    private InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
+    private ActionLib actionLib;
+    private GameGUI gui;
+    private static final Logger logger = Logger.getLogger(IsoControl.class.getName());
 
     // ==========================================================================
     //      Methods
@@ -594,12 +593,10 @@ public class IsoControl {
                     InputMappings.MOUSE_RIGHT_CLICK,
                     InputMappings.MOUSE_WHEEL_DOWN,
                     InputMappings.MOUSE_WHEEL_UP);
-        }
-        if (inputManager != null) {
+
             inputManager.addListener(keyActionListener,
                     InputMappings.KEYBOARD_CONTROL);
-        }
-        if (inputManager != null) {
+
             inputManager.addListener(touchListener, new String[]{"Touch"});
         }
     }
@@ -762,7 +759,8 @@ public class IsoControl {
         Vector3f click3d = cam.getWorldCoordinates(
                 new Vector2f(click2d.x, click2d.y), 0f).clone();
         Vector3f dir = cam.getWorldCoordinates(
-                new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+                new Vector2f(click2d.x, click2d.y), 1f).
+                subtractLocal(click3d).normalizeLocal();
         Ray ray = new Ray(click3d, dir);
 
         float t = -ray.getOrigin().y / ray.getDirection().y;
@@ -772,16 +770,6 @@ public class IsoControl {
 
         updateDragRect(click2d);
 
-        centerDrag.updateGUI(tpf);
-        leftDrag.updateGUI(tpf);
-        topDrag.updateGUI(tpf);
-        rightDrag.updateGUI(tpf);
-        bottomDrag.updateGUI(tpf);
-
-        for (MarkerNode marker : markerNodes) {
-            removeMarker(marker);
-        }
-        markerNodes.clear();
         lastXZPlanePos = currentXZPlanePos;
     }
 
@@ -855,26 +843,26 @@ public class IsoControl {
         lastXZPlanePos = null;
         startScreenPos = null;
         startXZPlanePos = null;
-        if (centerDrag != null) {
-            gui.removeGUIElement(centerDrag);
-            centerDrag = null;
-        }
-        if (leftDrag != null) {
-            gui.removeGUIElement(leftDrag);
-            leftDrag = null;
-        }
-        if (topDrag != null) {
-            gui.removeGUIElement(topDrag);
-            topDrag = null;
-        }
-        if (rightDrag != null) {
-            gui.removeGUIElement(rightDrag);
-            rightDrag = null;
-        }
-        if (bottomDrag != null) {
-            gui.removeGUIElement(bottomDrag);
-            bottomDrag = null;
-        }
+//        if (centerDrag != null) {
+//            gui.removeGUIElement(centerDrag);
+//            centerDrag = null;
+//        }
+//        if (leftDrag != null) {
+//            gui.removeGUIElement(leftDrag);
+//            leftDrag = null;
+//        }
+//        if (topDrag != null) {
+//            gui.removeGUIElement(topDrag);
+//            topDrag = null;
+//        }
+//        if (rightDrag != null) {
+//            gui.removeGUIElement(rightDrag);
+//            rightDrag = null;
+//        }
+//        if (bottomDrag != null) {
+//            gui.removeGUIElement(bottomDrag);
+//            bottomDrag = null;
+//        }
 //        if (startDrag != null) {
 //            rootNode.detachChild(startDrag);
 //        }
@@ -916,9 +904,11 @@ public class IsoControl {
         private boolean fadeDir = true;
         /** The tick. */
         private float tick = 0f;
+        private float rangeFade = 0;
         private float range = 1;
         private Spatial rangeBatch;
         private Node rangeNode;
+        private ColorRGBA rangeColor;
         private Material rangeMaterial;
         private Geometry rangeCylinder;
         private ShipGroup shipGroup;
@@ -979,7 +969,7 @@ public class IsoControl {
 
             rangeMaterial = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
-            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.05f));
+            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.2f));
             rangeMaterial.getAdditionalRenderState().
                     setBlendMode(BlendMode.AlphaAdditive);
 //            rangeMaterial.getAdditionalRenderState().setWireframe(true);
@@ -1009,10 +999,11 @@ public class IsoControl {
         public void updateMarker(float tpf) {
             updateScaleFade(tpf);
             updateColorFade(tpf);
-            updateRange();
+            updateRange(tpf);
         }
 
-        private void updateRange() {
+        private void updateRange(float tpf) {
+            // Update range geometry
             if (planet != null) {
                 range = planet.getRange();
 
@@ -1020,6 +1011,14 @@ public class IsoControl {
                 range = shipGroup.getRange();
             }
             rangeBatch.setLocalScale(range);
+            // Update range opacity
+            this.rangeFade += tpf;
+            if (rangeFade > Math.PI) {
+                rangeFade = 0;
+            }
+            float alpha = (0.025f * (5f + (float) Math.sin((4f * rangeFade))));
+            rangeColor.a = alpha;
+            rangeMaterial.setColor("Color", rangeColor);
         }
 
         private void updateScaleFade(float tpf) {
@@ -1105,8 +1104,9 @@ public class IsoControl {
                     (planet.getOwner() == null) ? CullHint.Always : CullHint.Never);
             if (planet.getOwner() != null) {
                 ColorRGBA c = planet.getOwner().getColor().clone();
-                c.a = 0.05f;
-                rangeMaterial.setColor("Color", c);
+                rangeColor = c;
+//                rangeColor.a = 0.05f;
+                rangeMaterial.setColor("Color", rangeColor);
             }
         }
 
@@ -1117,8 +1117,9 @@ public class IsoControl {
             setScaleAndRange(s, shipGroup.getRange());
             if (shipGroup.getOwner() != null) {
                 ColorRGBA c = shipGroup.getOwner().getColor().clone();
-                c.a = 0.05f;
-                rangeMaterial.setColor("Color", c);
+                rangeColor = c;
+//                rangeColor.a = 0.05f;
+                rangeMaterial.setColor("Color", rangeColor);
             }
         }
     }

@@ -39,10 +39,6 @@ public class GameplayException extends Exception {
         super(message, cause);
     }
 
-    public GameplayException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
     public GameplayException(Throwable cause) {
         super(cause);
     }

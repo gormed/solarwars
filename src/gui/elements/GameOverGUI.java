@@ -28,7 +28,6 @@ import gamestates.GamestateManager;
 import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
-import logic.DeathmatchGameplay;
 import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
@@ -39,13 +38,6 @@ import solarwars.SolarWarsGame;
  */
 public class GameOverGUI extends GUIElement implements ClickableGUI {
 
-    /* (non-Javadoc)
-     * @see gui.ClickableGUI#canGainFocus()
-     */
-    public boolean canGainFocus() {
-        return false;
-    }
-
     /**
      * The Enum GameOverState.
      */
@@ -53,7 +45,6 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 
         /** The WON. */
         WON,
-        
         /** The LOST. */
         LOST
     }
@@ -67,13 +58,10 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     protected Button mainMenuLabel;
     /** The continue game. */
     protected Button watchGameLabel;
-    
     /** The background. */
     protected Panel background;
-    
     /** The watch game. */
     private boolean watchGame = false;
-    
     /** The instance. */
     private static GameOverGUI instance;
 
@@ -188,7 +176,28 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
                 }
             }
         };
+        attachToGUI(gui);
+    }
 
+    private void attachToGUI(final GameGUI gui) {
+        attachChild(background);
+        attachChild(gameOverLabel);
+        attachChild(mainMenuLabel);
+        attachChild(watchGameLabel);
+        gui.addGUIElement(this);
+//        gui.addGUIElement(background);
+//        gui.addGUIElement(gameOverLabel);
+//        gui.addGUIElement(mainMenuLabel);
+//        gui.addGUIElement(watchGameLabel);
+        setVisible(false);
+    }
+    
+    /* (non-Javadoc)
+     * @see gui.ClickableGUI#canGainFocus()
+     */
+    @Override
+    public boolean canGainFocus() {
+        return false;
     }
 
     /**
@@ -232,10 +241,10 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);
-        background.setVisible(show);
-        gameOverLabel.setVisible(show);
-        mainMenuLabel.setVisible(show);
-        watchGameLabel.setVisible(show);
+//        background.setVisible(show);
+//        gameOverLabel.setVisible(show);
+//        mainMenuLabel.setVisible(show);
+//        watchGameLabel.setVisible(show);
     }
 
     /**
@@ -243,10 +252,6 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      */
     public void display() {
         if (gui != null) {
-            gui.addGUIElement(background);
-            gui.addGUIElement(gameOverLabel);
-            gui.addGUIElement(mainMenuLabel);
-            gui.addGUIElement(watchGameLabel);
             setVisible(true);
         }
     }
@@ -256,10 +261,6 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      */
     public void hide() {
         if (gui != null) {
-            gui.removeGUIElement(background);
-            gui.removeGUIElement(gameOverLabel);
-            gui.removeGUIElement(mainMenuLabel);
-            gui.removeGUIElement(watchGameLabel);
             setVisible(false);
         }
     }
@@ -267,6 +268,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     /* (non-Javadoc)
      * @see gui.ClickableGUI#onClick(com.jme3.math.Vector2f, boolean, float)
      */
+    @Override
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
     }
 }

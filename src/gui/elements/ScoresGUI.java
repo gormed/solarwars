@@ -26,6 +26,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import entities.AbstractPlanet;
+import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import solarwars.SolarWarsGame;
  *
  * @author Hans
  */
-public class ScoresGUI extends GUIElement {
+public class ScoresGUI extends GUIElement implements ClickableGUI {
 
     /** The Constant FADE_SPEED. */
     public static final int FADE_SPEED = 3500;
@@ -360,8 +361,18 @@ public class ScoresGUI extends GUIElement {
         labelPosition.clear();
         playerLabels.clear();
         fadeCurrent = 0;
-        fadeing = false;
+        fadeing = false;    
         fadeDirection = false;
+    }
+
+    @Override
+    public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+        
+    }
+
+    @Override
+    public boolean canGainFocus() {
+        return false;
     }
 
     /**

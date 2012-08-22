@@ -40,13 +40,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-import logic.DeathmatchGameplay;
 import logic.MultiplayerGameplay;
 import logic.Level;
 import net.NetworkManager;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.InputMappings;
+import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -55,29 +55,19 @@ import solarwars.SolarWarsGame;
  */
 public class MultiplayerMatchState extends Gamestate {
 
-    /** The gui. */
+    // GUI
     private GameGUI gui;
-    /** The tab scores. */
     private ScoresGUI tabScores;
-    /** The game. */
-    private SolarWarsGame game;
-    /** The pause listener. */
+    private GameOverGUI gameOverGUI;
     private PauseActionListener pauseListener;
-    /** The pause. */
     private PauseGUI pause;
-    /** The hub. */
+    // Network and game
     private Hub hub;
-    /** The current level. */
     private Level currentLevel;
-    /** The gameplay. */
     private MultiplayerGameplay gameplay;
-    /** The client. */
     private Client client;
-    /** The application. */
     private final SolarWarsApplication application;
-    /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
-    /** The lost connection. */
     private boolean lostConnection;
 
     /**
@@ -188,11 +178,38 @@ public class MultiplayerMatchState extends Gamestate {
      * Setup gui.
      */
     private void setupGUI() {
+        //percentage label
         gui.addGUIElement(new Percentage(gui));
+        // setup the pause menue function
+        createPauseGUI();
+        // init game over gui
+        gameOverGUI = GameOverGUI.getInstance();
+        // setup the tab-score menue function
+        createScoresGUI();
+        // creates the drag-rect geometry
+        IsoControl.getInstance().createDragRectGeometry();
+        // applys the chat gui from the last to the next state (this)
+        NetworkManager.getInstance().getChatModule().changeGUI(gui);
+    }
+
+    private void createScoresGUI() {
+        // init scores panel
+        tabScores = new ScoresGUI(gui);
+
+        //tabScores.setVisible(false);
+        application.getInputManager().
+                addListener(
+                tabScores.getActionListener(),
+                InputMappings.KEYBOARD_TABSCORE);
+    }
+
+    /**
+     * Creates the pause gui and its listeners.
+     */
+    private void createPauseGUI() {
+
         pause = new PauseGUI(game, gui);
-
         pauseListener = new PauseActionListener();
-
         application.getInputManager().addMapping(
                 InputMappings.KEYBOARD_PAUSE,
                 new KeyTrigger(KeyInput.KEY_P),
@@ -201,13 +218,6 @@ public class MultiplayerMatchState extends Gamestate {
         game.getApplication().getInputManager().addListener(
                 pauseListener,
                 InputMappings.KEYBOARD_PAUSE);
-        tabScores = new ScoresGUI(gui);
-        //tabScores.setVisible(false);
-        application.getInputManager().
-                addListener(
-                tabScores.getActionListener(),
-                InputMappings.KEYBOARD_TABSCORE);
-        NetworkManager.getInstance().getChatModule().changeGUI(gui);
     }
 
     /**
