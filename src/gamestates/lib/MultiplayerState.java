@@ -234,7 +234,7 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-
+        
         gui.cleanUpGUI();
         gui = null;
     }
