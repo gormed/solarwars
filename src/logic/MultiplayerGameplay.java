@@ -42,7 +42,7 @@ import solarwars.SolarWarsGame;
  */
 public class MultiplayerGameplay {
 
-    public static final boolean MULTIPLAYER_GAMEPLAY_DEBUG = true;
+    public static final boolean MULTIPLAYER_GAMEPLAY_DEBUG = false;
     /** The instance. */
     private static MultiplayerGameplay instance;
     private static Level currentLevel;

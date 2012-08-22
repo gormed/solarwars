@@ -38,7 +38,6 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
 
     /** The gui. */
     private GameGUI gui;
-    
     /** The background. */
     protected Panel background;
     /** The game. */
@@ -138,7 +137,16 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
                 }
             }
         };
+        addToGUI(gui);
+    }
 
+    private void addToGUI(final GameGUI gui) {
+        attachChild(background);
+        attachChild(pauseLabel);
+        attachChild(mainMenu);
+        attachChild(continueGame);
+        gui.addGUIElement(this);
+        setVisible(false);
     }
 
     /* (non-Javadoc)
@@ -166,26 +174,14 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      * Pause.
      */
     public void pause() {
-        if (gui != null) {
-            gui.addGUIElement(background);
-            gui.addGUIElement(pauseLabel);
-            gui.addGUIElement(mainMenu);
-            gui.addGUIElement(continueGame);
-        }
-        //setVisible(true);
+        setVisible(true);
     }
 
     /**
      * Unpause.
      */
     public void unpause() {
-        if (gui != null) {
-            gui.removeGUIElement(background);
-            gui.removeGUIElement(pauseLabel);
-            gui.removeGUIElement(mainMenu);
-            gui.removeGUIElement(continueGame);
-        }
-        //setVisible(false);
+        setVisible(false);
     }
 
     /**
@@ -204,6 +200,7 @@ public class PauseGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+        
     }
 
     /* (non-Javadoc)

@@ -57,7 +57,7 @@ import solarwars.SolarWarsApplication;
 public class NetworkManager {
 
     public static final boolean WAIT_FOR_CLIENTS = true;
-    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 5;
+    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 4;
 
     public enum ClientConnectionState {
         CONNECTING,

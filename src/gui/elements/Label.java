@@ -121,6 +121,7 @@ public abstract class Label extends GUIElement implements ClickableGUI {
      * @param caption the new caption
      */
     public void setCaption(String caption) {
+        this.title = caption;                
         this.text.setText(caption);
         Vector3f offset = new Vector3f(-text.getLineWidth() / 2,
                 text.getLineHeight() / 2,

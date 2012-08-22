@@ -120,7 +120,7 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        gui.updateGUIElements(tpf);
+        
         currentLevel.updateLevel(tpf);
     }
 

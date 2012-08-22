@@ -921,7 +921,7 @@ public class IsoControl {
             super("Marker Transform");
 
             createMarker();
-            createCollision();
+            createRange();
         }
 
         private void createMarker() {
@@ -958,7 +958,7 @@ public class IsoControl {
          * Creates the bounding-volume for the range-checks.
          * @param game the MazeTDGame singleton
          */
-        private void createCollision() {
+        private void createRange() {
             rangeNode = new Node("RangeNode");
             Cylinder c = new Cylinder(
                     2,
@@ -971,7 +971,7 @@ public class IsoControl {
                     "Common/MatDefs/Misc/Unshaded.j3md");
             rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.2f));
             rangeMaterial.getAdditionalRenderState().
-                    setBlendMode(BlendMode.AlphaAdditive);
+                    setBlendMode(BlendMode.Alpha);
 //            rangeMaterial.getAdditionalRenderState().setWireframe(true);
 
             float[] angles = {(float) Math.PI / 2, 0, 0};

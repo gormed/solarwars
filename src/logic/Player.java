@@ -25,7 +25,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
 import entities.AbstractPlanet;
 import entities.ShipGroup;
-import gui.elements.GameOverGUI;
 import java.util.ArrayList;
 import java.util.Map;
 import solarwars.Hub;
@@ -104,10 +103,6 @@ public class Player {
     static void localPlayerWins() {
         if (lastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-            GameOverGUI gameOverGUI = GameOverGUI.getInstance();
-            gameOverGUI.setGameOverState(GameOverGUI.GameOverState.WON);
-
-            gameOverGUI.display();
         } else {
             //TODO: Display: "You defeated..."
         }
@@ -120,13 +115,6 @@ public class Player {
     static void localPlayerLooses() {
         if (lastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-        }
-
-        GameOverGUI gameOverGUI = GameOverGUI.getInstance();
-        if (!gameOverGUI.isWatchGame()) {
-            gameOverGUI.setGameOverState(GameOverGUI.GameOverState.LOST);
-
-            gameOverGUI.display();
         }
     }
     private static boolean hostSet = false;

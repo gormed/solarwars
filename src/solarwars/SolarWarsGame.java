@@ -31,6 +31,7 @@ import gamestates.lib.MultiplayerState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
+import gui.GameGUI;
 import input.KeyInputManager;
 import java.util.logging.Logger;
 import logic.AbstractGameplay;
@@ -86,6 +87,7 @@ public class SolarWarsGame {
     private ActionLib actionLib;
     private AudioManager audioManager;
     private KeyInputManager keyInputManager;
+    private GameGUI gameGUI;
     private static AbstractGameplay currentGameplay;
     private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
 
@@ -114,6 +116,8 @@ public class SolarWarsGame {
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
         keyInputManager = KeyInputManager.getInstance();
+        
+        gameGUI = GameGUI.getInstance();
         logger.info("SolarWarsGame initialized!");
 
     }
@@ -179,6 +183,7 @@ public class SolarWarsGame {
      * @param timePerFrame
      */
     void update(float timePerFrame) {
+        gameGUI.updateGUIElements(timePerFrame);
         gamestateManager.update(timePerFrame);
     }
 

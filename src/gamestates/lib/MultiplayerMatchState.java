@@ -86,7 +86,6 @@ public class MultiplayerMatchState extends Gamestate {
     public void update(float tpf) {
         if (!lostConnection) {
             gameplay.update(tpf);
-            gui.updateGUIElements(tpf);
             currentLevel.updateLevel(tpf);
         } else if (lostConnection && !currentLevel.isGameOver()) {
             GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
@@ -184,6 +183,7 @@ public class MultiplayerMatchState extends Gamestate {
         createPauseGUI();
         // init game over gui
         gameOverGUI = GameOverGUI.getInstance();
+        gameOverGUI.hide();
         // setup the tab-score menue function
         createScoresGUI();
         // creates the drag-rect geometry

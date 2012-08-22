@@ -29,6 +29,7 @@ import gui.ClickableGUI;
 import gui.GUIElement;
 import gui.GameGUI;
 import solarwars.AudioManager;
+import solarwars.Hub;
 import solarwars.SolarWarsGame;
 
 /**
@@ -77,8 +78,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
         return instance =
                 new GameOverGUI(
                 SolarWarsGame.getInstance(),
-                GameGUI.getInstance(),
-                GameOverState.WON);
+                GameGUI.getInstance());
     }
 
     /**
@@ -88,17 +88,11 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      * @param gui the gui
      * @param state the state
      */
-    private GameOverGUI(SolarWarsGame swgame, final GameGUI gui, GameOverState state) {
+    private GameOverGUI(SolarWarsGame swgame, final GameGUI gui) {
         this.game = swgame;
         this.gui = gui;
 
-
-        String label;
-        if (state == GameOverState.WON) {
-            label = "Game won!";
-        } else {
-            label = "Game lost!";
-        }
+        String gameOverStateString = "No state set";
 
         background = new Panel(
                 "GameOverPanel",
@@ -107,7 +101,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
                 new ColorRGBA(0, 0, 1, 0.7f));
 
 
-        gameOverLabel = new Label(label, new Vector3f(gui.getWidth() / 2,
+        gameOverLabel = new Label(gameOverStateString, new Vector3f(gui.getWidth() / 2,
                 6.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
 
             private float time;
@@ -191,7 +185,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 //        gui.addGUIElement(watchGameLabel);
         setVisible(false);
     }
-    
+
     /* (non-Javadoc)
      * @see gui.ClickableGUI#canGainFocus()
      */
@@ -205,7 +199,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      *
      * @param state the new game over state
      */
-    public void setGameOverState(GameOverState state) {
+    private void setGameOverState(GameOverState state) {
         String label;
         if (state == GameOverState.WON) {
             label = "Game won!";
@@ -217,22 +211,21 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
 
     }
 
-    /**
-     * Checks if is watch game.
-     *
-     * @return true, if is watch game
-     */
-    public boolean isWatchGame() {
-        return watchGame;
-    }
-
     /* (non-Javadoc)
      * @see gui.GUIElement#updateGUI(float)
      */
     @Override
     public void updateGUI(float tpf) {
-        gameOverLabel.updateGUI(tpf);
-        mainMenuLabel.updateGUI(tpf);
+        if ((SolarWarsGame.getInstance().getCurrentLevel().isGameOver() && !isVisible() && !watchGame)) {
+            setGameOverState((Hub.getLocalPlayer().hasLost())
+                    ? GameOverState.LOST
+                    : GameOverState.WON);
+            display();
+        }
+        if (isVisible()) {
+            gameOverLabel.updateGUI(tpf);
+            mainMenuLabel.updateGUI(tpf);
+        }
     }
 
     /* (non-Javadoc)
@@ -241,10 +234,10 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);
-//        background.setVisible(show);
-//        gameOverLabel.setVisible(show);
-//        mainMenuLabel.setVisible(show);
-//        watchGameLabel.setVisible(show);
+        background.setVisible(show);
+        gameOverLabel.setVisible(show);
+        mainMenuLabel.setVisible(show);
+        watchGameLabel.setVisible(show);
     }
 
     /**

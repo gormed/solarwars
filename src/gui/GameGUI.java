@@ -72,10 +72,10 @@ public class GameGUI {
     private GameGUI(SolarWarsGame game) {
 
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-		this.game = game;
-		this.width = game.getApplication().getCamera().getWidth();
-		this.height = game.getApplication().getCamera().getHeight();
-		this.guiElements = new ArrayList<GUIElement>();
+        this.game = game;
+        this.width = game.getApplication().getCamera().getWidth();
+        this.height = game.getApplication().getCamera().getHeight();
+        this.guiElements = new ArrayList<GUIElement>();
 
         this.decoNode = new Node("DecoNode");
         inputManager = game.getApplication().getInputManager();
@@ -252,25 +252,11 @@ public class GameGUI {
 
             // 5. Use the results (we mark the hit object)
             if (results.size() > 0) {
-                // The closest collision point is what was truly hit:
-                CollisionResult closest = results.getClosestCollision();
-                Node n = closest.getGeometry().getParent();
-
-                if (n instanceof ClickableGUI) {
-
-                    clickableHit(n, click2d, isPressed, tpf);
+                for (CollisionResult current : results) {
+                    Node n = current.getGeometry().getParent();
+                    checkClickableHit(n, click2d, isPressed, tpf);
                     logGUIHit(isPressed, n);
                 }
-
-                Node parent = null;
-                parent = n.getParent();
-                while (parent != null) {
-
-                    clickableHit(parent, click2d, isPressed, tpf);
-                    logGUIHit(isPressed, parent);
-                    parent = parent.getParent();
-                }
-
             }
         } catch (IndexOutOfBoundsException exception) {
             Logger.getLogger(GameGUI.class.getName()).
@@ -285,6 +271,22 @@ public class GameGUI {
         } else {
             final String releaseMsg = "Released at GUI-Element " + n.getName();
             logger.info(releaseMsg);
+        }
+    }
+
+    private void checkClickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
+
+        if (n instanceof GUIElement) {
+            GUIElement element = (GUIElement) n;
+
+            if (element.isVisible() && n instanceof ClickableGUI) {
+                ClickableGUI g = (ClickableGUI) n;
+                if (g.canGainFocus()) {
+                    setFocus(g);
+
+                }
+                g.onClick(click2d, isPressed, tpf);
+            }
         }
     }
 
@@ -306,22 +308,6 @@ public class GameGUI {
                     + ", " + dist + " wu away.\n";
         }
         logger.log(Level.FINER, hits, results);
-    }
-
-    private void clickableHit(Node n, Vector2f click2d, boolean isPressed, float tpf) {
-
-        if (n instanceof GUIElement) {
-            GUIElement element = (GUIElement) n;
-
-            if (element.isVisible() && n instanceof ClickableGUI) {
-                ClickableGUI g = (ClickableGUI) n;
-                if (g.canGainFocus()) {
-                    setFocus(g);
-
-                }
-                g.onClick(click2d, isPressed, tpf);
-            }
-        }
     }
 
     /**

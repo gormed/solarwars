@@ -21,8 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
-import com.jme3.network.ConnectionListener;
-import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
 
 /**
@@ -44,8 +42,5 @@ public interface ServerRegisterListener {
      * @param server the server
      */
     public void registerServerListener(Server server);
-    
-    public MessageListener getMessageListener();
-    public ConnectionListener getConnectionListener();
     
 }

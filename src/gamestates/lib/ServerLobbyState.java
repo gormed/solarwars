@@ -159,7 +159,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     public void update(float tpf) {
-        gui.updateGUIElements(tpf);
+        
         if (clientState == ClientConnectionState.ERROR
                 || clientState == ClientConnectionState.DISCONNECTED) {
             if (clientState == ClientConnectionState.ERROR) {
@@ -473,16 +473,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
 
-    }
-
-    @Override
-    public MessageListener<Client> getMessageListener() {
-        return playerConnectionListener;
-    }
-
-    @Override
-    public ConnectionListener getConnectionListener() {
-        return null;
     }
 
     /**

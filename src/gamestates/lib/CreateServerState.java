@@ -40,7 +40,6 @@ import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
-import gui.elements.TexturedPanel;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -162,7 +161,6 @@ public class CreateServerState extends Gamestate
         if (!serverEstablished) {
             cancelServer();
         }
-        gui.updateGUIElements(tpf);
         if (gameStarted) {
             Server server = solarWarsServer.getGameServer();
             server.removeMessageListener(serverMessageListener);
@@ -658,16 +656,6 @@ public class CreateServerState extends Gamestate
                 PlayerConnectingMessage.class,
                 StartGameMessage.class);
 
-    }
-
-    @Override
-    public MessageListener<HostedConnection> getMessageListener() {
-        return serverMessageListener;
-    }
-
-    @Override
-    public ConnectionListener getConnectionListener() {
-        return clientConnectedListener;
     }
 
     /*

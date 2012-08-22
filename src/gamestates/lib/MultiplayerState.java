@@ -75,7 +75,7 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        gui.updateGUIElements(tpf);
+        
     }
 
     /* (non-Javadoc)
