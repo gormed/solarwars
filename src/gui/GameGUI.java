@@ -70,7 +70,6 @@ public class GameGUI {
      * @param game the game
      */
     private GameGUI(SolarWarsGame game) {
-
         logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
         this.game = game;
         this.width = game.getApplication().getCamera().getWidth();

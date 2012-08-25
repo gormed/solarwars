@@ -31,6 +31,7 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Line;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Logger;
 import jme3tools.optimize.GeometryBatchFactory;
 import logic.Level;
 import logic.Player;
@@ -38,9 +39,13 @@ import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
 /**
- * The Class ShipBatchManager.
+ * The Class ShipBatchManager creates and handles all ships displayed in game.
+ * 
+ * It is resposible for the creation of ships, gives an instance to a logical ship,
+ * that needs to display. To keep aware of the global ship count it creates new 
+ * batches if the players create more and more ships due their planets.
  *
- * @author Hans
+ * @author Hans Ferchland
  */
 public class ShipBatchManager {
 
@@ -49,12 +54,22 @@ public class ShipBatchManager {
     private Node shipBatchNode = new Node("ShipBatchNode");
     /** The update timer. */
     private float updateTimer;
+    private static final Logger logger = Logger.getLogger(ShipBatchManager.class.getName());
 
     /**
      * Instantiates a new ship batch manager.
      */
     public ShipBatchManager(Level level) {
         level.getLevelNode().attachChild(shipBatchNode);
+        setupLogger();
+    }
+
+    private void setupLogger() {
+        if (logger == null) {
+            logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
+            logger.setUseParentHandlers(true);
+            logger.setParent(SolarWarsApplication.getClientLogger());
+        }
     }
 
     /**
@@ -74,11 +89,12 @@ public class ShipBatchManager {
             s.setCullHint(CullHint.Always);
             unusedBatches.add(s);
         }
+        logger.log(java.util.logging.Level.INFO, "Created {0} Ship-Batches!", shipCount);
     }
 
     public void destroy() {
         usedBatches.clear();
-        unusedBatches.clear();        
+        unusedBatches.clear();
     }
 
     /**
@@ -112,6 +128,7 @@ public class ShipBatchManager {
         shipBatchNode.attachChild(shipBatchSpatial);
 
 
+
         return shipBatchSpatial;
     }
     /** The used batches. */
@@ -132,14 +149,16 @@ public class ShipBatchManager {
         if (unusedBatches.isEmpty()) {
             Spatial s = createNextBatch();
             usedBatches.add(s);
-            System.out.println("Created new Batch");
-            System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
+            logger.warning("Created Ship-Batch at needs. Not that good!");
+            logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}", new Object[]{usedBatches.size(), unusedBatches.size()});
             s.setCullHint(CullHint.Never);
             return s;
         }
         Spatial s = unusedBatches.get(unusedBatches.size() - 1);
         unusedBatches.remove(s);
         usedBatches.add(s);
+        logger.info("Aquired Ship-Batch at needs. Perfect!");
+        logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}", new Object[]{usedBatches.size(), unusedBatches.size()});
 //        System.out.println("Activated unused Batch");
 //        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
         s.setCullHint(CullHint.Never);
@@ -167,7 +186,7 @@ public class ShipBatchManager {
     public void refreshBatchSize(float tpf) {
 
         updateTimer += tpf;
-        if (updateTimer > 0.16f) {
+        if (updateTimer > 1f) {
 
             int globalShips = 0;
             for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
@@ -179,11 +198,18 @@ public class ShipBatchManager {
             unusedBatches.ensureCapacity((int) (desiredShipCount * 2f));
             usedBatches.ensureCapacity((int) (desiredShipCount * 2f));
             if (currentShipCount < desiredShipCount) {
-                int step = 10;
+                int step = 10 * Hub.playersByID.size();
+                logger.log(java.util.logging.Level.INFO,
+                        "Creating {0} ShipBatches to reach desired count of {1} from current count of {2}.",
+                        new Object[]{step, desiredShipCount, currentShipCount});
+                Spatial s;
                 for (int i = 0; i < step; i++) {
-                    unusedBatches.add(createNextBatch());
+                    s = createNextBatch();
+                    s.setCullHint(CullHint.Always);
+                    unusedBatches.add(s);
+                    currentShipCount++;
                 }
-                currentShipCount++;
+
             }
             updateTimer = 0;
         }

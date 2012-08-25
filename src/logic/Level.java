@@ -452,10 +452,10 @@ public class Level {
      */
     public void updateLevel(float tpf) {
 
-        if (!levelLoaded || gameOver) {
-            GameOverGUI.getInstance().display();
-            return;
-        }
+//        if (!levelLoaded || gameOver) {
+//            GameOverGUI.getInstance().display();
+//            return;
+//        }
 
         DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
 
@@ -470,7 +470,7 @@ public class Level {
             entry.getValue().updatePlanet(tpf);
         }
 
-        //batchManager.refreshBatchSize(tpf);
+        batchManager.refreshBatchSize(tpf);
 
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);

@@ -26,11 +26,18 @@ package logic;
  * @author Hans Ferchland
  * @version
  */
-public class GameplayException extends Exception {
+public class GameplayException extends RuntimeException {
+
+    public GameplayException() {
+    }
+    
+    private static final long serialVersionUID = 42;
+    
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
 
+    
     public GameplayException(String msg) {
         super(msg);
     }
