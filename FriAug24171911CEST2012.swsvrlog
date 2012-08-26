@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2012-08-24T17:19:37</date>
+  <millis>1345821577587</millis>
+  <sequence>357</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer$ServerListener</class>
+  <method>messageReceived</method>
+  <thread>25</thread>
+  <message>Server received 'Player joins the server!' from client #0</message>
+  <param>net.messages.StringMessage@7ad364f8</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:37</date>
+  <millis>1345821577589</millis>
+  <sequence>358</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>respondPlayer</method>
+  <thread>25</thread>
+  <message>#0/Player joined server.</message>
+  <param>net.messages.PlayerAcceptedMessage@79db5779</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:53</date>
+  <millis>1345821593781</millis>
+  <sequence>422</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer$ServerListener</class>
+  <method>messageReceived</method>
+  <thread>25</thread>
+  <message>Server received 'Player joins the server!' from client #1</message>
+  <param>net.messages.StringMessage@62dca5f4</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:53</date>
+  <millis>1345821593783</millis>
+  <sequence>423</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>respondPlayer</method>
+  <thread>25</thread>
+  <message>#1/1514400 joined server.</message>
+  <param>net.messages.PlayerAcceptedMessage@164a8dde</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:53</date>
+  <millis>1345821593783</millis>
+  <sequence>424</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>respondPlayer</method>
+  <thread>25</thread>
+  <message>Told #0/Player that #1/1514400 joined server.</message>
+  <param>net.messages.PlayerAcceptedMessage@164a8dde</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:57</date>
+  <millis>1345821597522</millis>
+  <sequence>435</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>stop</method>
+  <thread>33</thread>
+  <message>Closing server...</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:57</date>
+  <millis>1345821597530</millis>
+  <sequence>441</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>respondPlayer</method>
+  <thread>25</thread>
+  <message>#0/Player left server.</message>
+  <param>net.messages.PlayerLeavingMessage@46e33a4d</param>
+</record>
+<record>
+  <date>2012-08-24T17:19:57</date>
+  <millis>1345821597542</millis>
+  <sequence>442</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>destroy</method>
+  <thread>24</thread>
+  <message>Shutting down connection to #1 ...</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:57</date>
+  <millis>1345821597544</millis>
+  <sequence>445</sequence>
+  <logger>net.SolarWarsServer</logger>
+  <level>INFO</level>
+  <class>net.SolarWarsServer</class>
+  <method>destroy</method>
+  <thread>24</thread>
+  <message>...Server closed!</message>
+</record>
+</log>

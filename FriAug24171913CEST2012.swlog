@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2012-08-24T17:19:31</date>
+  <millis>1345821571794</millis>
+  <sequence>60</sequence>
+  <logger>solarwars.SolarWarsGame</logger>
+  <level>INFO</level>
+  <class>solarwars.SolarWarsGame</class>
+  <method>initialize</method>
+  <thread>19</thread>
+  <message>SolarWarsGame initialized!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572067</millis>
+  <sequence>61</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Singleplayer added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572069</millis>
+  <sequence>62</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572069</millis>
+  <sequence>63</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572070</millis>
+  <sequence>64</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Create Server added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572072</millis>
+  <sequence>65</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Server Lobby added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572073</millis>
+  <sequence>66</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer Match added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572075</millis>
+  <sequence>67</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Tutorial added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572079</millis>
+  <sequence>68</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu added!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572081</millis>
+  <sequence>69</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>initialize</method>
+  <thread>19</thread>
+  <message>GamestateManager initialized with start-state Mainmenu</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572132</millis>
+  <sequence>105</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>start</method>
+  <thread>19</thread>
+  <message>GamestateManager started, entering Mainmenu...</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:32</date>
+  <millis>1345821572132</millis>
+  <sequence>106</sequence>
+  <logger>solarwars.SolarWarsGame</logger>
+  <level>INFO</level>
+  <class>solarwars.SolarWarsGame</class>
+  <method>start</method>
+  <thread>19</thread>
+  <message>SolarWarsGame started!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:45</date>
+  <millis>1345821585887</millis>
+  <sequence>144</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu left!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:45</date>
+  <millis>1345821585967</millis>
+  <sequence>184</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer enterd!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:53</date>
+  <millis>1345821593518</millis>
+  <sequence>221</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer left!</message>
+</record>
+<record>
+  <date>2012-08-24T17:19:53</date>
+  <millis>1345821593544</millis>
+  <sequence>250</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Server Lobby enterd!</message>
+</record>
+</log>

@@ -642,7 +642,7 @@ public class Level {
             level.labelNode = new Node("Planet Labels");
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
-            level.background = new LevelBackground(solarwars.SolarWarsGame.getInstance());
+            level.background = new LevelBackground(solarwars.SolarWarsGame.getInstance(),(int)seed);
             level.rootNode.attachChild(background);
 
             AbstractPlanet p;
@@ -685,7 +685,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance(),(int)seed);
             level.rootNode.attachChild(background);
 
 
@@ -747,7 +747,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance(),(int)seed);
             level.rootNode.attachChild(background);
 
 
@@ -794,7 +794,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(solarwars.SolarWarsGame.getInstance());
+                    new LevelBackground(solarwars.SolarWarsGame.getInstance(),(int)seed);
             level.rootNode.attachChild(background);
 
 
