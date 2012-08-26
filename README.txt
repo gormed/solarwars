@@ -12,10 +12,17 @@ Email me: hans{dot}ferchland{at}gmx{dot}de
 
 For the latest information about SolarWars, please visit our space at: 
 
-   https://www.assembla.com/code/solarwars/subversion/nodes
+   https://www.assembla.com/code/solarwars/git/nodes
+
+   http://gormed.go.funpic.de/solarwars/
+   http://gormed.go.funpic.de/solarwars/applet
 
 and our helpdesk, at:
 
    http://gormed.go.funpic.de/hesk/
+
+for developers/members
+
+   http://gormed.go.funpic.de/hesk/admin
 
 
