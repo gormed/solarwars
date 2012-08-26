@@ -978,7 +978,7 @@ public class IsoControl {
 
             rangeCylinder = new Geometry("CollisionCylinderGeometry", c);
 
-            rangeCylinder.setLocalTranslation(0, -0.1f, 0);
+            rangeCylinder.setLocalTranslation(0, -0.1f + ((float)Math.random() * 0.1f), 0);
             rangeCylinder.setLocalRotation(new Quaternion(angles));
 
             rangeCylinder.setQueueBucket(Bucket.Transparent);

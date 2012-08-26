@@ -74,7 +74,7 @@ public class SolarWarsApplication extends Application {
     //      Static Fields
     //==========================================================================
     public static final boolean USE_LOG_FILES = true;
-    public static final Level GLOBAL_LOGGING_LEVEL = Level.ALL;
+    public static final Level GLOBAL_LOGGING_LEVEL = Level.INFO;
     public static boolean TOON_ENABLED = true;
     /** Flag for Bloom-Effect */
     public static boolean BLOOM_ENABLED = true;
@@ -366,7 +366,7 @@ public class SolarWarsApplication extends Application {
             settings.put("VSync", true);
             settings.put("FrameRate", 100);
             settings.put("SettingsDialogImage", "/Interface/solarwars_v2.png");
-            settings.put("USE_VA", true);
+            settings.put("USE_VA", false);
         }
     }
 

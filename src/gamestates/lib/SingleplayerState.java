@@ -28,6 +28,7 @@ import com.jme3.math.ColorRGBA;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
+import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import gui.elements.ScoresGUI;
@@ -38,7 +39,7 @@ import net.ServerHub;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.InputMappings;
-import solarwars.SolarWarsGame;
+import solarwars.IsoControl;
 
 /**
  * The Class SingleplayerState.
@@ -55,13 +56,13 @@ public class SingleplayerState extends Gamestate {
     private GameGUI gui;
     /** The pause. */
     private PauseGUI pause;
-    
     /** The tab scores. */
     private ScoresGUI tabScores;
     /** The hub. */
     private Hub hub;
     /** The pause listener. */
     private PauseActionListener pauseListener;
+    private GameOverGUI gameOverGUI;
 
     /**
      * Instantiates a new singleplayer state.
@@ -83,7 +84,7 @@ public class SingleplayerState extends Gamestate {
         hub = Hub.getInstance();
         setupSingleplayer();
         application.attachIsoCameraControl();
-        
+
         currentLevel = new Level(
                 application.getRootNode(),
                 application.getAssetManager(),
@@ -120,7 +121,7 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        
+
         currentLevel.updateLevel(tpf);
     }
 
@@ -140,26 +141,45 @@ public class SingleplayerState extends Gamestate {
      * Setup gui.
      */
     private void setupGUI() {
+        //percentage label
         gui.addGUIElement(new Percentage(gui));
+        // setup the pause menue function
+        createPauseGUI();
+        // init game over gui
+        gameOverGUI = GameOverGUI.getInstance();
+        gameOverGUI.hide();
+        // setup the tab-score menue function
+        createScoresGUI();
+        // creates the drag-rect geometry
+        IsoControl.getInstance().createDragRectGeometry();
+    }
+
+    private void createScoresGUI() {
+        // init scores panel
+        tabScores = new ScoresGUI(gui);
+
+        //tabScores.setVisible(false);
+        application.getInputManager().
+                addListener(
+                tabScores.getActionListener(),
+                InputMappings.KEYBOARD_TABSCORE);
+    }
+
+    /**
+     * Creates the pause gui and its listeners.
+     */
+    private void createPauseGUI() {
+
         pause = new PauseGUI(game, gui);
-
         pauseListener = new PauseActionListener();
-
         application.getInputManager().addMapping(
                 InputMappings.KEYBOARD_PAUSE,
                 new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),
                 new KeyTrigger(KeyInput.KEY_ESCAPE));
-        application.getInputManager().addListener(
+        game.getApplication().getInputManager().addListener(
                 pauseListener,
                 InputMappings.KEYBOARD_PAUSE);
-        
-        tabScores = new ScoresGUI(gui);
-        //tabScores.setVisible(false);
-        application.getInputManager().
-                addListener(
-                tabScores.getActionListener(), 
-                InputMappings.KEYBOARD_TABSCORE);
     }
 
     /**
