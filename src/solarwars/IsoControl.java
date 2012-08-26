@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
 
+import input.InputMappings;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -135,7 +136,6 @@ public class IsoControl {
     // ==========================================================================
     //      Methods
     //==========================================================================
-
     /**
      * Creates the dragging raectangle for selection geometry.
      * @param width 
@@ -224,7 +224,7 @@ public class IsoControl {
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
-                if (name.equals(InputMappings.KEYBOARD_CONTROL)) {
+                if (name.equals(InputMappings.CONTROL_MODIFIER)) {
                     controlPressed = isPressed;
                 }
             }
@@ -268,7 +268,7 @@ public class IsoControl {
      * but not on its hold.
      */
     private void onButtonDown(String name, Vector2f point) {
-        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
+        if (name.equals(InputMappings.LEFT_CLICK_SELECT)) {
             onDragSelectEntity(point);
             final String mouseDownMsg = "Left mouse-button down @["
                     + point.x + "/" + point.y + "]";
@@ -284,7 +284,7 @@ public class IsoControl {
                 new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
         Ray ray = new Ray(click3d, dir);
         float t = -ray.getOrigin().y / ray.getDirection().y;
-		Vector3f currentXZPlanePos = ray.getDirection().clone().mult(t).addLocal(	ray.getOrigin().clone());
+        Vector3f currentXZPlanePos = ray.getDirection().clone().mult(t).addLocal(ray.getOrigin().clone());
         if (!dragging) {
             startXZPlanePos = currentXZPlanePos;
             startScreenPos = click2d.clone();
@@ -315,11 +315,11 @@ public class IsoControl {
      */
     private void onMouseWeel(String name) {
         Player local = Hub.getLocalPlayer();
-        if (!(name.equals(InputMappings.MOUSE_WHEEL_DOWN)
-                || name.equals(InputMappings.MOUSE_WHEEL_UP))) {
+        if (!(name.equals(InputMappings.PERCENT_DOWN)
+                || name.equals(InputMappings.PERCENT_UP))) {
             return;
         }
-        boolean down = (name.equals(InputMappings.MOUSE_WHEEL_DOWN)) ? true : false;
+        boolean down = (name.equals(InputMappings.PERCENT_DOWN)) ? true : false;
 
         float amount = 0.05f;
         onPercentageChange(amount, down);
@@ -327,6 +327,7 @@ public class IsoControl {
         logger.log(Level.FINE, percentageChangeS);
     }
     //TODO MB Auslagern
+
     private void onPercentageChange(float amount, boolean down) {
         if (!down) {
             amount *= -1.0f;
@@ -340,11 +341,11 @@ public class IsoControl {
      * for selection or right click for attack.
      */
     private boolean onButtonUp(String name, Vector2f point) {
-        boolean attack = (name.equals(InputMappings.MOUSE_LEFT_CLICK)
-                && (name.equals(InputMappings.MOUSE_LEFT_CLICK) || name.equals(InputMappings.MOUSE_RIGHT_CLICK)))
+        boolean attack = (name.equals(InputMappings.LEFT_CLICK_SELECT)
+                && (name.equals(InputMappings.LEFT_CLICK_SELECT) || name.equals(InputMappings.RIGHT_CLICK_ATTACK)))
                 ? false : true;
-        if (name.equals(InputMappings.MOUSE_LEFT_CLICK)
-                || name.equals(InputMappings.MOUSE_RIGHT_CLICK)) {
+        if (name.equals(InputMappings.LEFT_CLICK_SELECT)
+                || name.equals(InputMappings.RIGHT_CLICK_ATTACK)) {
             return onAttackOrSelect(point, attack);
         }
         return false;
@@ -589,21 +590,24 @@ public class IsoControl {
         inputManager = SolarWarsApplication.getInstance().getInputManager();
         if (inputManager != null) {
             inputManager.addListener(mouseActionListener,
-                    InputMappings.MOUSE_LEFT_CLICK,
-                    InputMappings.MOUSE_RIGHT_CLICK,
-                    InputMappings.MOUSE_WHEEL_DOWN,
-                    InputMappings.MOUSE_WHEEL_UP);
+                    InputMappings.LEFT_CLICK_SELECT,
+                    InputMappings.RIGHT_CLICK_ATTACK,
+                    InputMappings.PERCENT_DOWN,
+                    InputMappings.PERCENT_UP);
 
             inputManager.addListener(keyActionListener,
-                    InputMappings.KEYBOARD_CONTROL);
+                    InputMappings.CONTROL_MODIFIER);
 
             inputManager.addListener(touchListener, new String[]{"Touch"});
         }
     }
 
     public void removeControlListener() {
-        inputManager.removeListener(mouseActionListener);
-        inputManager.removeListener(keyActionListener);
+        inputManager = SolarWarsApplication.getInstance().getInputManager();
+        if (inputManager != null) {
+            inputManager.removeListener(mouseActionListener);
+            inputManager.removeListener(keyActionListener);
+        }
     }
 
     public boolean isControlPressed() {
@@ -971,14 +975,14 @@ public class IsoControl {
                     "Common/MatDefs/Misc/Unshaded.j3md");
             rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.2f));
             rangeMaterial.getAdditionalRenderState().
-                    setBlendMode(BlendMode.Alpha);
+                    setBlendMode(BlendMode.AlphaAdditive);
 //            rangeMaterial.getAdditionalRenderState().setWireframe(true);
 
             float[] angles = {(float) Math.PI / 2, 0, 0};
 
             rangeCylinder = new Geometry("CollisionCylinderGeometry", c);
 
-            rangeCylinder.setLocalTranslation(0, -0.1f + ((float)Math.random() * 0.1f), 0);
+            rangeCylinder.setLocalTranslation(0, -0.1f + ((float) Math.random() * 0.1f), 0);
             rangeCylinder.setLocalRotation(new Quaternion(angles));
 
             rangeCylinder.setQueueBucket(Bucket.Transparent);

@@ -29,8 +29,9 @@ import gui.GameGUI;
 import gui.elements.ChatGUI;
 import logic.Player;
 import net.messages.ChatMessage;
-import solarwars.InputMappings;
+import input.InputMappings;
 import solarwars.IsoCamera;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class ChatModule.
@@ -41,16 +42,12 @@ public class ChatModule implements ActionListener {
 
     /** The game gui. */
     private GameGUI gameGUI;
-    
     /** The chat gui. */
     private ChatGUI chatGUI;
-    
     /** The input manager. */
     private InputManager inputManager;
-    
     /** The network manager. */
     private NetworkManager networkManager;
-    
     /** The visible. */
     private boolean visible;
 
@@ -59,8 +56,7 @@ public class ChatModule implements ActionListener {
      *
      * @param inputManager the input manager
      */
-    public ChatModule(InputManager inputManager) {
-        this.inputManager = inputManager;
+    public ChatModule() {
     }
 
     /**
@@ -73,8 +69,11 @@ public class ChatModule implements ActionListener {
         this.networkManager = networkManager;
         this.chatGUI = new ChatGUI(gameGUI, this);
         this.gameGUI = gameGUI;
-        inputManager.addMapping(InputMappings.KEYBOARD_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
-        inputManager.addListener(this, InputMappings.KEYBOARD_CHAT);
+        this.inputManager = SolarWarsApplication.getInstance().getInputManager();
+        if (inputManager != null) {
+            inputManager.addMapping(InputMappings.PLAYER_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
+            inputManager.addListener(this, InputMappings.PLAYER_CHAT);
+        }
         chatGUI.setVisible(false);
         gameGUI.addGUIElement(chatGUI);
         chatGUI.hide();
@@ -107,8 +106,9 @@ public class ChatModule implements ActionListener {
      * @param p the p
      */
     public void playerLeaves(Player p) {
-        if (p.isLeaver())
+        if (p.isLeaver()) {
             return;
+        }
         chatGUI.serverSays(
                 p.getName() + " leaves the game...");
         if (!chatGUI.isFadeDirection()) {
@@ -163,7 +163,7 @@ public class ChatModule implements ActionListener {
      */
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        if (!isPressed && name.equals(InputMappings.KEYBOARD_CHAT)) {
+        if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
             visible = !visible;
             if (visible) {
                 chatGUI.show();

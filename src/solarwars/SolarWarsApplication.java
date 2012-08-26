@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
 
+import input.InputMappings;
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
@@ -67,13 +68,12 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        getInstance().initSettings();
         getInstance().start();
     }
     //==========================================================================
     //      Static Fields
     //==========================================================================
-    public static final boolean USE_LOG_FILES = true;
+    public static final boolean USE_LOG_FILES = false;
     public static final Level GLOBAL_LOGGING_LEVEL = Level.INFO;
     public static boolean TOON_ENABLED = true;
     /** Flag for Bloom-Effect */
@@ -144,6 +144,7 @@ public class SolarWarsApplication extends Application {
             clientLogger.log(Level.SEVERE, null, ex);
         }
         assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
+        initSettings();
     }
 
     /**
@@ -346,7 +347,7 @@ public class SolarWarsApplication extends Application {
     /**
      * Initializes basic settings.
      */
-    public void initSettings() {
+    private void initSettings() {
         if (settings == null) {
             settings = new AppSettings(false);
 
@@ -417,7 +418,7 @@ public class SolarWarsApplication extends Application {
 
         // add app action listener for mappings
         inputManager.addListener(actionListener,
-                InputMappings.KEYBOARD_EXIT,
+                InputMappings.EXIT_GAME,
                 InputMappings.DEBUG_CAMERA_POS,
                 InputMappings.DEBUG_MEMORY,
                 InputMappings.DEBUG_HIDE_STATS);
@@ -706,7 +707,7 @@ public class SolarWarsApplication extends Application {
                 return;
             }
 
-            if (name.equals(InputMappings.KEYBOARD_EXIT)) {
+            if (name.equals(InputMappings.EXIT_GAME)) {
                 stop();
             } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
                 if (cam != null) {

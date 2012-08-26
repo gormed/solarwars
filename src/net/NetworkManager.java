@@ -291,9 +291,9 @@ public class NetworkManager {
         if (serverIPAdress == null || udpPort < 1) {
             return null;
         }
-
-        this.chatModule = new ChatModule(
-                SolarWarsApplication.getInstance().getInputManager());
+        
+        // setup chat
+        this.chatModule = new ChatModule();
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(ChatMessage.class);

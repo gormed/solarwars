@@ -25,9 +25,8 @@ import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
+import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
@@ -40,6 +39,7 @@ import gui.GUIElement;
 import gui.GameGUI;
 import input.KeyInputManager;
 import input.KeyboardListener;
+import solarwars.SolarWarsApplication;
 
 /**
  * The Class TextBox.
@@ -189,13 +189,11 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
      * Creates the listener.
      */
     private void createListener() {
-        if (!isNumberBox) {
-            this.textListener = new TextBoxActionListener(
-                    solarwars.SolarWarsApplication.getInstance().getInputManager(), this);
-        } else {
 
-            this.textListener = new NumberBoxActionListener(
-                    solarwars.SolarWarsApplication.getInstance().getInputManager(), this);
+        if (!isNumberBox) {
+            this.textListener = new TextBoxActionListener(this);
+        } else {
+            this.textListener = new NumberBoxActionListener(this);
         }
     }
 
@@ -349,13 +347,14 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
          * @param inputManager the input manager
          * @param textBox the text box
          */
-        public NumberBoxActionListener(InputManager inputManager, TextBox textBox) {
+        public NumberBoxActionListener(TextBox textBox) {
             this.textBox = textBox;
-            this.inputManager = inputManager;
+            this.inputManager = SolarWarsApplication.getInstance().getInputManager();
             addNumberListener(inputManager);
         }
 
         private void addNumberListener(InputManager inputManager) {
+            if (inputManager == null) return;
             inputManager.addListener(this,
                     KeyInputManager.INPUT_MAPPING_0,
                     KeyInputManager.INPUT_MAPPING_1,
@@ -421,8 +420,8 @@ public abstract class TextBox extends GUIElement implements ClickableGUI {
          * @param inputManager the input manager
          * @param box the box
          */
-        public TextBoxActionListener(InputManager inputManager, TextBox box) {
-            super(inputManager, box);
+        public TextBoxActionListener(TextBox box) {
+            super(box);
         }
 
         /* (non-Javadoc)

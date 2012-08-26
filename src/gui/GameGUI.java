@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import solarwars.InputMappings;
+import input.InputMappings;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -90,7 +90,7 @@ public class GameGUI {
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
-                if (name.equals(InputMappings.MOUSE_LEFT_CLICK)) {
+                if (name.equals(InputMappings.LEFT_CLICK_SELECT)) {
                     onClick(isPressed, tpf, inputManager.getCursorPosition());
                 } else {
                 }
@@ -105,9 +105,9 @@ public class GameGUI {
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
-                if (name.equals(InputMappings.KEYBOARD_CONTROL)) {
+                if (name.equals(InputMappings.CONTROL_MODIFIER)) {
                     ctrlHold = isPressed;
-                } else if (name.equals(InputMappings.KEY_V)) {
+                } else if (name.equals(InputMappings.KEY_COPY_V)) {
                     vHold = isPressed;
                 }
                 if (ctrlHold && vHold) {
@@ -175,9 +175,9 @@ public class GameGUI {
         if (inputManager
                 != null) {
             inputManager.addListener(clickActionListener,
-                    InputMappings.MOUSE_LEFT_CLICK);
+                    InputMappings.LEFT_CLICK_SELECT);
             inputManager.addListener(keyActionListener,
-                    InputMappings.KEYBOARD_CONTROL, InputMappings.KEY_V);
+                    InputMappings.CONTROL_MODIFIER, InputMappings.KEY_COPY_V);
         }
 
         applyGUI();

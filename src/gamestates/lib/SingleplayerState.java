@@ -38,7 +38,7 @@ import logic.Level;
 import net.ServerHub;
 import solarwars.AudioManager;
 import solarwars.Hub;
-import solarwars.InputMappings;
+import input.InputMappings;
 import solarwars.IsoControl;
 
 /**
@@ -162,7 +162,7 @@ public class SingleplayerState extends Gamestate {
         application.getInputManager().
                 addListener(
                 tabScores.getActionListener(),
-                InputMappings.KEYBOARD_TABSCORE);
+                InputMappings.GAME_SCORES);
     }
 
     /**
@@ -172,14 +172,9 @@ public class SingleplayerState extends Gamestate {
 
         pause = new PauseGUI(game, gui);
         pauseListener = new PauseActionListener();
-        application.getInputManager().addMapping(
-                InputMappings.KEYBOARD_PAUSE,
-                new KeyTrigger(KeyInput.KEY_P),
-                new KeyTrigger(KeyInput.KEY_PAUSE),
-                new KeyTrigger(KeyInput.KEY_ESCAPE));
         game.getApplication().getInputManager().addListener(
                 pauseListener,
-                InputMappings.KEYBOARD_PAUSE);
+                InputMappings.PAUSE_GAME);
     }
 
     /**
@@ -227,7 +222,7 @@ public class SingleplayerState extends Gamestate {
             if (isPressed) {
                 return;
             }
-            if (name.equals(InputMappings.KEYBOARD_PAUSE)) {
+            if (name.equals(InputMappings.PAUSE_GAME)) {
                 pause.togglePause();
             }
         }
