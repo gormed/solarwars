@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022166</millis>
+  <sequence>60</sequence>
+  <logger>solarwars.SolarWarsGame</logger>
+  <level>INFO</level>
+  <class>solarwars.SolarWarsGame</class>
+  <method>initialize</method>
+  <thread>19</thread>
+  <message>SolarWarsGame initialized!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022337</millis>
+  <sequence>61</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Singleplayer added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022338</millis>
+  <sequence>62</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022338</millis>
+  <sequence>63</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022339</millis>
+  <sequence>64</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Create Server added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022339</millis>
+  <sequence>65</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Server Lobby added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022340</millis>
+  <sequence>66</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Multiplayer Match added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022342</millis>
+  <sequence>67</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Tutorial added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022342</millis>
+  <sequence>68</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>addState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu added!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022343</millis>
+  <sequence>69</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>initialize</method>
+  <thread>19</thread>
+  <message>GamestateManager initialized with start-state Mainmenu</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022433</millis>
+  <sequence>105</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>start</method>
+  <thread>19</thread>
+  <message>GamestateManager started, entering Mainmenu...</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:22</date>
+  <millis>1345989022434</millis>
+  <sequence>106</sequence>
+  <logger>solarwars.SolarWarsGame</logger>
+  <level>INFO</level>
+  <class>solarwars.SolarWarsGame</class>
+  <method>start</method>
+  <thread>19</thread>
+  <message>SolarWarsGame started!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:25</date>
+  <millis>1345989025293</millis>
+  <sequence>142</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Mainmenu left!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:27</date>
+  <millis>1345989027178</millis>
+  <sequence>2071</sequence>
+  <logger>gamestates.GamestateManager</logger>
+  <level>INFO</level>
+  <class>gamestates.GamestateManager</class>
+  <method>enterState</method>
+  <thread>19</thread>
+  <message>Gamestate: Singleplayer enterd!</message>
+</record>
+<record>
+  <date>2012-08-26T15:50:27</date>
+  <millis>1345989027180</millis>
+  <sequence>2073</sequence>
+  <logger>solarwars</logger>
+  <level>FINE</level>
+  <class>solarwars.SolarWarsApplication</class>
+  <method>simpleUpdate</method>
+  <thread>19</thread>
+  <exception>
+    <message>java.lang.NullPointerException</message>
+    <frame>
+      <class>solarwars.IsoControl$MarkerNode</class>
+      <method>updateRange</method>
+      <line>1020</line>
+    </frame>
+    <frame>
+      <class>solarwars.IsoControl$MarkerNode</class>
+      <method>updateMarker</method>
+      <line>1002</line>
+    </frame>
+    <frame>
+      <class>solarwars.IsoControl</class>
+      <method>updateSelection</method>
+      <line>747</line>
+    </frame>
+    <frame>
+      <class>solarwars.SolarWarsApplication</class>
+      <method>simpleUpdate</method>
+      <line>569</line>
+    </frame>
+    <frame>
+      <class>solarwars.SolarWarsApplication</class>
+      <method>update</method>
+      <line>532</line>
+    </frame>
+    <frame>
+      <class>com.jme3.system.lwjgl.LwjglAbstractDisplay</class>
+      <method>runLoop</method>
+      <line>149</line>
+    </frame>
+    <frame>
+      <class>com.jme3.system.lwjgl.LwjglDisplay</class>
+      <method>runLoop</method>
+      <line>182</line>
+    </frame>
+    <frame>
+      <class>com.jme3.system.lwjgl.LwjglAbstractDisplay</class>
+      <method>run</method>
+      <line>223</line>
+    </frame>
+    <frame>
+      <class>java.lang.Thread</class>
+      <method>run</method>
+      <line>722</line>
+    </frame>
+  </exception>
+</record>
+</log>
