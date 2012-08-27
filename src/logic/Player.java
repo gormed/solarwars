@@ -38,7 +38,7 @@ public class Player {
 
     /** The Constant PLAYER_COLORS. */
     public static final ColorRGBA[] PLAYER_COLORS = {
-        ColorRGBA.Blue, ColorRGBA.Red,
+        new ColorRGBA(0.3f,0.3f,1.0f,1.0f), ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};

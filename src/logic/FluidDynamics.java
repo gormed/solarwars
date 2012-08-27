@@ -13,7 +13,7 @@ public class FluidDynamics {
     //private static final int TEST_SEED=1700;
     
     /* side length of square simulation area */
-    public static final int FLUID_RES = 256;
+    public static final int FLUID_RES = 128;
     private static final int FLUID_SIZE = FLUID_RES * FLUID_RES;
 
     /* number of stars */
@@ -73,7 +73,7 @@ public class FluidDynamics {
         /* strength of blur dependant on area */
         //float a=dt*diff*FLUID_SIZE;
         
-        float a=dt*diff*128;
+        float a=dt*diff*100;
         
         for (k=0;k<2;k++)
         for (i=0;i<FLUID_RES;i++)
@@ -352,11 +352,11 @@ public class FluidDynamics {
     {
         ByteBuffer data = ByteBuffer.allocateDirect(FLUID_RES*FLUID_RES*3);
 
-        //float sd,sd2;
+        float sd,sd2;
 
         for (int i=0;i<FLUID_RES;i++)
         {
-            //sd=0;
+           sd=0;
             for (int j=0;j<FLUID_RES;j++)
             {
                 int d=(int)((dens[ix(j,i)]-dens[ix(j-1,i)]*0.6f)*500);
@@ -367,7 +367,7 @@ public class FluidDynamics {
                 if (d2>255) d2=255;
                 if (d2<0) d2=0;
 
-                /*sd2=dens[ix(j,i)]+densb[ix(j,i)];
+                sd2=dens[ix(j,i)]+densb[ix(j,i)];
                 if (sd2>sd)    // simple shadows
                 {
                     sd=sd2;
@@ -376,13 +376,13 @@ public class FluidDynamics {
                 {
                     d/=2;
                     d2/=2;
-                }*/
+                }
                 
                 data.put((byte)(d+d2*7/8));
                 data.put((byte)(d*7/8+d2*7/8));
                 data.put((byte)(d2+d*7/8));
                     
-                //sd-=0.05f;
+                sd-=0.05f;
 
             }
         }

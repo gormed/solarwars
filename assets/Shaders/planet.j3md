@@ -1,0 +1,30 @@
+MaterialDef Planet {
+
+    MaterialParameters {
+        Texture2D ColorMap
+		Texture2D TransformMap
+		Float Shift
+		Float VerticalShift
+        Color Color (Color)
+    }
+
+    Technique {
+        VertexShader GLSL100:   Shaders/planet.vert
+        FragmentShader GLSL100: Shaders/planet.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+        }
+    }
+
+    Technique Glow {
+	
+	VertexShader GLSL100:   Shaders/planet.vert
+        FragmentShader GLSL100: Shaders/planet.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+        }
+    }
+
+}

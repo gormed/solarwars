@@ -1,4 +1,4 @@
-MaterialDef Unshaded {
+MaterialDef Scramble {
 
     MaterialParameters {
         Texture2D ColorMap

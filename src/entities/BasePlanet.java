@@ -23,14 +23,14 @@ package entities;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Sphere;
+import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
-import com.jme3.util.TangentBinormalGenerator;
 import logic.Level;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class BasePlanet.
@@ -56,6 +56,8 @@ public class BasePlanet extends AbstractPlanet {
     @Override
     public void createPlanet() {
         //Geometry
+        
+        /*
         Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);
 
         s.setTextureMode(Sphere.TextureMode.Projected);
@@ -81,6 +83,39 @@ public class BasePlanet extends AbstractPlanet {
             
             material.setBoolean("VertexLighting", true);
         }
+        
+        */
+        
+        
+        geometry = new Geometry("BasePlanet_" + id, new Quad(size*2,size*2));
+        
+        float rot=(float)Math.random()*(float)Math.PI*2.0f;
+        float angles[] = {
+            (float) -Math.PI / 2, rot,0
+        };
+
+        geometry.setLocalTranslation(size*(-(float)Math.cos(-rot)-(float)Math.sin(-rot)),0,
+                                     size*((float)Math.cos(-rot)-(float)Math.sin(-rot)));
+        geometry.setLocalRotation(new Quaternion(angles));
+        
+        material = new Material(assetManager, "Shaders/planet.j3md");
+        
+        Texture surface = assetManager.loadTexture("Textures/Planets/planet-surface.png");
+        surface.setWrap(Texture.WrapMode.Repeat);
+        material.setTexture("ColorMap",surface);
+        
+        Texture transform=assetManager.loadTexture("Textures/Planets/planet-transform.png");
+        transform.setWrap(Texture.WrapMode.Repeat);
+        material.setTexture("TransformMap",transform);
+
+        material.setColor("Color",new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        
+        material.setFloat("VerticalShift",(float)Math.random());
+        
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        material.getAdditionalRenderState().setAlphaTest(true);
+        material.getAdditionalRenderState().setAlphaFallOff(0.1f);
+        //material.getAdditionalRenderState().setDepthWrite(false);
 
         geometry.setMaterial(material);
         transformNode.attachChild(geometry);
