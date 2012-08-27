@@ -46,6 +46,7 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
+import java.io.File;
 
 
 import java.io.IOException;
@@ -72,15 +73,14 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        
-		getInstance().start();
+
+        getInstance().start();
     }
     //==========================================================================
     //      Static Fields
     //==========================================================================
     public static final boolean USE_LOG_FILES = SolarWarsSettings.getInstance().isFileLoggingEnabled();
     public static final Level GLOBAL_LOGGING_LEVEL = SolarWarsSettings.getInstance().getGlobalLogLevel();
-    
     public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
     /** Flag for Bloom-Effect */
     public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
@@ -93,8 +93,8 @@ public class SolarWarsApplication extends Application {
     //      Static Methods
     //==========================================================================
     public static String removeSpaces(String s) {
-        
-    	StringTokenizer st = new StringTokenizer(s, " ", false);
+
+        StringTokenizer st = new StringTokenizer(s, " ", false);
         String t = "";
         while (st.hasMoreElements()) {
             t += st.nextElement();
@@ -135,12 +135,20 @@ public class SolarWarsApplication extends Application {
         super();
         try {
             if (USE_LOG_FILES) {
-                fileName = new Date(System.currentTimeMillis()).toString();
-                fileName = removeSpaces(fileName);
-                logFileHandler = new FileHandler(fileName + ".swlog", true);
-                logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
-                clientLogger.addHandler(logFileHandler);
+                File folder = new File("log/");
+                boolean folderCreated = folder.exists();
+                if (!folderCreated) {
+                    folderCreated = folder.mkdir();
+                }
+                if (folderCreated) {
+                    fileName = "log/" + new Date(System.currentTimeMillis()).toString();
+                    fileName = removeSpaces(fileName);
 
+                    logFileHandler = new FileHandler(fileName + ".swlog", true);
+                    logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
+                    clientLogger.addHandler(logFileHandler);
+
+                }
             }
             clientLogger.setLevel(GLOBAL_LOGGING_LEVEL);
             Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(GLOBAL_LOGGING_LEVEL);
@@ -150,8 +158,10 @@ public class SolarWarsApplication extends Application {
         } catch (SecurityException ex) {
             clientLogger.log(Level.SEVERE, null, ex);
         }
-        assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
-		initSettings();
+        assetManager = JmeSystem.newAssetManager(
+                Thread.currentThread().getContextClassLoader().
+                getResource("com/jme3/asset/Desktop.cfg"));
+        initSettings();
     }
 
     /**
@@ -354,28 +364,9 @@ public class SolarWarsApplication extends Application {
     /**
      * Initializes basic settings.
      */
-    public void initSettings() {
+    private void initSettings() {
         if (settings == null) {
             settings = SolarWarsSettings.getInstance().toAppSettings();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
     }
 
