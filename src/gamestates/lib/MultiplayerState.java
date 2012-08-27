@@ -21,9 +21,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
+import java.io.IOException;
+
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.Ergonomics;
@@ -33,6 +36,8 @@ import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
 import net.NetworkManager;
+import settings.GameSettingsException;
+import settings.SolarWarsSettings;
 import solarwars.AudioManager;
 import solarwars.SolarWarsGame;
 
@@ -89,7 +94,7 @@ public class MultiplayerState extends Gamestate {
                 ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ.clone(),
-                Ergonomics.getInstance().getName(),
+                SolarWarsSettings.getInstance().getPlayerName(),
                 ColorRGBA.White.clone(),
                 gui, false) {
 
@@ -102,7 +107,7 @@ public class MultiplayerState extends Gamestate {
                 if (caption.length() > 8) {
                     caption = caption.substring(0, caption.length() - 1);
                 }
-                Ergonomics.getInstance().setName(caption);
+                SolarWarsSettings.getInstance().setPlayerName(caption);
             }
         };
 
@@ -130,7 +135,7 @@ public class MultiplayerState extends Gamestate {
                 ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ.clone(), 
-                Ergonomics.getInstance().getIpAddress(),
+                SolarWarsSettings.getInstance().getIpAddressFavouriteServer(),
                 ColorRGBA.White.clone(), gui, true) {
 
             @Override
@@ -139,7 +144,7 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-                Ergonomics.getInstance().setIpAddress(caption);
+            	SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
             }
         };
 
@@ -234,7 +239,12 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-        
+    	try {
+			SolarWarsSettings.getInstance().save();
+		} catch (GameSettingsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         gui.cleanUpGUI();
         gui = null;
     }
@@ -276,7 +286,7 @@ public class MultiplayerState extends Gamestate {
             AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
             ip = NetworkManager.getInstance().getClientIPAdress().getHostAddress();
             serverip.setCaption(ip);
-            Ergonomics.getInstance().setIpAddress(ip);
+            SolarWarsSettings.getInstance().setIpAddressFavouriteServer(ip);
         }
     }
 }

@@ -36,7 +36,10 @@ public class KeyInputManager {
     //==========================================================================
 
     private KeyInputManager() {
-        initKeyboardMappings();
+        inputManager = SolarWarsApplication.getInstance().getInputManager();
+        if (inputManager != null) {
+            initKeyboardMappings();
+        }
     }
 
     public static KeyInputManager getInstance() {
@@ -146,11 +149,14 @@ public class KeyInputManager {
     public static final String INPUT_MAPPING_STRG = "Strg";
     /** The Constant INPUT_MAPPING_POINT. */
     public static final String INPUT_MAPPING_SHIFT = "Shift";
+    
+    
+    
     //</editor-fold>
     //==========================================================================
     //      Private Fields
     //==========================================================================
-    private InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
+    private InputManager inputManager;
     //==========================================================================
     //      Methods
     //==========================================================================
@@ -246,6 +252,8 @@ public class KeyInputManager {
                 new KeyTrigger(KeyInput.KEY_COMMA));
         //            inputManager.addMapping(KeyInputMap.INPUT_MAPPING_EXCREMATIONMARK,
         //                    new KeyTrigger(KeyInput.KEY_COMMA));
+
+        
         //</editor-fold>
     }
 }

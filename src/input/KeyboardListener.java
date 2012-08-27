@@ -24,6 +24,7 @@ package input;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import gui.elements.TextBox;
+import solarwars.SolarWarsApplication;
 
 /**
  * The listener interface for receiving keyboard events.
@@ -64,14 +65,15 @@ public abstract class KeyboardListener implements ActionListener {
      * @param inputManager the input manager
      * @param textBox the text box
      */
-    public KeyboardListener(InputManager inputManager, TextBox textBox) {
+    public KeyboardListener(TextBox textBox) {
         this.textBox = textBox;
-        this.inputManager = inputManager;
-        addTextListener(inputManager);
+        inputManager = SolarWarsApplication.getInstance().getInputManager();
+        addTextListener();
 
     }
 
-    private void addTextListener(InputManager inputManager) {
+    private void addTextListener() {
+        if (inputManager == null) return;
         inputManager.addListener(this,
                 KeyInputManager.INPUT_MAPPING_0,
                 KeyInputManager.INPUT_MAPPING_1,

@@ -31,6 +31,7 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
+
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.Ergonomics;
@@ -66,6 +67,8 @@ import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
 import net.messages.StringMessage;
+import settings.GameSettingsException;
+import settings.SolarWarsSettings;
 import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
@@ -102,7 +105,7 @@ public class CreateServerState extends Gamestate
     private Anchor playerLabelsNode;
     private HashMap<Player, Integer> playerLabelIdx;
     private HashMap<Integer, Player> refreshedPlayers;
-    private int maxPlayerNumber = Ergonomics.getInstance().getPlayers();
+    private int maxPlayerNumber = SolarWarsSettings.getInstance().getMaxPlayerNumber();
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
     private NetworkManager networkManager;
@@ -114,7 +117,7 @@ public class CreateServerState extends Gamestate
     private final SolarWarsApplication application;
     private long clientSeed;
     private boolean playersChanged;
-    private String seedString = Ergonomics.getInstance().getSeed();
+    private String seedString = SolarWarsSettings.getInstance().getSeed();
     private long serverSeed = 42;
 
     /**
@@ -316,7 +319,7 @@ public class CreateServerState extends Gamestate
         levelSeedBox = new TextBox(ColorRGBA.Blue, new Vector3f(
                 4.0f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, new Vector2f(gui.getWidth() / 6, 30),
-                Ergonomics.getInstance().getSeed(), ColorRGBA.White, gui, false) {
+                SolarWarsSettings.getInstance().getSeed(), ColorRGBA.White, gui, false) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -335,7 +338,7 @@ public class CreateServerState extends Gamestate
                     caption = serverSeed + "";
                 }
 
-                Ergonomics.getInstance().setSeed(caption);
+                SolarWarsSettings.getInstance().setSeed(caption);
             }
         };
 
@@ -355,7 +358,7 @@ public class CreateServerState extends Gamestate
         playerCountBox = new TextBox(ColorRGBA.Blue, new Vector3f(
                 8.5f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ, new Vector2f(40, 30),
-                Ergonomics.getInstance().getPlayers() + "", ColorRGBA.White,
+                SolarWarsSettings.getInstance().getMaxPlayerNumber() + "", ColorRGBA.White,
                 gui, true) {
 
             @Override
@@ -387,7 +390,7 @@ public class CreateServerState extends Gamestate
                 } catch (Exception e) {
                     caption = playerNumber + "";
                 } finally {
-                    Ergonomics.getInstance().setPlayers(playerNumber);
+                	  SolarWarsSettings.getInstance().setMaxPlayerNumber( playerNumber );
                 }
             }
         };
@@ -447,7 +450,14 @@ public class CreateServerState extends Gamestate
      */
     @Override
     protected void unloadContent() {
-
+    	
+    	try { 
+			SolarWarsSettings.getInstance().save();
+		} catch (GameSettingsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
         if (serverClient != null) {
             serverClient.removeMessageListener(clientMessageListener);
         }

@@ -413,12 +413,15 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
              * @param textBox the text box
              */
             public ChatInputListener(InputManager inputManager, TextBox textBox) {
-                super(inputManager, textBox);
+                super(textBox);
                 if (inputManager != null) {
-                    inputManager.addMapping(KeyInputManager.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
-
-                    inputManager.addListener(this, KeyInputManager.INPUT_MAPPING_ENTER);
+                    createAndAddMappings(inputManager);
                 }
+            }
+
+            private void createAndAddMappings(InputManager inputManager) {
+                inputManager.addMapping(KeyInputManager.INPUT_MAPPING_ENTER, new KeyTrigger(KeyInput.KEY_RETURN));
+                inputManager.addListener(this, KeyInputManager.INPUT_MAPPING_ENTER);
             }
 
             /* (non-Javadoc)

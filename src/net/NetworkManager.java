@@ -33,6 +33,8 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
+
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -48,6 +50,7 @@ import net.messages.PlanetActionMessage;
 import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
+import settings.SolarWarsSettings;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 
@@ -67,7 +70,7 @@ public class NetworkManager {
         JOINED
     }
     /** The Constant DEFAULT_PORT. */
-    public static final int DEFAULT_PORT = 6142;
+    public static final int DEFAULT_PORT = SolarWarsSettings.getInstance().getDefaultPort();
     /** The instance. */
     private static NetworkManager instance;
 
@@ -291,9 +294,9 @@ public class NetworkManager {
         if (serverIPAdress == null || udpPort < 1) {
             return null;
         }
-
-        this.chatModule = new ChatModule(
-                SolarWarsApplication.getInstance().getInputManager());
+        
+        // setup chat
+        this.chatModule = new ChatModule();
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(ChatMessage.class);

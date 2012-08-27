@@ -22,11 +22,15 @@
 package gui.elements;
 
 import com.jme3.audio.AudioNode;
+
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+
+import settings.SolarWarsSettings;
 import solarwars.AudioManager;
 import solarwars.SolarWarsApplication;
 
@@ -342,7 +346,9 @@ public class BeatBox {
      * Play.
      */
     public void play() {
-        if (baseSound != null) {
+        if(!SolarWarsSettings.getInstance().isMusicEnabled())
+        	return;
+    	if (baseSound != null) {
             baseSound.play();
             for (Beat beat : timerTasks) {
                 globalTimer.schedule(beat, beat.layback, beat.period);

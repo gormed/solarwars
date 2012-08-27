@@ -23,8 +23,12 @@ package solarwars;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
+
+
 import java.util.HashMap;
 import java.util.Map;
+
+import settings.SolarWarsSettings;
 
 /**
  * The Class AudioManager.
@@ -158,7 +162,9 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean playSound(String sound) {
-        if (audioNodes.containsKey(sound)) {
+    	if(isSoundDisabled())
+      	   return true;
+    	if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.play();
@@ -176,7 +182,9 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean pauseSound(String sound) {
-        if (audioNodes.containsKey(sound)) {
+    	if(isSoundDisabled())
+       	   return true;
+    	if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.pause();
@@ -194,7 +202,9 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean stopSound(String sound) {
-        if (audioNodes.containsKey(sound)) {
+    	if(isSoundDisabled())
+        	   return true;
+    	if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.stop();
@@ -212,14 +222,24 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean playSoundInstance(String sound) {
-        if (audioNodes.containsKey(sound)) {
+       if(isSoundDisabled())
+    	   return true;
+    	if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
-
+            
             n.playInstance();
 
             return true;
         } else {
             return false;
         }
+    }
+    /**
+     * Check if the sound is enabled.
+     * 
+     * @return true, if the sound is enabled
+     */
+    private boolean isSoundDisabled() {
+    	return !SolarWarsSettings.getInstance().isSoundEnabled();
     }
 }

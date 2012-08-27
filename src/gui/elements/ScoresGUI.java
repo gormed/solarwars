@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
+import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -32,11 +33,10 @@ import gui.GameGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import logic.DeathmatchGameplay;
 import logic.Level;
 import logic.Player;
 import solarwars.Hub;
-import solarwars.InputMappings;
+import input.InputMappings;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
 
@@ -85,7 +85,6 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
     private Label headColorLabel;
     /** The background frame. */
     private Panel backgroundFrame;
-    
     private Level level;
 
     /**
@@ -171,19 +170,19 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
                 new Vector3f(1.4f * parentPanel.getSize().x / 3, height, 0),
                 Vector2f.UNIT_XY.clone().multLocal(24f),
                 "Interface/player_icon.png");
-        
+
         this.headShipsPanel = new TexturedPanel(
                 "SHIPS",
                 new Vector3f(2.5f * parentPanel.getSize().x / 3, height, 0),
                 Vector2f.UNIT_XY.clone().multLocal(20f),
                 "Interface/ship_icon.png");
-        
+
         this.headPlanetsPanel = new TexturedPanel(
                 "PLANETS",
                 new Vector3f(3.15f * parentPanel.getSize().x / 3, height, 0),
                 Vector2f.UNIT_XY.clone().multLocal(25f),
                 "Interface/planet_icon.png");
-        
+
         this.headPercentPanel = new TexturedPanel(
                 "% OF ALL",
                 new Vector3f(3.8f * parentPanel.getSize().x / 3, height, 0),
@@ -192,7 +191,7 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
 
         this.headStatePanel = new TexturedPanel(
                 "Gain",
-                new Vector3f(4.6f * parentPanel.getSize().x / 3, height-0.1f, 0),
+                new Vector3f(4.6f * parentPanel.getSize().x / 3, height - 0.1f, 0),
                 Vector2f.UNIT_XY.clone().multLocal(24f),
                 "Interface/gain_icon.png");
 
@@ -356,18 +355,20 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
      */
     public void destroy() {
         this.detachAllChildren();
-        SolarWarsApplication.getInstance().
-                getInputManager().removeListener(actionListener);
+        InputManager inputManager =
+                SolarWarsApplication.getInstance().getInputManager();
+        if (inputManager != null) {
+            inputManager.removeListener(actionListener);
+        }
         labelPosition.clear();
         playerLabels.clear();
         fadeCurrent = 0;
-        fadeing = false;    
+        fadeing = false;
         fadeDirection = false;
     }
 
     @Override
     public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-        
     }
 
     @Override
@@ -610,7 +611,7 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
             avgGrowth = 0;
             globalSize = 0;
             growthPerSecond = 0;
-            
+
             for (AbstractPlanet p : player.getPlanets()) {
                 size = p.getSizeID();
                 growth += Level.PLANET_INCREMENT_TIME[p.getSizeID()];
@@ -657,10 +658,10 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
          */
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (isPressed && name.equals(InputMappings.KEYBOARD_TABSCORE)) {
+            if (isPressed && name.equals(InputMappings.GAME_SCORES)) {
                 //setVisible(show = true);
                 startFadeIn();
-            } else if (!isPressed && name.equals(InputMappings.KEYBOARD_TABSCORE)) {
+            } else if (!isPressed && name.equals(InputMappings.GAME_SCORES)) {
                 //setVisible(show = false);
                 startFadeOut();
             }

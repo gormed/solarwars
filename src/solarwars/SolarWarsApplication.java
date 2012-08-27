@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package solarwars;
 
+import input.InputMappings;
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
@@ -45,12 +46,16 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
+
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import settings.SolarWarsSettings;
 import net.NetworkManager;
 
 /**
@@ -67,17 +72,18 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        getInstance().initSettings();
-        getInstance().start();
+        
+		getInstance().start();
     }
     //==========================================================================
     //      Static Fields
     //==========================================================================
-    public static final boolean USE_LOG_FILES = true;
-    public static final Level GLOBAL_LOGGING_LEVEL = Level.INFO;
-    public static boolean TOON_ENABLED = true;
+    public static final boolean USE_LOG_FILES = SolarWarsSettings.getInstance().isFileLoggingEnabled();
+    public static final Level GLOBAL_LOGGING_LEVEL = SolarWarsSettings.getInstance().getGlobalLogLevel();
+    
+    public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
     /** Flag for Bloom-Effect */
-    public static boolean BLOOM_ENABLED = true;
+    public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
     /** The logger for the complete client, called 'solarwars'*/
     private static final Logger clientLogger =
             Logger.getLogger(
@@ -87,7 +93,8 @@ public class SolarWarsApplication extends Application {
     //      Static Methods
     //==========================================================================
     public static String removeSpaces(String s) {
-        StringTokenizer st = new StringTokenizer(s, " ", false);
+        
+    	StringTokenizer st = new StringTokenizer(s, " ", false);
         String t = "";
         while (st.hasMoreElements()) {
             t += st.nextElement();
@@ -144,6 +151,7 @@ public class SolarWarsApplication extends Application {
             clientLogger.log(Level.SEVERE, null, ex);
         }
         assetManager = JmeSystem.newAssetManager(Thread.currentThread().getContextClassLoader().getResource("com/jme3/asset/Desktop.cfg"));
+		initSettings();
     }
 
     /**
@@ -348,25 +356,26 @@ public class SolarWarsApplication extends Application {
      */
     public void initSettings() {
         if (settings == null) {
-            settings = new AppSettings(false);
+            settings = SolarWarsSettings.getInstance().toAppSettings();
 
-            settings.put("Width", 1024);
-            settings.put("Height", 768);
-            settings.put("BitsPerPixel", 24);
-            settings.put("Frequency", 60);
-            settings.put("DepthBits", 24);
-            settings.put("StencilBits", 0);
-            settings.put("Samples", 4);
-            settings.put("Fullscreen", false);
-            settings.put("Title", "SolarWars_");
-            settings.put("Renderer", AppSettings.LWJGL_OPENGL2);
-            settings.put("AudioRenderer", AppSettings.LWJGL_OPENAL);
-            settings.put("DisableJoysticks", true);
-            settings.put("UseInput", true);
-            settings.put("VSync", true);
-            settings.put("FrameRate", 100);
-            settings.put("SettingsDialogImage", "/Interface/solarwars_v2.png");
-            settings.put("USE_VA", false);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 
@@ -380,7 +389,7 @@ public class SolarWarsApplication extends Application {
         // settings dialog is not shown
         boolean loadSettings = false;
         if (settings == null) {
-            setSettings(new AppSettings(true));
+            setSettings(SolarWarsSettings.getInstance().toAppSettings());
             loadSettings = true;
         }
 
@@ -417,7 +426,7 @@ public class SolarWarsApplication extends Application {
 
         // add app action listener for mappings
         inputManager.addListener(actionListener,
-                InputMappings.KEYBOARD_EXIT,
+                InputMappings.EXIT_GAME,
                 InputMappings.DEBUG_CAMERA_POS,
                 InputMappings.DEBUG_MEMORY,
                 InputMappings.DEBUG_HIDE_STATS);
@@ -706,7 +715,7 @@ public class SolarWarsApplication extends Application {
                 return;
             }
 
-            if (name.equals(InputMappings.KEYBOARD_EXIT)) {
+            if (name.equals(InputMappings.EXIT_GAME)) {
                 stop();
             } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
                 if (cam != null) {
