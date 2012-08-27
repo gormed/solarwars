@@ -597,6 +597,7 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getPlanetID());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
+                
                 final String planetActionMsg =
                         "Client@" + new Date(clientMessage.getClientTime()).toString()
                         + " | " + clientMessage.getActionName() + " from #"

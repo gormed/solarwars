@@ -112,7 +112,7 @@ public class MainmenuState extends Gamestate {
                 new Vector3f(gui.getWidth() / 2,
                 7 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
+                ColorRGBA.Cyan,                                                                                                  
                 ColorRGBA.DarkGray, gui) {
 
             @Override

@@ -25,6 +25,7 @@ package gui;
  * The Class Ergonomics.
  *
  * @author Hans
+ * @deprecated
  */
 public final class Ergonomics {
     

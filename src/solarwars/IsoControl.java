@@ -43,6 +43,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
+
 import entities.AbstractPlanet;
 import entities.ShipGroup;
 import gui.GameGUI;
@@ -55,6 +56,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import settings.SolarWarsSettings;
 import jme3tools.optimize.GeometryBatchFactory;
 import logic.ActionLib;
 import logic.DeathmatchGameplay;
@@ -68,7 +71,8 @@ import logic.Player;
  */
 public class IsoControl {
 
-    private static final boolean DEBUG_RAYCASTS = true;
+    private static final boolean DEBUG_RAYCASTS = SolarWarsSettings.getInstance()
+    											  .isDEBUG_RAYCASTSEnabled();
     //==========================================================================
     //      Singleton
     //==========================================================================
