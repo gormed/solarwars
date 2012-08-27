@@ -5,6 +5,7 @@ MaterialDef Scramble {
 		Texture2D ScrambleMap
         Texture2D LightMap
         Color Color (Color)
+		Vector2 Shift
         Boolean VertexColor (UseVertexColor)
         Boolean SeparateTexCoord
 

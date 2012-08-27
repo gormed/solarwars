@@ -108,6 +108,10 @@ public class BasePlanet extends AbstractPlanet {
         transform.setWrap(Texture.WrapMode.Repeat);
         material.setTexture("TransformMap",transform);
 
+        Texture halo=assetManager.loadTexture("Textures/Planets/planet-halo.png");
+        transform.setWrap(Texture.WrapMode.Repeat);
+        material.setTexture("HaloMap",halo);
+
         material.setColor("Color",new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
         
         material.setFloat("VerticalShift",(float)Math.random());

@@ -257,17 +257,17 @@ public class LevelBackground extends Node {
         
         /* star material */
         
-        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Environment/smallstar.png"));
-        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        material.getAdditionalRenderState().setDepthWrite(false);
+        Material smaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        smaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/Environment/smallstar.png"));
+        smaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        smaterial.getAdditionalRenderState().setDepthWrite(false);
 
         /* finally, create stars */
         
         for (i=0;i<nstars;i++)
         {
             stargeo[i]=new Geometry("BackgroundStar"+i,mesh);
-            stargeo[i].setMaterial(material);
+            stargeo[i].setMaterial(smaterial);
             stargeo[i].setLocalRotation(new Quaternion(angles));
             stargeo[i].setLocalTranslation(stary[i]*WIDTH/fd.FLUID_RES-WIDTH/2,-0.5f,starx[i]*HEIGHT/fd.FLUID_RES-HEIGHT/2);
             stargeo[i].setQueueBucket(Bucket.Transparent);
@@ -281,6 +281,8 @@ public class LevelBackground extends Node {
         /* animate the star field */
         int i;
         timeframe+=tpf;
+        
+        material.setVector2("Shift", new Vector2f(timeframe*0.01f,(float)Math.cos(timeframe*0.01f)));
         
         for(i=0;i<nstars;i++)
         {

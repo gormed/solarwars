@@ -3,6 +3,7 @@ MaterialDef Planet {
     MaterialParameters {
         Texture2D ColorMap
 		Texture2D TransformMap
+		Texture2D HaloMap
 		Float Shift
 		Float VerticalShift
         Color Color (Color)
