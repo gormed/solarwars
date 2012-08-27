@@ -21,10 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.math.ColorRGBA;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -32,14 +28,17 @@ import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import gui.elements.ScoresGUI;
+import input.InputMappings;
 import logic.DeathmatchGameplay;
-import logic.Player;
 import logic.Level;
+import logic.Player;
 import net.ServerHub;
 import solarwars.AudioManager;
 import solarwars.Hub;
-import input.InputMappings;
 import solarwars.IsoControl;
+
+import com.jme3.input.controls.ActionListener;
+import com.jme3.math.ColorRGBA;
 
 /**
  * The Class SingleplayerState.

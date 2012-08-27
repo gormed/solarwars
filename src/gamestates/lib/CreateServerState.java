@@ -21,26 +21,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.network.Client;
-import com.jme3.network.ConnectionListener;
-import com.jme3.network.Filters;
-import com.jme3.network.HostedConnection;
-import com.jme3.network.Message;
-import com.jme3.network.MessageListener;
-import com.jme3.network.Server;
-
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
-import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Anchor;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
 import gui.elements.TextBox;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -55,15 +44,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import logic.DeathmatchGameplay;
 import logic.Player;
 import net.ClientRegisterListener;
 import net.NetworkManager;
-import net.ServerRegisterListener;
 import net.ServerHub;
-import net.messages.PlayerConnectingMessage;
+import net.ServerRegisterListener;
 import net.SolarWarsServer;
 import net.messages.PlayerAcceptedMessage;
+import net.messages.PlayerConnectingMessage;
 import net.messages.PlayerLeavingMessage;
 import net.messages.StartGameMessage;
 import net.messages.StringMessage;
@@ -73,6 +63,17 @@ import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
+
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+import com.jme3.network.Client;
+import com.jme3.network.ConnectionListener;
+import com.jme3.network.Filters;
+import com.jme3.network.HostedConnection;
+import com.jme3.network.Message;
+import com.jme3.network.MessageListener;
+import com.jme3.network.Server;
 
 /**
  * The Class CreateServerState.

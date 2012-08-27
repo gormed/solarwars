@@ -21,12 +21,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic.path;
 
-import entities.AbstractPlanet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+
 import logic.Level;
+import entities.AbstractPlanet;
 
 /**
  * The Class AIMap.

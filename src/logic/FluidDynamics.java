@@ -36,7 +36,7 @@ public class FluidDynamics {
     private float densb[],densb_prev[];
     
     /* position of stars */
-    private float starx[],stary[];
+    private float starx[], stary[];
     
     
     /* random number generator */

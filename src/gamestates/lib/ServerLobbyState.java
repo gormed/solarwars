@@ -21,22 +21,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
-import com.jme3.font.BitmapFont.Align;
-import com.jme3.font.Rectangle;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.network.Client;
-import com.jme3.network.ClientStateListener;
-import com.jme3.network.ConnectionListener;
-import com.jme3.network.Message;
-import com.jme3.network.MessageListener;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;
 import gui.elements.Panel;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -45,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import logic.DeathmatchGameplay;
 import logic.Player;
 import net.ClientRegisterListener;
@@ -57,6 +49,16 @@ import solarwars.AudioManager;
 import solarwars.Hub;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
+
+import com.jme3.font.BitmapFont.Align;
+import com.jme3.font.Rectangle;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+import com.jme3.network.Client;
+import com.jme3.network.ClientStateListener;
+import com.jme3.network.Message;
+import com.jme3.network.MessageListener;
 
 /**
  * The Class ServerLobbyState.

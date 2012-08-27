@@ -24,6 +24,7 @@ package net;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import logic.Player;
 
 /**
@@ -128,7 +129,7 @@ public class ServerHub {
      */
     public void initialize(Player hostPlayer, ArrayList<Player> players) {
         hostPlayer.setHost();
-        this.hostPlayer = hostPlayer;
+        ServerHub.hostPlayer = hostPlayer;
         if (players != null) {
             for (Player p : players) {
                 addPlayer(p);

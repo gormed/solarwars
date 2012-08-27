@@ -21,10 +21,16 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gui.elements;
 
+import gui.ClickableGUI;
+import gui.GUIElement;
+import gui.GameGUI;
+import input.KeyInputManager;
+import input.KeyboardListener;
+import solarwars.SolarWarsApplication;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.input.InputManager;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
@@ -34,12 +40,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
-import gui.ClickableGUI;
-import gui.GUIElement;
-import gui.GameGUI;
-import input.KeyInputManager;
-import input.KeyboardListener;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class TextBox.

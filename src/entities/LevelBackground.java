@@ -21,6 +21,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
+import java.nio.ByteBuffer;
+
+import logic.FluidDynamics;
+import solarwars.SolarWarsGame;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
@@ -32,15 +37,10 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import com.jme3.util.BufferUtils;
-
-import java.nio.ByteBuffer;
-import logic.FluidDynamics;
-import solarwars.SolarWarsGame;
 
 /**
  * The Class LevelBackground.
@@ -133,7 +133,7 @@ public class LevelBackground extends Node {
         /* get the simulation result and store into texture */
         
         ByteBuffer data=fd.createtexture();
-        Image img=new Image(Image.Format.RGB8,fd.FLUID_RES,fd.FLUID_RES,data,null);
+        Image img=new Image(Image.Format.RGB8,FluidDynamics.FLUID_RES,FluidDynamics.FLUID_RES,data,null);
         Texture tex=new Texture2D();
         tex.setImage(img);
 
@@ -269,7 +269,7 @@ public class LevelBackground extends Node {
             stargeo[i]=new Geometry("BackgroundStar"+i,mesh);
             stargeo[i].setMaterial(smaterial);
             stargeo[i].setLocalRotation(new Quaternion(angles));
-            stargeo[i].setLocalTranslation(stary[i]*WIDTH/fd.FLUID_RES-WIDTH/2,-0.5f,starx[i]*HEIGHT/fd.FLUID_RES-HEIGHT/2);
+            stargeo[i].setLocalTranslation(stary[i]*WIDTH/FluidDynamics.FLUID_RES-WIDTH/2,-0.5f,starx[i]*HEIGHT/FluidDynamics.FLUID_RES-HEIGHT/2);
             stargeo[i].setQueueBucket(Bucket.Transparent);
             this.attachChild(stargeo[i]);
         }

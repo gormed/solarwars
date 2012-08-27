@@ -21,33 +21,34 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
 
-import solarwars.Hub;
-import com.jme3.asset.AssetManager;
-import com.jme3.effect.ParticleEmitter;
-import com.jme3.input.InputManager;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.scene.Node;
-import entities.AbstractPlanet;
-import entities.AbstractShip;
-import entities.BasePlanet;
-import entities.ShipGroup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import entities.LevelBackground;
-import entities.ShipBatchManager;
-import gui.GameGUI;
-import gui.elements.GameOverGUI;
 import java.util.Stack;
+
+import solarwars.Hub;
 import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
+
+import com.jme3.asset.AssetManager;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
+import com.jme3.scene.Node;
+
+import entities.AbstractPlanet;
+import entities.AbstractShip;
+import entities.BasePlanet;
+import entities.LevelBackground;
+import entities.ShipBatchManager;
+import entities.ShipGroup;
+import gui.GameGUI;
+import gui.elements.GameOverGUI;
 
 /**
  * The Class Level.

@@ -3,8 +3,6 @@ package settings.loaderImpl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.jme3.system.AppSettings;
-
 import settings.BaseSettingsLoader;
 import settings.GameSettings;
 import settings.GameSettingsException;

@@ -21,6 +21,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
+import logic.AbstractGameplay;
+import logic.Level;
+import logic.Player;
+import solarwars.FontLoader;
+import solarwars.Hub;
+import solarwars.IsoCamera;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
@@ -36,13 +43,6 @@ import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import logic.AbstractGameplay;
-import logic.Level;
-import logic.Player;
-import solarwars.FontLoader;
-import solarwars.Hub;
-import solarwars.IsoCamera;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class AbstractPlanet.

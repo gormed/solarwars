@@ -21,8 +21,31 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import logic.DeathmatchGameplay;
+import logic.Player;
+import logic.PlayerState;
+import net.messages.ChatMessage;
+import net.messages.GeneralActionMessage;
+import net.messages.LevelActionMessage;
+import net.messages.PlanetActionMessage;
+import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerConnectingMessage;
+import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 import net.messages.StringMessage;
+import solarwars.SolarWarsApplication;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
@@ -34,27 +57,6 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import logic.DeathmatchGameplay;
-import logic.Player;
-import logic.PlayerState;
-import net.messages.ChatMessage;
-import net.messages.GeneralActionMessage;
-import net.messages.LevelActionMessage;
-import net.messages.PlanetActionMessage;
-import net.messages.PlayerAcceptedMessage;
-import net.messages.PlayerLeavingMessage;
-import net.messages.StartGameMessage;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class SolarWarsServer.
