@@ -15,7 +15,7 @@ void main(){
 		tform.y += m_Shift;
 		tform.x += m_VerticalShift;
 
-		vec4 color = texture2D(m_ColorMap, tform);
+		vec4 color = texture2D(m_ColorMap, tform.xy);
 		color.w = tform.z*(color.x+0.5);
 		
 		color += texture2D(m_HaloMap,texCoord).x;
