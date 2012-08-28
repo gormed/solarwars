@@ -51,9 +51,6 @@ public class SettingsLoaderSaverFactory {
 		Object loaderSaverObject = null;
 		String className = packageName + "." + type + interfaceObj.getSimpleName();
 		try {
-
-                        // TODO Yves still a warning here, please fix
-
 			Class<?> implClass = ctxLoader.loadClass(className);
 			if(!interfaceObj.isAssignableFrom(implClass)) {
 				throw new GameSettingsException(String.format("The requested %s does not implement the interface \"%s\" please correct that." , interfaceObj.getSimpleName(), interfaceObj.getName()));
