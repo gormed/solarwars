@@ -22,6 +22,17 @@
 package solarwars;
 
 import input.InputMappings;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.NetworkManager;
+import settings.SolarWarsSettings;
+
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
@@ -42,22 +53,10 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial.CullHint;
-import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
 import java.io.File;
-
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.StringTokenizer;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import settings.SolarWarsSettings;
-import net.NetworkManager;
 
 /**
  * The Class SolarWarsApplication.

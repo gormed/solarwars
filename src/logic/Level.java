@@ -21,7 +21,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package logic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+import java.util.Stack;
+
 import solarwars.Hub;
+import solarwars.IsoControl;
+import solarwars.SolarWarsApplication;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.math.Ray;
@@ -29,23 +40,15 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+
 import entities.AbstractPlanet;
 import entities.AbstractShip;
 import entities.BasePlanet;
-import entities.ShipGroup;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 import entities.LevelBackground;
 import entities.ShipBatchManager;
+import entities.ShipGroup;
 import gui.GameGUI;
 import gui.elements.GameOverGUI;
-import java.util.Stack;
-import solarwars.IsoControl;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class Level.
@@ -456,7 +459,20 @@ public class Level {
 //            GameOverGUI.getInstance().display();
 //            return;
 //        }
-
+        
+        // some code to reposition camera dependant on mouse position
+        // added by roman
+        
+        /*Vector2f cp=SolarWarsApplication.getInstance().getInputManager().getCursorPosition();
+        Camera cam = SolarWarsApplication.getInstance().getCamera();
+        Vector3f loc=cam.getLocation().clone();
+        loc.x=-(float)(cp.x-512)*0.002f;
+        loc.z=(float)(cp.y-384)*0.002f-6.0f;
+        cam.setLocation(loc);
+        cam.lookAt(new Vector3f(0,-2.0f,0), new Vector3f(0,1,0));*/
+        
+        background.update(tpf);
+        
         DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
 
         if (Hub.getLocalPlayer().hasLost()) {

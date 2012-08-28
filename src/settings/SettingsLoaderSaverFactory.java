@@ -45,13 +45,16 @@ public class SettingsLoaderSaverFactory {
 		return (SettingsSaver) loadClass(SAVER_PACKAGE, type , SettingsSaver.class);
 	}
 	
-	private static Object loadClass(String packageName, String type, Class interfaceObj) throws GameSettingsException {
+
+	private static Object loadClass(String packageName, String type, Class<?> interfaceObj) throws GameSettingsException {
 		ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
 		Object loaderSaverObject = null;
 		String className = packageName + "." + type + interfaceObj.getSimpleName();
 		try {
+
                         // TODO Yves still a warning here, please fix
-			Class implClass = ctxLoader.loadClass(className);
+
+			Class<?> implClass = ctxLoader.loadClass(className);
 			if(!interfaceObj.isAssignableFrom(implClass)) {
 				throw new GameSettingsException(String.format("The requested %s does not implement the interface \"%s\" please correct that." , interfaceObj.getSimpleName(), interfaceObj.getName()));
 			}

@@ -21,8 +21,27 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package net;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import logic.Player;
+import logic.PlayerState;
+import net.messages.ChatMessage;
+import net.messages.GeneralActionMessage;
+import net.messages.LevelActionMessage;
+import net.messages.PlanetActionMessage;
+import net.messages.PlayerAcceptedMessage;
 import net.messages.PlayerConnectingMessage;
+import net.messages.PlayerLeavingMessage;
+import net.messages.StartGameMessage;
 import net.messages.StringMessage;
+import settings.SolarWarsSettings;
+import solarwars.Hub;
+
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
@@ -33,26 +52,6 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Network;
 import com.jme3.network.serializing.Serializer;
-
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import logic.Player;
-import logic.PlayerState;
-import net.messages.ChatMessage;
-import net.messages.GeneralActionMessage;
-import net.messages.LevelActionMessage;
-import net.messages.PlanetActionMessage;
-import net.messages.PlayerAcceptedMessage;
-import net.messages.PlayerLeavingMessage;
-import net.messages.StartGameMessage;
-import settings.SolarWarsSettings;
-import solarwars.Hub;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class NetworkManager.

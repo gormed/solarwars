@@ -92,7 +92,7 @@ public class Hub {
     public void initialize(Player localPlayer, ArrayList<Player> players) {
         playersByID = new HashMap<Integer, Player>();
         playersByName = new HashMap<String, Player>();
-        this.localPlayer = localPlayer;
+        Hub.localPlayer = localPlayer;
         addPlayer(localPlayer);
         if (players != null) {
             for (Player p : players) {

@@ -21,12 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.network.Client;
-import com.jme3.network.ClientStateListener;
-import com.jme3.network.ClientStateListener.DisconnectInfo;
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
 import gui.GameGUI;
@@ -34,21 +28,27 @@ import gui.elements.GameOverGUI;
 import gui.elements.PauseGUI;
 import gui.elements.Percentage;
 import gui.elements.ScoresGUI;
+import input.InputMappings;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-import logic.MultiplayerGameplay;
+
 import logic.Level;
+import logic.MultiplayerGameplay;
 import net.NetworkManager;
 import solarwars.AudioManager;
 import solarwars.Hub;
-import input.InputMappings;
 import solarwars.IsoControl;
 import solarwars.SolarWarsApplication;
 import solarwars.SolarWarsGame;
+
+import com.jme3.input.controls.ActionListener;
+import com.jme3.network.Client;
+import com.jme3.network.ClientStateListener;
 
 /**
  * The Class MultiplayerMatchState.

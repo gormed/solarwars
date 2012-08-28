@@ -977,9 +977,12 @@ public class IsoControl {
 
             rangeMaterial = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
-            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.2f));
+            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.1f));
             rangeMaterial.getAdditionalRenderState().
                     setBlendMode(BlendMode.Alpha);
+            
+            rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
+            
 //            rangeMaterial.getAdditionalRenderState().setWireframe(true);
 rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
             float[] angles = {(float) Math.PI / 2, 0, 0};
@@ -990,7 +993,6 @@ rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
             rangeCylinder.setLocalRotation(new Quaternion(angles));
 
             rangeCylinder.setQueueBucket(Bucket.Transparent);
-
             rangeNode.attachChild(rangeCylinder);
 
             rangeBatch = GeometryBatchFactory.optimize(rangeNode);
@@ -1024,7 +1026,7 @@ rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
             if (rangeFade > Math.PI) {
                 rangeFade = 0;
             }
-            float alpha = (0.025f * (5f + (float) Math.sin((4f * rangeFade))));
+            float alpha = (0.0125f * (5f + (float) Math.sin((4f * rangeFade))));
             rangeColor.a = alpha;
             rangeMaterial.setColor("Color", rangeColor);
         }

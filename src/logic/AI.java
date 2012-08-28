@@ -27,7 +27,7 @@ package logic;
 public class AI {
 
     /** The player. */
-    private Player player;
+    private Player player = null;
     
     /**
      * Instantiates a new aI.

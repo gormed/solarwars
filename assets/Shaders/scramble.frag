@@ -7,6 +7,7 @@ uniform vec4 m_Color;
 #ifdef HAS_COLORMAP
     uniform sampler2D m_ColorMap;
 	uniform sampler2D m_ScrambleMap;
+	uniform vec2 m_Shift;
 #endif
 
 #ifdef NEED_TEXCOORD1
@@ -28,7 +29,7 @@ void main(){
     vec4 color = vec4(1.0);
 
     #ifdef HAS_COLORMAP
-        color *= texture2D(m_ColorMap, texCoord1+(texture2D(m_ScrambleMap,texCoord1*4.0)-0.5)*0.02);
+        color *= texture2D(m_ColorMap, texCoord1+(texture2D(m_ScrambleMap,texCoord1*4.0+m_Shift)-0.5)*0.02);
     #endif
 
     #ifdef HAS_VERTEXCOLOR

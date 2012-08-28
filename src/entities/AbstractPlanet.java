@@ -21,6 +21,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
+import logic.AbstractGameplay;
+import logic.Level;
+import logic.Player;
+import solarwars.FontLoader;
+import solarwars.Hub;
+import solarwars.IsoCamera;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
@@ -36,13 +43,6 @@ import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import logic.AbstractGameplay;
-import logic.Level;
-import logic.Player;
-import solarwars.FontLoader;
-import solarwars.Hub;
-import solarwars.IsoCamera;
-import solarwars.SolarWarsApplication;
 
 /**
  * The Class AbstractPlanet.
@@ -72,6 +72,8 @@ public abstract class AbstractPlanet extends Node implements Ranged
     private ParticleEmitter impact;
     private ParticleEmitter capture;
     protected float range = AbstractGameplay.PLANET_RANGE;
+    
+    private float shift=0.0f;
 
 	private void createImpactEmitter ()
 	{
@@ -308,8 +310,8 @@ public abstract class AbstractPlanet extends Node implements Ranged
 	public void setOwner (Player p)
 	{
 		owner = p;
-		label.setColor(ColorRGBA.Black.clone());
-		material.setColor("Specular", owner.getColor());
+		label.setColor(ColorRGBA.White.clone());
+		/*material.setColor("Specular", owner.getColor());
 		if (SolarWarsApplication.TOON_ENABLED)
 		{
 			material.setColor("Diffuse", ColorRGBA.LightGray);
@@ -321,7 +323,9 @@ public abstract class AbstractPlanet extends Node implements Ranged
 		if (SolarWarsApplication.BLOOM_ENABLED)
 		{
 			material.setColor("GlowColor", owner.getColor());
-		}
+		}*/
+                
+                material.setColor("Color",owner.getColor().mult(new ColorRGBA(2,2,2,1)));
 	}
 
 	/**
@@ -494,6 +498,10 @@ public abstract class AbstractPlanet extends Node implements Ranged
 	 */
 	public void updatePlanet (float tpf)
 	{
+                material.setFloat("Shift",shift);
+                shift+=tpf*0.08f/size;
+                
+                        
 		shipGainTime += tpf;
 		if (owner != null && !level.isGameOver())
 		{

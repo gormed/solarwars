@@ -21,6 +21,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package entities;
 
+import java.nio.ByteBuffer;
+
+import logic.FluidDynamics;
+import solarwars.SolarWarsGame;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
@@ -32,16 +37,10 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
-import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import com.jme3.util.BufferUtils;
-
-import java.nio.ByteBuffer;
-import java.util.Random;
-import logic.FluidDynamics;
-import solarwars.SolarWarsGame;
 
 /**
  * The Class LevelBackground.
@@ -49,15 +48,21 @@ import solarwars.SolarWarsGame;
 public class LevelBackground extends Node {
 
     /** The Constant WIDTH. */
-    public static final float WIDTH = 20;
+    public static final float WIDTH = 15;
     
     /** The Constant HEIGHT. */
-    public static final float HEIGHT = 20;
+    public static final float HEIGHT = 15;
     
     public static final int HEIGHTMAP_RES = 128;
     
     /** The geometry. */
     private Geometry geometry;
+    
+    /** Star geometry and animation params */
+    
+    private Geometry stargeo[];
+    int nstars;
+    float timeframe;
     
     /** The material. */
     private Material material;
@@ -105,6 +110,8 @@ public class LevelBackground extends Node {
         // dont know if right position - would class Level be better?
         // Roman
         
+        /* run the fluid dynamics simulation */
+        
         FluidDynamics fd = new FluidDynamics();
         
         fd.init();
@@ -115,7 +122,7 @@ public class LevelBackground extends Node {
         
 	for (i=0;i<5;i++)
 	{
-	    for (j=0;j<10-i;j++) fd.push();
+	    for (j=0;j<7-i;j++) fd.push();  // less supernovas the further we are in time
 	    fd.simulate();
 	}
 	for (i=0;i<10;i++)
@@ -123,12 +130,16 @@ public class LevelBackground extends Node {
 	    fd.simulate();
 	}
 
+        /* get the simulation result and store into texture */
+        
         ByteBuffer data=fd.createtexture();
-        Image img=new Image(Image.Format.RGB8,fd.FLUID_RES,fd.FLUID_RES,data,null);
+        Image img=new Image(Image.Format.RGB8,FluidDynamics.FLUID_RES,FluidDynamics.FLUID_RES,data,null);
         Texture tex=new Texture2D();
         tex.setImage(img);
 
         AssetManager assetManager = game.getApplication().getAssetManager();
+        
+        /* build a heightmap for more 3d-looking fog */
         
         Vector3f vertices[] = new Vector3f[(HEIGHTMAP_RES+1)*(HEIGHTMAP_RES+1)];
         Vector2f texcoords[] = new Vector2f[(HEIGHTMAP_RES+1)*(HEIGHTMAP_RES+1)];
@@ -141,7 +152,7 @@ public class LevelBackground extends Node {
             vertices[k]=new Vector3f();
             vertices[k].x=j*WIDTH/HEIGHTMAP_RES;
             vertices[k].y=i*WIDTH/HEIGHTMAP_RES;
-            vertices[k].z=fd.densityat((float)j/HEIGHTMAP_RES,(float)i/HEIGHTMAP_RES);
+            vertices[k].z=fd.densityat((float)j/HEIGHTMAP_RES,(float)i/HEIGHTMAP_RES)*0.5f;
             
             texcoords[k]=new Vector2f();
             texcoords[k].x=(float)j/HEIGHTMAP_RES;
@@ -172,54 +183,110 @@ public class LevelBackground extends Node {
         mesh.setBuffer(Type.Index,    3, BufferUtils.createIntBuffer(indices));
         mesh.updateBound();
         
-        //Quad q = new Quad(WIDTH, HEIGHT);
         geometry = new Geometry("BackgroundGeometry", mesh);
 
+        /* generate material for displaying fog */
+        /* the scramble shader will do a bit of 2d-displacement mapping */
+        
         material = new Material(assetManager, "Shaders/scramble.j3md");
         
-        //material.setTexture("ColorMap", assetManager.loadTexture("Textures/Enviorment/stars.png"));
         tex.setWrap(Texture.WrapMode.Repeat);
         material.setTexture("ColorMap",tex);
         
         Texture sct=assetManager.loadTexture("Textures/Effects/scramble.png");
         sct.setWrap(Texture.WrapMode.Repeat);
         material.setTexture("ScrambleMap",sct);
-
+        
+        /* do not draw over level geometry */        
+        material.getAdditionalRenderState().setDepthWrite(false);
 
         geometry.setMaterial(material);
 
+        /* NOTE: i do not think this is needed, when geometry is generated the right way */
         float angles[] = {
             (float) -Math.PI / 2, (float) -Math.PI / 2, 0
         };
-
         geometry.setLocalRotation(new Quaternion(angles));
-        geometry.setLocalTranslation(-WIDTH/2, -2, -HEIGHT/2);
         
-
+        geometry.setLocalTranslation(-WIDTH/2, -0.5f, -HEIGHT/2);
+        
+        
         attachChild(geometry);
         
         
+        /* generate the stars */
+        
+        /* build nice 0-centered quad geometry,
+           reuse old mesh object */
+        
+        vertices=new Vector3f[4];
+        texcoords=new Vector2f[4];
+        indices=new int[6];
+        
+        vertices[0]=new Vector3f(-1,-1,0);
+        vertices[1]=new Vector3f( 1,-1,0);
+        vertices[2]=new Vector3f(-1, 1,0);
+        vertices[3]=new Vector3f( 1, 1,0);
+        
+        texcoords[0]=new Vector2f(0,0);
+        texcoords[1]=new Vector2f(1,0);
+        texcoords[2]=new Vector2f(0,1);
+        texcoords[3]=new Vector2f(1,1);
+
+        indices[0]=0;
+        indices[1]=1;
+        indices[2]=2;
+        indices[3]=1;
+        indices[4]=3;
+        indices[5]=2;
+        
+        mesh = new Mesh();
+        
+        mesh.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+        mesh.setBuffer(Type.TexCoord, 2, BufferUtils.createFloatBuffer(texcoords));
+        mesh.setBuffer(Type.Index,    3, BufferUtils.createIntBuffer(indices));
+        mesh.updateBound();    
+        
+        /* get star positions from fd simulation */
         
         float starx[]=fd.getStarXArray();
         float stary[]=fd.getStarYArray();
-        int nstars=starx.length;
+        nstars=starx.length;
+        
+        stargeo=new Geometry[nstars];
+        
+        /* star material */
+        
+        Material smaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        smaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/Environment/smallstar.png"));
+        smaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        smaterial.getAdditionalRenderState().setDepthWrite(false);
 
-        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setTexture("ColorMap", assetManager.loadTexture("Textures/Environment/smallstar.png"));
-        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        material.getAdditionalRenderState().setDepthWrite(false);
-    
-        Random rgen=new Random(123);
+        /* finally, create stars */
+        
         for (i=0;i<nstars;i++)
         {
-            float s=rgen.nextFloat()*0.3f;
-            geometry=new Geometry("BackgroundStar"+i,new Quad(s,s));
-            geometry.setMaterial(material);
-            geometry.setLocalRotation(new Quaternion(angles));
-            geometry.setLocalTranslation(starx[i]*WIDTH/fd.FLUID_RES-WIDTH/2,-1,stary[i]*HEIGHT/fd.FLUID_RES-HEIGHT/2);
-            geometry.setQueueBucket(Bucket.Transparent);
-            this.attachChild(geometry);
+            stargeo[i]=new Geometry("BackgroundStar"+i,mesh);
+            stargeo[i].setMaterial(smaterial);
+            stargeo[i].setLocalRotation(new Quaternion(angles));
+            stargeo[i].setLocalTranslation(stary[i]*WIDTH/FluidDynamics.FLUID_RES-WIDTH/2,-0.5f,starx[i]*HEIGHT/FluidDynamics.FLUID_RES-HEIGHT/2);
+            stargeo[i].setQueueBucket(Bucket.Transparent);
+            this.attachChild(stargeo[i]);
         }
         
+    }
+    
+    public void update(float tpf)
+    {
+        /* animate the star field */
+        int i;
+        timeframe+=tpf;
+        
+        material.setVector2("Shift", new Vector2f(timeframe*0.01f,(float)Math.cos(timeframe*0.01f)));
+        
+        for(i=0;i<nstars;i++)
+        {
+            stargeo[i].setLocalScale( ((float)Math.cos(timeframe+(float)i)*0.5f+0.5f)*0.2f*((float)i/(float)nstars) );
+        }
     }
 }
