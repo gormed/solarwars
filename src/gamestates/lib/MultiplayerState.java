@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package gamestates.lib;
 
-import java.io.IOException;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -29,7 +28,6 @@ import com.jme3.math.Vector3f;
 
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
-import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Button;
 import gui.elements.Label;

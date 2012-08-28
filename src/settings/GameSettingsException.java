@@ -8,6 +8,8 @@ package settings;
  */
 public class GameSettingsException extends Exception {
 
+        private static final long serialVersionUID = 235;
+    
 	public GameSettingsException() {
 		// TODO Auto-generated constructor stub
 	}

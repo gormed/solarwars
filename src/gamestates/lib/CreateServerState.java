@@ -34,7 +34,6 @@ import com.jme3.network.Server;
 
 import gamestates.Gamestate;
 import gamestates.GamestateManager;
-import gui.Ergonomics;
 import gui.GameGUI;
 import gui.elements.Anchor;
 import gui.elements.Button;

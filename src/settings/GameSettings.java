@@ -36,7 +36,7 @@ public abstract class GameSettings implements Map<String, Object>, Cloneable {
 	 * @return 
 	 */
 	public AppSettings toAppSettings() {
-		return (AppSettings) this.settings;
+		return this.settings;
 	}
 	
 	/**
@@ -131,7 +131,7 @@ public abstract class GameSettings implements Map<String, Object>, Cloneable {
 	}
 	
 	protected SettingsSaver getSaver() throws GameSettingsException {
-		return (SettingsSaver) SettingsLoaderSaverFactory.getSaver( this.getLoaderSaverType() );
+		return SettingsLoaderSaverFactory.getSaver( this.getLoaderSaverType() );
 	}
 	
 	//==========================================================================
