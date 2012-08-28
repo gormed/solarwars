@@ -123,6 +123,5 @@ public class BasePlanet extends AbstractPlanet {
 
         geometry.setMaterial(material);
         transformNode.attachChild(geometry);
-        transformNode.setLocalScale(1.1f);
     }
 }

@@ -22,6 +22,7 @@
 package gui.elements;
 
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import gui.GameGUI;
@@ -32,38 +33,12 @@ import solarwars.Hub;
  */
 public class Percentage extends Label {
 
-    /** The value changed. */
-    private boolean valueChanged = false;
-    
     /** The percentage. */
     private int percentage = 50;
-    
     /** The background. */
     private final Panel background;
-    
     /** The background frame. */
     private final Panel backgroundFrame;
-//    private final Label frame;
-    /** The fade max. */
-private float fadeMax;
-    
-    /** The peek. */
-    private float peek;
-    
-    /** The fade current. */
-    private float fadeCurrent = 0;
-    
-    /** The Constant PEEK_DURATION. */
-    public static final float PEEK_DURATION = 1.5f;
-    
-    /** The Constant FADE_SPEED. */
-    public static final int FADE_SPEED = 400;
-    
-    /** The fadeing. */
-    private boolean fadeing = false;
-    
-    /** The fade direction. */
-    private boolean fadeDirection = true;
 
     /**
      * Instantiates a new percentage.
@@ -71,74 +46,42 @@ private float fadeMax;
      * @param gui the gui
      */
     public Percentage(GameGUI gui) {
-        super("Percentage: " + (int) (Hub.getLocalPlayer().getShipPercentage() * 100) + "%",
-                new Vector3f(
-                0,
-                0,
-                0),
+        super((int) (Hub.getLocalPlayer().getShipPercentage() * 100) + "%",
+                Vector3f.ZERO.clone(),
                 new Vector3f(0.7f, 0.7f, 1),
                 new ColorRGBA(1, 0.5f, 0, 0.7f), gui);
 
-        fadeMax = 1.02f * gui.getHeight();
-        fadeCurrent = 0.95f * gui.getHeight();
         this.setLocalTranslation(
-                gui.getWidth() / 2,
-                fadeCurrent,
+                gui.getWidth() - text.getLineWidth()*0.5f,
+                text.getHeight()*0.5f,
                 0);
-
-//        frame = new Label(title, screenPosition, scale.clone().multLocal(1.025f), new ColorRGBA(0, 0, 0, 0.5f), gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//                setCaption(text.getText());
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
         background = new Panel("Percentage_Back",
                 new Vector3f(
                 0,
-                0.1f * gui.getHeight(),
+                -text.getHeight()*0.475f,
                 0),
                 new Vector2f(
-                130,
-                text.getLineHeight() * 2.5f),
+                text.getLineWidth() * 2f,
+                text.getHeight() * 1.1f),
                 new ColorRGBA(0, 0, 1, 0.2f));
         backgroundFrame = new Panel("Percentage_Back",
                 new Vector3f(
                 0,
-                0.1f * gui.getHeight(),
+                -text.getHeight()*0.475f,
                 0),
                 new Vector2f(
-                135,
-                text.getLineHeight() * 2.6f),
-                new ColorRGBA(0, 0, 1, 0.2f));
-        detachChild(text);
+                text.getLineWidth() * 2f,
+                text.getHeight() * 1.0f),
+                new ColorRGBA(0, 0, 1, 0.5f));
 
+        float[] rotation = {0, 0, (float) Math.PI / 5};
+        background.setRotation(new Quaternion(rotation));
+        backgroundFrame.setRotation(new Quaternion(rotation));
+
+        detachChild(text);
         attachChild(background);
         attachChild(backgroundFrame);
-//        attachChild(frame);
         attachChild(text);
-//        font = FontLoader.getInstance().getFont("SolarWarsFont32");
-//        text = new BitmapText(font, false);
-//        text.setText();
-//        text.setColor(ColorRGBA.Orange);
-//        
-//        Vector3f scale = new Vector3f(0.5f, 0.5f, 1);
-//        Vector3f pos = new Vector3f(
-//                gui.getWidth()/2 - text.getLineWidth()/2, 
-//                gui.getHeight() - text.getLineHeight(), 
-//                0);
-//        pos.multLocal(scale);
-//        
-//        setLocalTranslation(pos);
-//        text.setLocalScale(scale);
-//        
-//        this.attachChild(text);
-//        
-//        setVisible(true);
     }
 
     /**
@@ -146,15 +89,8 @@ private float fadeMax;
      *
      * @return true, if successful
      */
-    private boolean refreshPercentage() {
-        int newPerc = (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
-        boolean changed = (percentage != newPerc);
-        if (changed) {
-            this.percentage = newPerc;
-
-            valueChanged = changed;
-        }
-        return changed;
+    private int refreshPercentage() {
+        return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
     }
 
     /* (non-Javadoc)
@@ -162,70 +98,18 @@ private float fadeMax;
      */
     @Override
     public void updateGUI(float tpf) {
-        boolean changed = refreshPercentage();
-        peek += tpf;
-
-        if (changed) {
-            startFadeIn();
-            peek = 0;
-        }
-
-        if (peek > PEEK_DURATION) {
-            startFadeOut();
-            peek = 0;
-        }
-
-        if (fadeing) {
-            if (fadeDirection) {
-                fadeCurrent -= tpf * FADE_SPEED;
-                this.setLocalTranslation(0.5f * gui.getWidth(), fadeCurrent, 0);
-                if (fadeCurrent <= 0.95f * gui.getHeight()) {
-                    fadeing = false;
-                    fadeCurrent = 0.95f * gui.getHeight();
-                    this.setLocalTranslation(0.5f * gui.getWidth(), fadeCurrent, 0);
-                }
-
-            } else {
-                fadeCurrent += tpf * FADE_SPEED;
-                this.setLocalTranslation(0.5f * gui.getWidth(), fadeCurrent, 0);
-                if (fadeCurrent >= fadeMax) {
-                    fadeing = false;
-                    fadeCurrent = fadeMax;
-                    this.setLocalTranslation(0.5f * gui.getWidth(), fadeCurrent, 0);
-                    setVisible(true);
-                }
-            }
-        } else {
-        }
+        percentage = refreshPercentage();
 
         background.updateGUI(tpf);
         backgroundFrame.updateGUI(tpf);
 //        frame.updateGUI(tpf);
 
-        text.setText("Percentage: " + percentage + "%");
+        text.setText(percentage + "%");
     }
 
-    /**
-     * Start fade in.
-     */
-    public void startFadeIn() {
-        setVisible(true);
-        fadeing = true;
-        fadeDirection = true;
-    }
-
-    /**
-     * Start fade out.
-     */
-    public void startFadeOut() {
-        //setVisible(true);
-        fadeing = true;
-        fadeDirection = false;
-    }
     /* (non-Javadoc)
      * @see gui.GUIElement#setVisible(boolean)
      */
-
     @Override
     public void setVisible(boolean show) {
         super.setVisible(show);

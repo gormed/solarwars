@@ -889,6 +889,7 @@ public class IsoControl {
      * The Class MarkerNode.
      */
     private class MarkerNode extends Node {
+        public static final float MARKER_PLANET_ADJUST = -0.1f;
 
         /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
@@ -971,13 +972,12 @@ public class IsoControl {
             Cylinder c = new Cylinder(
                     2,
                     15,
-                    1,
-                    0.1f,
+                    1, MARKER_PLANET_ADJUST,
                     true);
 
             rangeMaterial = new Material(assetManager,
                     "Common/MatDefs/Misc/Unshaded.j3md");
-            rangeMaterial.setColor("Color", new ColorRGBA(0.1f, 0.1f, 1, 0.1f));
+            rangeMaterial.setColor("Color", new ColorRGBA(MARKER_PLANET_ADJUST, MARKER_PLANET_ADJUST, 1, MARKER_PLANET_ADJUST));
             rangeMaterial.getAdditionalRenderState().
                     setBlendMode(BlendMode.Alpha);
             
@@ -989,7 +989,7 @@ rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
 
             rangeCylinder = new Geometry("CollisionCylinderGeometry", c);
 
-            rangeCylinder.setLocalTranslation(0, -0.1f + ((float) Math.random() * 0.1f), 0);
+            rangeCylinder.setLocalTranslation(0, -MARKER_PLANET_ADJUST + ((float) Math.random() * MARKER_PLANET_ADJUST), 0);
             rangeCylinder.setLocalRotation(new Quaternion(angles));
 
             rangeCylinder.setQueueBucket(Bucket.Transparent);
@@ -1038,7 +1038,7 @@ rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
                 running = 0;
             }
             // size
-            fadeScale = 0.05f * (float) Math.sin((double) running * SELECTION_ANIMATION_SPEED) + scale + 0.02f;
+            fadeScale = 0.05f * (float) Math.sin((double) running * SELECTION_ANIMATION_SPEED) + scale + MARKER_PLANET_ADJUST;
             markerGeometry.setLocalScale(fadeScale);
             markerGeometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
         }

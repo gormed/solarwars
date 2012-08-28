@@ -25,6 +25,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -39,6 +40,8 @@ public class Panel extends GUIElement {
 
     /** The screen position. */
     protected Vector3f screenPosition;
+    
+    protected Quaternion rotation = Quaternion.IDENTITY;
     /** The geometry. */
     protected Geometry geometry;
     /** The material. */
@@ -89,6 +92,7 @@ public class Panel extends GUIElement {
     @Override
     public void updateGUI(float tpf) {
         geometry.setLocalTranslation(screenPosition);
+        geometry.setLocalRotation(rotation);
         geometry.setLocalScale(size.x, size.y, 1);
     }
 
@@ -119,6 +123,10 @@ public class Panel extends GUIElement {
         return screenPosition;
     }
 
+    public void setScreenPosition(Vector3f screenPosition) {
+        this.screenPosition = screenPosition;
+    }
+
     /**
      * Gets the size.
      *
@@ -128,11 +136,15 @@ public class Panel extends GUIElement {
         return size;
     }
 
-    public void setScreenPosition(Vector3f screenPosition) {
-        this.screenPosition = screenPosition;
-    }
-
     public void setSize(Vector2f size) {
         this.size = size;
+    }
+
+    public Quaternion getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Quaternion rotation) {
+        this.rotation = rotation;
     }
 }
