@@ -48,16 +48,11 @@ public class MainmenuState extends Gamestate {
     private Label solarwars;
     /** The quit button. */
     private Button quitButton;
-    /** The game. */
-    private SolarWarsGame game;
-    
     /** The beat box. */
     private BeatBox beatBox;
-    /*
-     * 
-     */
     /** The tutorial button. */
     private Button tutorialButton;
+    private Button optionsButton;
 
     /**
      * Instantiates a new mainmenu state.
@@ -74,7 +69,6 @@ public class MainmenuState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        
     }
 
     /* (non-Javadoc)
@@ -112,7 +106,7 @@ public class MainmenuState extends Gamestate {
                 new Vector3f(gui.getWidth() / 2,
                 7 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,                                                                                                  
+                ColorRGBA.Cyan,
                 ColorRGBA.DarkGray, gui) {
 
             @Override
@@ -149,13 +143,38 @@ public class MainmenuState extends Gamestate {
             public void updateGUI(float tpf) {
             }
         };
-        
-        tutorialButton = new Button("Tutorial",
+
+        optionsButton = new Button("Options",
                 new Vector3f(gui.getWidth() / 2,
                 5 * gui.getHeight() / 10, 0),
                 Vector3f.UNIT_XYZ,
                 ColorRGBA.Cyan,
                 ColorRGBA.DarkGray, gui) {
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
+                    GamestateManager.getInstance().enterState(GamestateManager.OPTIONS_STATE);
+                }
+            }
+        };
+
+        tutorialButton = new Button(
+                "Tutorial",
+                new Vector3f(
+                gui.getWidth() / 2,
+                4 * gui.getHeight() / 10,
+                0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray,
+                gui) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -171,9 +190,16 @@ public class MainmenuState extends Gamestate {
             }
         };
 
-        quitButton = new Button("Quit Game", new Vector3f(gui.getWidth() / 2,
-                4 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Cyan, ColorRGBA.DarkGray, gui) {
+        quitButton = new Button(
+                "Quit Game",
+                new Vector3f(
+                gui.getWidth() / 2,
+                3 * gui.getHeight() / 10,
+                0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray,
+                gui) {
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
@@ -188,6 +214,7 @@ public class MainmenuState extends Gamestate {
         gui.addGUIElement(solarwars);
         gui.addGUIElement(singleplayerButton);
         gui.addGUIElement(multiplayerButton);
+        gui.addGUIElement(optionsButton);
         gui.addGUIElement(tutorialButton);
         gui.addGUIElement(quitButton);
 

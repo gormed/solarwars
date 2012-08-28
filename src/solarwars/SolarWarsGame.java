@@ -28,6 +28,7 @@ import gamestates.lib.CreateServerState;
 import gamestates.lib.MainmenuState;
 import gamestates.lib.MultiplayerMatchState;
 import gamestates.lib.MultiplayerState;
+import gamestates.lib.OptionsState;
 import gamestates.lib.ServerLobbyState;
 import gamestates.lib.SingleplayerState;
 import gamestates.lib.TutorialState;
@@ -133,6 +134,7 @@ public class SolarWarsGame {
         ServerLobbyState sls = new ServerLobbyState();
         MultiplayerMatchState mms = new MultiplayerMatchState();
         TutorialState ts = new TutorialState();
+        OptionsState os = new OptionsState();
         gamestateManager.addState(sp);
         gamestateManager.addState(mp);
         gamestateManager.addState(m);
@@ -140,6 +142,7 @@ public class SolarWarsGame {
         gamestateManager.addState(sls);
         gamestateManager.addState(mms);
         gamestateManager.addState(ts);
+        gamestateManager.addState(os);
         // init gamestate manager with mainmenu state
         gamestateManager.initialize(m);
         // start the game with the init state
