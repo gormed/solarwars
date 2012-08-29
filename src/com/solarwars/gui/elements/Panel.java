@@ -32,11 +32,12 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.solarwars.gui.GUIElement;
 import com.solarwars.SolarWarsApplication;
+import com.solarwars.gui.ClickableGUI;
 
 /**
  * The Class Panel.
  */
-public class Panel extends GUIElement {
+public class Panel extends GUIElement implements ClickableGUI {
 
     /** The screen position. */
     protected Vector3f screenPosition;
@@ -146,5 +147,14 @@ public class Panel extends GUIElement {
 
     public void setRotation(Quaternion rotation) {
         this.rotation = rotation;
+    }
+
+    @Override
+    public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+    }
+
+    @Override
+    public boolean canGainFocus() {
+        return false;
     }
 }

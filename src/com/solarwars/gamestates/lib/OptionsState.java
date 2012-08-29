@@ -30,6 +30,7 @@ import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
+import com.solarwars.gui.elements.CheckBox;
 import com.solarwars.gui.elements.Label;
 import com.solarwars.gui.elements.Panel;
 
@@ -51,6 +52,8 @@ public class OptionsState extends Gamestate {
     private Button back;
     /** The line. */
     private Panel line;
+    
+    private CheckBox box_test;
 
     /**
      * Instantiates a new tutorial state.
@@ -78,6 +81,7 @@ public class OptionsState extends Gamestate {
         gui.addGUIElement(optionsLabel);
         gui.addGUIElement(background);
         gui.addGUIElement(line);
+        gui.addGUIElement(box_test);
         gui.addGUIElement(back);
     }
 
@@ -86,7 +90,7 @@ public class OptionsState extends Gamestate {
                 "Options",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
                 new Vector3f(2, 2, 1),
-                ColorRGBA.White,
+                ColorRGBA.White.clone(),
                 gui) {
 
             private float time;
@@ -114,15 +118,26 @@ public class OptionsState extends Gamestate {
                 new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
                 new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
                 ColorRGBA.Blue.clone());
+        
         line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
                 new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
                 ColorRGBA.White.clone());
 
+        box_test = new CheckBox(
+                "Ckeck_Test",
+                new Vector3f(
+                        gui.getWidth() / 10, 
+                        7.0f * gui.getHeight() / 10, 
+                        0),
+                new Vector2f(24f, 24f), 
+                ColorRGBA.Blue.clone());
 
         back = new Button("Back",
                 new Vector3f(gui.getWidth() / 10, 1.0f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-                ColorRGBA.White, gui) {
+                Vector3f.UNIT_XYZ.clone(),
+                ColorRGBA.Orange.clone(),
+                ColorRGBA.White.clone(), 
+                gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -137,6 +152,8 @@ public class OptionsState extends Gamestate {
                 }
             }
         };
+        
+        
     }
 
     /* (non-Javadoc)

@@ -71,8 +71,8 @@ import jme3tools.optimize.GeometryBatchFactory;
  */
 public class IsoControl {
 
-    private static final boolean DEBUG_RAYCASTS = SolarWarsSettings.getInstance()
-    											  .isDEBUG_RAYCASTSEnabled();
+    private static final boolean DEBUG_RAYCASTS = 
+            SolarWarsSettings.getInstance().isDEBUG_RAYCASTSEnabled();
     //==========================================================================
     //      Singleton
     //==========================================================================
@@ -888,7 +888,7 @@ public class IsoControl {
      * The Class MarkerNode.
      */
     private class MarkerNode extends Node {
-        public static final float MARKER_PLANET_ADJUST = -0.1f;
+        public static final float MARKER_PLANET_ADJUST = -0.2f;
 
         /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
