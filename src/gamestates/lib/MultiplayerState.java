@@ -141,7 +141,6 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-            	System.out.println(caption);
             	SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
             }
         };
