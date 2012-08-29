@@ -85,7 +85,6 @@ public class IsoControl {
      * @param application the application
      */
     private IsoControl() {
-        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
         this.actionLib = ActionLib.getInstance();
         this.markerNode = new MarkerNode();
         initialize();

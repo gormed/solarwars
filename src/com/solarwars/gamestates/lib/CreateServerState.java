@@ -455,7 +455,6 @@ public class CreateServerState extends Gamestate
     	try { 
 			SolarWarsSettings.getInstance().save();
 		} catch (GameSettingsException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	

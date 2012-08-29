@@ -22,19 +22,15 @@
 package com.solarwars;
 
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -54,10 +50,9 @@ import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
 import com.solarwars.input.InputMappings;
+import com.solarwars.log.Logging;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.SolarWarsSettings;
-
-import java.io.File;
 
 /**
  * The Class SolarWarsApplication.
@@ -73,14 +68,12 @@ public class SolarWarsApplication extends Application {
      * @param args the arguments
      */
     public static void main(String[] args) {
-
         getInstance().start();
     }
     //==========================================================================
     //      Static Fields
     //==========================================================================
-    public static final boolean USE_LOG_FILES = SolarWarsSettings.getInstance().isFileLoggingEnabled();
-    public static final Level GLOBAL_LOGGING_LEVEL = SolarWarsSettings.getInstance().getGlobalLogLevel();
+
     public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
     /** Flag for Bloom-Effect */
     public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
@@ -133,35 +126,11 @@ public class SolarWarsApplication extends Application {
      */
     private SolarWarsApplication(boolean thisHasNoUse) {
         super();
-        try {
-            if (USE_LOG_FILES) {
-                File folder = new File("log/");
-                boolean folderCreated = folder.exists();
-                if (!folderCreated) {
-                    folderCreated = folder.mkdir();
-                }
-                if (folderCreated) {
-                    fileName = "log/" + new Date(System.currentTimeMillis()).toString();
-                    fileName = removeSpaces(fileName);
-
-                    logFileHandler = new FileHandler(fileName + ".swlog", true);
-                    logFileHandler.setLevel(GLOBAL_LOGGING_LEVEL);
-                    clientLogger.addHandler(logFileHandler);
-
-                }
-            }
-            clientLogger.setLevel(GLOBAL_LOGGING_LEVEL);
-            Logger.getLogger(SolarWarsApplication.class.getName()).setLevel(GLOBAL_LOGGING_LEVEL);
-
-        } catch (IOException ex) {
-            clientLogger.log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            clientLogger.log(Level.SEVERE, null, ex);
-        }
+        Logging.init();
+        initSettings();
         assetManager = JmeSystem.newAssetManager(
                 Thread.currentThread().getContextClassLoader().
                 getResource("com/jme3/asset/Desktop.cfg"));
-        initSettings();
     }
 
     /**
@@ -221,7 +190,6 @@ public class SolarWarsApplication extends Application {
     private float realTimePerFrame;
     private float correctedTimePerFrame;
     private FileHandler logFileHandler;
-    private String fileName;
     //==========================================================================
     //      Methods
     //==========================================================================
@@ -233,14 +201,6 @@ public class SolarWarsApplication extends Application {
      */
     public IsoCamera getIsoCam() {
         return isoCam;
-    }
-
-    /**
-     * Gets the name of the currently used log-file.
-     * @return 
-     */
-    public String getClientLogFileName() {
-        return fileName;
     }
 
     /**
@@ -436,10 +396,10 @@ public class SolarWarsApplication extends Application {
         game.initialize(this);
         game.start();
 
-        // Attach the logger of input to the client logger.
-        Logger inputLogger = Logger.getLogger(InputManager.class.getName());
-        inputLogger.setUseParentHandlers(true);
-        inputLogger.setParent(clientLogger);
+// 		  TODO: remove Attach the logger of input to the client logger.
+//        Logger inputLogger = Logger.getLogger(InputManager.class.getName());
+//        inputLogger.setUseParentHandlers(true);
+//        inputLogger.setParent(clientLogger);
     }
 
     /**
@@ -609,9 +569,9 @@ public class SolarWarsApplication extends Application {
             NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             clientLogger.log(Level.INFO, "Connections closed!");
         }
-        if (USE_LOG_FILES) {
-            logFileHandler.close();
-        }
+        //if (USE_LOG_FILES) {
+        //    logFileHandler.close();
+        //}
         super.destroy();
     }
 

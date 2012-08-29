@@ -54,8 +54,7 @@ public class SolarWarsGame {
      * Instantiates a new solar wars game.
      */
     private SolarWarsGame() {
-        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-        logger.setUseParentHandlers(true);
+    	
     }
 
     /**
