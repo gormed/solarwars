@@ -6,8 +6,12 @@ import java.io.InputStream;
 import settings.BaseSettingsLoader;
 import settings.GameSettings;
 import settings.GameSettingsException;
+import settings.SettingsLoader;
 
 public class JM3SettingsLoader extends BaseSettingsLoader {
+	/**
+	 * @see SettingsLoader
+	 */
 	@Override
 	public GameSettings load(GameSettings settings, InputStream in)
 			throws GameSettingsException {

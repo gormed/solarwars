@@ -2,8 +2,21 @@ package settings;
 
 
 /**
- * 
- * @author Yves
+ * Provide access for various Loader and Saver types.</b>
+ * A client can request a "Load/Saved" by specifying a Type.</b>
+ * The supported types are provided as class members. </b>
+ * Those class members begin with "TYPE_".</b>
+ * </br>
+ * You can request your own loader implementations, if you place them into </b>
+ * the package settings.loaderImpl and rename your loader implementations</b>
+ * so that they starts with her type identification and </b>
+ * ends with  "SettingsLoader".
+ * </br>
+ * It is the same procedure for the saver implementations only that</b>
+ * you have to place them into the package "settings.saverImpl"</b>
+ * and you have to rename her so that they ends with "SettingsSaver".</b>
+ * </b>
+ * @author fxdapokalypse
  */
 public class SettingsLoaderSaverFactory {
 	
@@ -17,30 +30,51 @@ public class SettingsLoaderSaverFactory {
 	private static final String SAVER_PACKAGE = "settings.saverImpl";
 	
 	/**
-	 * Type indicator for jmonkey settings saver and loader
+	 * Type identification for jmonkey settings saver and loader
 	 */
 	public static final String TYPE_JM3 = "JM3";
 	
 	/**
-	 * Type indicator for XML settings saver and loader
+	 * Type identification for XML settings saver and loader
 	 * 
-	 * Notice the type XML isn't yet implemented
 	 */
 	public static final String TYPE_XML = "XML";
 	
 	/**
-	 * Type indicator for Android settings saver and loader
+	 * Type identification for Android settings saver and loader
 	 * 
 	 * Notice the type Android isn't yet implemented
 	 */
 	public static final String TYPE_ANDROID = "DROID";
 	
 	
+	/**
+	 * Requests a SettingsLoader by a specified a type.
+	 * 
+	 * @param type 
+	 * 	SettingsLoaded type identification
+	 * @return 
+	 * 	the requested SettingsLoader
+	 * @throws GameSettingsException 
+	 *  If the specified type not exists or 
+	 *  the Instantiation of the Loader failed. 
+	 */
 	public static SettingsLoader getLoader(String type) throws GameSettingsException {
 		return (SettingsLoader) loadClass(LOADER_PACKAGE, type , SettingsLoader.class); 
 	
 	}
 	
+	/**
+	 * Requests a SettingsSaver by a specified a type.
+	 * 
+	 * @param type 
+	 * 	SettingsSaver type identification
+	 * @return 
+	 * 	the requested SettingsSaver
+	 * @throws GameSettingsException
+	 *  If the specified type not exists or 
+	 *  the Instantiation of the Saver failed. 
+	 */
 	public static SettingsSaver getSaver(String type) throws GameSettingsException {
 		return (SettingsSaver) loadClass(SAVER_PACKAGE, type , SettingsSaver.class);
 	}
@@ -70,8 +104,14 @@ public class SettingsLoaderSaverFactory {
 		return loaderSaverObject;
 	}
 	
+	/**
+	 * Simple Test routine.
+	 *  
+	 * @param args
+	 * @throws GameSettingsException
+	 */
 	public static void main(String[] args) throws GameSettingsException {
-		SettingsLoader jm3Loader = SettingsLoaderSaverFactory.getLoader(SettingsLoaderSaverFactory.TYPE_JM3);
+		SettingsLoader jm3Loader = SettingsLoaderSaverFactory.getLoader("");
 		if(jm3Loader != null) {
 			System.out.println(jm3Loader.getClass().getName());
 		}

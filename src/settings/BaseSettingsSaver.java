@@ -8,6 +8,16 @@ import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base class for a settings loader which provide
+ * a template implementation for a SettingLoader.
+ * 
+ * A subclass must only provides the method 
+ * load(GameSettings settings, OutputStrean out). 
+ * 
+ * @author fxdapokalyse
+ *
+ */
 public abstract class BaseSettingsSaver implements SettingsSaver {
 	
 	private static final File DEFAULT_CONFIGURATION  = new File("gameSettings.cfg");
@@ -27,7 +37,7 @@ public abstract class BaseSettingsSaver implements SettingsSaver {
 	}
 
 	@Override
-	public void save(GameSettings settings, File configurationFile)
+	public GameSettings save(GameSettings settings, File configurationFile)
 			throws GameSettingsException {
 		FileOutputStream os = null;
 		FileLock lock = null;
@@ -56,13 +66,13 @@ public abstract class BaseSettingsSaver implements SettingsSaver {
 				ex.printStackTrace();
 			}
 		}
+		return settings;
 
 	}
 
 	@Override
-	public void save(GameSettings settings) throws GameSettingsException {
-		save(settings, BaseSettingsSaver.DEFAULT_CONFIGURATION);
-
+	public GameSettings save(GameSettings settings) throws GameSettingsException {
+		return save(settings, BaseSettingsSaver.DEFAULT_CONFIGURATION);
 	}
 
 }

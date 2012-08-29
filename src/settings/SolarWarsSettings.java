@@ -46,7 +46,7 @@ public class SolarWarsSettings extends  GameSettings {
 		/**
 		 * Default Server address for multiplayer games
 		 */
-		public static final String FAVOURITE_SERVER = "";
+		public static final String FAVOURITE_SERVER = "network.favourite_server";
 		/**
 		 * The count of possible players for multiplayer game
 		 */
@@ -118,9 +118,9 @@ public class SolarWarsSettings extends  GameSettings {
 	public static final class Game {
 		public static final String SETTINGS_DIALOG_IMAGE = "SettingsDialogImage";
 		public static final String Title = "Title";
-		public static final String ENABLE_LOG_FILES = "USE_LOG_FILES";
-		public static final String LOG_LEVEL = "GLOBAL_LOGGING_LEVEL";
-		public static final String PLAYER_NAME = "game.playername";
+		public static final String ENABLE_LOG_FILES = "game.useLogFiles";
+		public static final String LOG_LEVEL = "game.globalLogLevel";
+		public static final String PLAYER_NAME = "game.playerName";
 		public static final String FAVOURITE_SEED = "game.seed";
 		
 	}
@@ -131,7 +131,7 @@ public class SolarWarsSettings extends  GameSettings {
 
 	public SolarWarsSettings(boolean loadDefaults, boolean loadFromDataSource) {
 		super();
-		this.setLoaderSaverType(SettingsLoaderSaverFactory.TYPE_JM3);
+		this.setLoaderSaverType(SettingsLoaderSaverFactory.TYPE_XML);
 		initialize(loadDefaults, loadFromDataSource);
 	}
 	
@@ -174,9 +174,7 @@ public class SolarWarsSettings extends  GameSettings {
         this.put(Game.ENABLE_LOG_FILES, true);
         this.put(Game.LOG_LEVEL, "ALL");
         this.put(Game.FAVOURITE_SEED, "42");
-        this.put(Game.PLAYER_NAME, "Player");
-        
-        
+        this.put(Game.PLAYER_NAME, "Player");   
 	}
 	/**
 	 * 
@@ -293,11 +291,11 @@ public class SolarWarsSettings extends  GameSettings {
 	}
 	
 	public void setSoundEnabled(boolean state) {
-		this.put( Audio.SOUNDS_ENABLED, state );
+		this.putBoolean( Audio.SOUNDS_ENABLED, state );
 	}
 	
 	public void setIpAddressFavouriteServer(String ipAddress) {
-		this.put(Network.FAVOURITE_SERVER, ipAddress);
+		this.putString(Network.FAVOURITE_SERVER, ipAddress);
 	}
 	
 	public String getIpAddressFavouriteServer() {

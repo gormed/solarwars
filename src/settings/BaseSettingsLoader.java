@@ -8,7 +8,18 @@ import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base class for a settings loader which provide
+ * a template implementation for a SettingLoader.
+ * 
+ *  A subclass must only provides the method 
+ *  load(GameSettings settings, InputStream in). 
+ * 
+ * @author fxdapokalyse
+ *
+ */
 public abstract class BaseSettingsLoader implements SettingsLoader {
+	
 	
 	private static final File DEFAULT_CONFIGURATION  = new File("gameSettings.cfg");
 	
@@ -21,10 +32,12 @@ public abstract class BaseSettingsLoader implements SettingsLoader {
 	}
 
 	@Override
-	public void getParam(String parameter) {
-		this.parameter.get(parameter);
+	public String getParam(String parameter) {
+		return this.parameter.get(parameter);
 
 	}
+	
+	
 	
 	@Override
 	public GameSettings load(GameSettings settings, File configurationFile)

@@ -121,8 +121,7 @@ public abstract class GameSettings implements Map<String, Object>, Cloneable {
 	 * @see SolarWarsSettings
 	 */
 	protected abstract void defineDefaultSettings (boolean loadDefaults);
-	
-	
+
 	protected  SettingsLoader getLoader() throws GameSettingsException {
 		return SettingsLoaderSaverFactory.getLoader( this.getLoaderSaverType() );
 	}

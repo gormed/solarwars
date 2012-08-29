@@ -44,6 +44,8 @@ public class MainmenuState extends Gamestate {
     private Button singleplayerButton;
     /** The multiplayer button. */
     private Button multiplayerButton;
+    /** The options button. */
+    private Button optionsButton;
     /** The solarwars. */
     private Label solarwars;
     /** The quit button. */
@@ -52,7 +54,7 @@ public class MainmenuState extends Gamestate {
     private BeatBox beatBox;
     /** The tutorial button. */
     private Button tutorialButton;
-    private Button optionsButton;
+;
 
     /**
      * Instantiates a new mainmenu state.
@@ -144,6 +146,7 @@ public class MainmenuState extends Gamestate {
             }
         };
 
+
         optionsButton = new Button("Options",
                 new Vector3f(gui.getWidth() / 2,
                 5 * gui.getHeight() / 10, 0),
@@ -181,6 +184,29 @@ public class MainmenuState extends Gamestate {
                 if (!isPressed) {
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
+                   // TODO: NIfty integration
+                }
+            }
+
+            @Override
+            public void updateGUI(float tpf) {
+            }
+        };
+        
+      
+        
+        tutorialButton = new Button("Tutorial",
+                new Vector3f(gui.getWidth() / 2,
+                4 * gui.getHeight() / 10, 0),
+                Vector3f.UNIT_XYZ,
+                ColorRGBA.Cyan,
+                ColorRGBA.DarkGray, gui) {
+
+            @Override
+            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+                if (!isPressed) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_CLICK);
                     GamestateManager.getInstance().enterState(GamestateManager.TUTORIAL_STATE);
                 }
             }
@@ -189,6 +215,7 @@ public class MainmenuState extends Gamestate {
             public void updateGUI(float tpf) {
             }
         };
+
 
         quitButton = new Button(
                 "Quit Game",
@@ -200,6 +227,7 @@ public class MainmenuState extends Gamestate {
                 ColorRGBA.Cyan,
                 ColorRGBA.DarkGray,
                 gui) {
+
 
             @Override
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
