@@ -32,7 +32,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
@@ -44,7 +43,6 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
-import com.solarwars.SolarWarsApplication;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.logic.PlayerState;
@@ -112,21 +110,6 @@ public class SolarWarsServer extends SimpleApplication {
         Serializer.registerClass(LevelActionMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
-
-        try {
-            if (SolarWarsApplication.USE_LOG_FILES) {
-                String fileName = SolarWarsApplication.getInstance().getClientLogFileName();
-
-                serverLogFileHandler = new FileHandler(fileName + ".swsvrlog", true);
-                serverLogFileHandler.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-                logger.addHandler(serverLogFileHandler);
-            }
-            logger.setLevel(Level.ALL);
-        } catch (IOException ex) {
-            Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
     }
     /** The game server. */
@@ -314,15 +297,10 @@ public class SolarWarsServer extends SimpleApplication {
      */
     @Override
     public void stop(boolean waitFor) {
-//        System.out.println("Closing server...");
+
         logger.info("Closing server...");
         long t1 = System.currentTimeMillis();
-
         super.stop(waitFor);
-        if (SolarWarsApplication.USE_LOG_FILES) {
-            serverLogFileHandler.close();
-        }
-
         long t2 = System.currentTimeMillis();
         final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
         logger.info(timeMsg);

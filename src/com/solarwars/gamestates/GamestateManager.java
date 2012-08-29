@@ -24,8 +24,6 @@ package com.solarwars.gamestates;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import com.solarwars.SolarWarsApplication;
-
 /**
  * The Class GamestateManager.
  */
@@ -86,9 +84,6 @@ public class GamestateManager {
      * Instantiates a new gamestate manager.
      */
     private GamestateManager() {
-        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-        logger.setUseParentHandlers(true);
-        logger.setParent(SolarWarsApplication.getClientLogger());
         gamestates = new HashMap<String, Gamestate>();
     }
 

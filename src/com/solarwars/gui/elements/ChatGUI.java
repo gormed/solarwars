@@ -231,7 +231,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
         chatInput.updateGUI(tpf);
 
         if (!chatLog.isEmpty()) {
-            int j = maxMessagesDisplayed - 1;
+			int j = maxMessagesDisplayed - 1;
 
             for (int i = 0; i < textLines.size(); i++) {
                 if (chatLog.size() - 1 < i) {

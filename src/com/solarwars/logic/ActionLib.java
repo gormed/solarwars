@@ -24,7 +24,6 @@ package com.solarwars.logic;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import com.solarwars.SolarWarsApplication;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
 
@@ -56,9 +55,7 @@ public class ActionLib {
      * Instantiates a new action lib.
      */
     private ActionLib() {
-        logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-        logger.setParent(SolarWarsApplication.getClientLogger());
-        logger.setUseParentHandlers(true);
+
         generalActions = new HashMap<String, GeneralAction>();
         planetActions = new HashMap<String, PlanetAction>();
         shipActions = new HashMap<String, ShipGroupAction>();

@@ -62,16 +62,8 @@ public class ShipBatchManager {
      */
     public ShipBatchManager(Level level) {
         level.getLevelNode().attachChild(shipBatchNode);
-        setupLogger();
     }
-
-    private void setupLogger() {
-        if (logger == null) {
-            logger.setLevel(SolarWarsApplication.GLOBAL_LOGGING_LEVEL);
-            logger.setUseParentHandlers(true);
-            logger.setParent(SolarWarsApplication.getClientLogger());
-        }
-    }
+   
 
     /**
      * Initializes the.

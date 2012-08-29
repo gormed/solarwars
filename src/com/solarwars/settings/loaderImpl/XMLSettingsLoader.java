@@ -25,7 +25,6 @@ import com.solarwars.settings.saverImpl.XMLSettingsSaver;
 public class XMLSettingsLoader extends BaseSettingsLoader {
 
 	public XMLSettingsLoader() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**
