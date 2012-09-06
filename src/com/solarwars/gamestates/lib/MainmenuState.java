@@ -21,18 +21,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.BeatBox;
 import com.solarwars.gui.elements.Button;
 import com.solarwars.gui.elements.Label;
-
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.Screen;
 
 /**
  * The Class MainmenuState.
@@ -55,16 +52,16 @@ public class MainmenuState extends Gamestate {
     private BeatBox beatBox;
     /** The tutorial button. */
     private Button tutorialButton;
-;
+
+    ;
 
     /**
      * Instantiates a new mainmenu state.
      *
      * @param game the game
      */
-    public MainmenuState(SolarWarsGame game) {
-        super(GamestateManager.MAINMENU_STATE);
-        this.game = game;
+    public MainmenuState() {
+        super(SolarWarsGame.MAINMENU_STATE);
     }
 
     /* (non-Javadoc)
@@ -78,175 +75,8 @@ public class MainmenuState extends Gamestate {
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame swgame) {
-        gui = GameGUI.getInstance();
-        solarwars = new Label("SOLARWARS", new Vector3f(gui.getWidth() / 2,
-                9 * gui.getHeight() / 10, 4), new Vector3f(2, 2, 1), ColorRGBA.White, gui) {
-
-            private float time;
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-
-                time += tpf;
-
-                if (time < 0.2f) {
-                    text.setText(title + "_");
-                } else if (time < 0.4f) {
-                    text.setText(title);
-                } else {
-                    time = 0;
-                }
-            }
-        };
-
-
-        singleplayerButton = new Button("Singleplayer",
-                new Vector3f(gui.getWidth() / 2,
-                7 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray, gui) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    startSingleplayer();
-                }
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-        };
-
-        multiplayerButton = new Button("Multiplayer",
-                new Vector3f(gui.getWidth() / 2,
-                6 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray, gui) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    startMultiplayer();
-                }
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-        };
-
-
-        optionsButton = new Button("Options",
-                new Vector3f(gui.getWidth() / 2,
-                5 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.OPTIONS_STATE);
-                }
-            }
-        };
-
-        tutorialButton = new Button(
-                "Tutorial",
-                new Vector3f(
-                gui.getWidth() / 2,
-                4 * gui.getHeight() / 10,
-                0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray,
-                gui) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                   // TODO: NIfty integration
-                }
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-        };
-        
-      
-        
-        tutorialButton = new Button("Tutorial",
-                new Vector3f(gui.getWidth() / 2,
-                4 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray, gui) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.TUTORIAL_STATE);
-                }
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-        };
-
-
-        quitButton = new Button(
-                "Quit Game",
-                new Vector3f(
-                gui.getWidth() / 2,
-                3 * gui.getHeight() / 10,
-                0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Cyan,
-                ColorRGBA.DarkGray,
-                gui) {
-
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                game.getApplication().stop();
-            }
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-        };
-
-        gui.addGUIElement(solarwars);
-        gui.addGUIElement(singleplayerButton);
-        gui.addGUIElement(multiplayerButton);
-        gui.addGUIElement(optionsButton);
-        gui.addGUIElement(tutorialButton);
-        gui.addGUIElement(quitButton);
-
+    protected void loadContent() {
+        niftyGUI.gotoScreen("mainmenu");
         beatBox = new BeatBox();
         beatBox.setupSounds();
         beatBox.play();
@@ -257,10 +87,6 @@ public class MainmenuState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-        gui.cleanUpGUI();
-
-        gui = null;
-
         beatBox.stop();
         beatBox = null;
     }
@@ -268,14 +94,44 @@ public class MainmenuState extends Gamestate {
     /**
      * Start singleplayer.
      */
-    private void startSingleplayer() {
-        GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
+    public void startSingleplayer() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        switchToState(SolarWarsGame.SINGLEPLAYER_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
     }
 
     /**
      * Start multiplayer.
      */
-    private void startMultiplayer() {
-        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+    public void startMultiplayer() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+    }
+
+    public void openOptions() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        switchToState(SolarWarsGame.OPTIONS_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.OPTIONS_STATE);
+    }
+
+    public void openTutorial() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        switchToState(SolarWarsGame.TUTORIAL_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.TUTORIAL_STATE);
+    }
+
+    public void quitGame() {
+        game.getApplication().stop();
+    }
+
+    @Override
+    public void bind(Nifty nifty, Screen screen) {
+        super.bind(nifty, screen);
+        
     }
 }

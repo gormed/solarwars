@@ -27,7 +27,6 @@ import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.ClickableGUI;
 import com.solarwars.gui.GUIElement;
 import com.solarwars.gui.GameGUI;
@@ -167,7 +166,7 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
                 if (!isPressed) {
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+//                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
                 }
             }
         };

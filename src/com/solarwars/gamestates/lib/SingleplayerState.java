@@ -21,78 +21,84 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-
-import com.jme3.input.controls.ActionListener;
+import com.jme3.app.Application;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.IsoControl;
+import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.GameOverGUI;
-import com.solarwars.gui.elements.PauseGUI;
-import com.solarwars.gui.elements.Percentage;
-import com.solarwars.gui.elements.ScoresGUI;
 import com.solarwars.input.InputMappings;
+import com.solarwars.input.PauseActionListener;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 /**
  * The Class SingleplayerState.
  */
 public class SingleplayerState extends Gamestate {
 
-    /** The application. */
-    private com.solarwars.SolarWarsApplication application;
-    /** The game. */
-    private com.solarwars.SolarWarsGame game;
     /** The current level. */
     private Level currentLevel;
-    /** The gui. */
-    private GameGUI gui;
-    /** The pause. */
-    private PauseGUI pause;
-    /** The tab scores. */
-    private ScoresGUI tabScores;
     /** The hub. */
     private Hub hub;
     /** The pause listener. */
     private PauseActionListener pauseListener;
-    private GameOverGUI gameOverGUI;
 
     /**
      * Instantiates a new singleplayer state.
      *
      * @param game the game
      */
-    public SingleplayerState(com.solarwars.SolarWarsGame game) {
-        super(GamestateManager.SINGLEPLAYER_STATE);
-        this.game = game;
-        this.application = this.game.getApplication();
+    public SingleplayerState() {
+        super(SolarWarsGame.SINGLEPLAYER_STATE);
+        hub = Hub.getInstance();
+    }
+
+    @Override
+    public void initialize(AppStateManager stateManager, Application app) {
+        super.initialize(stateManager, app);
+        // create pause listener
+        pauseListener = new PauseActionListener(niftyGUI);
+
     }
 
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#loadContent()
      */
     @Override
-    protected void loadContent(com.solarwars.SolarWarsGame game) {
-        gui = GameGUI.getInstance();
-        hub = Hub.getInstance();
+    protected void loadContent() {
+        // switch to singleplayer gui
+        niftyGUI.gotoScreen("singleplayer");
+        // setup game for singleplayer
         setupSingleplayer();
+        // attach iso control
         application.attachIsoCameraControl();
 
+        // Create Level and setup gameplay
         currentLevel = new Level(
                 application.getRootNode(),
                 application.getAssetManager(),
                 application.getIsoControl(),
-                gui, Hub.playersByID);
+                Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
-        //currentLevel.setupPlayers(Hub.playersByID);
-        setupGUI();
+
+        pauseListener.hidePopup();
+        // attach listener for pause layer
+        application.getInputManager().addListener(
+                pauseListener,
+                InputMappings.PAUSE_GAME);
+
+        // creates the drag-rect geometry
+        IsoControl.getInstance().createDragRectGeometry();
+
+        // play startup sound
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
     }
@@ -102,16 +108,12 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
+        //pause gui
         application.getInputManager().removeListener(pauseListener);
-        pauseListener = null;
-
-        hub = null;
-
+//        pauseListener = null;
+        //level
         currentLevel.destroy();
-        tabScores.destroy();
-        tabScores = null;
-        gui.cleanUpGUI();
-        gui = null;
+        //3d controls
         application.detachIsoCameraControl();
     }
 
@@ -120,8 +122,19 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
+        if (isEnabled()) {
+            currentLevel.updateLevel(tpf);
+            updateNifty();
+        }
+    }
 
-        currentLevel.updateLevel(tpf);
+    private void updateNifty() {
+        // find old text
+        Element niftyElement = niftyGUI.getCurrentScreen().
+                findElementByName("percentage");
+        // swap old with new text
+        niftyElement.getRenderer(TextRenderer.class).
+                setText(refreshPercentage() + "%");
     }
 
     /**
@@ -136,94 +149,15 @@ public class SingleplayerState extends Gamestate {
         hub.addPlayer(local);
     }
 
-    /**
-     * Setup gui.
-     */
-    private void setupGUI() {
-        //percentage label
-        gui.addGUIElement(new Percentage(gui));
-        // setup the pause menue function
-        createPauseGUI();
-        // init game over gui
-        gameOverGUI = GameOverGUI.getInstance();
-        gameOverGUI.hide();
-        // setup the tab-score menue function
-        createScoresGUI();
-        // creates the drag-rect geometry
-        IsoControl.getInstance().createDragRectGeometry();
+    public int refreshPercentage() {
+        return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
     }
 
-    private void createScoresGUI() {
-        // init scores panel
-        tabScores = new ScoresGUI(gui);
-
-        //tabScores.setVisible(false);
-        application.getInputManager().
-                addListener(
-                tabScores.getActionListener(),
-                InputMappings.GAME_SCORES);
+    public void continueGame() {
+        pauseListener.hidePopup();
     }
 
-    /**
-     * Creates the pause gui and its listeners.
-     */
-    private void createPauseGUI() {
-
-        pause = new PauseGUI(game, gui);
-        pauseListener = new PauseActionListener();
-        game.getApplication().getInputManager().addListener(
-                pauseListener,
-                InputMappings.PAUSE_GAME);
-    }
-
-    /**
-     * Load.
-     *
-     * @param seed the seed
-     */
-    public void load(long seed) {
-        currentLevel = new Level(
-                application.getRootNode(),
-                application.getAssetManager(),
-                application.getIsoControl(),
-                gui,
-                Hub.playersByID,
-                seed);
-    }
-
-    /**
-     * Save.
-     *
-     * @return the level
-     */
-    public Level save() {
-        return currentLevel;
-    }
-
-    /**
-     * The listener interface for receiving pauseAction events.
-     * The class that is interested in processing a pauseAction
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addPauseActionListener<code> method. When
-     * the pauseAction event occurs, that object's appropriate
-     * method is invoked.
-     *
-     * @see PauseActionEvent
-     */
-    private class PauseActionListener implements ActionListener {
-
-        /* (non-Javadoc)
-         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
-         */
-        @Override
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (isPressed) {
-                return;
-            }
-            if (name.equals(InputMappings.PAUSE_GAME)) {
-                pause.togglePause();
-            }
-        }
+    public void quitGame() {
+        switchToState(SolarWarsGame.MAINMENU_STATE);
     }
 }

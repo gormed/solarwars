@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars;
 
-
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -37,6 +36,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
 import com.jme3.post.filters.CartoonEdgeFilter;
@@ -53,6 +53,7 @@ import com.solarwars.input.InputMappings;
 import com.solarwars.log.Logging;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.Nifty;
 
 /**
  * The Class SolarWarsApplication.
@@ -73,10 +74,11 @@ public class SolarWarsApplication extends Application {
     //==========================================================================
     //      Static Fields
     //==========================================================================
-
     public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
     /** Flag for Bloom-Effect */
     public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
+    public static boolean NIFTY_LOGGING = false;
+    public static boolean NIFTY_USE_COLORED_PANELS = false;
     /** The logger for the complete client, called 'com.solarwars'*/
     private static final Logger clientLogger =
             Logger.getLogger(
@@ -152,6 +154,7 @@ public class SolarWarsApplication extends Application {
     protected float secondCounter = 0.0f;
     /** The frame counter. */
     protected int frameCounter = 0;
+    protected Nifty niftyGUI;
     /** The fps text. */
     protected BitmapText fpsText;
     /** The gui font. */
@@ -228,6 +231,10 @@ public class SolarWarsApplication extends Application {
      */
     public IsoControl getIsoControl() {
         return isoControl;
+    }
+
+    public Nifty getNiftyGUI() {
+        return niftyGUI;
     }
 
     /**
@@ -315,7 +322,8 @@ public class SolarWarsApplication extends Application {
      * Load stats view.
      */
     public void loadStatsView() {
-        statsView = new StatsView("Statistics View", assetManager, renderer.getStatistics());
+        statsView = new StatsView("Statistics View",
+                assetManager, renderer.getStatistics());
         // move it up so it appears above fps text
         statsView.setLocalTranslation(0, fpsText.getLineHeight(), 0);
         guiNode.attachChild(statsView);
@@ -372,20 +380,22 @@ public class SolarWarsApplication extends Application {
         // load up main scene
         viewPort.attachScene(rootNode);
         guiViewPort.attachScene(guiNode);
-
+        // init input mappings
         InputMappings.getInstance().initialize(inputManager);
-
         // add app action listener for mappings
         inputManager.addListener(actionListener,
                 InputMappings.EXIT_GAME,
                 InputMappings.DEBUG_CAMERA_POS,
                 InputMappings.DEBUG_MEMORY,
                 InputMappings.DEBUG_HIDE_STATS);
+        //setup nifty
+        setupNiftyGUI();
 
         // SETUP GAME CONTENT
         // hide stats
         setDisplayStatView(false);
         setDisplayFps(false);
+
         // setup lights
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
@@ -400,6 +410,21 @@ public class SolarWarsApplication extends Application {
 //        Logger inputLogger = Logger.getLogger(InputManager.class.getName());
 //        inputLogger.setUseParentHandlers(true);
 //        inputLogger.setParent(clientLogger);
+    }
+
+    private void setupNiftyGUI() {
+        NiftyJmeDisplay niftyJmeDisplay = new NiftyJmeDisplay(
+                assetManager,
+                inputManager,
+                audioRenderer,
+                viewPort);
+        niftyGUI = niftyJmeDisplay.getNifty();
+        guiViewPort.addProcessor(niftyJmeDisplay);
+        niftyGUI.setDebugOptionPanelColors(NIFTY_USE_COLORED_PANELS);
+        if (!NIFTY_LOGGING) {
+            Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
+            Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+        }
     }
 
     /**
@@ -465,9 +490,14 @@ public class SolarWarsApplication extends Application {
             tpf = 0;
             lostFocus = false;
         }
-
-//        tpf += (lastDelay + currentDelay) * timer.getTimePerFrame();
-
+        // Network delay fixing attempt
+        realTimePerFrame = tpf;
+        resetSync();
+        correctedTimePerFrame = 
+                tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
+        
+        tpf = correctedTimePerFrame;
+        
         //<editor-fold defaultstate="collapsed" desc="Frames Per Second and Ping Output">
         if (showFps) {
             secondCounter += timer.getTimePerFrame();
@@ -500,7 +530,10 @@ public class SolarWarsApplication extends Application {
         renderManager.render(tpf, context.isRenderable());
         simpleRender(renderManager);
         stateManager.postRender();
-
+        
+        // indicate that everything is done and current time can be recoreded
+        // for next step
+        endSync();
 
     }
 
@@ -520,11 +553,7 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleUpdate(float tpf) {
         try {
-            realTimePerFrame = tpf;
-            resetSync();
-            correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
-            game.update(correctedTimePerFrame);
-            endSync();
+
             if (isoCam != null && isoControl != null) {
                 isoControl.updateSelection(tpf);
                 if (isoCam.isDragged()) {

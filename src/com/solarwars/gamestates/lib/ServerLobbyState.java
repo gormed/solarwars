@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,7 +45,6 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
 import com.solarwars.gui.elements.Label;
@@ -59,7 +57,7 @@ import com.solarwars.net.NetworkManager.ClientConnectionState;
 import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
 import com.solarwars.net.messages.StartGameMessage;
-
+import com.solarwars.settings.SolarWarsSettings;
 
 /**
  * The Class ServerLobbyState.
@@ -117,43 +115,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private Thread connectorThread = null;
 
     /**
-     * Sets the client player color.
-     * 
-     * Input Methods, that set the inital point of the state until loadContent is called
-     *
-     * @param clientPlayerColor the new client player color
-     */
-    public void setClientPlayerColor(ColorRGBA clientPlayerColor) {
-        this.clientPlayerColor = clientPlayerColor;
-    }
-
-    /**
-     * Sets the server ip address.
-     * 
-     * Input Methods, that set the inital point of the state until loadContent is called
-     *
-     * @param serverIPAddress the new server ip address
-     */
-    public void setServerIPAddress(String serverIPAddress) {
-        this.serverIPAddress = serverIPAddress;
-    }
-
-    /**
-     * Sets the client player name.
-     * 
-     * Input Methods, that set the inital point of the state until loadContent is called
-     *
-     * @param clientPlayerName the new client player name
-     */
-    public void setClientPlayerName(String clientPlayerName) {
-        this.clientPlayerName = clientPlayerName;
-    }
-
-    /**
      * Instantiates a new server lobby state.
      */
     public ServerLobbyState() {
-        super(GamestateManager.SERVER_LOBBY_STATE);
+        super(SolarWarsGame.SERVER_LOBBY_STATE);
         this.application = SolarWarsApplication.getInstance();
     }
 
@@ -162,38 +127,40 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     public void update(float tpf) {
-        
-        if (clientState == ClientConnectionState.ERROR
-                || clientState == ClientConnectionState.DISCONNECTED) {
-            if (clientState == ClientConnectionState.ERROR) {
-                AudioManager.getInstance().
-                        playSoundInstance(AudioManager.SOUND_ERROR);
+        if (isEnabled()) {
+            if (clientState == ClientConnectionState.ERROR
+                    || clientState == ClientConnectionState.DISCONNECTED) {
+                if (clientState == ClientConnectionState.ERROR) {
+                    AudioManager.getInstance().
+                            playSoundInstance(AudioManager.SOUND_ERROR);
+                }
+                disconnect();
+                switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+//                GamestateManager.getInstance().
+//                        enterState(GamestateManager.MULTIPLAYER_STATE);
             }
-            disconnect();
-            GamestateManager.getInstance().
-                    enterState(GamestateManager.MULTIPLAYER_STATE);
-        }
-        if (clientState == ClientConnectionState.CONNECTED) {
-            networkManager.getChatModule().
-                    initialize(gui, networkManager);
-            serverName.setCaption(
-                    client.getGameName() + " ver." + client.getVersion()
-                    + " - "
-                    + networkManager.getServerIPAdress().getHostName());
+            if (clientState == ClientConnectionState.CONNECTED) {
+                networkManager.getChatModule().
+                        initialize(gui, networkManager);
+                serverName.setCaption(
+                        client.getGameName() + " ver." + client.getVersion()
+                        + " - "
+                        + networkManager.getServerIPAdress().getHostName());
 
-            float w = serverName.getText().getLineWidth();
-            float h = serverName.getText().getHeight();
-            serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
-            clientState = ClientConnectionState.JOINED;
+                float w = serverName.getText().getLineWidth();
+                float h = serverName.getText().getHeight();
+                serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
+                clientState = ClientConnectionState.JOINED;
+            }
+            if (gameStarted && clientState == ClientConnectionState.JOINED) {
+                startGame();
+                switchToState(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
+//                GamestateManager.getInstance().
+//                        enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+            } else {
+                refreshPlayers(refreshedPlayers);
+            }
         }
-        if (gameStarted && clientState == ClientConnectionState.JOINED) {
-            startGame();
-            GamestateManager.getInstance().
-                    enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
-        } else {
-            refreshPlayers(refreshedPlayers);
-        }
-
         //if (!client.isConnected())
     }
 
@@ -207,8 +174,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
                 SolarWarsApplication.getInstance().getIsoControl(),
-                gui,
-                Hub.playersByID, clientSeed);
+                        Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }
 
@@ -216,14 +182,17 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
         gui = GameGUI.getInstance();
         gameStarted = false;
         clientState = ClientConnectionState.CONNECTING;
         playersChanged = false;
         game.getApplication().setPauseOnLostFocus(false);
-
         networkManager = NetworkManager.getInstance();
+        
+        serverIPAddress = SolarWarsSettings.getInstance().getIpAddressFavouriteServer();
+        clientPlayerColor = ColorRGBA.Red.clone();
+        clientPlayerName = SolarWarsSettings.getInstance().getPlayerName();
 
         playerNamePos = new HashMap<Integer, Vector3f>();
         playerLabels = new HashMap<Integer, Label>();
@@ -396,7 +365,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
             gui.removeGUIElement(entry.getValue());
         }
-        
+
         this.networkManager = null;
         this.clientState = ClientConnectionState.DISCONNECTED;
         this.playerLabelIdx = null;

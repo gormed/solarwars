@@ -27,7 +27,6 @@ import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
 import com.solarwars.gui.elements.CheckBox;
@@ -59,7 +58,7 @@ public class OptionsState extends Gamestate {
      * Instantiates a new tutorial state.
      */
     public OptionsState() {
-        super(GamestateManager.OPTIONS_STATE);
+        super(SolarWarsGame.OPTIONS_STATE);
     }
 
     /* (non-Javadoc)
@@ -73,7 +72,7 @@ public class OptionsState extends Gamestate {
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
         gui = GameGUI.getInstance();
 
         createStateGUI();
@@ -148,7 +147,8 @@ public class OptionsState extends Gamestate {
                 if (!isPressed) {
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                    switchToState(SolarWarsGame.MAINMENU_STATE);
+//                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
                 }
             }
         };

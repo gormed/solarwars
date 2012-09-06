@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -53,7 +52,6 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Anchor;
 import com.solarwars.gui.elements.Button;
@@ -122,36 +120,10 @@ public class CreateServerState extends Gamestate
     private long serverSeed = 42;
 
     /**
-     * Sets the host player color.
-     * 
-     * Input Methods, that set the inital point of the state until loadContent
-     * is called
-     * 
-     * @param hostPlayerColor
-     *            the new host player color
-     */
-    public void setHostPlayerColor(ColorRGBA hostPlayerColor) {
-        this.hostPlayerColor = hostPlayerColor;
-    }
-
-    /**
-     * Sets the host player name.
-     * 
-     * Input Methods, that set the inital point of the state until loadContent
-     * is called
-     * 
-     * @param hostPlayerName
-     *            the new host player name
-     */
-    public void setHostPlayerName(String hostPlayerName) {
-        this.hostPlayerName = hostPlayerName;
-    }
-
-    /**
      * Instantiates a new CreateServerState.
      */
     public CreateServerState() {
-        super(GamestateManager.CREATE_SERVER_STATE);
+        super(SolarWarsGame.CREATE_SERVER_STATE);
         this.application = SolarWarsApplication.getInstance();
     }
 
@@ -162,19 +134,25 @@ public class CreateServerState extends Gamestate
      */
     @Override
     public void update(float tpf) {
-        if (!serverEstablished) {
-            cancelServer();
-        }
-        if (gameStarted) {
-            Server server = solarWarsServer.getGameServer();
-            server.removeMessageListener(serverMessageListener);
-            // server.removeConnectionListener(serverConnectionListener);
-            serverClient.removeMessageListener(clientMessageListener);
-            solarWarsServer.enterLevel();
-            startGame();
-            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        if (isEnabled()) {
+            if (!serverEstablished) {
+                cancelServer();
+            }
+            if (gameStarted) {
+                Server server = solarWarsServer.getGameServer();
+                server.removeMessageListener(serverMessageListener);
+                // server.removeConnectionListener(serverConnectionListener);
+                serverClient.removeMessageListener(clientMessageListener);
+                solarWarsServer.enterLevel();
+                startGame();
+                
+                switchToState(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
+//                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
+            } else {
+                refreshPlayers(refreshedPlayers);
+            }
         } else {
-            refreshPlayers(refreshedPlayers);
+            
         }
         // if (!leavingPlayers.isEmpty()) {
         // for (Player p : leavingPlayers) {
@@ -192,7 +170,7 @@ public class CreateServerState extends Gamestate
         com.solarwars.logic.Level mpLevel = new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getIsoControl(), gui,
+                SolarWarsApplication.getInstance().getIsoControl(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }
@@ -203,7 +181,7 @@ public class CreateServerState extends Gamestate
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
 
         gui = GameGUI.getInstance();
         gameStarted = false;
@@ -391,7 +369,7 @@ public class CreateServerState extends Gamestate
                 } catch (Exception e) {
                     caption = playerNumber + "";
                 } finally {
-                	  SolarWarsSettings.getInstance().setMaxPlayerNumber( playerNumber );
+                    SolarWarsSettings.getInstance().setMaxPlayerNumber(playerNumber);
                 }
             }
         };
@@ -451,13 +429,13 @@ public class CreateServerState extends Gamestate
      */
     @Override
     protected void unloadContent() {
-    	
-    	try { 
-			SolarWarsSettings.getInstance().save();
-		} catch (GameSettingsException e) {
-			e.printStackTrace();
-		}
-    	
+
+        try {
+            SolarWarsSettings.getInstance().save();
+        } catch (GameSettingsException e) {
+            e.printStackTrace();
+        }
+
         if (serverClient != null) {
             serverClient.removeMessageListener(clientMessageListener);
         }
@@ -483,9 +461,13 @@ public class CreateServerState extends Gamestate
     private void setupServer() {
         ServerHub.resetPlayerID(0);
         int id = ServerHub.getContiniousPlayerID();
+        
+        hostPlayerName = SolarWarsSettings.getInstance().getPlayerName();
+        hostPlayerColor = ColorRGBA.Blue.clone();
+        
         Player hostPlayer = new Player(hostPlayerName,
                 Player.PLAYER_COLORS[id], id, true);
-
+        
         serverHub.initialize(hostPlayer, null);
         // hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
@@ -596,7 +578,8 @@ public class CreateServerState extends Gamestate
                             ex});
             }
         }
-        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
     /**

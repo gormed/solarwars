@@ -29,7 +29,6 @@ import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
 import com.solarwars.gui.elements.Label;
@@ -62,7 +61,7 @@ public class TutorialState extends Gamestate {
      * Instantiates a new tutorial state.
      */
     public TutorialState() {
-        super(GamestateManager.TUTORIAL_STATE);
+        super(SolarWarsGame.TUTORIAL_STATE);
     }
 
     /* (non-Javadoc)
@@ -77,7 +76,7 @@ public class TutorialState extends Gamestate {
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
         gui = GameGUI.getInstance();
         tutorialLabel = new Label(
                 "Tutorial",
@@ -140,7 +139,8 @@ public class TutorialState extends Gamestate {
                 if (!isPressed) {
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                    switchToState(SolarWarsGame.MAINMENU_STATE);
+//                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
                 }
             }
         };

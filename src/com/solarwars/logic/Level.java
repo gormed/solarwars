@@ -48,7 +48,7 @@ import com.solarwars.entities.ShipBatchManager;
 import com.solarwars.entities.ShipGroup;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.GameOverGUI;
-
+import com.solarwars.net.NetworkManager;
 
 /**
  * The Class Level.
@@ -171,8 +171,6 @@ public class Level {
     private AssetManager assetManager;
     /** The control. */
     private IsoControl control;
-    /** The currently used game gui. */
-    private GameGUI gui;
     /** The players by id. */
     private HashMap<Integer, Player> playersByID;
     /** The batch manager. */
@@ -200,7 +198,9 @@ public class Level {
      */
     void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
-        MultiplayerGameplay.getInstance().removeGameplayListener();
+        if (NetworkManager.getInstance().isMultiplayerGame()) {
+            MultiplayerGameplay.getInstance().removeGameplayListener();
+        }
     }
 
     /**
@@ -241,8 +241,8 @@ public class Level {
      * @param gui the gui
      * @param players the players
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players) {
-        this.gui = gui;
+    public Level(Node rootNode, AssetManager assetManager, IsoControl control,
+            HashMap<Integer, Player> players) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, System.currentTimeMillis());
     }
@@ -257,8 +257,8 @@ public class Level {
      * @param players the players
      * @param seed the seed
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control, GameGUI gui, HashMap<Integer, Player> players, long seed) {
-        this.gui = gui;
+    public Level(Node rootNode, AssetManager assetManager,
+            IsoControl control, HashMap<Integer, Player> players, long seed) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, seed);
     }
@@ -459,10 +459,10 @@ public class Level {
 //            GameOverGUI.getInstance().display();
 //            return;
 //        }
-        
+
         // some code to reposition camera dependant on mouse position
         // added by roman
-        
+
         /*Vector2f cp=SolarWarsApplication.getInstance().getInputManager().getCursorPosition();
         Camera cam = SolarWarsApplication.getInstance().getCamera();
         Vector3f loc=cam.getLocation().clone();
@@ -470,9 +470,9 @@ public class Level {
         loc.z=(float)(cp.y-384)*0.002f-6.0f;
         cam.setLocation(loc);
         cam.lookAt(new Vector3f(0,-2.0f,0), new Vector3f(0,1,0));*/
-        
-        background.update(tpf);
-        
+
+//        background.update(tpf);
+
         DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
 
         if (Hub.getLocalPlayer().hasLost()) {
@@ -539,8 +539,6 @@ public class Level {
         this.rootNode = null;
         this.assetManager = null;
         this.control = null;
-        this.gui.cleanUpGUI();
-        this.gui = null;
     }
 
     /**
@@ -658,7 +656,7 @@ public class Level {
             level.labelNode = new Node("Planet Labels");
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
-            level.background = new LevelBackground(com.solarwars.SolarWarsGame.getInstance(),(int)seed);
+            level.background = new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
             level.rootNode.attachChild(background);
 
             AbstractPlanet p;
@@ -701,7 +699,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(),(int)seed);
+                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
             level.rootNode.attachChild(background);
 
 
@@ -763,7 +761,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(),(int)seed);
+                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
             level.rootNode.attachChild(background);
 
 
@@ -810,7 +808,7 @@ public class Level {
             // attach the labels on the root!
             level.rootNode.attachChild(labelNode);
             level.background =
-                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(),(int)seed);
+                    new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
             level.rootNode.attachChild(background);
 
 

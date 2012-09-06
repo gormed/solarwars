@@ -42,6 +42,7 @@ import com.solarwars.logic.Player;
  * The Class AbstractShip.
  */
 public abstract class AbstractShip extends Node {
+    public static final float SHIP_IMPACT_ADJUST = 0.00f;
 
     /** The SHI p_ size. */
     protected static float SHIP_SIZE = 0.2f;
@@ -189,14 +190,16 @@ public abstract class AbstractShip extends Node {
 
             Vector3f impactPos = order.position.clone();
             Vector3f offset = dir.clone();
-            offset.normalizeLocal().negateLocal().multLocal(order.getSize() + 0.05f);
+            offset.normalizeLocal().negateLocal().multLocal(order.getSize() + SHIP_IMPACT_ADJUST);
             impactPos.addLocal(offset);
 
             Vector3f impact = impactPos.clone();
             impact.subtractLocal(position);
 
             if (impact.length() < 0.1f || dir.length() < 0.01f) {
-
+                // TODO HANS predict ship position via time required for 
+                // distance at current ship-speed and fire event at given 
+                // max time automaticly!
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
                             this, 

@@ -21,16 +21,27 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
+import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.screen.ScreenController;
 
 /**
  * The Class Gamestate.
  */
-public abstract class Gamestate {
+public abstract class Gamestate extends AbstractAppState implements ScreenController {
 
     /** The name. */
     private String name;
     protected SolarWarsGame game;
+    protected Nifty niftyGUI;
+    protected Screen screen;
+    protected SolarWarsApplication application;
+    protected AppStateManager stateManager;
 
     /**
      * Instantiates a new gamestate.
@@ -39,6 +50,10 @@ public abstract class Gamestate {
      */
     public Gamestate(String name) {
         this.name = name;
+        this.game = SolarWarsGame.getInstance();
+        this.application = game.getApplication();
+        this.niftyGUI = application.getNiftyGUI();
+        this.stateManager = application.getStateManager();
     }
 
     /**
@@ -51,60 +66,82 @@ public abstract class Gamestate {
     }
 
     /**
+     * Inits the Gamestate with the apps state manager and the app itself.
+     * @param stateManager
+     * @param app 
+     */
+    @Override
+    public void initialize(AppStateManager stateManager, Application app) {
+        super.setEnabled(false);
+        super.initialize(stateManager, app);
+    }
+
+    /**
+     * Enables or disables this state. 
+     * There can be more than one state at a time!
+     * @param enabled true if state is updateing or false otherwise.
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (enabled) {
+            enter();
+        } else {
+            leave();
+        }
+    }
+
+    /**
      * Enter.
      */
-    void enter() {
-        game = SolarWarsGame.getInstance();
-        loadContent(game);
+    private void enter() {
+        loadContent();
     }
 
     /**
      * Leave.
      */
-    void leave() {
+    private void leave() {
         unloadContent();
     }
 
     /**
-     * Pause.
-     */
-    public void pause() {
-    }
-
-    /**
-     * Resume.
-     */
-    public void resume() {
-    }
-
-    /**
-     * Reset.
-     */
-    public void reset() {
-    }
-
-    /**
-     * Terminate.
-     */
-    public void terminate() {
-    }
-
-    /**
-     * Updates the.
-     *
-     * @param tpf the tpf
-     */
-    public abstract void update(float tpf);
-
-    /**
      * Load content.
      *
-     * @param game the game
+     * 
      */
-    protected abstract void loadContent(SolarWarsGame game);
+    protected abstract void loadContent();
 
     /**
      * Unload content.
      */
     protected abstract void unloadContent();
+
+    @Override
+    public void onEndScreen() {
+    }
+
+    @Override
+    public void onStartScreen() {
+    }
+
+    @Override
+    public void bind(Nifty nifty, Screen screen) {
+        this.screen = screen;
+    }
+
+//    @Override
+//    public void stateAttached(AppStateManager stateManager) {
+//        enter();
+//    }
+//
+//    @Override
+//    public void stateDetached(AppStateManager stateManager) {
+//        leave();
+//    }
+
+    public void switchToState(String name) {
+        setEnabled(false);
+        game.triggerGamestate(name, true);
+    }
 }

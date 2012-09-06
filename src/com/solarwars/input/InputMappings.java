@@ -91,10 +91,14 @@ public class InputMappings {
     public static final String PERCENT_DOWN = "SOLARWARS_WheelDown";
     public static final String KEY_COPY_V = "SOLARWARS_KEY_V";
 
+    
+    private boolean displayOSCursor = true;
     // ==========================================================================
     // === Methods
     // ==========================================================================
     public void initialize(InputManager inputManager) {
+        
+        inputManager.setCursorVisible(displayOSCursor);
         // Map interface clicking for ingame and GUI and Debugging
         inputManager.addMapping(InputMappings.LEFT_CLICK_SELECT,
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));

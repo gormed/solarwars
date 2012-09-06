@@ -21,10 +21,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars;
 
+import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
-import com.solarwars.gamestates.GamestateManager;
+import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.lib.CreateServerState;
+import com.solarwars.gamestates.lib.MainmenuState;
 import com.solarwars.gamestates.lib.MainmenuState;
 import com.solarwars.gamestates.lib.MultiplayerMatchState;
 import com.solarwars.gamestates.lib.MultiplayerState;
@@ -40,6 +42,7 @@ import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.GameplayException;
 import com.solarwars.logic.Level;
 import com.solarwars.net.NetworkManager;
+import java.util.HashMap;
 
 import java.util.logging.Logger;
 
@@ -48,13 +51,34 @@ import java.util.logging.Logger;
  */
 public class SolarWarsGame {
 
+    //==========================================================================
+    //      Gamestates
+    //==========================================================================
+    /** The Constant SINGLEPLAYER_STATE. */
+    public static final String SINGLEPLAYER_STATE = "Singleplayer";
+    /** The Constant MULTIPLAYER_STATE. */
+    public static final String MULTIPLAYER_STATE = "Multiplayer";
+    /** The Constant MAINMENU_STATE. */
+    public static final String MAINMENU_STATE = "Mainmenu";
+    /** The Constant OPTIONS_STATE. */
+    public static final String OPTIONS_STATE = "Options";
+    /** The Constant CREATE_SERVER_STATE. */
+    public static final String CREATE_SERVER_STATE = "Create Server";
+    /** The Constant SERVER_LOBBY_STATE. */
+    public static final String SERVER_LOBBY_STATE = "Server Lobby";
+    /** The Constant MULTIPLAYER_MATCH_STATE. */
+    public static final String MULTIPLAYER_MATCH_STATE = "Multiplayer Match";
+    /** The Constant TUTORIAL_STATE. */
+    public static final String TUTORIAL_STATE = "Tutorial";
+    //==========================================================================
+    //      Singleton
+    //==========================================================================
     private static SolarWarsGame instance;
 
     /**
      * Instantiates a new solar wars game.
      */
     private SolarWarsGame() {
-    	
     }
 
     /**
@@ -68,19 +92,12 @@ public class SolarWarsGame {
         }
         return instance = new SolarWarsGame();
     }
+    //==========================================================================
+    //      Fields
+    //==========================================================================
     /** The application. */
     private SolarWarsApplication application;
-
-    /**
-     * Gets the application.
-     *
-     * @return the application
-     */
-    public SolarWarsApplication getApplication() {
-        return application;
-    }
     private AssetManager assetManager;
-    private GamestateManager gamestateManager;
     private NetworkManager networkManager;
     private IsoControl isoControl;
     private InputManager inputManager;
@@ -89,8 +106,13 @@ public class SolarWarsGame {
     private AudioManager audioManager;
     private KeyInputManager keyInputManager;
     private GameGUI gameGUI;
+    private AppStateManager stateManager;
+    private HashMap<String, Gamestate> gamestates = new HashMap<String, Gamestate>();
     private static AbstractGameplay currentGameplay;
     private static final Logger logger = Logger.getLogger(SolarWarsGame.class.getName());
+    //==========================================================================
+    //      Methods
+    //==========================================================================
 
     /**
      * Initializes the.
@@ -99,14 +121,15 @@ public class SolarWarsGame {
      */
     public void initialize(SolarWarsApplication app) {
         application = app;
+
         assetManager = app.getAssetManager();
+        stateManager = app.getStateManager();
 
         isoControl = IsoControl.getInstance();
 
         audioManager = AudioManager.getInstance();
         audioManager.initialize();
 
-        gamestateManager = GamestateManager.getInstance();
         networkManager = NetworkManager.getInstance();
 
         actionLib = ActionLib.getInstance();
@@ -117,7 +140,7 @@ public class SolarWarsGame {
         fontLoader.initialize(assetManager);
         inputManager = app.getInputManager();
         keyInputManager = KeyInputManager.getInstance();
-        
+
         gameGUI = GameGUI.getInstance();
         logger.info("SolarWarsGame initialized!");
 
@@ -127,26 +150,53 @@ public class SolarWarsGame {
      * Starts the game, creates all gamestates and enters the first state.
      */
     public void start() {
-        MainmenuState m = new MainmenuState(this);
-        SingleplayerState sp = new SingleplayerState(this);
-        MultiplayerState mp = new MultiplayerState();
-        CreateServerState cs = new CreateServerState();
-        ServerLobbyState sls = new ServerLobbyState();
-        MultiplayerMatchState mms = new MultiplayerMatchState();
-        TutorialState ts = new TutorialState();
-        OptionsState os = new OptionsState();
-        gamestateManager.addState(sp);
-        gamestateManager.addState(mp);
-        gamestateManager.addState(m);
-        gamestateManager.addState(cs);
-        gamestateManager.addState(sls);
-        gamestateManager.addState(mms);
-        gamestateManager.addState(ts);
-        gamestateManager.addState(os);
-        // init gamestate manager with mainmenu state
-        gamestateManager.initialize(m);
-        // start the game with the init state
-        gamestateManager.start();
+        MainmenuState mainmenu = new MainmenuState();
+        SingleplayerState singleplayer = new SingleplayerState();
+        MultiplayerState multiplayer = new MultiplayerState();
+        CreateServerState createServerState = new CreateServerState();
+        ServerLobbyState serverLobbyState = new ServerLobbyState();
+        MultiplayerMatchState multiplayerMatchState = new MultiplayerMatchState();
+        TutorialState tutorialState = new TutorialState();
+        OptionsState optionsState = new OptionsState();
+
+//        mainmenu.initialize(stateManager, application);
+//        singleplayer.initialize(stateManager, application);
+//        multiplayer.initialize(stateManager, application);
+//        createServerState.initialize(stateManager, application);
+//        serverLobbyState.initialize(stateManager, application);
+//        multiplayerMatchState.initialize(stateManager, application);
+//        tutorialState.initialize(stateManager, application);
+//        optionsState.initialize(stateManager, application);
+
+        stateManager.attach(mainmenu);
+        stateManager.attach(singleplayer);
+        stateManager.attach(createServerState);
+        stateManager.attach(multiplayerMatchState);
+        stateManager.attach(multiplayer);
+        stateManager.attach(optionsState);
+        stateManager.attach(serverLobbyState);
+        stateManager.attach(tutorialState);
+
+        gamestates.put(MAINMENU_STATE, mainmenu);
+        gamestates.put(SINGLEPLAYER_STATE, singleplayer);
+        gamestates.put(MULTIPLAYER_STATE, multiplayer);
+        gamestates.put(CREATE_SERVER_STATE, createServerState);
+        gamestates.put(SERVER_LOBBY_STATE, serverLobbyState);
+        gamestates.put(MULTIPLAYER_MATCH_STATE, multiplayerMatchState);
+        gamestates.put(TUTORIAL_STATE, tutorialState);
+        gamestates.put(OPTIONS_STATE, optionsState);
+
+//        mainmenu.setEnabled(true);
+
+        application.getNiftyGUI().fromXml(
+                "Interface/Nifty/NiftyClientGUI.xml", "startup",
+                mainmenu, singleplayer, multiplayer, createServerState,
+                serverLobbyState, multiplayerMatchState, tutorialState,
+                optionsState);
+        
+//        attachGamestate(MAINMENU_STATE);
+        triggerGamestate(MAINMENU_STATE, true);
+
         logger.info("SolarWarsGame started!");
     }
 
@@ -154,7 +204,7 @@ public class SolarWarsGame {
      * Pause.
      */
     public void pause() {
-        gamestateManager.pause();
+//        gamestateManager.pause();
         logger.info("SolarWarsGame paused!");
     }
 
@@ -162,7 +212,7 @@ public class SolarWarsGame {
      * Resume.
      */
     public void resume() {
-        gamestateManager.resume();
+//        gamestateManager.resume();
         logger.info("SolarWarsGame resumed!");
     }
 
@@ -170,7 +220,7 @@ public class SolarWarsGame {
      * Reset.
      */
     public void reset() {
-        gamestateManager.reset();
+//        gamestateManager.reset();
         logger.info("SolarWarsGame reset!");
     }
 
@@ -178,7 +228,7 @@ public class SolarWarsGame {
      * Terminate.
      */
     public void terminate() {
-        gamestateManager.terminate();
+//        gamestateManager.terminate();
         logger.info("SolarWarsGame terminated!");
     }
 
@@ -187,7 +237,6 @@ public class SolarWarsGame {
      */
     void update(float timePerFrame) {
         gameGUI.updateGUIElements(timePerFrame);
-        gamestateManager.update(timePerFrame);
     }
 
     public static AbstractGameplay getCurrentGameplay() {
@@ -209,8 +258,59 @@ public class SolarWarsGame {
         } catch (GameplayException ex) {
             Logger.getLogger(SolarWarsGame.class.getName()).
                     log(java.util.logging.Level.SEVERE, null, ex);
-            gamestateManager.enterState(GamestateManager.MAINMENU_STATE);
             return null;
         }
+    }
+
+    /**
+     * Triggers a gamestate on or off.
+     * @param name the name of the gamestate to trigger on/off
+     * @param value the value for enable/disable, on = true & off = false
+     * @return true if everything went okay, false if gamestate wasnt found 
+     * in the SolarWarsGame.gamestates HashMap or in the stateManagers list
+     */
+    public boolean triggerGamestate(String name, boolean value) {
+        Gamestate gs = gamestates.get(name);
+        if (gs != null && stateManager.hasState(gs)) {
+            gs.setEnabled(value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+//    public boolean attachGamestate(String name) {
+//        Gamestate gs = gamestates.get(name);
+//        if (gs != null) {
+//            if (stateManager.hasState(gs)) {
+//                return false;
+//            } else {
+//                stateManager.attach(gs);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public boolean detachGamestate(String name) {
+//        Gamestate gs = gamestates.get(name);
+//        if (gs != null) {
+//            if (stateManager.hasState(gs)) {
+//                stateManager.detach(gs);
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
+
+    /**
+     * Gets the application.
+     *
+     * @return the application
+     */
+    public SolarWarsApplication getApplication() {
+        return application;
     }
 }

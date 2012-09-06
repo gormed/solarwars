@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -39,7 +38,6 @@ import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.GameOverGUI;
 import com.solarwars.gui.elements.PauseGUI;
@@ -74,7 +72,7 @@ public class MultiplayerMatchState extends Gamestate {
      * Instantiates a new multiplayer match state.
      */
     public MultiplayerMatchState() {
-        super(GamestateManager.MULTIPLAYER_MATCH_STATE);
+        super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
         this.application = SolarWarsApplication.getInstance();
 
     }
@@ -84,11 +82,15 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        if (!lostConnection) {
-            gameplay.update(tpf);
-            currentLevel.updateLevel(tpf);
-        } else if (lostConnection && !currentLevel.isGameOver()) {
-            GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+        if (isEnabled()) {
+            if (!lostConnection) {
+                gameplay.update(tpf);
+                currentLevel.updateLevel(tpf);
+            } else if (lostConnection && !currentLevel.isGameOver()) {
+                switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+//                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+            }
+        } else {
         }
     }
 
@@ -96,11 +98,10 @@ public class MultiplayerMatchState extends Gamestate {
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
         gui = GameGUI.getInstance();
         lostConnection = false;
         hub = Hub.getInstance();
-        this.game = game;
         application.setPauseOnLostFocus(false);
         client = NetworkManager.getInstance().getThisClient();
         client.addClientStateListener(playerStateListener);

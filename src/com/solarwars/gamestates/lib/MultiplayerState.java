@@ -21,14 +21,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gamestates.GamestateManager;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
 import com.solarwars.gui.elements.Label;
@@ -68,7 +66,7 @@ public class MultiplayerState extends Gamestate {
      * Instantiates a new multiplayer state.
      */
     public MultiplayerState() {
-        super(GamestateManager.MULTIPLAYER_STATE);
+        super(SolarWarsGame.MULTIPLAYER_STATE);
 
     }
 
@@ -77,14 +75,13 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        
     }
 
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @Override
-    protected void loadContent(SolarWarsGame game) {
+    protected void loadContent() {
         gui = GameGUI.getInstance();
         networkManager = NetworkManager.getInstance();
         playerName = new TextBox(
@@ -110,8 +107,8 @@ public class MultiplayerState extends Gamestate {
 
         joinServer = new Button("Join Sever",
                 new Vector3f(gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), 
-                ColorRGBA.Orange.clone(), 
+                Vector3f.UNIT_XYZ.clone(),
+                ColorRGBA.Orange.clone(),
                 ColorRGBA.White.clone(), gui) {
 
             @Override
@@ -131,7 +128,7 @@ public class MultiplayerState extends Gamestate {
         serverip = new TextBox(
                 ColorRGBA.Blue.clone(),
                 new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), 
+                Vector3f.UNIT_XYZ.clone(),
                 SolarWarsSettings.getInstance().getIpAddressFavouriteServer(),
                 ColorRGBA.White.clone(), gui, true) {
 
@@ -141,13 +138,13 @@ public class MultiplayerState extends Gamestate {
 
             @Override
             protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-            	SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
+                SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
             }
         };
 
         back = new Button("Back",
                 new Vector3f(gui.getWidth() / 2, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), 
+                Vector3f.UNIT_XYZ.clone(),
                 ColorRGBA.Orange.clone(),
                 ColorRGBA.White.clone(), gui) {
 
@@ -160,15 +157,16 @@ public class MultiplayerState extends Gamestate {
                 if (!isPressed) {
                     AudioManager.getInstance().
                             playSoundInstance(AudioManager.SOUND_CLICK);
-                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+                    switchToState(SolarWarsGame.MAINMENU_STATE);
+//                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
                 }
             }
         };
 
         createServer = new Button("Create Sever",
                 new Vector3f(3 * gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(), 
-                ColorRGBA.Orange.clone(), 
+                Vector3f.UNIT_XYZ.clone(),
+                ColorRGBA.Orange.clone(),
                 ColorRGBA.White.clone(), gui) {
 
             @Override
@@ -236,11 +234,11 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
-    	try {
-			SolarWarsSettings.getInstance().save();
-		} catch (GameSettingsException e) {
-			e.printStackTrace();
-		}
+        try {
+            SolarWarsSettings.getInstance().save();
+        } catch (GameSettingsException e) {
+            e.printStackTrace();
+        }
         gui.cleanUpGUI();
         gui = null;
     }
@@ -249,14 +247,8 @@ public class MultiplayerState extends Gamestate {
      * Creates the server.
      */
     private void createServer() {
-        GamestateManager gm = GamestateManager.getInstance();
-        Gamestate g = gm.getGamestate(GamestateManager.CREATE_SERVER_STATE);
-        if (g instanceof CreateServerState) {
-            CreateServerState cs = (CreateServerState) g;
-            cs.setHostPlayerName(playerName.getCaption());
-            cs.setHostPlayerColor(ColorRGBA.Blue.clone());
-        }
-        GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
+        switchToState(SolarWarsGame.CREATE_SERVER_STATE);
+//        GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
     }
 
     /**
@@ -267,17 +259,7 @@ public class MultiplayerState extends Gamestate {
         String ip = serverip.getCaption();
 
         if (NetworkManager.checkIP(ip)) {
-
-            GamestateManager gm = GamestateManager.getInstance();
-            Gamestate g = gm.getGamestate(GamestateManager.SERVER_LOBBY_STATE);
-            if (g instanceof ServerLobbyState) {
-                ServerLobbyState serverLobbyState = (ServerLobbyState) g;
-                serverLobbyState.setClientPlayerName(playerName.getCaption());
-                serverLobbyState.setClientPlayerColor(ColorRGBA.Red.clone());
-                serverLobbyState.setServerIPAddress(ip);
-
-                gm.enterState(GamestateManager.SERVER_LOBBY_STATE);
-            }
+            switchToState(SolarWarsGame.SERVER_LOBBY_STATE);
         } else {
             AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
             ip = NetworkManager.getInstance().getClientIPAdress().getHostAddress();
