@@ -24,7 +24,9 @@ package com.solarwars.input;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.InputListener;
+import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
 
 /**
@@ -51,6 +53,7 @@ public class PauseActionListener implements ActionListener {
     //===   Private Fields
     //==========================================================================
     private boolean paused = false;
+    private boolean fadeing = false;
     private Element pausePopup;
     private Nifty niftyGUI;
 
@@ -89,18 +92,72 @@ public class PauseActionListener implements ActionListener {
     }
 
     public void showPopup() {
+        if (paused || fadeing) {
+            return;
+        }
         if (pausePopup == null) {
             pausePopup = niftyGUI.createPopup("pause");
         }
         niftyGUI.showPopup(niftyGUI.getCurrentScreen(),
                 pausePopup.getId(), null);
+        fadeing = true;
         paused = true;
+        showElement(pausePopup, new EndNotify() {
+
+            @Override
+            public void perform() {
+                fadeing = false;
+            }
+        });
     }
 
     public void hidePopup() {
-        if (pausePopup != null) {
-            niftyGUI.closePopup(pausePopup.getId());
-            paused = false;
+        if (pausePopup != null && paused && !fadeing) {
+            fadeing = true;
+            hideElement(
+                    pausePopup,
+                    new EndNotify() {
+
+                        @Override
+                        public void perform() {
+                            niftyGUI.closePopup(pausePopup.getId());
+                            paused = false;
+                            fadeing = false;
+                        }
+                    });
+
         }
+    }
+
+    public void showElement(final Element element, final EndNotify... endNotify) {
+        element.showWithoutEffects();
+        element.startEffect(
+                EffectEventId.onCustom,
+                new EndNotify() {
+
+                    @Override
+                    public void perform() {
+                        for (EndNotify ed : endNotify) {
+                            ed.perform();
+                        }
+                    }
+                },
+                "in");
+    }
+
+    public void hideElement(final Element element, final EndNotify... endNotify) {
+        element.startEffect(
+                EffectEventId.onCustom,
+                new EndNotify() {
+
+                    @Override
+                    public void perform() {
+                        element.hideWithoutEffect();
+                        for (EndNotify ed : endNotify) {
+                            ed.perform();
+                        }
+                    }
+                },
+                "out");
     }
 }

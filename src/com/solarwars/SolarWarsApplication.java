@@ -77,8 +77,8 @@ public class SolarWarsApplication extends Application {
     public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
     /** Flag for Bloom-Effect */
     public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
-    public static boolean NIFTY_LOGGING = false;
-    public static boolean NIFTY_USE_COLORED_PANELS = false;
+    public static boolean NIFTY_LOGGING = true;
+    public static boolean NIFTY_USE_COLORED_PANELS = true;
     /** The logger for the complete client, called 'com.solarwars'*/
     private static final Logger clientLogger =
             Logger.getLogger(

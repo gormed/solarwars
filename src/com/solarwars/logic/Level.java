@@ -471,7 +471,7 @@ public class Level {
         cam.setLocation(loc);
         cam.lookAt(new Vector3f(0,-2.0f,0), new Vector3f(0,1,0));*/
 
-//        background.update(tpf);
+        background.update(tpf);
 
         DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
 

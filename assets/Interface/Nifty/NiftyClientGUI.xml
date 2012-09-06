@@ -3,42 +3,62 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd 
 http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
-<!--
-<useControls filename="nifty-default-controls.xml" />
-<useStyles filename="nifty-default-styles.xml" />
--->
+    <useControls filename="nifty-default-controls.xml" />
+    <useStyles filename="nifty-default-styles.xml" />
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- pause popup -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <popup id="pause" childLayout="center" backgroundColor="#000a">
-        <panel id="pause_panel" childLayout="vertical" height="30%" width="45%" align="left" valign="center" color="#00ff">
-            <panel id="solarwars_continue_panel_frame" align="right" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="40%" width="60%">
-                <panel id="solarwars_continue_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
-                    <interact onClick="continueGame()"/>
-                    <text id="continue_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" 
-                    text="continue" align="center" valign="center">
-                        <effect>
-                            <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                        </effect>
-                    </text>
-                        
-                </panel>
-            </panel>
-            <!-- SPACER -->
-            <panel id="spacer" align="center" backgroundColor="#0000" 
-            childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+    <popup id="pause" childLayout="center" backgroundColor="#0000" >
+        <effect>
+            <onCustom customKey="in" name="move" length="200" mode="in" 
+                direction="left" startDelay="0" inherit="true"/>
+            <onCustom customKey="out" name="move" length="200" mode="out" 
+                direction="left" startDelay="0" inherit="true"/>
+        </effect>
+        <panel id="pause_panel" childLayout="center" height="25%" width="40%" 
+        align="left" valign="center" backgroundColor="#fff8" padding="5px">
 
-            <panel id="solarwars_quit_panel_frame" align="right" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="40%" width="60%">
-                <panel id="solarwars_quit_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
-                    <interact onClick="quitGame()"/>
-                    <text id="quit_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" 
-                    text="quit" align="center" valign="center">
-                        <effect>
-                            <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                        </effect>
-                    </text>
+            <panel id="pause_panel_frame" childLayout="vertical" align="center" 
+            valign="center" color="#ffff" backgroundColor="#00f8" padding="10%">
+            <!-- SPACER -->
+                <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+            <!-- CONTINUE BUTTON -->
+                <panel id="pause_continue_panel_frame" align="right" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="40%" width="60%" padding="3px">
+                    <panel id="pause_continue_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
+                        <interact onClick="continueGame()"/>
+                        <text id="continue_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                        color="#ffff" text="continue" align="center" valign="center">
+                            <effect>
+                                <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
+                            </effect>
+                        </text>
                         
+                    </panel>
                 </panel>
+            <!-- SPACER -->
+                <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+            <!-- QUIT BUTTON -->
+                <panel id="pause_quit_panel_frame" align="right" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="40%" width="60%" padding="3px">
+                    <panel id="pause_quit_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
+                        <interact onClick="quitGame()"/>
+                        <text id="quit_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                        color="#ffff" text="quit" align="center" valign="center">
+                            <effect>
+                                <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
+                            </effect>
+                        </text>
+                        
+                    </panel>
+                </panel>
+                <!-- SPACER -->
+                <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
             </panel>
         </panel>
     </popup>
@@ -67,20 +87,26 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
             <panel id="solarwars_mainmenu_panel" align="center" backgroundColor="#0000" 
             childLayout="vertical" visibleToMouse="true" height="100%" width="80%">
                 <!-- HEADING -->
-                <panel id="solarwars_head_panel" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="20%" width="100%">
-                    <text id="solarwars_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="SolarWars_" align="center" valign="center" width="100%" height="100%">
+                <panel id="solarwars_head_panel" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="20%" width="100%">
+                    <text id="solarwars_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                    color="#ffff" text="SolarWars" align="center" valign="center" width="100%" height="100%">
                         <effect>
                             <onActive name="textSizePulsate" startSize="90%" endSize="100%"/>
                         </effect>
                     </text>
                 </panel>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
+                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" 
+                visibleToMouse="false" height="5%" width="60%"/>
                 <!-- MENU BUTTONS -->
-                <panel id="solarwars_singleplayer_panel_frame" align="center" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%">
-                    <panel id="solarwars_singleplayer_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
+                <panel id="solarwars_singleplayer_panel_frame" align="center" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                    <panel id="solarwars_singleplayer_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
                         <interact onClick="startSingleplayer()"/>
-                        <text id="singleplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="singleplayer" align="center" valign="center">
+                        <text id="singleplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                        color="#ffff" text="singleplayer" align="center" valign="center">
                             <effect>
                                 <onActive name="textSize" startSize="0.5" endSize="0.5" oneShot="true"/>
                             </effect>
@@ -88,9 +114,12 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                     </panel>
                 </panel>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
-                <panel id="solarwars_multiplayer_panel_frame" align="center" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%">
-                    <panel id="solarwars_multiplayer_panel_frame" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
+                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" 
+                visibleToMouse="false" height="5%" width="60%"/>
+                <panel id="solarwars_multiplayer_panel_frame" align="center" 
+                backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                    <panel id="solarwars_multiplayer_panel_frame" align="center" 
+                    backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="100%" width="100%">
                         <interact onClick="startMultiplayer()"/>
                         <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="multiplayer" align="center" valign="center">
                             <effect>
@@ -100,9 +129,12 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                     </panel>
                 </panel>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
-                <panel id="solarwars_options_panel_frame" align="center" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%">
-                    <panel id="solarwars_options_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
+                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" 
+                visibleToMouse="false" height="5%" width="60%"/>
+                <panel id="solarwars_options_panel_frame" align="center" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                    <panel id="solarwars_options_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
                         <interact onClick="openOptions()"/>
                         <text id="options_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="options" align="center" valign="center">
                             <effect>
@@ -112,9 +144,12 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                     </panel>
                 </panel>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
-                <panel id="solarwars_tutorial_panel_frame" align="center" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%">
-                    <panel id="solarwars_tutorial_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
+                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" 
+                visibleToMouse="false" height="5%" width="60%"/>
+                <panel id="solarwars_tutorial_panel_frame" align="center" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                    <panel id="solarwars_tutorial_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
                         <interact onClick="openTutorial()"/>
                         <text id="tutorial_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="tutorial" align="center" valign="center">
                             <effect>
@@ -124,9 +159,12 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                     </panel>
                 </panel>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
-                <panel id="solarwars_quit_panel_frame" align="center" backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%">
-                    <panel id="solarwars_quit_panel" align="center" backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="95%" width="98%">
+                <panel id="spacer" align="center" backgroundColor="#0000" childLayout="center" 
+                visibleToMouse="false" height="5%" width="60%"/>
+                <panel id="solarwars_quit_panel_frame" align="center" backgroundColor="#ffff" 
+                childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                    <panel id="solarwars_quit_panel" align="center" backgroundColor="#00ff" 
+                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
                         <interact onClick="quitGame()"/>
                         <text id="quit_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="quit" align="center" valign="center">
                             <effect>
@@ -164,15 +202,84 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                 backgroundColor="#fff8" childLayout="center" visibleToMouse="false">
                 <panel id="percentage_panel" height="95%" width="98%" align="right" valign="bottom" 
                 backgroundColor="#00f8" childLayout="center" visibleToMouse="false">
-                <!--
-                <control name="percentage" text="${CALL.refreshPercentage()}%" color="#f88f" />
-                -->
                     <text id="percentage" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                color="#f88f" text="${CALL.refreshPercentage()}%" align="center" valign="center"> 
+                    color="#f88f" text="${CALL.refreshPercentage()}%" align="center" valign="center"> 
                         <effect>
                             <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                         </effect>
                     </text>
+                </panel>
+            </panel>
+        </layer>
+    </screen>
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+<!-- multiplayer menu screen -->
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <screen id="multiplayer_menu" 
+    controller="com.solarwars.gamestates.lib.MultiplayerState">
+        <layer id="multiplayer_menu" backgroundColor="#0000" childLayout="center">
+            <panel id="multiplayer_menu_panel" height="95%" width="95%" 
+            align="left" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
+                <panel id="multiplayer_panel" align="center" backgroundColor="#00ff" 
+                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="10%">
+                <!-- HEADING -->
+                    <panel id="multiplayer_head_panel" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="20%" width="100%">
+                        <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                        color="#ffff" text="Multiplayer" align="center" valign="center">
+                            <effect>
+                                <onActive name="textSizePulsate" startSize="90%" endSize="100%"/>
+                            </effect>
+                        </text>
+                    </panel>
+                <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                    childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
+                <!-- HORIZONTAl -->
+                    <!-- PLAYER NAME -->
+                    <panel id="multiplayer_player_name_align_h" childLayout="horizontal" height="30%">
+                        <panel id="multiplayer_player_name_align_v" childLayout="vertical">
+                            <panel id="multiplayer_player_name_align_h" childLayout="horizontal">
+                                <!-- MENU BUTTONS 
+                                <panel id="solarwars_singleplayer_panel_frame" align="center" 
+                                backgroundColor="#ffff" childLayout="center" visibleToMouse="true" height="10%" width="60%" padding="3px">
+                                    <panel id="solarwars_singleplayer_panel" align="center" 
+                                    backgroundColor="#00ff" childLayout="center" visibleToMouse="true" height="100%" width="100%">
+                                        <interact onClick="startSingleplayer()"/>
+                                        <text id="singleplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" color="#ffff" text="singleplayer" align="center" valign="center">
+                                            <effect>
+                                                <onActive name="textSize" startSize="0.5" endSize="0.5" oneShot="true"/>
+                                            </effect>
+                                        </text>
+                                    </panel>
+                                </panel> -->
+                                <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                                color="#ffff" text="NAME" align="center" valign="center">
+                                    <effect>
+                                        <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
+                                    </effect>
+                                </text>
+                                <control id="player_name" name="textfield" maxLength="20" 
+                                text="${CALL.getPlayerName()}" align="center" valign="center" width="40%"/>
+                            </panel>
+                        </panel>
+                    </panel>
+                    
+                    <!-- SERVER IP CONNECT -->
+                    <panel id="multiplayer_join_server_align_h" childLayout="horizontal" height="30%">
+                        <panel id="multiplayer_join_server_align_v" childLayout="vertical" width="50%">
+                            <control id="ip_address" name="textfield" maxLength="15" 
+                                text="${CALL.getFavIPAddress()}" align="center" valign="center" width="40%"/>
+
+                            <panel id="multiplayer_join_server_align_h" childLayout="horizontal">
+                                <control id="join_server" name="button" label="JOIN SERVER" 
+                                align="center" valign="center" width="40%"/>
+                            </panel>
+                        </panel>
+                        <panel id="multiplayer_join_server_align_v" childLayout="vertical" width="50%">
+                            <control id="create_server" name="button" label="CREATE SERVER" 
+                            align="center" valign="center" width="40%"/>
+                        </panel>
+                    </panel>
                 </panel>
             </panel>
         </layer>

@@ -21,46 +21,48 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates.lib;
 
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
+import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.Button;
-import com.solarwars.gui.elements.Label;
-import com.solarwars.gui.elements.Panel;
-import com.solarwars.gui.elements.TextBox;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.ButtonClickedEvent;
+import de.lessvoid.nifty.controls.TextField;
+import de.lessvoid.nifty.controls.TextField;
+import de.lessvoid.nifty.controls.textfield.TextFieldControl;
+import de.lessvoid.nifty.controls.textfield.TextFieldLogic;
+import java.lang.Class;
+import java.util.logging.Level;
 
 /**
  * The Class MultiplayerState.
  */
 public class MultiplayerState extends Gamestate {
 
-    /** The multiplayer label. */
-    private Label multiplayerLabel;
-    /** The background panel. */
-    private Panel backgroundPanel;
-    /** The line. */
-    private Panel line;
-    /** The player name. */
-    private TextBox playerName;
-    /** The join server. */
-    private Button joinServer;
-    /** The create server. */
-    private Button createServer;
-    /** The back. */
-    private Button back;
-    /** The serverip. */
-    private TextBox serverip;
-    /** The gui. */
-    private GameGUI gui;
+//    /** The multiplayer label. */
+//    private Label multiplayerLabel;
+//    /** The background panel. */
+//    private Panel backgroundPanel;
+//    /** The line. */
+//    private Panel line;
+//    /** The player name. */
+//    private TextBox playerName;
+//    /** The join server. */
+//    private Button joinServer;
+//    /** The create server. */
+//    private Button createServer;
+//    /** The back. */
+//    private Button back;
+//    /** The serverip. */
+//    private TextBox serverip;
+//    /** The gui. */
+//    private GameGUI gui;
     /** The network manager. */
     private NetworkManager networkManager;
+    private String currentIPAddress = SolarWarsSettings.getInstance().getIpAddressFavouriteServer();
 
     /**
      * Instantiates a new multiplayer state.
@@ -82,151 +84,156 @@ public class MultiplayerState extends Gamestate {
      */
     @Override
     protected void loadContent() {
-        gui = GameGUI.getInstance();
+        // switch to multiplayer_menu gui
+        niftyGUI.gotoScreen("multiplayer_menu");
+        // init network manager
         networkManager = NetworkManager.getInstance();
-        playerName = new TextBox(
-                ColorRGBA.Blue.clone(),
-                new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                SolarWarsSettings.getInstance().getPlayerName(),
-                ColorRGBA.White.clone(),
-                gui, false) {
+//        playerName = new TextBox(
+//                ColorRGBA.Blue.clone(),
+//                new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ.clone(),
+//                SolarWarsSettings.getInstance().getPlayerName(),
+//                ColorRGBA.White.clone(),
+//                gui, false) {
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//
+//            @Override
+//            protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+//                if (caption.length() > 8) {
+//                    caption = caption.substring(0, caption.length() - 1);
+//                }
+//                SolarWarsSettings.getInstance().setPlayerName(caption);
+//            }
+//        };
+//
+//        joinServer = new Button("Join Sever",
+//                new Vector3f(gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ.clone(),
+//                ColorRGBA.Orange.clone(),
+//                ColorRGBA.White.clone(), gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().
+//                            playSoundInstance(AudioManager.SOUND_CLICK);
+//                    joinServer();
+//                }
+//            }
+//        };
+//
+//        serverip = new TextBox(
+//                ColorRGBA.Blue.clone(),
+//                new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ.clone(),
+//                SolarWarsSettings.getInstance().getIpAddressFavouriteServer(),
+//                ColorRGBA.White.clone(), gui, true) {
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//
+//            @Override
+//            protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
+//                SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
+//            }
+//        };
+//
+//        back = new Button("Back",
+//                new Vector3f(gui.getWidth() / 2, 1.5f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ.clone(),
+//                ColorRGBA.Orange.clone(),
+//                ColorRGBA.White.clone(), gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().
+//                            playSoundInstance(AudioManager.SOUND_CLICK);
+//                    switchToState(SolarWarsGame.MAINMENU_STATE);
+////                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
+//                }
+//            }
+//        };
+//
+//        createServer = new Button("Create Sever",
+//                new Vector3f(
+//                        3 * gui.getWidth() / 4f, 
+//                        5.5f * gui.getHeight() / 10, 
+//                        0),
+//                Vector3f.UNIT_XYZ.clone(),
+//                ColorRGBA.Orange.clone(),
+//                ColorRGBA.White.clone(), gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().
+//                            playSoundInstance(AudioManager.SOUND_CLICK);
+//                    createServer();
+//                }
+//            }
+//        };
+//
+//        multiplayerLabel = new Label(
+//                "MULTIPLAYER",
+//                new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
+//                new Vector3f(2, 2, 1),
+//                ColorRGBA.White.clone(), gui) {
+//
+//            private float time;
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//                time += tpf;
+//
+//                if (time < 0.2f) {
+//                    text.setText(title + "_");
+//                } else if (time < 0.4f) {
+//                    text.setText(title);
+//                } else {
+//                    time = 0;
+//                }
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        backgroundPanel = new Panel(
+//                "BackgroundPanel",
+//                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
+//                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
+//                ColorRGBA.Blue.clone());
+//
+//        line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
+//                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
+//                ColorRGBA.White.clone());
 
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-
-            @Override
-            protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-                if (caption.length() > 8) {
-                    caption = caption.substring(0, caption.length() - 1);
-                }
-                SolarWarsSettings.getInstance().setPlayerName(caption);
-            }
-        };
-
-        joinServer = new Button("Join Sever",
-                new Vector3f(gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                ColorRGBA.Orange.clone(),
-                ColorRGBA.White.clone(), gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    joinServer();
-                }
-            }
-        };
-
-        serverip = new TextBox(
-                ColorRGBA.Blue.clone(),
-                new Vector3f(gui.getWidth() / 4f, 4.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                SolarWarsSettings.getInstance().getIpAddressFavouriteServer(),
-                ColorRGBA.White.clone(), gui, true) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-
-            @Override
-            protected void onKeyTrigger(String key, boolean isPressed, float tpf) {
-                SolarWarsSettings.getInstance().setIpAddressFavouriteServer(caption);
-            }
-        };
-
-        back = new Button("Back",
-                new Vector3f(gui.getWidth() / 2, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                ColorRGBA.Orange.clone(),
-                ColorRGBA.White.clone(), gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    switchToState(SolarWarsGame.MAINMENU_STATE);
-//                    GamestateManager.getInstance().enterState(GamestateManager.MAINMENU_STATE);
-                }
-            }
-        };
-
-        createServer = new Button("Create Sever",
-                new Vector3f(3 * gui.getWidth() / 4f, 5.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                ColorRGBA.Orange.clone(),
-                ColorRGBA.White.clone(), gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    createServer();
-                }
-            }
-        };
-
-        multiplayerLabel = new Label(
-                "MULTIPLAYER",
-                new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
-                new Vector3f(2, 2, 1),
-                ColorRGBA.White.clone(), gui) {
-
-            private float time;
-
-            @Override
-            public void updateGUI(float tpf) {
-                time += tpf;
-
-                if (time < 0.2f) {
-                    text.setText(title + "_");
-                } else if (time < 0.4f) {
-                    text.setText(title);
-                } else {
-                    time = 0;
-                }
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        backgroundPanel = new Panel(
-                "BackgroundPanel",
-                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
-                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-                ColorRGBA.Blue.clone());
-
-        line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
-                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-                ColorRGBA.White.clone());
-
-        gui.addGUIElement(backgroundPanel);
-        gui.addGUIElement(line);
-        gui.addGUIElement(multiplayerLabel);
-        gui.addGUIElement(playerName);
-        gui.addGUIElement(joinServer);
-        gui.addGUIElement(createServer);
-        gui.addGUIElement(serverip);
-        gui.addGUIElement(back);
+//        gui.addGUIElement(backgroundPanel);
+//        gui.addGUIElement(line);
+//        gui.addGUIElement(multiplayerLabel);
+//        gui.addGUIElement(playerName);
+//        gui.addGUIElement(joinServer);
+//        gui.addGUIElement(createServer);
+//        gui.addGUIElement(serverip);
+//        gui.addGUIElement(back);
     }
 
     /* (non-Javadoc)
@@ -237,33 +244,54 @@ public class MultiplayerState extends Gamestate {
         try {
             SolarWarsSettings.getInstance().save();
         } catch (GameSettingsException e) {
-            e.printStackTrace();
+            SolarWarsApplication.getClientLogger().
+                    log(Level.WARNING, "{0} caused by {1}",
+                    new Object[]{e.getMessage(), e.getCause().getMessage()});
         }
-        gui.cleanUpGUI();
-        gui = null;
+//        gui.cleanUpGUI();
+//        gui = null;
+    }
+
+    public String getPlayerName() {
+        return SolarWarsSettings.getInstance().getPlayerName();
+    }
+
+    public String getFavIPAddress() {
+        return currentIPAddress = SolarWarsSettings.getInstance().getIpAddressFavouriteServer();
     }
 
     /**
      * Creates the server.
      */
-    private void createServer() {
+    @NiftyEventSubscriber(id = "create_server")
+    public void onCreateServerButton(final String id,
+            final ButtonClickedEvent event) {
         switchToState(SolarWarsGame.CREATE_SERVER_STATE);
 //        GamestateManager.getInstance().enterState(GamestateManager.CREATE_SERVER_STATE);
     }
 
+//    @NiftyEventSubscriber(id = "ip_address")
+//    public void ipAddressChanged(final String id, TextFieldChangedEvent event) {
+//        currentIPAddress = event.getText();
+//        SolarWarsSettings.getInstance().setIpAddressFavouriteServer(currentIPAddress);
+//    }
+
     /**
      * Join server.
      */
-    private void joinServer() {
-
-        String ip = serverip.getCaption();
+    @NiftyEventSubscriber(id = "join_server")
+    public void joinServer(final String id,
+            final ButtonClickedEvent event) {
+        TextField textBox = (TextField) niftyGUI.getCurrentScreen().
+                findNiftyControl("ip_address", TextField.class);
+        String ip = textBox.getText();
 
         if (NetworkManager.checkIP(ip)) {
             switchToState(SolarWarsGame.SERVER_LOBBY_STATE);
         } else {
             AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
             ip = NetworkManager.getInstance().getClientIPAdress().getHostAddress();
-            serverip.setCaption(ip);
+            textBox.setText(ip);
             SolarWarsSettings.getInstance().setIpAddressFavouriteServer(ip);
         }
     }
