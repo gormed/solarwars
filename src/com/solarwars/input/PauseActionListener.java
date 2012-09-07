@@ -96,7 +96,7 @@ public class PauseActionListener implements ActionListener {
             return;
         }
         if (pausePopup == null) {
-            pausePopup = niftyGUI.createPopup("pause");
+            pausePopup = niftyGUI.createPopup("pause_popup");
         }
         niftyGUI.showPopup(niftyGUI.getCurrentScreen(),
                 pausePopup.getId(), null);
