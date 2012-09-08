@@ -74,10 +74,11 @@ public class SolarWarsServer extends SimpleApplication {
         INGAME,
         CLOSED
     }
+    // TODO YVES Add this both to config
     /** The Constant SERVER_VERSION. */
-    public static final int SERVER_VERSION = 15;
+    public static int SERVER_VERSION = 2;
     /** The Constant SERVER_NAME. */
-    public static final String SERVER_NAME = "SolarWars Server";
+    public static String SERVER_NAME = "SolarWars Server";
     /** The server app. */
     private static SolarWarsServer serverApp;
 

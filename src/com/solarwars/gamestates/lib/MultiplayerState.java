@@ -33,9 +33,12 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -138,7 +141,7 @@ public class MultiplayerState extends Gamestate {
     private NetworkManager networkManager;
     private String currentIPAddress = SolarWarsSettings.getInstance().
             getIpAddressFavouriteServer();
-    private ListBox serverListBox;
+    private ListBox<SavedServerItem> serverListBox;
     private SavedServerItem localServer =
             new SavedServerItem("LOCAL", "127.0.0.1");
     private SavedServerItem lastServer =
@@ -177,8 +180,8 @@ public class MultiplayerState extends Gamestate {
 //            serverListBox.addItem(lastServer);
 //        }
         serverListBox.clear();
-        serverListBox.addItem(localServer.name + " - " + localServer.ip);
-        serverListBox.addItem(lastServer.name + " - " + lastServer.ip);
+        serverListBox.addItem(localServer);//.name + " - " + localServer.ip);
+        serverListBox.addItem(lastServer);//.name + " - " + lastServer.ip);
         // init network manager
         networkManager = NetworkManager.getInstance();
 //        playerName = new TextBox(
@@ -359,8 +362,12 @@ public class MultiplayerState extends Gamestate {
     @NiftyEventSubscriber(id = "add_new_server")
     public void onAddNewServerButton(final String id,
             final ButtonClickedEvent event) {
-        serverListBox.addItem(addServerPopup.getNewServerName()
-                + " - " + addServerPopup.getNewServerIP());
+        serverListBox.addItem(new SavedServerItem(
+                addServerPopup.getNewServerName(),
+                addServerPopup.getNewServerIP()));
+
+//        serverListBox.addItem(addServerPopup.getNewServerName()
+//                + " - " + addServerPopup.getNewServerIP());
         currentIPAddress = addServerPopup.getNewServerIP();
         addServerPopup.hidePopup();
     }
@@ -381,8 +388,8 @@ public class MultiplayerState extends Gamestate {
     public void onDeleteServerButton(final String id,
             final ButtonClickedEvent event) {
         Object s = serverListBox.getSelection().get(0);
-        if (s != null) {
-            serverListBox.removeItem(s);
+        if (s != null && s instanceof SavedServerItem) {
+            serverListBox.removeItem((SavedServerItem) s);
         }
     }
 
@@ -394,6 +401,35 @@ public class MultiplayerState extends Gamestate {
             final ButtonClickedEvent event) {
         addServerPopup.showPopup();
     }
+
+    @NiftyEventSubscriber(id = "saved_servers_box")
+    public void onListBoxSelectionChanged(final String id,
+            final ListBoxSelectionChangedEvent<SavedServerItem> event) {
+        List<SavedServerItem> selection = event.getSelection();
+
+        if (!selection.isEmpty() && selection.get(0) != null) {
+            currentIPAddress = selection.get(0).getIp();
+        }
+    }
+
+//    public void listBoxItemClicked() {
+//        SavedServerItem focus = serverListBox.getFocusItem();
+//        int idx = serverListBox.getFocusItemIndex();
+//        ArrayList<SavedServerItem> clone =
+//                new ArrayList<SavedServerItem>(serverListBox.getSelection());
+//        for (SavedServerItem item : clone) {
+//            serverListBox.deselectItem(item);
+//        }
+//        if (focus != null) {
+//            serverListBox.selectItemByIndex(idx);
+//        }
+//
+//        for (SavedServerItem item : clone) {
+//            if (!item.equals(focus)) {
+//                serverListBox.deselectItem(item);
+//            }
+//        }
+//    }
 
     /**
      * Creates the server.
@@ -410,13 +446,7 @@ public class MultiplayerState extends Gamestate {
     @NiftyEventSubscriber(id = "join_server")
     public void onJoinServerButton(final String id,
             final ButtonClickedEvent event) {
-        Object s = serverListBox.getSelection().get(0);
-        if (s == null) {
-            return;
-        }
-        String sel = (String) s;
-        String[] splitt = sel.split(" - ");
-        String ip = splitt[1];
+        String ip = currentIPAddress;
 
         if (NetworkManager.checkIP(ip)) {
             switchToState(SolarWarsGame.SERVER_LOBBY_STATE);

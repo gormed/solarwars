@@ -38,10 +38,7 @@ import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.GameOverGUI;
 import com.solarwars.gui.elements.PauseGUI;
-import com.solarwars.gui.elements.Percentage;
 import com.solarwars.gui.elements.ScoresGUI;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.Level;
@@ -54,11 +51,7 @@ import com.solarwars.net.NetworkManager;
 public class MultiplayerMatchState extends Gamestate {
 
     // GUI
-    private GameGUI gui;
-    private ScoresGUI tabScores;
-    private GameOverGUI gameOverGUI;
     private PauseActionListener pauseListener;
-    private PauseGUI pause;
     // Network and game
     private Hub hub;
     private Level currentLevel;
@@ -99,7 +92,7 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void loadContent() {
-        gui = GameGUI.getInstance();
+        niftyGUI.gotoScreen("singleplayer");
         lostConnection = false;
         hub = Hub.getInstance();
         application.setPauseOnLostFocus(false);
@@ -152,17 +145,14 @@ public class MultiplayerMatchState extends Gamestate {
                     new Object[]{ex.getMessage(), ex});
         }
 
-        GameOverGUI.getInstance().hide();
-        application.getInputManager().removeListener(pauseListener);
-        pauseListener = null;
+//        GameOverGUI.getInstance().hide();
+//        application.getInputManager().removeListener(pauseListener);
+//        pauseListener = null;
 
         hub = null;
 
         currentLevel.destroy();
-        tabScores.destroy();
-        tabScores = null;
-        gui.cleanUpGUI();
-        gui = null;
+
 
         if (client != null) {
             client.removeClientStateListener(playerStateListener);
@@ -178,42 +168,11 @@ public class MultiplayerMatchState extends Gamestate {
      * Setup gui.
      */
     private void setupGUI() {
-        //percentage label
-        gui.addGUIElement(new Percentage(gui));
-        // setup the pause menue function
-        createPauseGUI();
-        // init game over gui
-        gameOverGUI = GameOverGUI.getInstance();
-        gameOverGUI.hide();
-        // setup the tab-score menue function
-        createScoresGUI();
+
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
         // applys the chat gui from the last to the next state (this)
-        NetworkManager.getInstance().getChatModule().changeGUI(gui);
-    }
-
-    private void createScoresGUI() {
-        // init scores panel
-        tabScores = new ScoresGUI(gui);
-
-        //tabScores.setVisible(false);
-        application.getInputManager().
-                addListener(
-                tabScores.getActionListener(),
-                InputMappings.GAME_SCORES);
-    }
-
-    /**
-     * Creates the pause gui and its listeners.
-     */
-    private void createPauseGUI() {
-
-        pause = new PauseGUI(game, gui);
-        pauseListener = new PauseActionListener();
-        game.getApplication().getInputManager().addListener(
-                pauseListener,
-                InputMappings.PAUSE_GAME);
+//        NetworkManager.getInstance().getChatModule().changeGUI(gui);
     }
 
     /**
@@ -278,7 +237,7 @@ public class MultiplayerMatchState extends Gamestate {
                 return;
             }
             if (name.equals(InputMappings.PAUSE_GAME)) {
-                pause.togglePause();
+//                pause.togglePause();
             }
         }
     }

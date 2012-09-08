@@ -27,7 +27,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -38,8 +37,6 @@ import java.util.logging.Logger;
 
 
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
@@ -47,17 +44,10 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
-import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.Anchor;
-import com.solarwars.gui.elements.Button;
-import com.solarwars.gui.elements.Label;
-import com.solarwars.gui.elements.Panel;
-import com.solarwars.gui.elements.TextBox;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ClientRegisterListener;
@@ -72,6 +62,9 @@ import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.net.messages.StringMessage;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.ButtonClickedEvent;
+import java.util.Random;
 
 /**
  * The Class CreateServerState.
@@ -82,42 +75,31 @@ public class CreateServerState extends Gamestate
     public static final String SERVER_FULL_MSG = "Server is full!";
     public static final String SERVER_NOT_IN_LOBBY_MSG = "Server is locked! The game is probably running...";
     // GUI
-    private Label createServerLabel;
-    private Label yourIPLabel;
-    private Label addressLabel;
-    private Panel backgroundPanel;
-    private Panel linePanel;
-    private Panel playerPanel;
-    private Button cancelButton;
-    private Button startButton;
-    private Label maxPlayersLabel;
-    private TextBox playerCountBox;
-    private Label seedLabel;
-    private TextBox levelSeedBox;
-    private HashMap<Integer, Vector3f> playerNamePos;
-    private HashMap<Integer, Label> playerLabels;
-    private GameGUI gui;
-    // Game
-    private ServerHub serverHub;
-    private SolarWarsServer solarWarsServer;
-    private Client serverClient;
-    private Anchor playerLabelsNode;
-    private HashMap<Player, Integer> playerLabelIdx;
-    private HashMap<Integer, Player> refreshedPlayers;
     private int maxPlayerNumber = SolarWarsSettings.getInstance().getMaxPlayerNumber();
     private String hostPlayerName;
     private ColorRGBA hostPlayerColor;
-    private NetworkManager networkManager;
+    private HashMap<Integer, Player> refreshedPlayers;
+    private String seedString = SolarWarsSettings.getInstance().getSeed();
+    // Network
+    private ServerHub serverHub;
+    private NetworkManager networkManager = NetworkManager.getInstance();
+    private SolarWarsServer solarWarsServer;
+    private Client serverClient;
     private ClientMessageListener clientMessageListener = new ClientMessageListener();
     private ServerMessageListener serverMessageListener = new ServerMessageListener();
     private ClientConnectedListener clientConnectedListener = new ClientConnectedListener();
+    // Logic
     private boolean gameStarted = false;
     private boolean serverEstablished = false;
     private final SolarWarsApplication application;
     private long clientSeed;
     private boolean playersChanged;
-    private String seedString = SolarWarsSettings.getInstance().getSeed();
     private long serverSeed = 42;
+    private String hardSeed[] = {
+        "42", "23", "666", "ESEL", "1337", "QWERT",
+        "ASDF", ":D", ":-)", ":-P", "SOLARWARS",
+        "ALT-F4", "ALTERNATIVLOS", "DOUGLAS ADAMS", "MAGRATHEA", "ERDE",
+        "ALPHA CENTAURI", "PER ANHALTER INS ALL"};
 
     /**
      * Instantiates a new CreateServerState.
@@ -145,14 +127,13 @@ public class CreateServerState extends Gamestate
                 serverClient.removeMessageListener(clientMessageListener);
                 solarWarsServer.enterLevel();
                 startGame();
-                
+
                 switchToState(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
             } else {
                 refreshPlayers(refreshedPlayers);
             }
         } else {
-            
         }
         // if (!leavingPlayers.isEmpty()) {
         // for (Player p : leavingPlayers) {
@@ -183,241 +164,212 @@ public class CreateServerState extends Gamestate
     @Override
     protected void loadContent() {
 
-        gui = GameGUI.getInstance();
         gameStarted = false;
         game.getApplication().setPauseOnLostFocus(false);
-        networkManager = NetworkManager.getInstance();
         serverHub = ServerHub.getInstance();
-        playerNamePos = new HashMap<Integer, Vector3f>();
-        playerLabels = new HashMap<Integer, Label>();
-        playerLabelsNode = new Anchor();
-        playerLabelIdx = new HashMap<Player, Integer>();
-        // = new ArrayList<Player>();
         refreshedPlayers = new HashMap<Integer, Player>();
 
-
-        for (int i = 0; i < 8; i++) {
-            playerNamePos.put(i, new Vector3f(gui.getWidth() / 3,
-                    (6 - i * 0.5f) * gui.getHeight() / 10, 0));
-        }
-
-        createServerLabel = new Label("CREATE SERVER", new Vector3f(
-                gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4), new Vector3f(
-                2, 2, 1), ColorRGBA.White, gui) {
-
-            private float time;
-
-            @Override
-            public void updateGUI(float tpf) {
-                time += tpf;
-
-                if (time < 0.2f) {
-                    text.setText(title + "_");
-                } else if (time < 0.4f) {
-                    text.setText(title);
-                } else {
-                    time = 0;
-                }
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        backgroundPanel = new Panel("BackgroundPanel", new Vector3f(
-                gui.getWidth() / 2, gui.getHeight() / 2, 0), new Vector2f(
-                gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-                ColorRGBA.Blue);
-
-        linePanel = new Panel("Line", new Vector3f(gui.getWidth() / 2,
-                8 * gui.getHeight() / 10, 0), new Vector2f(
-                gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-                ColorRGBA.White);
-
-        cancelButton = new Button("Cancel", new Vector3f(gui.getWidth() / 4,
-                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-                ColorRGBA.Orange, ColorRGBA.White, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-                    cancelServer();
-                }
-            }
-        };
-
-        startButton = new Button("Start", new Vector3f(3 * gui.getWidth() / 4,
-                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-                ColorRGBA.Orange, ColorRGBA.White, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-                    startServer();
-                }
-            }
-        };
-
-        yourIPLabel = new Label("Your IP:", new Vector3f(gui.getWidth() / 2,
-                1.75f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-                ColorRGBA.White, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        seedLabel = new Label("Seed", new Vector3f(gui.getWidth() / 8,
-                7f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-                ColorRGBA.Orange, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        levelSeedBox = new TextBox(ColorRGBA.Blue, new Vector3f(
-                4.0f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, new Vector2f(gui.getWidth() / 6, 30),
-                SolarWarsSettings.getInstance().getSeed(), ColorRGBA.White, gui, false) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-
-            @Override
-            protected void onKeyTrigger(String key, boolean isPressed,
-                    float tpf) {
-                char[] chars = caption.toCharArray();
-                try {
-                    serverSeed = 0;
-                    for (Character c : chars) {
-                        serverSeed += c.hashCode();
-                    }
-                } catch (Exception e) {
-                    caption = serverSeed + "";
-                }
-
-                SolarWarsSettings.getInstance().setSeed(caption);
-            }
-        };
-
-        maxPlayersLabel = new Label("Players", new Vector3f(
-                7 * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        playerCountBox = new TextBox(ColorRGBA.Blue, new Vector3f(
-                8.5f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, new Vector2f(40, 30),
-                SolarWarsSettings.getInstance().getMaxPlayerNumber() + "", ColorRGBA.White,
-                gui, true) {
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-
-            @Override
-            protected void onKeyTrigger(String key, boolean isPressed,
-                    float tpf) {
-                int players = 0;
-                try {
-                    players = Integer.parseInt(caption);
-                } catch (NumberFormatException e) {
-                    caption = "";
-                }
-                if (players < 2 || players > 8) {
-                    caption = "";
-                } else {
-                    maxPlayerNumber = players;
-                }
-
-                int playerNumber = 2;
-                try {
-                    if (caption.equals("")) {
-                        playerNumber = 8;
-                    } else {
-                        playerNumber = Integer.parseInt(caption);
-                    }
-                } catch (Exception e) {
-                    caption = playerNumber + "";
-                } finally {
-                    SolarWarsSettings.getInstance().setMaxPlayerNumber(playerNumber);
-                }
-            }
-        };
-
-        playerPanel = new Panel("BackgroundPanel", new Vector3f(
-                gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
-                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
-                ColorRGBA.White);
-
+        niftyGUI.gotoScreen("create_server");
         // =========================================
         // SETUP SERVER
         // =========================================
         setupServer();
+//        networkManager.getChatModule().initialize(gui, networkManager);
 
-        addressLabel = new Label(
-                networkManager.getServerIPAdress().getHostAddress(),
-                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10,
-                0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
+//        createServerLabel = new Label("CREATE SERVER", new Vector3f(
+//                gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4), new Vector3f(
+//                2, 2, 1), ColorRGBA.White, gui) {
+//
+//            private float time;
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//                time += tpf;
+//
+//                if (time < 0.2f) {
+//                    text.setText(title + "_");
+//                } else if (time < 0.4f) {
+//                    text.setText(title);
+//                } else {
+//                    time = 0;
+//                }
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        backgroundPanel = new Panel("BackgroundPanel", new Vector3f(
+//                gui.getWidth() / 2, gui.getHeight() / 2, 0), new Vector2f(
+//                gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
+//                ColorRGBA.Blue);
+//
+//        linePanel = new Panel("Line", new Vector3f(gui.getWidth() / 2,
+//                8 * gui.getHeight() / 10, 0), new Vector2f(
+//                gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
+//                ColorRGBA.White);
+//
+//        cancelButton = new Button("Cancel", new Vector3f(gui.getWidth() / 4,
+//                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
+//                ColorRGBA.Orange, ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+//                    cancelServer();
+//                }
+//            }
+//        };
+//
+//        startButton = new Button("Start", new Vector3f(3 * gui.getWidth() / 4,
+//                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
+//                ColorRGBA.Orange, ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+//                    startServer();
+//                }
+//            }
+//        };
+//
+//        yourIPLabel = new Label("Your IP:", new Vector3f(gui.getWidth() / 2,
+//                1.75f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
+//                ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        seedLabel = new Label("Seed", new Vector3f(gui.getWidth() / 8,
+//                7f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
+//                ColorRGBA.Orange, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        levelSeedBox = new TextBox(ColorRGBA.Blue, new Vector3f(
+//                4.0f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ, new Vector2f(gui.getWidth() / 6, 30),
+//                SolarWarsSettings.getInstance().getSeed(), ColorRGBA.White, gui, false) {
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//
+//            @Override
+//            protected void onKeyTrigger(String key, boolean isPressed,
+//                    float tpf) {
+//                char[] chars = caption.toCharArray();
+//                try {
+//                    serverSeed = 0;
+//                    for (Character c : chars) {
+//                        serverSeed += c.hashCode();
+//                    }
+//                } catch (Exception e) {
+//                    caption = serverSeed + "";
+//                }
+//
+//                SolarWarsSettings.getInstance().setSeed(caption);
+//            }
+//        };
+//
+//        maxPlayersLabel = new Label("Players", new Vector3f(
+//                7 * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ, ColorRGBA.Orange, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        playerCountBox = new TextBox(ColorRGBA.Blue, new Vector3f(
+//                8.5f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ, new Vector2f(40, 30),
+//                SolarWarsSettings.getInstance().getMaxPlayerNumber() + "", ColorRGBA.White,
+//                gui, true) {
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//
+//            @Override
+//            protected void onKeyTrigger(String key, boolean isPressed,
+//                    float tpf) {
+//                int players = 0;
+//                try {
+//                    players = Integer.parseInt(caption);
+//                } catch (NumberFormatException e) {
+//                    caption = "";
+//                }
+//                if (players < 2 || players > 8) {
+//                    caption = "";
+//                } else {
+//                    maxPlayerNumber = players;
+//                }
+//
+//                int playerNumber = 2;
+//                try {
+//                    if (caption.equals("")) {
+//                        playerNumber = 8;
+//                    } else {
+//                        playerNumber = Integer.parseInt(caption);
+//                    }
+//                } catch (Exception e) {
+//                    caption = playerNumber + "";
+//                } finally {
+//                    SolarWarsSettings.getInstance().setMaxPlayerNumber(playerNumber);
+//                }
+//            }
+//        };
+//
+//        playerPanel = new Panel("BackgroundPanel", new Vector3f(
+//                gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
+//                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
+//                ColorRGBA.White);
+//
 
-            @Override
-            public void updateGUI(float tpf) {
-            }
+//
+//        addressLabel = new Label(
+//                networkManager.getServerIPAdress().getHostAddress(),
+//                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10,
+//                0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
 
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        // addConnectedPlayer(Hub.getHostPlayer());
-
-        // chatGUI = new ChatGUI(gui);
-        // chatGUI.setVisible(true);
-
-
-        gui.addGUIElement(backgroundPanel);
-        gui.addGUIElement(linePanel);
-        gui.addGUIElement(createServerLabel);
-        gui.addGUIElement(cancelButton);
-        gui.addGUIElement(playerCountBox);
-        gui.addGUIElement(playerPanel);
-        gui.addGUIElement(playerLabelsNode);
-        gui.addGUIElement(yourIPLabel);
-        gui.addGUIElement(addressLabel);
-        gui.addGUIElement(startButton);
-        gui.addGUIElement(seedLabel);
-        gui.addGUIElement(levelSeedBox);
-        gui.addGUIElement(maxPlayersLabel);
-        networkManager.getChatModule().initialize(gui, networkManager);
         // gui.addGUIElement(chatGUI);
 
     }
@@ -429,7 +381,6 @@ public class CreateServerState extends Gamestate
      */
     @Override
     protected void unloadContent() {
-
         try {
             SolarWarsSettings.getInstance().save();
         } catch (GameSettingsException e) {
@@ -439,20 +390,6 @@ public class CreateServerState extends Gamestate
         if (serverClient != null) {
             serverClient.removeMessageListener(clientMessageListener);
         }
-
-        playerLabels.clear();
-        playerNamePos.clear();
-        playerLabelIdx.clear();
-
-        gui.cleanUpGUI();
-
-        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-            gui.removeGUIElement(entry.getValue());
-        }
-        this.playerLabelIdx = null;
-        this.playerLabels = null;
-        this.playerNamePos = null;
-        gui = null;
     }
 
     /**
@@ -461,13 +398,13 @@ public class CreateServerState extends Gamestate
     private void setupServer() {
         ServerHub.resetPlayerID(0);
         int id = ServerHub.getContiniousPlayerID();
-        
+
         hostPlayerName = SolarWarsSettings.getInstance().getPlayerName();
         hostPlayerColor = ColorRGBA.Blue.clone();
-        
+
         Player hostPlayer = new Player(hostPlayerName,
                 Player.PLAYER_COLORS[id], id, true);
-        
+
         serverHub.initialize(hostPlayer, null);
         // hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
@@ -501,6 +438,57 @@ public class CreateServerState extends Gamestate
             }
             serverEstablished = false;
         }
+    }
+
+    public String getSeedString() {
+        seedString = SolarWarsSettings.getInstance().getSeed();
+        Random r = new Random(convertGenericSeed(seedString));
+        return hardSeed[r.nextInt(hardSeed.length)];
+    }
+
+    public String getServerName() {
+        return SolarWarsServer.SERVER_NAME;
+    }
+
+    public String getServerVersion() {
+        return String.format("v%1.2f", SolarWarsServer.SERVER_VERSION * 1f);
+    }
+
+    public String getServerIP() {
+        return NetworkManager.getInstance().getClientIPAdress().getHostAddress();
+    }
+
+    private long convertGenericSeed(String seed) {
+        char[] chars = seed.toCharArray();
+        try {
+            serverSeed = 0;
+            for (Character c : chars) {
+                serverSeed += c.hashCode();
+            }
+        } catch (Exception e) {
+            serverSeed = SolarWarsServer.SERVER_VERSION;
+        }
+        return serverSeed;
+    }
+
+    public void onServerSeedBoxChanged() {
+        //                char[] chars = caption.toCharArray();
+//                try {
+//                    serverSeed = 0;
+//                    for (Character c : chars) {
+//                        serverSeed += c.hashCode();
+//                    }
+//                } catch (Exception e) {
+//                    caption = serverSeed + "";
+//                }
+//
+//                SolarWarsSettings.getInstance().setSeed(caption);
+    }
+
+    @NiftyEventSubscriber(id = "start")
+    public void onStartServer(final String id,
+            final ButtonClickedEvent event) {
+        startServer();
     }
 
     /**
@@ -537,6 +525,12 @@ public class CreateServerState extends Gamestate
 
         this.clientSeed = seed;
         gameStarted = true;
+    }
+
+    @NiftyEventSubscriber(id = "cancel")
+    public void onCancelServer(final String id,
+            final ButtonClickedEvent event) {
+        cancelServer();
     }
 
     /**
@@ -583,56 +577,12 @@ public class CreateServerState extends Gamestate
     }
 
     /**
-     * Adds the connected player.
-     * 
-     * @param p
-     *            the p
-     */
-    private void addConnectedPlayer(Player p) {
-        // Label temp = playerLabels.get(p.getId());
-        // if (temp != null) {
-        // gui.removeGUIElement(temp);
-        // }
-        // playerLabels.remove(p.getId());
-
-
-        int id = playerLabels.size();
-
-        playerLabelIdx.put(p, id);
-
-        Label player = new Label(p.getName(), playerNamePos.get(id),
-                Vector3f.UNIT_XYZ.clone(), ColorRGBA.Blue.clone(), gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-        player.setFontColor(p.getColor());
-        playerLabelsNode.addElement(player);
-        playerLabels.put(id, player);
-    }
-
-    /**
      * Removes the leaving player.
      * 
      * @param p
      *            the p
-     * @deprecated
      */
-    @Deprecated
     private void removeLeavingPlayer(Player p) {
-        if (playerLabelIdx.containsKey(p)) {
-            int id = playerLabelIdx.get(p);
-            Label player = playerLabels.get(id);
-            if (player != null) {
-                playerLabels.remove(id);
-                playerLabelsNode.removeElement(player);
-            }
-        }
     }
 
     /*
@@ -672,19 +622,10 @@ public class CreateServerState extends Gamestate
      * @param players the players
      */
     private void refreshPlayers(HashMap<Integer, Player> players) {
-        if (playerLabels == null || gui == null || !playersChanged) {
+        if (!playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
-        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-            playerLabelsNode.removeElement(entry.getValue());
-        }
 
-        playerLabels.clear();
-
-        for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
-            addConnectedPlayer(entry.getValue());
-        }
         playersChanged = false;
     }
 

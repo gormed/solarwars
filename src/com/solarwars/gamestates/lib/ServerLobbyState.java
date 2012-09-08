@@ -26,16 +26,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-import com.jme3.font.BitmapFont.Align;
-import com.jme3.font.Rectangle;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
 import com.jme3.network.Message;
@@ -45,10 +40,6 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.Button;
-import com.solarwars.gui.elements.Label;
-import com.solarwars.gui.elements.Panel;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ClientRegisterListener;
@@ -58,61 +49,42 @@ import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.ButtonClickedEvent;
+import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 /**
  * The Class ServerLobbyState.
+ * @author Hans Ferchland
  */
 public class ServerLobbyState extends Gamestate implements ClientRegisterListener {
+    //==========================================================================
+    //      Fields
+    //==========================================================================
 
-    /** The lobby. */
-    private Label lobbyLabel;
-    /** The background panel. */
-    private Panel backgroundPanel;
-    /** The line. */
-    private Panel line;
-    /** The player panel. */
-    private Panel playerPanel;
-    /** The leave. */
-    private Button leave;
-    /** The ready. */
-    private Button ready;
-    /** The server name. */
-    private Label serverName;
-    /** The gui. */
-    private GameGUI gui;
-    /** The client player name. */
+    // GUI
     private String clientPlayerName;
-    /** The client player color. */
     private ColorRGBA clientPlayerColor;
-    /** The server ip address. */
     private String serverIPAddress;
-    /** The network manager. */
+    private Element serverIPLabel;
+    private ListBox<ConnectedPlayerItem> serverLobbyBox;
+    private float animateConnectCounter = 0;
+    // NETWORK
     private NetworkManager networkManager;
-    /** The client. */
     private Client client;
-    /** The player name pos. */
-    private HashMap<Integer, Vector3f> playerNamePos;
-    /** The player labels. */
-    private HashMap<Integer, Label> playerLabels;
-    /** The player label idx. */
-    private HashMap<Player, Integer> playerLabelIdx;
-    /** The refreshed players. */
     private HashMap<Integer, Player> refreshedPlayers;
-    /** The players changed. */
     private boolean playersChanged;
-    /** The player state listener. */
     private PlayerStateListener playerStateListener = new PlayerStateListener();
-    /** The player connection listener. */
-    private PlayerConnectionListener playerConnectionListener = new PlayerConnectionListener();
-    /** The no server found. */
+    private PlayerConnectionListener playerConnectionListener =
+            new PlayerConnectionListener();
     private ClientConnectionState clientState = ClientConnectionState.CONNECTING;
-    /** indicates that the game is set up and can be started. */
-    private boolean gameStarted = false;
-    /** The application. */
-    private final SolarWarsApplication application;
-    /** The client seed. */
-    private long clientSeed;
     private Thread connectorThread = null;
+    // LOGIC
+    private boolean gameStarted = false;
+    private final SolarWarsApplication application;
+    private long clientSeed;
 
     /**
      * Instantiates a new server lobby state.
@@ -121,6 +93,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         super(SolarWarsGame.SERVER_LOBBY_STATE);
         this.application = SolarWarsApplication.getInstance();
     }
+
+    //==========================================================================
+    //      GAMESTATE METHODS
+    //==========================================================================
 
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#update(float)
@@ -140,16 +116,16 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 //                        enterState(GamestateManager.MULTIPLAYER_STATE);
             }
             if (clientState == ClientConnectionState.CONNECTED) {
-                networkManager.getChatModule().
-                        initialize(gui, networkManager);
-                serverName.setCaption(
-                        client.getGameName() + " ver." + client.getVersion()
-                        + " - "
-                        + networkManager.getServerIPAdress().getHostName());
+//                networkManager.getChatModule().
+//                        initialize(gui, networkManager);
+//                serverName.setCaption(
+//                        client.getGameName() + " ver." + client.getVersion()
+//                        + " - "
+//                        + networkManager.getServerIPAdress().getHostName());
 
-                float w = serverName.getText().getLineWidth();
-                float h = serverName.getText().getHeight();
-                serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
+//                float w = serverName.getText().getLineWidth();
+//                float h = serverName.getText().getHeight();
+//                serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
                 clientState = ClientConnectionState.JOINED;
             }
             if (gameStarted && clientState == ClientConnectionState.JOINED) {
@@ -159,6 +135,14 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 //                        enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
             } else {
                 refreshPlayers(refreshedPlayers);
+                animateConnectCounter += tpf;
+                if (animateConnectCounter > 0.5f) {
+                    String text = serverIPLabel.getRenderer(TextRenderer.class).
+                            getOriginalText() + ".";
+                    serverIPLabel.getRenderer(TextRenderer.class).
+                            setText(text);
+                    animateConnectCounter = 0;
+                } 
             }
         }
         //if (!client.isConnected())
@@ -174,7 +158,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
                 SolarWarsApplication.getInstance().getIsoControl(),
-                        Hub.playersByID, clientSeed);
+                Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }
 
@@ -183,151 +167,26 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     protected void loadContent() {
-        gui = GameGUI.getInstance();
+
+        serverIPAddress = SolarWarsSettings.getInstance().getIpAddressFavouriteServer();
+        clientPlayerColor = ColorRGBA.Red.clone();
+        clientPlayerName = SolarWarsSettings.getInstance().getPlayerName();
+        refreshedPlayers = new HashMap<Integer, Player>();
+
         gameStarted = false;
         clientState = ClientConnectionState.CONNECTING;
         playersChanged = false;
         game.getApplication().setPauseOnLostFocus(false);
         networkManager = NetworkManager.getInstance();
-        
-        serverIPAddress = SolarWarsSettings.getInstance().getIpAddressFavouriteServer();
-        clientPlayerColor = ColorRGBA.Red.clone();
-        clientPlayerName = SolarWarsSettings.getInstance().getPlayerName();
 
-        playerNamePos = new HashMap<Integer, Vector3f>();
-        playerLabels = new HashMap<Integer, Label>();
-        playerLabelIdx = new HashMap<Player, Integer>();
-        refreshedPlayers = new HashMap<Integer, Player>();
+        niftyGUI.gotoScreen("server_lobby");
 
-        for (int i = 0; i < 8; i++) {
-            playerNamePos.put(i, new Vector3f(
-                    gui.getWidth() / 3,
-                    (6 - i * 0.5f) * gui.getHeight() / 10,
-                    0));
-        }
+        serverLobbyBox = screen.findNiftyControl("saved_servers_box", ListBox.class);
+        serverIPLabel = screen.findElementByName("server_lobby_server_ip_label");
 
-        lobbyLabel = new Label(
-                "LOBBY",
-                new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
-                new Vector3f(2, 2, 1),
-                ColorRGBA.White, gui) {
-
-            private float time;
-
-            @Override
-            public void updateGUI(float tpf) {
-                time += tpf;
-
-                if (time < 0.2f) {
-                    text.setText(title + "_");
-                } else if (time < 0.4f) {
-                    text.setText(title);
-                } else {
-                    time = 0;
-                }
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        backgroundPanel = new Panel(
-                "BackgroundPanel",
-                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
-                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-                ColorRGBA.Blue);
-
-        line = new Panel("Line",
-                new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
-                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-                ColorRGBA.White);
-
-        leave = new Button("Leave",
-                new Vector3f(gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-                ColorRGBA.White, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                    leaveServer();
-                }
-            }
-        };
-
-        ready = new Button("Ready",
-                new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-                ColorRGBA.White, gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-                if (!isPressed) {
-
-                    AudioManager.getInstance().
-                            playSoundInstance(AudioManager.SOUND_CLICK);
-                }
-            }
-        };
-
-        serverName = new Label("Connecting to " + serverIPAddress,
-                new Vector3f(gui.getWidth() / 2, 7f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Orange,
-                gui) {
-
-            private float time;
-
-            @Override
-            public void updateGUI(float tpf) {
-                if (clientState == ClientConnectionState.JOINED) {
-                    return;
-                }
-                time += tpf;
-
-                if (time < 0.2f) {
-                    text.setText(title + "_");
-                } else if (time < 0.4f) {
-                    text.setText(title);
-                } else {
-                    time = 0;
-                }
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-//        float w = serverName.getText().getLineWidth();
-//        float h = serverName.getText().getHeight();
-//        serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Center);
-
-        playerPanel = new Panel(
-                "BackgroundPanel",
-                new Vector3f(gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
-                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
-                ColorRGBA.White);
-
-
-
-        gui.addGUIElement(backgroundPanel);
-        gui.addGUIElement(line);
-        gui.addGUIElement(lobbyLabel);
-        gui.addGUIElement(leave);
-        gui.addGUIElement(serverName);
-        gui.addGUIElement(playerPanel);
-        gui.addGUIElement(ready);
+        // swap old with new text
+        serverIPLabel.getRenderer(TextRenderer.class).
+                setText(serverIPAddress);
 
         connectorThread = new Thread("ConnectionThread") {
 
@@ -336,7 +195,139 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 clientState = joinServer();
             }
         };
+
         connectorThread.start();
+
+//        for (int i = 0; i < 8; i++) {
+//            playerNamePos.put(i, new Vector3f(
+//                    gui.getWidth() / 3,
+//                    (6 - i * 0.5f) * gui.getHeight() / 10,
+//                    0));
+//        }
+//
+//        lobbyLabel = new Label(
+//                "LOBBY",
+//                new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
+//                new Vector3f(2, 2, 1),
+//                ColorRGBA.White, gui) {
+//
+//            private float time;
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//                time += tpf;
+//
+//                if (time < 0.2f) {
+//                    text.setText(title + "_");
+//                } else if (time < 0.4f) {
+//                    text.setText(title);
+//                } else {
+//                    time = 0;
+//                }
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+//
+//        backgroundPanel = new Panel(
+//                "BackgroundPanel",
+//                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
+//                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
+//                ColorRGBA.Blue);
+//
+//        line = new Panel("Line",
+//                new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
+//                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
+//                ColorRGBA.White);
+//
+//        leave = new Button("Leave",
+//                new Vector3f(gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
+//                ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//                    AudioManager.getInstance().
+//                            playSoundInstance(AudioManager.SOUND_CLICK);
+//                    leaveServer();
+//                }
+//            }
+//        };
+//
+//        ready = new Button("Ready",
+//                new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
+//                ColorRGBA.White, gui) {
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//                if (!isPressed) {
+//
+//                    AudioManager.getInstance().
+//                            playSoundInstance(AudioManager.SOUND_CLICK);
+//                }
+//            }
+//        };
+//
+//        serverName = new Label("Connecting to " + serverIPAddress,
+//                new Vector3f(gui.getWidth() / 2, 7f * gui.getHeight() / 10, 0),
+//                Vector3f.UNIT_XYZ,
+//                ColorRGBA.Orange,
+//                gui) {
+//
+//            private float time;
+//
+//            @Override
+//            public void updateGUI(float tpf) {
+//                if (clientState == ClientConnectionState.JOINED) {
+//                    return;
+//                }
+//                time += tpf;
+//
+//                if (time < 0.2f) {
+//                    text.setText(title + "_");
+//                } else if (time < 0.4f) {
+//                    text.setText(title);
+//                } else {
+//                    time = 0;
+//                }
+//            }
+//
+//            @Override
+//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
+//            }
+//        };
+////        float w = serverName.getText().getLineWidth();
+////        float h = serverName.getText().getHeight();
+////        serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Center);
+//
+//        playerPanel = new Panel(
+//                "BackgroundPanel",
+//                new Vector3f(gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
+//                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
+//                ColorRGBA.White);
+//
+//
+//
+//        gui.addGUIElement(backgroundPanel);
+//        gui.addGUIElement(line);
+//        gui.addGUIElement(lobbyLabel);
+//        gui.addGUIElement(leave);
+//        gui.addGUIElement(serverName);
+//        gui.addGUIElement(playerPanel);
+//        gui.addGUIElement(ready);
+
     }
 
     /* (non-Javadoc)
@@ -348,11 +339,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gameStarted = false;
         playersChanged = false;
 
-        playerLabels.clear();
-        playerNamePos.clear();
-        playerLabelIdx.clear();
-        gui.cleanUpGUI();
-
         if (client != null) {
             client.removeMessageListener(
                     playerConnectionListener,
@@ -362,17 +348,27 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             client.removeClientStateListener(playerStateListener);
         }
 
-        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-            gui.removeGUIElement(entry.getValue());
-        }
-
         this.networkManager = null;
         this.clientState = ClientConnectionState.DISCONNECTED;
-        this.playerLabelIdx = null;
-        this.playerLabels = null;
-        this.playerNamePos = null;
-        this.gui = null;
+
     }
+    //==========================================================================
+    //      NIFTY GUI EVENT METHODS
+    //==========================================================================
+
+    @NiftyEventSubscriber(id = "leave")
+    public void onLeaveButton(final String id,
+            final ButtonClickedEvent event) {
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+    }
+
+    @NiftyEventSubscriber(id = "ready")
+    public void onReadyButton(final String id,
+            final ButtonClickedEvent event) {
+    }
+    //==========================================================================
+    //      INTERNAL GUI REQUESTS
+    //==========================================================================
 
     /**
      * Leave server.
@@ -453,53 +449,18 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param players the players
      */
     private void refreshPlayers(HashMap<Integer, Player> players) {
-        if (playerLabels == null || gui == null || !playersChanged) {
+        if (!playersChanged) {
             return;
         }
-        HashMap<Integer, Player> clone = new HashMap<Integer, Player>(players);
-        for (Map.Entry<Integer, Label> entry : playerLabels.entrySet()) {
-            gui.removeGUIElement(entry.getValue());
-        }
 
-        playerLabels.clear();
+        serverLobbyBox.clear();
 
-        for (Map.Entry<Integer, Player> entry : clone.entrySet()) {
-            addConnectedPlayer(entry.getValue());
+        for (Player p : players.values()) {
+            if (p != null) {
+                serverLobbyBox.addItem(new ConnectedPlayerItem(p.getName(), p.getColor()));
+            }
         }
         playersChanged = false;
-    }
-
-    /**
-     * Adds the connected player.
-     *
-     * @param p the p
-     */
-    private void addConnectedPlayer(Player p) {
-
-        int id = playerLabels.size();
-
-        playerLabelIdx.put(p, id);
-
-        Label player = new Label(p.getName(),
-                playerNamePos.get(id),
-                Vector3f.UNIT_XYZ,
-                ColorRGBA.Blue,
-                gui) {
-
-            @Override
-            public void updateGUI(float tpf) {
-            }
-
-            @Override
-            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-            }
-        };
-
-        player.setFontColor(p.getColor());
-        gui.addGUIElement(player);
-        playerLabels.put(
-                id,
-                player);
     }
 
     /**
@@ -508,11 +469,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * @param p the p
      */
     private void removeLeavingPlayer(Player p) {
-        Label player = playerLabels.get(p.getId());
-        if (player != null) {
-            playerLabels.remove(p.getId());
-            gui.removeGUIElement(player);
-        }
     }
 
     /**

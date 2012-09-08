@@ -67,10 +67,10 @@ public class SavedServerItemConverter
                 listBoxItem.findElementByName(SERVER_IP_TEXT);
         final TextRenderer serverIPRenderer =
                 serverIP.getRenderer(TextRenderer.class);
-        
-        return ((serverNameRenderer.getFont() == null) ? 
+        int width = ((serverNameRenderer.getFont() == null) ? 
                 0 : serverNameRenderer.getFont().getWidth(item.getName()))
                 + ((serverIPRenderer.getFont() == null) ? 
                 0 : serverIPRenderer.getFont().getWidth(item.getIp()));
+        return width;
     }
 }
