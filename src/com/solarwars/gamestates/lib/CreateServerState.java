@@ -64,6 +64,8 @@ import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
+import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import java.util.Random;
 
 /**
@@ -80,6 +82,7 @@ public class CreateServerState extends Gamestate
     private ColorRGBA hostPlayerColor;
     private HashMap<Integer, Player> refreshedPlayers;
     private String seedString = SolarWarsSettings.getInstance().getSeed();
+    private ListBox<ConnectedPlayerItem> serverLobbyBox;
     // Network
     private ServerHub serverHub;
     private NetworkManager networkManager = NetworkManager.getInstance();
@@ -170,10 +173,17 @@ public class CreateServerState extends Gamestate
         refreshedPlayers = new HashMap<Integer, Player>();
 
         niftyGUI.gotoScreen("create_server");
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
         // =========================================
         // SETUP SERVER
         // =========================================
         setupServer();
+
+        Player host = ServerHub.getHostPlayer();
+        if (host != null) {
+            serverLobbyBox.addItem(
+                    new ConnectedPlayerItem(host.getName(), host.getColor()));
+        }
 //        networkManager.getChatModule().initialize(gui, networkManager);
 
 //        createServerLabel = new Label("CREATE SERVER", new Vector3f(
@@ -471,24 +481,17 @@ public class CreateServerState extends Gamestate
         return serverSeed;
     }
 
-    public void onServerSeedBoxChanged() {
-        //                char[] chars = caption.toCharArray();
-//                try {
-//                    serverSeed = 0;
-//                    for (Character c : chars) {
-//                        serverSeed += c.hashCode();
-//                    }
-//                } catch (Exception e) {
-//                    caption = serverSeed + "";
-//                }
-//
-//                SolarWarsSettings.getInstance().setSeed(caption);
-    }
-
     @NiftyEventSubscriber(id = "start")
     public void onStartServer(final String id,
             final ButtonClickedEvent event) {
         startServer();
+    }
+
+    @NiftyEventSubscriber(id = "server_seed")
+    public void onServerSeedBoxChanged(final String id,
+            final TextFieldChangedEvent event) {
+        serverSeed = convertGenericSeed(event.getText());
+        SolarWarsSettings.getInstance().setSeed(event.getText());
     }
 
     /**
@@ -625,7 +628,14 @@ public class CreateServerState extends Gamestate
         if (!playersChanged) {
             return;
         }
+        serverLobbyBox.clear();
 
+        for (Player p : players.values()) {
+            if (p != null) {
+                serverLobbyBox.addItem(
+                        new ConnectedPlayerItem(p.getName(), p.getColor()));
+            }
+        }
         playersChanged = false;
     }
 

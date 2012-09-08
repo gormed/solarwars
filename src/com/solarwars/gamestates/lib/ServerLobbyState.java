@@ -71,6 +71,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private Element serverIPLabel;
     private ListBox<ConnectedPlayerItem> serverLobbyBox;
     private float animateConnectCounter = 0;
+    private Element serverNameLabel;
     // NETWORK
     private NetworkManager networkManager;
     private Client client;
@@ -116,16 +117,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 //                        enterState(GamestateManager.MULTIPLAYER_STATE);
             }
             if (clientState == ClientConnectionState.CONNECTED) {
-//                networkManager.getChatModule().
-//                        initialize(gui, networkManager);
-//                serverName.setCaption(
-//                        client.getGameName() + " ver." + client.getVersion()
-//                        + " - "
-//                        + networkManager.getServerIPAdress().getHostName());
-
-//                float w = serverName.getText().getLineWidth();
-//                float h = serverName.getText().getHeight();
-//                serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Left);
+                serverNameLabel.getRenderer(TextRenderer.class).
+                        setText(client.getGameName() + " ver." + client.getVersion());
+                serverIPLabel.getRenderer(TextRenderer.class).
+                        setText(networkManager.getServerIPAdress().getHostName());
                 clientState = ClientConnectionState.JOINED;
             }
             if (gameStarted && clientState == ClientConnectionState.JOINED) {
@@ -133,8 +128,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 switchToState(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
 //                GamestateManager.getInstance().
 //                        enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
-            } else {
-                refreshPlayers(refreshedPlayers);
+            } else if (clientState != ClientConnectionState.JOINED) {
+                
                 animateConnectCounter += tpf;
                 if (animateConnectCounter > 0.5f) {
                     String text = serverIPLabel.getRenderer(TextRenderer.class).
@@ -142,8 +137,9 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                     serverIPLabel.getRenderer(TextRenderer.class).
                             setText(text);
                     animateConnectCounter = 0;
-                } 
+                }
             }
+            refreshPlayers(refreshedPlayers);
         }
         //if (!client.isConnected())
     }
@@ -181,7 +177,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         niftyGUI.gotoScreen("server_lobby");
 
-        serverLobbyBox = screen.findNiftyControl("saved_servers_box", ListBox.class);
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
+        serverNameLabel = screen.findElementByName("server_lobby_server_name_label");
         serverIPLabel = screen.findElementByName("server_lobby_server_ip_label");
 
         // swap old with new text
@@ -359,6 +356,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     @NiftyEventSubscriber(id = "leave")
     public void onLeaveButton(final String id,
             final ButtonClickedEvent event) {
+        leaveServer();
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
     }
 
@@ -457,18 +455,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
         for (Player p : players.values()) {
             if (p != null) {
-                serverLobbyBox.addItem(new ConnectedPlayerItem(p.getName(), p.getColor()));
+                serverLobbyBox.addItem(
+                        new ConnectedPlayerItem(p.getName(), p.getColor()));
             }
         }
         playersChanged = false;
-    }
-
-    /**
-     * Removes the leaving player.
-     *
-     * @param p the p
-     */
-    private void removeLeavingPlayer(Player p) {
     }
 
     /**
@@ -505,9 +496,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 System.out.println("client closed");
                 clientState = ClientConnectionState.DISCONNECTED;
             }
-//                if (c.equals(client)) {
-//                    noServerFound = true;
-//                }
         }
     }
 

@@ -22,22 +22,19 @@
 package com.solarwars.gamestates.lib;
 
 import com.solarwars.AudioManager;
+import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
+import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
-import de.lessvoid.nifty.EndNotify;
-import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
-import de.lessvoid.nifty.controls.TextField;
-import de.lessvoid.nifty.effects.EffectEventId;
-import de.lessvoid.nifty.elements.Element;
-import java.util.ArrayList;
+import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -45,99 +42,7 @@ import java.util.logging.Level;
  * The Class MultiplayerState.
  */
 public class MultiplayerState extends Gamestate {
-
-    public static class SavedServerItem {
-
-        private final String name;
-        private final String ip;
-
-        public SavedServerItem(String name, String ip) {
-            this.name = name;
-            this.ip = ip;
-        }
-
-        public String getIp() {
-            return ip;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    public static class AddServerPopup {
-
-        private Nifty niftyGUI;
-        private Element addServerPopup;
-        private boolean visible = false;
-
-        public AddServerPopup(Nifty niftyGUI) {
-            this.niftyGUI = niftyGUI;
-        }
-
-        public String getNewServerIP() {
-            TextField ip = niftyGUI.getCurrentScreen().
-                    findNiftyControl("ip_address", TextField.class);
-            return ip.getText();
-        }
-
-        public String getNewServerName() {
-            TextField name = niftyGUI.getCurrentScreen().
-                    findNiftyControl("server_name", TextField.class);
-            return name.getText();
-        }
-
-        public void showPopup() {
-            if (visible) {
-                return;
-            }
-            if (addServerPopup == null) {
-                addServerPopup = niftyGUI.createPopup("add_server_popup");
-            }
-            niftyGUI.showPopup(niftyGUI.getCurrentScreen(),
-                    addServerPopup.getId(), null);
-            visible = true;
-        }
-
-        public void hidePopup() {
-            if (addServerPopup != null && visible) {
-                niftyGUI.closePopup(addServerPopup.getId());
-                visible = false;
-            }
-        }
-
-        public void showElement(final Element element, final EndNotify... endNotify) {
-            element.showWithoutEffects();
-            element.startEffect(
-                    EffectEventId.onCustom,
-                    new EndNotify() {
-
-                        @Override
-                        public void perform() {
-                            for (EndNotify ed : endNotify) {
-                                ed.perform();
-                            }
-                        }
-                    },
-                    "in");
-        }
-
-        public void hideElement(final Element element, final EndNotify... endNotify) {
-            element.startEffect(
-                    EffectEventId.onCustom,
-                    new EndNotify() {
-
-                        @Override
-                        public void perform() {
-                            element.hideWithoutEffect();
-                            for (EndNotify ed : endNotify) {
-                                ed.perform();
-                            }
-                        }
-                    },
-                    "out");
-        }
-    }
+    
     private NetworkManager networkManager;
     private String currentIPAddress = SolarWarsSettings.getInstance().
             getIpAddressFavouriteServer();
@@ -173,17 +78,15 @@ public class MultiplayerState extends Gamestate {
         addServerPopup = new AddServerPopup(niftyGUI);
         serverListBox = screen.findNiftyControl(
                 "saved_servers_box", ListBox.class);
-//        if (!serverListBox.getItems().contains(localServer)) {
-//            serverListBox.addItem(localServer);
-//        }
-//        if (!serverListBox.getItems().contains(lastServer)) {
-//            serverListBox.addItem(lastServer);
-//        }
+        
         serverListBox.clear();
-        serverListBox.addItem(localServer);//.name + " - " + localServer.ip);
-        serverListBox.addItem(lastServer);//.name + " - " + lastServer.ip);
+        serverListBox.addItem(localServer);
+        serverListBox.addItem(lastServer);
+        
         // init network manager
         networkManager = NetworkManager.getInstance();
+        
+        
 //        playerName = new TextBox(
 //                ColorRGBA.Blue.clone(),
 //                new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
@@ -431,6 +334,12 @@ public class MultiplayerState extends Gamestate {
 //        }
 //    }
 
+    @NiftyEventSubscriber(id = "player_name")
+    public void onPlayerNameChanged(final String id,
+            final TextFieldChangedEvent event) {
+        SolarWarsSettings.getInstance().setPlayerName(event.getText());
+    }
+    
     /**
      * Creates the server.
      */
