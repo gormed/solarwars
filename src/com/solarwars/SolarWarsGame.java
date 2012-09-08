@@ -27,7 +27,6 @@ import com.jme3.input.InputManager;
 import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.lib.CreateServerState;
 import com.solarwars.gamestates.lib.MainmenuState;
-import com.solarwars.gamestates.lib.MainmenuState;
 import com.solarwars.gamestates.lib.MultiplayerMatchState;
 import com.solarwars.gamestates.lib.MultiplayerState;
 import com.solarwars.gamestates.lib.OptionsState;
@@ -188,12 +187,30 @@ public class SolarWarsGame {
 
 //        mainmenu.setEnabled(true);
 
-        application.getNiftyGUI().fromXml(
-                "Interface/Nifty/NiftyClientGUI.xml", "startup",
+//        application.getNiftyGUI().fromXml(
+//                "Interface/Nifty/NiftyClientGUI.xml", "startup",
+//                mainmenu, singleplayer, multiplayer, createServerState,
+//                serverLobbyState, multiplayerMatchState, tutorialState,
+//                optionsState);
+
+
+        application.getNiftyGUI().
+                registerScreenController(
                 mainmenu, singleplayer, multiplayer, createServerState,
                 serverLobbyState, multiplayerMatchState, tutorialState,
                 optionsState);
         
+        application.getNiftyGUI().addXml("Interface/Nifty/NiftyClientGUI.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/NiftyPopups.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/MainMenuState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/MultiplayerState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/SingleplayerGUI.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/CreateServerState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/ServerLobbyState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/MultiplayerGUI.xml");
+
+        application.getNiftyGUI().gotoScreen("startup");
+
 //        attachGamestate(MAINMENU_STATE);
         triggerGamestate(MAINMENU_STATE, true);
 
@@ -304,7 +321,6 @@ public class SolarWarsGame {
 //        }
 //        return false;
 //    }
-
     /**
      * Gets the application.
      *
