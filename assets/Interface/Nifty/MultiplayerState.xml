@@ -4,7 +4,7 @@
 <!-- multiplayer menu screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <screen id="multiplayer_menu" 
-    controller="com.solarwars.gamestates.lib.MultiplayerState">
+    controller="com.solarwars.gamestates.MultiplayerState">
         <layer id="multiplayer_menu" backgroundColor="#0000" childLayout="center">
             <panel id="multiplayer_menu_panel" height="95%" width="95%" 
             align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
@@ -47,7 +47,7 @@
                         <control id="saved_servers_box"  
                         name="listBox" horizontal="off" displayItems="10" 
                         selectionMode="Single" forceSelection="true" vertical="optional" 
-                        viewConverterClass="com.solarwars.gamestates.lib.SavedServerItemConverter">
+                        viewConverterClass="com.solarwars.gamestates.gui.SavedServerItemConverter">
                             <control name="saved-server-line" style="favorite-listbox-item" />
                         </control>
                     </panel>

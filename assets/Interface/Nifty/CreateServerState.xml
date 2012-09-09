@@ -3,7 +3,7 @@
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- create server menu screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <screen id="create_server" controller="com.solarwars.gamestates.lib.CreateServerState">
+    <screen id="create_server" controller="com.solarwars.gamestates.CreateServerState">
         <layer id="create_server_menu" backgroundColor="#0000" childLayout="center">
             <panel id="create_server_menu_panel" height="95%" width="95%" 
             align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
@@ -67,7 +67,7 @@
                         name="listBox" horizontal="optional" displayItems="8" height="100%"
                         selectionMode="Single" forceSelection="false" vertical="optional" 
                         viewConverterClass=
-                        "com.solarwars.gamestates.lib.ConnectedPlayerItemConverter">
+                        "com.solarwars.gamestates.gui.ConnectedPlayerItemConverter">
                             <control name="server-lobby-line" style="favorite-listbox-item" />
                         </control>
                     </panel>

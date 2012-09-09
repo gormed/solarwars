@@ -19,7 +19,7 @@
  * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -48,6 +48,7 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
+import com.solarwars.gamestates.gui.ConnectedPlayerItem;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ClientRegisterListener;

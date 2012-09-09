@@ -19,7 +19,7 @@
  * Documentation created: 08.09.2012 - 13:34:21 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates.gui;
 
 import com.jme3.math.ColorRGBA;
 import de.lessvoid.nifty.controls.CheckBox;

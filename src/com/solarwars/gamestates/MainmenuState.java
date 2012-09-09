@@ -19,7 +19,7 @@
  * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
 import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsGame;

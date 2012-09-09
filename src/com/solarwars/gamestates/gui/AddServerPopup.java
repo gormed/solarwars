@@ -19,7 +19,7 @@
  * Documentation created: 08.09.2012 - 15:10:26 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates.gui;
 
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;

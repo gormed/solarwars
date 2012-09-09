@@ -13,66 +13,40 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: ConnectedPlayerItem.java
- * Type: com.solarwars.gamestates.lib.ConnectedPlayerItem
+ * File: Class.java
+ * Type: com.solarwars.gamestates.lib.Class
  * 
- * Documentation created: 07.09.2012 - 22:13:25 by Hans Ferchland <hans.ferchland at gmx.de>
+ * Documentation created: 08.09.2012 - 13:46:31 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
-
-import com.jme3.math.ColorRGBA;
-import com.solarwars.logic.Player;
+package com.solarwars.gamestates.gui;
 
 /**
- * The class ConnectedPlayerItem.
+ * The class Class.
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
-public class ConnectedPlayerItem {
+public class SavedServerItem {
+
     //==========================================================================
     //===   Private Fields
     //==========================================================================
-    private String name;
-    private ColorRGBA color;
-    private boolean ready = false;
-    private float handycap = 1;
-//    private Player player;
+    private final String name;
+    private final String ip;
+
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
-    public ConnectedPlayerItem(String name, ColorRGBA color) {
+    public SavedServerItem(String name, String ip) {
         this.name = name;
-        this.color = color;
-//        this.player = player;
+        this.ip = ip;
     }
 
-    public ColorRGBA getColor() {
-        return color;
+    public String getIp() {
+        return ip;
     }
 
     public String getName() {
         return name;
-    }
-
-    public float getHandycap() {
-        return handycap;
-    }
-
-//    public Player getPlayer() {
-//        return player;
-//    }
-    
-
-    public boolean isReady() {
-        return ready;
-    }
-
-    public void setHandycap(float handycap) {
-        this.handycap = handycap;
-    }
-
-    public void setReady(boolean ready) {
-        this.ready = ready;
     }
 }

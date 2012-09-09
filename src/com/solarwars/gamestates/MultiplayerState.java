@@ -19,13 +19,15 @@
  * Documentation created: 14.07.2012 - 19:37:58 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
+import com.solarwars.gamestates.gui.AddServerPopup;
+import com.solarwars.gamestates.gui.SavedServerItem;
 import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.GameSettingsException;

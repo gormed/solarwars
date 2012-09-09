@@ -170,7 +170,7 @@ public class ScoresGUI extends GUIElement implements ClickableGUI {
                 "NAME",
                 new Vector3f(1.4f * parentPanel.getSize().x / 3, height, 0),
                 Vector2f.UNIT_XY.clone().multLocal(24f),
-                "Interface/player_icon.png");
+                "Interface/ScoreIcons/player_icon.png");
 
         this.headShipsPanel = new TexturedPanel(
                 "SHIPS",

@@ -3,7 +3,7 @@
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- server lobby menu screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <screen id="server_lobby" controller="com.solarwars.gamestates.lib.ServerLobbyState">
+    <screen id="server_lobby" controller="com.solarwars.gamestates.ServerLobbyState">
         <layer id="server_lobby_menu" backgroundColor="#0000" childLayout="center">
             <panel id="server_lobby_menu_panel" height="95%" width="95%" 
             align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
@@ -50,7 +50,7 @@
                         <control id="server_lobby_box"name="listBox" horizontal="optional" 
                         displayItems="8" selectionMode="Disabled" forceSelection="false" 
                         vertical="optional" viewConverterClass=
-                        "com.solarwars.gamestates.lib.ConnectedPlayerItemConverter">
+                        "com.solarwars.gamestates.gui.ConnectedPlayerItemConverter">
                             <control name="server-lobby-line"/>
                         </control>
                         

@@ -3,7 +3,7 @@
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- singleplayer screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <screen id="singleplayer" controller="com.solarwars.gamestates.lib.SingleplayerState">
+    <screen id="singleplayer" controller="com.solarwars.gamestates.SingleplayerState">
         <layer id="none" backgroundColor="#0000" childLayout="center" >
 
         </layer>

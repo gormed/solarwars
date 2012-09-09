@@ -19,17 +19,18 @@
  * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.solarwars.AudioManager;
+import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Button;
-import com.solarwars.gui.elements.CheckBox;
 import com.solarwars.gui.elements.Label;
 import com.solarwars.gui.elements.Panel;
 
@@ -39,26 +40,28 @@ import com.solarwars.gui.elements.Panel;
  *
  * @author Hans
  */
-public class OptionsState extends Gamestate {
+public class TutorialState extends Gamestate {
 
     /** The tutorial label. */
-    private Label optionsLabel;
+    private Label tutorialLabel;
+    
     /** The background. */
-    private Panel background;
+    private TutorialPanel background;
+    
     /** The gui. */
     private GameGUI gui;
+    
     /** The back. */
     private Button back;
-    /** The line. */
-    private Panel line;
     
-    private CheckBox box_test;
+    /** The background frame. */
+    private Panel backgroundFrame;
 
     /**
      * Instantiates a new tutorial state.
      */
-    public OptionsState() {
-        super(SolarWarsGame.OPTIONS_STATE);
+    public TutorialState() {
+        super(SolarWarsGame.TUTORIAL_STATE);
     }
 
     /* (non-Javadoc)
@@ -66,6 +69,7 @@ public class OptionsState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
+        
     }
 
     /* (non-Javadoc)
@@ -74,23 +78,11 @@ public class OptionsState extends Gamestate {
     @Override
     protected void loadContent() {
         gui = GameGUI.getInstance();
-
-        createStateGUI();
-
-        gui.addGUIElement(optionsLabel);
-        gui.addGUIElement(background);
-        gui.addGUIElement(line);
-        gui.addGUIElement(box_test);
-        gui.addGUIElement(back);
-    }
-
-    private void createStateGUI() {
-        optionsLabel = new Label(
-                "Options",
+        tutorialLabel = new Label(
+                "Tutorial",
                 new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
                 new Vector3f(2, 2, 1),
-                ColorRGBA.White.clone(),
-                gui) {
+                ColorRGBA.White, gui) {
 
             private float time;
 
@@ -99,7 +91,7 @@ public class OptionsState extends Gamestate {
                 time += tpf;
 
                 if (time < 0.2f) {
-                    text.setText(title + "_");
+                    text.setText(title + "_?");
                 } else if (time < 0.4f) {
                     text.setText(title);
                 } else {
@@ -111,32 +103,32 @@ public class OptionsState extends Gamestate {
             public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
             }
         };
-
-        background = new Panel(
-                "BackgroundFrame",
-                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
-                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-                ColorRGBA.Blue.clone());
         
-        line = new Panel("Line", new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
-                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-                ColorRGBA.White.clone());
-
-        box_test = new CheckBox(
-                "Ckeck_Test",
+        backgroundFrame = new Panel(
+                "Tutorial_BackgroundFrame",
                 new Vector3f(
-                        gui.getWidth() / 10, 
-                        7.0f * gui.getHeight() / 10, 
-                        0),
-                new Vector2f(24f, 24f), 
-                ColorRGBA.Blue.clone());
+                0.5f * gui.getWidth(),
+                0.5f * gui.getHeight() - 50,
+                0),
+                new Vector2f(510, 310),
+//                Vector2f.UNIT_XY.clone().
+//                multLocal(gui.getHeight() / 2),
+                new ColorRGBA(0, 0, 1, 0.5f));
 
+        background = new TutorialPanel(
+                "Tutorial_Background",
+                new Vector3f(
+                0.5f * gui.getWidth(),
+                0.5f * gui.getHeight() - 50,
+                0),
+                new Vector2f(500, 300),
+//                Vector2f.UNIT_XY.clone().
+//                multLocal(gui.getHeight() / 2),
+                ColorRGBA.White);
         back = new Button("Back",
                 new Vector3f(gui.getWidth() / 10, 1.0f * gui.getHeight() / 10, 0),
-                Vector3f.UNIT_XYZ.clone(),
-                ColorRGBA.Orange.clone(),
-                ColorRGBA.White.clone(), 
-                gui) {
+                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
+                ColorRGBA.White, gui) {
 
             @Override
             public void updateGUI(float tpf) {
@@ -153,7 +145,10 @@ public class OptionsState extends Gamestate {
             }
         };
         
-        
+        gui.addGUIElement(tutorialLabel);
+        gui.addGUIElement(backgroundFrame);
+        gui.addGUIElement(background);
+        gui.addGUIElement(back);
     }
 
     /* (non-Javadoc)
@@ -163,5 +158,26 @@ public class OptionsState extends Gamestate {
     protected void unloadContent() {
         gui.cleanUpGUI();
         gui = null;
+    }
+
+    /**
+     * The Class TutorialPanel.
+     */
+    private class TutorialPanel extends Panel {
+
+        /**
+         * Instantiates a new tutorial panel.
+         *
+         * @param name the name
+         * @param pos the pos
+         * @param size the size
+         * @param color the color
+         */
+        public TutorialPanel(String name, Vector3f pos, Vector2f size, ColorRGBA color) {
+            super(name, pos, size, color);
+            AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
+
+            material.setTexture("ColorMap", assetManager.loadTexture("Textures/gui/solarwars-tutorial.png"));
+        }
     }
 }

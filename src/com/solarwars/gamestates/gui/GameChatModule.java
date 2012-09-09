@@ -13,19 +13,20 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: ServerLobbyState.java
- * Type: .ServerLobbyState
+ * File: GameChatModule.java
+ * Type: com.solarwars.gamestates.gui.GameChatModule
  * 
- * Documentation created: 08.09.2012 - 17:16:12 by Hans Ferchland <hans.ferchland at gmx.de>
+ * Documentation created: 08.09.2012 - 17:54:31 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+package com.solarwars.gamestates.gui;
 
 /**
- * The class ServerLobbyState.
+ * The class GameChatModule.
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
-public class ServerLobbyState {
+public class GameChatModule {
     //==========================================================================
     //===   Private Fields
     //==========================================================================

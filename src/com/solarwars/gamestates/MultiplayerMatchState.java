@@ -19,7 +19,7 @@
  * Documentation created: 14.07.2012 - 19:37:57 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -37,13 +37,15 @@ import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.elements.PauseGUI;
-import com.solarwars.gui.elements.ScoresGUI;
+import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
+import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
+import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 /**
  * The Class MultiplayerMatchState.
@@ -52,6 +54,8 @@ public class MultiplayerMatchState extends Gamestate {
 
     // GUI
     private PauseActionListener pauseListener;
+    private Element statsLayer;
+    private GameStatsModule gameStatsModule;
     // Network and game
     private Hub hub;
     private Level currentLevel;
@@ -79,6 +83,7 @@ public class MultiplayerMatchState extends Gamestate {
             if (!lostConnection) {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
+                updateNifty(tpf);
             } else if (lostConnection && !currentLevel.isGameOver()) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
@@ -87,22 +92,38 @@ public class MultiplayerMatchState extends Gamestate {
         }
     }
 
+    private void updateNifty(float tpf) {
+        // find old text
+        Element niftyElement = niftyGUI.getCurrentScreen().
+                findElementByName("percentage");
+        // swap old with new text
+        niftyElement.getRenderer(TextRenderer.class).
+                setText(refreshPercentage() + "%");
+
+        gameStatsModule.update(tpf);
+    }
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
+
     @Override
     protected void loadContent() {
-        niftyGUI.gotoScreen("singleplayer");
+
+        // NIFTY GUI
+        niftyGUI.gotoScreen("multiplayer");
+
+        // LOGIC
         lostConnection = false;
         hub = Hub.getInstance();
         application.setPauseOnLostFocus(false);
         client = NetworkManager.getInstance().getThisClient();
         client.addClientStateListener(playerStateListener);
         gameplay = MultiplayerGameplay.getInstance();
-        setupGUI();
+
         currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
         currentLevel.generateLevel();
         //currentLevel.setupPlayers(Hub.playersByID);
+        setupNiftyGUI();
 
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
@@ -113,6 +134,9 @@ public class MultiplayerMatchState extends Gamestate {
      */
     @Override
     protected void unloadContent() {
+        //pause gui
+        application.getInputManager().removeListener(pauseListener);
+
         lostConnection = false;
         NetworkManager networkManager = NetworkManager.getInstance();
         networkManager.getChatModule().destroy();
@@ -153,7 +177,6 @@ public class MultiplayerMatchState extends Gamestate {
 
         currentLevel.destroy();
 
-
         if (client != null) {
             client.removeClientStateListener(playerStateListener);
         }
@@ -167,12 +190,26 @@ public class MultiplayerMatchState extends Gamestate {
     /**
      * Setup gui.
      */
-    private void setupGUI() {
-
+    private void setupNiftyGUI() {
+        
+        statsLayer = niftyGUI.getCurrentScreen().
+                findElementByName("stats");
+        gameStatsModule = new GameStatsModule(
+                niftyGUI.getCurrentScreen().
+                findNiftyControl("game_stats_box_panel",
+                ListBox.class), currentLevel);
+        
+        for (Player p : Hub.getPlayers()) {
+            gameStatsModule.addPlayer(p);
+        }
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
         // applys the chat gui from the last to the next state (this)
 //        NetworkManager.getInstance().getChatModule().changeGUI(gui);
+    }
+
+    public int refreshPercentage() {
+        return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
     }
 
     /**

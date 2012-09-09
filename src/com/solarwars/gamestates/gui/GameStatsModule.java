@@ -13,40 +13,49 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: Class.java
- * Type: com.solarwars.gamestates.lib.Class
+ * File: GameStatsModule.java
+ * Type: com.solarwars.gamestates.gui.GameStatsModule
  * 
- * Documentation created: 08.09.2012 - 13:46:31 by Hans Ferchland <hans.ferchland at gmx.de>
+ * Documentation created: 08.09.2012 - 17:54:19 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates.gui;
+
+import com.jme3.math.ColorRGBA;
+import com.solarwars.logic.Level;
+import com.solarwars.logic.Player;
+import de.lessvoid.nifty.controls.ListBox;
 
 /**
- * The class Class.
+ * The class GameStatsModule.
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
-public class SavedServerItem {
-
+public class GameStatsModule {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
-    private final String name;
-    private final String ip;
 
+    private ListBox<PlayerStatsItem> playerStateBox;
+    private Level level;
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
-    public SavedServerItem(String name, String ip) {
-        this.name = name;
-        this.ip = ip;
+
+    public GameStatsModule(ListBox<PlayerStatsItem> playerStateBox, Level level) {
+        this.playerStateBox = playerStateBox;
+        this.level = level;
     }
 
-    public String getIp() {
-        return ip;
+    public void update(float tpf) {
+        for (PlayerStatsItem item : playerStateBox.getItems()) {
+            item.update(tpf);
+//            updatePlayer(item, item.getPlayer());
+        }
+        playerStateBox.refresh();
     }
-
-    public String getName() {
-        return name;
+    
+    public void addPlayer(Player player) {
+        playerStateBox.addItem(new PlayerStatsItem(player));
     }
 }

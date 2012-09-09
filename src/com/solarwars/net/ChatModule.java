@@ -84,7 +84,7 @@ public class ChatModule implements ActionListener {
      * Destroy.
      */
     public void destroy() {
-        gameGUI.removeGUIElement(chatGUI);
+//        gameGUI.removeGUIElement(chatGUI);
         inputManager.removeListener(this);
     }
 
@@ -95,10 +95,10 @@ public class ChatModule implements ActionListener {
      * @param message the message
      */
     public void playerSays(Player p, String message) {
-        chatGUI.playerSays(p, message);
-        if (!chatGUI.isFadeDirection()) {
-            chatGUI.peek();
-        }
+//        chatGUI.playerSays(p, message);
+//        if (!chatGUI.isFadeDirection()) {
+//            chatGUI.peek();
+//        }
     }
 
     /**
@@ -110,11 +110,11 @@ public class ChatModule implements ActionListener {
         if (p.isLeaver()) {
             return;
         }
-        chatGUI.serverSays(
-                p.getName() + " leaves the game...");
-        if (!chatGUI.isFadeDirection()) {
-            chatGUI.peek();
-        }
+//        chatGUI.serverSays(
+//                p.getName() + " leaves the game...");
+//        if (!chatGUI.isFadeDirection()) {
+//            chatGUI.peek();
+//        }
     }
 
     /**
@@ -124,13 +124,13 @@ public class ChatModule implements ActionListener {
      * @param defeated the defeated
      */
     public void playerDefeats(Player victorious, Player defeated) {
-        chatGUI.serverSays(
-                victorious.getName()
-                + " defeats "
-                + defeated.getName() + "!");
-        if (!chatGUI.isFadeDirection()) {
-            chatGUI.peek();
-        }
+//        chatGUI.serverSays(
+//                victorious.getName()
+//                + " defeats "
+//                + defeated.getName() + "!");
+//        if (!chatGUI.isFadeDirection()) {
+//            chatGUI.peek();
+//        }
     }
 
     /**
@@ -144,20 +144,20 @@ public class ChatModule implements ActionListener {
         networkManager.getThisClient().send(chatMessage);
     }
 
-    /**
-     * Change gui.
-     *
-     * @param newGUI the new gui
-     */
-    public void changeGUI(GameGUI newGUI) {
-        if (gameGUI != null) {
-            gameGUI.removeGUIElement(chatGUI);
-        }
-        this.gameGUI = newGUI;
-        gameGUI.addGUIElement(chatGUI);
-        visible = false;
-        chatGUI.hide();
-    }
+//    /**
+//     * Change gui.
+//     *
+//     * @param newGUI the new gui
+//     */
+//    public void changeGUI(GameGUI newGUI) {
+//        if (gameGUI != null) {
+//            gameGUI.removeGUIElement(chatGUI);
+//        }
+//        this.gameGUI = newGUI;
+//        gameGUI.addGUIElement(chatGUI);
+//        visible = false;
+//        chatGUI.hide();
+//    }
 
     /* (non-Javadoc)
      * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
@@ -165,14 +165,14 @@ public class ChatModule implements ActionListener {
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
         if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
-            visible = !visible;
-            if (visible) {
-                chatGUI.show();
-                IsoCamera.getInstance().setEnabled(false);
-            } else {
-                chatGUI.hide();
-                IsoCamera.getInstance().setEnabled(true);
-            }
+//            visible = !visible;
+//            if (visible) {
+//                chatGUI.show();
+//                IsoCamera.getInstance().setEnabled(false);
+//            } else {
+//                chatGUI.hide();
+//                IsoCamera.getInstance().setEnabled(true);
+//            }
         }
     }
 }

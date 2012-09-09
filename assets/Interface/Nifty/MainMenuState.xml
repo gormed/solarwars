@@ -20,7 +20,7 @@
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- mainmenu screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <screen id="mainmenu" controller="com.solarwars.gamestates.lib.MainmenuState">
+    <screen id="mainmenu" controller="com.solarwars.gamestates.MainmenuState">
         <layer id="menu" backgroundColor="#0000" childLayout="center">
             <panel id="solarwars_mainmenu_panel" align="center" backgroundColor="#0000" 
             childLayout="vertical" visibleToMouse="true" height="100%" width="80%">

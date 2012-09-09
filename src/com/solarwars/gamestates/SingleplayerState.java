@@ -19,7 +19,7 @@
  * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gamestates.lib;
+package com.solarwars.gamestates;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
@@ -28,7 +28,6 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.Gamestate;
 import com.solarwars.input.InputMappings;
 import com.solarwars.input.PauseActionListener;
 import com.solarwars.logic.DeathmatchGameplay;
