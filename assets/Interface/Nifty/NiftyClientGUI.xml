@@ -118,5 +118,11 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
             <onHover name="colorBar" color="#009f" post="false" neverStopRendering="true" timeType="infinite" inset="1px"/>
             <onClick name="focus" targetElement="#parent#parent"/>
         </effect>
+    
+    </style>
+    <!-- GAME STATS WINDOW STYLE -->
+    <style id="game-stats-style">
+        <attributes width="100%" height="*" padding="10px" 
+        backgroundColor="#0000" childLayout="center" />
     </style>
 </nifty>

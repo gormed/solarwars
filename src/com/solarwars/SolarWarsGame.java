@@ -187,19 +187,17 @@ public class SolarWarsGame {
 
 //        mainmenu.setEnabled(true);
 
-//        application.getNiftyGUI().fromXml(
-//                "Interface/Nifty/NiftyClientGUI.xml", "startup",
+//        application.getNiftyGUI().fromXml("Interface/Nifty/MainNifty.xml", "startup", 
 //                mainmenu, singleplayer, multiplayer, createServerState,
 //                serverLobbyState, multiplayerMatchState, tutorialState,
 //                optionsState);
-
-
+        
         application.getNiftyGUI().
                 registerScreenController(
                 mainmenu, singleplayer, multiplayer, createServerState,
                 serverLobbyState, multiplayerMatchState, tutorialState,
                 optionsState);
-        
+
         application.getNiftyGUI().addXml("Interface/Nifty/NiftyClientGUI.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/NiftyPopups.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/MainMenuState.xml");

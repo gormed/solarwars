@@ -28,12 +28,14 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
 import com.solarwars.input.PauseActionListener;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
@@ -48,6 +50,8 @@ public class SingleplayerState extends Gamestate {
     private Hub hub;
     /** The pause listener. */
     private PauseActionListener pauseListener;
+    private Element statsLayer;
+    private GameStatsModule gameStatsModule;
 
     /**
      * Instantiates a new singleplayer state.
@@ -88,26 +92,44 @@ public class SingleplayerState extends Gamestate {
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
 
-        pauseListener.hidePopup();
-        // attach listener for pause layer
-        application.getInputManager().addListener(
-                pauseListener,
-                InputMappings.PAUSE_GAME);
 
-        // creates the drag-rect geometry
-        IsoControl.getInstance().createDragRectGeometry();
 
+        setupNiftyGUI();
         // play startup sound
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
     }
 
+    /**
+     * Setup gui.
+     */
+    private void setupNiftyGUI() {
+        pauseListener.hidePopup();
+        // attach listener for pause layer
+        application.getInputManager().addListener(
+                pauseListener,
+                InputMappings.PAUSE_GAME);
+        statsLayer = niftyGUI.getCurrentScreen().
+                findElementByName("stats");
+
+        gameStatsModule = new GameStatsModule(
+                statsLayer,
+                niftyGUI.getCurrentScreen().
+                findNiftyControl("game_stats_box_panel",
+                ListBox.class), currentLevel);
+        gameStatsModule.addPlayers(Hub.getPlayers());
+        // creates the drag-rect geometry
+//        IsoControl.getInstance().createDragRectGeometry();
+
+    }
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#unloadContent()
      */
+
     @Override
     protected void unloadContent() {
         //pause gui
+        gameStatsModule.destroy();
         application.getInputManager().removeListener(pauseListener);
 //        pauseListener = null;
         //level
@@ -123,17 +145,18 @@ public class SingleplayerState extends Gamestate {
     public void update(float tpf) {
         if (isEnabled()) {
             currentLevel.updateLevel(tpf);
-            updateNifty();
+            updateNifty(tpf);
         }
     }
 
-    private void updateNifty() {
+    private void updateNifty(float tpf) {
         // find old text
         Element niftyElement = niftyGUI.getCurrentScreen().
                 findElementByName("percentage");
         // swap old with new text
         niftyElement.getRenderer(TextRenderer.class).
                 setText(refreshPercentage() + "%");
+        gameStatsModule.update(tpf);
     }
 
     /**

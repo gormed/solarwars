@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+
+
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- singleplayer screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
@@ -7,7 +9,60 @@
         <layer id="none" backgroundColor="#0000" childLayout="center" >
 
         </layer>
-
+        <layer id="stats" backgroundColor="#0000" childLayout="center" >
+            <effect>
+                <onShow name="move" length="200" mode="in" 
+                direction="left" startDelay="0" inherit="true"/>
+                <onHide name="move" length="200" mode="out" 
+                direction="left" startDelay="0" inherit="true"/>
+            </effect>
+           <panel id="game_stats_panel_frame" childLayout="center" 
+            align="left" backgroundColor="#fff8" width="60%" 
+            height="60%" padding="5px">
+                <panel id="game_stats_panel" childLayout="vertical" 
+                backgroundColor="#00f8">
+                    <panel id="game_stats_heading" height="15%" childLayout="horizontal">
+                        <panel id="player_icon_align" width="25%" childLayout="center">
+                            <image id="player_icon"
+                            filename="Interface/ScoreIcons/player_icon.png" 
+                            filter="false" align="center"/>
+                        </panel>
+                        <panel id="ship_icon_align" width="15%" childLayout="center">
+                            <image id="ship_icon"
+                            filename="Interface/ScoreIcons/ship_icon.png" filter="false"/>
+                        </panel>
+                        <panel id="planet_icon_align" width="15%" childLayout="center">
+                            <image id="planet_icon"
+                            filename="Interface/ScoreIcons/planet_icon.png" filter="false"/>
+                        </panel>
+                        <panel id="gain_icon_align" width="15%" childLayout="center">
+                            <image id="gain_icon"
+                            filename="Interface/ScoreIcons/gain_icon.png" filter="false"/>
+                        </panel>
+                        
+                        <panel id="color_icon_align" width="15%" childLayout="center">
+                            <image id="color_icon"
+                            filename="Interface/ScoreIcons/color_icon.png" filter="false"/>
+                        </panel>
+                        <panel id="power_icon_align" width="15%" childLayout="center">
+                            <image id="power_icon"
+                            filename="Interface/ScoreIcons/power_icon.png" filter="false"/>
+                        </panel>
+                    </panel>
+                    <panel id="spacer" height="5px" backgroundColor="#fff8"/>
+                    <panel id="game_stats_box_panel" childLayout="horizontal">
+                        <control id="game_stats_box" style="game-stats-style"
+                        name="listBox" horizontal="off" displayItems="8" height="80%"
+                        selectionMode="Disabled" forceSelection="false" vertical="optional" 
+                        viewConverterClass="com.solarwars.gamestates.gui.PlayerStatsItemConverter">
+                            <control name="player-stats-line"/>
+                        </control>
+                    </panel>
+                </panel>
+                
+            </panel>
+        </layer>
+        
         <layer id="hud" backgroundColor="#0000" childLayout="center">
             <panel id="percentage_panel_frame" height="7%" width="10%" align="right" valign="bottom" 
                 backgroundColor="#fff8" childLayout="center" visibleToMouse="false">

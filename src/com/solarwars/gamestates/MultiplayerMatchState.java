@@ -194,14 +194,13 @@ public class MultiplayerMatchState extends Gamestate {
         
         statsLayer = niftyGUI.getCurrentScreen().
                 findElementByName("stats");
-        gameStatsModule = new GameStatsModule(
+        
+        gameStatsModule = new GameStatsModule(statsLayer,
                 niftyGUI.getCurrentScreen().
                 findNiftyControl("game_stats_box_panel",
                 ListBox.class), currentLevel);
+        gameStatsModule.addPlayers(Hub.getPlayers());
         
-        for (Player p : Hub.getPlayers()) {
-            gameStatsModule.addPlayer(p);
-        }
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
         // applys the chat gui from the last to the next state (this)
