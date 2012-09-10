@@ -47,7 +47,7 @@ import de.lessvoid.nifty.elements.Element;
  * @author Hans Ferchland
  * @version
  */
-public class PauseActionListener implements ActionListener {
+public class PausePopupController implements ActionListener {
 
     //==========================================================================
     //===   Private Fields
@@ -60,7 +60,7 @@ public class PauseActionListener implements ActionListener {
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
-    public PauseActionListener(Nifty niftyGUI) {
+    public PausePopupController(Nifty niftyGUI) {
         this.niftyGUI = niftyGUI;
     }
 

@@ -16,7 +16,7 @@
                 <onHide name="move" length="200" mode="out" 
                 direction="left" startDelay="0" inherit="true"/>
             </effect>
-            <panel id="game_stats_panel_frame" childLayout="center" 
+            <panel id="game_stats_panel_frame" childLayout="vertical" 
             align="left" backgroundColor="#fff8" width="60%" 
             height="60%" padding="5px">
                 <panel id="game_stats_panel" childLayout="vertical" 

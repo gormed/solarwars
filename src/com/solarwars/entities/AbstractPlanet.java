@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.entities;
 
-
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
@@ -51,6 +50,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     public static final int SPHERE_Z_SAMPLES = 10;
     public static final int SPHERE_RADIAL_SAMPLES = 10;
+    public static boolean PLANET_ANIMATE = true;
     protected AssetManager assetManager;
     protected Material material;
     protected Geometry geometry;
@@ -408,6 +408,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      * 
      * @return the position
      */
+    @Override
     public Vector3f getPosition() {
         return position;
     }
@@ -461,10 +462,11 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      *            the tpf
      */
     public void updatePlanet(float tpf) {
-        material.setFloat("Shift", shift);
-        shift += tpf * 0.08f / size;
-
-
+        if (PLANET_ANIMATE) {
+            material.setFloat("Shift", shift);
+            shift += tpf * 0.08f / size;
+        }
+        
         shipGainTime += tpf;
         if (owner != null && !level.isGameOver()) {
 

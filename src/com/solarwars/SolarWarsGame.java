@@ -206,6 +206,8 @@ public class SolarWarsGame {
         application.getNiftyGUI().addXml("Interface/Nifty/CreateServerState.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/ServerLobbyState.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/MultiplayerGUI.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/TutorialState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/OptionsState.xml");
 
         application.getNiftyGUI().gotoScreen("startup");
 

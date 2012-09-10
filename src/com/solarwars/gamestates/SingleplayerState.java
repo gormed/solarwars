@@ -26,11 +26,10 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
-import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
-import com.solarwars.input.PauseActionListener;
+import com.solarwars.input.PausePopupController;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
@@ -43,15 +42,18 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
  * The Class SingleplayerState.
  */
 public class SingleplayerState extends Gamestate {
+    //==========================================================================
+    //===   Private Fields
+    //==========================================================================
 
-    /** The current level. */
     private Level currentLevel;
-    /** The hub. */
     private Hub hub;
-    /** The pause listener. */
-    private PauseActionListener pauseListener;
+    private PausePopupController pauseListener;
     private Element statsLayer;
     private GameStatsModule gameStatsModule;
+    //==========================================================================
+    //===   Methods & Constructor
+    //==========================================================================
 
     /**
      * Instantiates a new singleplayer state.
@@ -67,7 +69,7 @@ public class SingleplayerState extends Gamestate {
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         // create pause listener
-        pauseListener = new PauseActionListener(niftyGUI);
+        pauseListener = new PausePopupController(niftyGUI);
 
     }
 
@@ -78,6 +80,8 @@ public class SingleplayerState extends Gamestate {
     protected void loadContent() {
         // switch to singleplayer gui
         niftyGUI.gotoScreen("singleplayer");
+        // setup nifty properly
+        setupNiftyGUI();
         // setup game for singleplayer
         setupSingleplayer();
         // attach iso control
@@ -92,9 +96,6 @@ public class SingleplayerState extends Gamestate {
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
 
-
-
-        setupNiftyGUI();
         // play startup sound
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
@@ -131,7 +132,6 @@ public class SingleplayerState extends Gamestate {
         //pause gui
         gameStatsModule.destroy();
         application.getInputManager().removeListener(pauseListener);
-//        pauseListener = null;
         //level
         currentLevel.destroy();
         //3d controls
