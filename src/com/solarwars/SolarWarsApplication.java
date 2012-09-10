@@ -146,42 +146,26 @@ public class SolarWarsApplication extends Application {
     //==========================================================================
     //      Protected & Private Fields
     //==========================================================================
-    /** The root node. */
     protected Node rootNode = new Node("Root Node");
-    /** The gui node. */
     protected Node guiNode = new Node("Gui Node");
-    /** The second counter. */
     protected float secondCounter = 0.0f;
-    /** The frame counter. */
     protected int frameCounter = 0;
     protected Nifty niftyGUI;
-    /** The fps text. */
     protected BitmapText fpsText;
-    /** The gui font. */
     protected BitmapFont guiFont;
-    /** The stats view. */
     protected StatsView statsView;
-    /** The iso cam. */
     protected IsoCamera isoCam;
-    /** The last screen pos. */
     protected Vector2f lastScreenPos;
-    /** The iso control. */
     protected IsoControl isoControl;
-    /** The show settings. */
     protected boolean showSettings = true;
     private String pingString = "";
-    /** The show fps. */
     private boolean showFps = true;
-    /** The action listener. */
     private AppActionListener actionListener = new AppActionListener();
-    /** The post processor. */
     private FilterPostProcessor postProcessor;
-    /** The bloom filter. */
     private BloomFilter bloomFilter =
             new BloomFilter(BloomFilter.GlowMode.Objects);
-    /** The game. */
     private SolarWarsGame game;
-    /** The lost focus. */
+    private NiftyJmeDisplay niftyJmeDisplay;
     private boolean lostFocus = false;
     /** value for the delay if in network */
     private float tempDelay;
@@ -387,7 +371,8 @@ public class SolarWarsApplication extends Application {
                 InputMappings.EXIT_GAME,
                 InputMappings.DEBUG_CAMERA_POS,
                 InputMappings.DEBUG_MEMORY,
-                InputMappings.DEBUG_HIDE_STATS);
+                InputMappings.DEBUG_HIDE_STATS,
+                InputMappings.DEBUG_NIFTY_GUI);
         //setup nifty
         setupNiftyGUI();
 
@@ -413,7 +398,7 @@ public class SolarWarsApplication extends Application {
     }
 
     private void setupNiftyGUI() {
-        NiftyJmeDisplay niftyJmeDisplay = new NiftyJmeDisplay(
+        niftyJmeDisplay = new NiftyJmeDisplay(
                 assetManager,
                 inputManager,
                 audioRenderer,
@@ -493,11 +478,11 @@ public class SolarWarsApplication extends Application {
         // Network delay fixing attempt
         realTimePerFrame = tpf;
         resetSync();
-        correctedTimePerFrame = 
+        correctedTimePerFrame =
                 tpf + (lastDelay + currentDelay) * timer.getTimePerFrame();
-        
+
         tpf = correctedTimePerFrame;
-        
+
         //<editor-fold defaultstate="collapsed" desc="Frames Per Second and Ping Output">
         if (showFps) {
             secondCounter += timer.getTimePerFrame();
@@ -530,7 +515,7 @@ public class SolarWarsApplication extends Application {
         renderManager.render(tpf, context.isRenderable());
         simpleRender(renderManager);
         stateManager.postRender();
-        
+
         // indicate that everything is done and current time can be recoreded
         // for next step
         endSync();
@@ -712,6 +697,12 @@ public class SolarWarsApplication extends Application {
                 boolean show = showFps;
                 setDisplayFps(!show);
                 setDisplayStatView(!show);
+            } else if (name.equals(InputMappings.DEBUG_NIFTY_GUI)) {
+                if (guiViewPort.getProcessors().contains(niftyJmeDisplay)) {
+                    guiViewPort.removeProcessor(niftyJmeDisplay);
+                } else {
+                    guiViewPort.addProcessor(niftyJmeDisplay);
+                }
             }
         }
     }

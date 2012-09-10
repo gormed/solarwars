@@ -85,14 +85,14 @@ public class InputMappings {
     public static final String DEBUG_CAMERA_POS = "SOLARWARS_CameraPos";
     public static final String DEBUG_HIDE_STATS = "SOLARWARS_HideStats";
     public static final String DEBUG_MEMORY = "SOLARWARS_Memory";
+    public static final String DEBUG_NIFTY_GUI = "SOLARWARS_DebugNifty";
     public static final String LEFT_CLICK_SELECT = "SOLARWARS_LeftClick";
     public static final String RIGHT_CLICK_ATTACK = "SOLARWARS_RightClick";
     public static final String PERCENT_UP = "SOLARWARS_WheelUp";
     public static final String PERCENT_DOWN = "SOLARWARS_WheelDown";
     public static final String KEY_COPY_V = "SOLARWARS_KEY_V";
-
     
-    private boolean displayOSCursor = true;
+    private static boolean displayOSCursor = true;
     // ==========================================================================
     // === Methods
     // ==========================================================================
@@ -117,6 +117,8 @@ public class InputMappings {
                 new KeyTrigger(KeyInput.KEY_M));
         inputManager.addMapping(InputMappings.DEBUG_HIDE_STATS,
                 new KeyTrigger(KeyInput.KEY_F3));
+        inputManager.addMapping(InputMappings.DEBUG_NIFTY_GUI,
+                new KeyTrigger(KeyInput.KEY_F4));
 
         inputManager.addMapping(InputMappings.GAME_SCORES,
                 new KeyTrigger(KeyInput.KEY_TAB));
