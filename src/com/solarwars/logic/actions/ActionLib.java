@@ -19,13 +19,15 @@
  * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.logic;
+package com.solarwars.logic.actions;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
+import com.solarwars.logic.MultiplayerGameplay;
+import com.solarwars.logic.Player;
 
 
 /**

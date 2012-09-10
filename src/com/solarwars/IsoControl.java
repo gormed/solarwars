@@ -47,7 +47,7 @@ import com.solarwars.entities.ShipGroup;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.gui.elements.Panel;
 import com.solarwars.input.InputMappings;
-import com.solarwars.logic.ActionLib;
+import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.settings.SolarWarsSettings;

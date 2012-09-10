@@ -45,7 +45,8 @@ public class BasePlanet extends AbstractPlanet {
      * @param position the position
      * @param sizeID the size id
      */
-    public BasePlanet(AssetManager assetManager, Level level, Vector3f position, int sizeID) {
+    public BasePlanet(AssetManager assetManager, 
+            Level level, Vector3f position, int sizeID) {
         super(assetManager, level, position, sizeID);
         this.range = 3.0f;
     }
@@ -55,38 +56,38 @@ public class BasePlanet extends AbstractPlanet {
      */
     @Override
     public void createPlanet() {
+        //<editor-fold defaultstate="collapsed" desc="OLD GEOMENTRY CREATION">
         //Geometry
         
         /*
-        Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);
-
-        s.setTextureMode(Sphere.TextureMode.Projected);
-        TangentBinormalGenerator.generate(s);
-        geometry = new Geometry("BasePlanet_" + id, s);
-        //geometry.setLocalRotation(new Quaternion(angles));
-
-        //Material
-        material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setBoolean("UseMaterialColors", true);
-        material.setColor("Specular", new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));//new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
-        material.setTexture("DiffuseMap", 
-                assetManager.loadTexture("Textures/Planets/noise.png"));
-        material.setColor("Diffuse", new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-        
-        if (material.getMaterialDef().getName().equals("Phong Lighting")
-                && SolarWarsApplication.TOON_ENABLED) {
-            Texture t = assetManager.loadTexture("Textures/Shader/toon.png");
-            //t.setMinFilter(Texture.MinFilter.NearestNoMipMaps);
-            //t.setMagFilter(Texture.MagFilter.Nearest);
-            material.setTexture("ColorRamp", t);
-            
-            material.setBoolean("VertexLighting", true);
-        }
-        
-        */
-        
-        
+         * Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);
+         * 
+         * s.setTextureMode(Sphere.TextureMode.Projected);
+         * TangentBinormalGenerator.generate(s);
+         * geometry = new Geometry("BasePlanet_" + id, s);
+         * //geometry.setLocalRotation(new Quaternion(angles));
+         * 
+         * //Material
+         * material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+         * //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+         * material.setBoolean("UseMaterialColors", true);
+         * material.setColor("Specular", new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));//new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.0f));
+         * material.setTexture("DiffuseMap",
+         * assetManager.loadTexture("Textures/Planets/noise.png"));
+         * material.setColor("Diffuse", new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
+         * 
+         * if (material.getMaterialDef().getName().equals("Phong Lighting")
+         * && SolarWarsApplication.TOON_ENABLED) {
+         * Texture t = assetManager.loadTexture("Textures/Shader/toon.png");
+         * //t.setMinFilter(Texture.MinFilter.NearestNoMipMaps);
+         * //t.setMagFilter(Texture.MagFilter.Nearest);
+         * material.setTexture("ColorRamp", t);
+         * 
+         * material.setBoolean("VertexLighting", true);
+         * }
+         * 
+         */
+        //</editor-fold>
         geometry = new Geometry("BasePlanet_" + id, new Quad(size*2,size*2));
         
         float rot=(float)Math.random()*(float)Math.PI*2.0f;

@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
+import com.solarwars.logic.actions.ActionLib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
 import com.solarwars.Hub;
@@ -85,7 +86,7 @@ public class Player {
      *
      * @return true, if successful
      */
-    static boolean lastPlayer() {
+    public static boolean isLastPlayer() {
         int lostPlayerCount = 0;
         for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
             Player p = entry.getValue();
@@ -102,7 +103,7 @@ public class Player {
      * Local player wins.
      */
     static void localPlayerWins() {
-        if (lastPlayer()) {
+        if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         } else {
             //TODO: Display: "You defeated..."
@@ -114,7 +115,7 @@ public class Player {
      * Local player looses.
      */
     static void localPlayerLooses() {
-        if (lastPlayer()) {
+        if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         }
     }
@@ -243,7 +244,7 @@ public class Player {
      *
      * @param id the new defeated player
      */
-    void setDefeatedPlayer(int id) {
+    public void setDefeatedPlayer(int id) {
         state.defeatedPlayerID = id;
     }
 
@@ -274,7 +275,7 @@ public class Player {
     /**
      * Clear multi select.
      */
-    void clearPlanetMultiSelect() {
+    public void clearPlanetMultiSelect() {
         state.multiSelectedPlanets.clear();
     }
 
@@ -301,7 +302,7 @@ public class Player {
      *
      * @return true, if successful
      */
-    boolean hasMultiSelectedPlanets() {
+    public boolean hasMultiSelectedPlanets() {
         return state.multiSelectedPlanets != null && !state.multiSelectedPlanets.isEmpty();
     }
 
@@ -310,7 +311,7 @@ public class Player {
      *
      * @return the multi select planets
      */
-    ArrayList<AbstractPlanet> getMultiSelectPlanets() {
+    public ArrayList<AbstractPlanet> getMultiSelectPlanets() {
         Level current = SolarWarsGame.getInstance().getCurrentLevel();
         ArrayList<AbstractPlanet> aps = new ArrayList<AbstractPlanet>();
         for (Integer i : state.multiSelectedPlanets) {
@@ -336,7 +337,7 @@ public class Player {
      *
      * @return true, if successful
      */
-    boolean hasSelectedPlanet() {
+    public boolean hasSelectedPlanet() {
         return state.selectedPlanetId > -1;
     }
 
@@ -345,7 +346,7 @@ public class Player {
      *
      * @return the selected planet
      */
-    AbstractPlanet getSelectedPlanet() {
+    public AbstractPlanet getSelectedPlanet() {
         return SolarWarsGame.getInstance().
                 getCurrentLevel().getPlanet(state.selectedPlanetId);
     }
@@ -447,7 +448,7 @@ public class Player {
     /**
      * Clear multi select.
      */
-    void clearShipGroupMultiSelect() {
+    public void clearShipGroupMultiSelect() {
         state.multiSelectedShipGroups.clear();
     }
 
@@ -475,7 +476,7 @@ public class Player {
      *
      * @return true, if successful
      */
-    boolean hasMultiSelectedShipGroups() {
+    public boolean hasMultiSelectedShipGroups() {
         return state.multiSelectedShipGroups != null && !state.multiSelectedShipGroups.isEmpty();
     }
 
@@ -484,7 +485,7 @@ public class Player {
      *
      * @return the multi select planets
      */
-    ArrayList<ShipGroup> getMultiSelectShipGroups() {
+    public ArrayList<ShipGroup> getMultiSelectShipGroups() {
         ArrayList<ShipGroup> sgs = new ArrayList<ShipGroup>();
         Level current = SolarWarsGame.getInstance().getCurrentLevel();
         for (Integer i : state.multiSelectedShipGroups) {
@@ -510,7 +511,7 @@ public class Player {
      *
      * @return true, if successful
      */
-    boolean hasSelectedShipGroup() {
+    public boolean hasSelectedShipGroup() {
         return state.selectedShipGroupId > -1;
     }
 
@@ -519,7 +520,7 @@ public class Player {
      *
      * @return the selected ship group
      */
-    ShipGroup getSelectedShipGroup() {
+    public ShipGroup getSelectedShipGroup() {
         return SolarWarsGame.getInstance().
                 getCurrentLevel().getShipGroup(state.selectedShipGroupId);
     }
@@ -538,7 +539,7 @@ public class Player {
      *
      * @return the aI
      */
-    AI getAI() {
+    public AI getAI() {
         return artificial;
     }
 
@@ -556,7 +557,7 @@ public class Player {
      *
      * @param sg the sg
      */
-    void createShipGroup(ShipGroup sg) {
+    public void createShipGroup(ShipGroup sg) {
         shipGroups.add(sg);
     }
 
@@ -565,7 +566,7 @@ public class Player {
      *
      * @param sg the sg
      */
-    void destroyShipGroup(ShipGroup sg) {
+    public void destroyShipGroup(ShipGroup sg) {
         shipGroups.remove(sg);
     }
 
@@ -574,7 +575,7 @@ public class Player {
      *
      * @param planet the planet
      */
-    void capturePlanet(AbstractPlanet planet) {
+    public void capturePlanet(AbstractPlanet planet) {
         Player prevOwner = null;
 
         if (planet.hasOwner()) {
@@ -592,7 +593,7 @@ public class Player {
      *
      * @param planet the planet
      */
-    void uncapturePlanet(AbstractPlanet planet) {
+    public void uncapturePlanet(AbstractPlanet planet) {
         planets.remove(planet);
 
     }
@@ -611,7 +612,7 @@ public class Player {
      *
      * @return the ship groups
      */
-    ArrayList<ShipGroup> getShipGroups() {
+    public ArrayList<ShipGroup> getShipGroups() {
         return shipGroups;
     }
 }

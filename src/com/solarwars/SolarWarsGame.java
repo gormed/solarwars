@@ -36,7 +36,7 @@ import com.solarwars.gamestates.TutorialState;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.input.KeyInputManager;
 import com.solarwars.logic.AbstractGameplay;
-import com.solarwars.logic.ActionLib;
+import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.GameplayException;
 import com.solarwars.logic.Level;

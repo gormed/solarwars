@@ -69,6 +69,7 @@ public class GameStatsModule {
 //            updatePlayer(item, item.getPlayer());
             }
             playerStateBox.refresh();
+            refreshCounter = 0;
         }
     }
 

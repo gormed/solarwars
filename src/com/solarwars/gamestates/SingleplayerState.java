@@ -78,10 +78,7 @@ public class SingleplayerState extends Gamestate {
      */
     @Override
     protected void loadContent() {
-        // switch to singleplayer gui
-        niftyGUI.gotoScreen("singleplayer");
-        // setup nifty properly
-        setupNiftyGUI();
+
         // setup game for singleplayer
         setupSingleplayer();
         // attach iso control
@@ -95,7 +92,10 @@ public class SingleplayerState extends Gamestate {
                 Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
-
+        // switch to singleplayer gui
+        niftyGUI.gotoScreen("singleplayer");
+        // setup nifty properly
+        setupNiftyGUI();
         // play startup sound
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);

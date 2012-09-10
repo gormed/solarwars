@@ -29,6 +29,9 @@ import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.Ranged;
 import com.solarwars.entities.ShipGroup;
+import com.solarwars.logic.actions.GeneralAction;
+import com.solarwars.logic.actions.PlanetAction;
+import com.solarwars.logic.actions.ShipGroupAction;
 import com.solarwars.net.NetworkManager;
 
 
@@ -253,7 +256,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 SHIP_MULTI_SELECT) {
 
             @Override
-            boolean doAction(Object sender, ShipGroup shipGroup, Player p) {
+            public boolean doAction(Object sender, ShipGroup shipGroup, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
                 }
@@ -279,7 +282,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         GeneralAction gameOver = new GeneralAction(GAME_OVER) {
 
             @Override
-            boolean doAction(Object sender, Player a, Player b) {
+            public boolean doAction(Object sender, Player a, Player b) {
 
                 Player victorious = a;
                 Player defeated = b;
@@ -301,7 +304,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         GeneralAction playerDefeated = new GeneralAction(DEFEATED) {
 
             @Override
-            boolean doAction(Object sender, Player a, Player b) {
+            public boolean doAction(Object sender, Player a, Player b) {
                 return false;
             }
         };
