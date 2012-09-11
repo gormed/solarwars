@@ -354,16 +354,16 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     //      NIFTY GUI EVENT METHODS
     //==========================================================================
 
-    @NiftyEventSubscriber(id = "leave")
-    public void onLeaveButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onLeaveButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         leaveServer();
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
     }
 
-    @NiftyEventSubscriber(id = "ready")
-    public void onReadyButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onReadyButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_EXPLOSION);
     }
     //==========================================================================
     //      INTERNAL GUI REQUESTS

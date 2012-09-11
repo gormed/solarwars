@@ -9,9 +9,10 @@
             <panel id="multiplayer_menu_panel" height="95%" width="95%" 
             align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
                 <panel id="multiplayer_panel" align="center" backgroundColor="#00ff" 
-                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="5%">
+                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="1%">
                 <!-- HEADING -->
-                    <panel id="multiplayer_head_panel" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="20%" width="100%">
+                    <panel id="multiplayer_head_panel" align="center" backgroundColor="#0000" 
+                    childLayout="center" visibleToMouse="false" height="15%" width="100%">
                         <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
                         color="#ffff" text="Multiplayer" align="center" valign="center">
                             <effect>
@@ -33,8 +34,11 @@
                                         <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                                     </effect>
                                 </text>
-                                <control id="player_name" name="textfield" maxLength="20" 
-                                text="${CALL.getPlayerName()}" align="center" valign="center" width="40%"/>
+                                <control id="player_name"
+                                name="textfield" maxLength="20" 
+                                text="${CALL.getPlayerName()}" align="center" 
+                                valign="center" width="40%">
+                                </control>
                             </panel>
                         </panel>
                     </panel>                
@@ -42,9 +46,10 @@
                     <panel id="spacer" align="center" backgroundColor="#0000" 
                     childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
                     <!-- SERVER LIST -->
-                    <panel id="multiplayer_join_server_align_h" childLayout="horizontal" height="55%">
-
-                        <control id="saved_servers_box"  
+                    <panel id="multiplayer_join_server_align_h" 
+                    childLayout="horizontal" height="54%"
+                    backgroundColor="ffff" padding="5px">
+                        <control id="saved_servers_box"
                         name="listBox" horizontal="off" displayItems="10" 
                         selectionMode="Single" forceSelection="true" vertical="optional" 
                         viewConverterClass="com.solarwars.gamestates.gui.SavedServerItemConverter">
@@ -53,28 +58,43 @@
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="5%" width="60%"/>
+                    childLayout="center" visibleToMouse="false" height="1%" width="60%"/>
                     <!-- BACK & SERVER CONTROL BOTTOM LIST -->
-                    <panel id="multiplayer_bottom_align_h" childLayout="horizontal" height="25%">
-                        <panel id="multiplayer_back_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="back" name="button" label="BACK" 
-                                align="center" valign="center" width="100%"/>
+                    <panel id="multiplayer_bottom_align_h" childLayout="horizontal" height="10%">
+                        <panel id="multiplayer_back_align_v" childLayout="vertical" 
+                        width="15%" padding="2%">
+                            <control id="back" name="sw-button" text="BACK" 
+                            align="center" valign="center">
+                                <interact onClick="onBackButton()"/>
+                            </control>
                         </panel>
-                        <panel id="multiplayer_add_server_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="add_server" name="button" label="ADD SERVER" 
-                                align="center" valign="center" width="100%"/>
+                        <panel id="multiplayer_add_server_align_v" childLayout="vertical" 
+                        width="15%" padding="2%">
+                            <control id="add_server" name="sw-button" text="ADD" 
+                            align="center" valign="center" width="100%">
+                                <interact onClick="onAddServerButton()"/>
+                            </control>
                         </panel>
-                        <panel id="multiplayer_delete_server_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="delete_server" name="button" label="DELETE SERVER" 
-                                align="center" valign="center" width="100%"/>
+                        <panel id="multiplayer_delete_server_align_v" childLayout="vertical" 
+                        width="15%" padding="2%">
+                            <control id="delete_server" name="sw-button" text="DELETE" 
+                            align="center" valign="center" width="100%">
+                                <interact onClick="onDeleteServerButton()"/>
+                            </control>
                         </panel>
-                        <panel id="multiplayer_join_server_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="join_server" name="button" label="JOIN SERVER" 
-                                align="center" valign="center" width="100%"/>
+                        <panel id="multiplayer_join_server_align_v" childLayout="vertical" 
+                        width="25%" padding="2%">
+                            <control id="join_server" name="sw-button" text="JOIN SERVER" 
+                            align="center" valign="center" width="100%">
+                                <interact onClick="onJoinServerButton()"/>
+                            </control>
                         </panel>
-                        <panel id="multiplayer_create_server_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="create_server" name="button" label="CREATE SERVER" 
-                            align="center" valign="center" width="100%"/>
+                        <panel id="multiplayer_create_server_align_v" childLayout="vertical" 
+                        width="30%" padding="2%">
+                            <control id="join_server" name="sw-button" text="CREATE SERVER" 
+                            align="center" valign="center" width="100%">
+                                <interact onClick="onCreateServerButton()"/>
+                            </control>
                         </panel>
                     </panel>
                 </panel>

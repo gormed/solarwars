@@ -216,7 +216,8 @@ public class GameOverGUI extends GUIElement implements ClickableGUI {
      */
     @Override
     public void updateGUI(float tpf) {
-        if ((SolarWarsGame.getInstance().getCurrentLevel().isGameOver() && !isVisible() && !watchGame)) {
+        if ((SolarWarsGame.getInstance().getCurrentLevel().isGameOver() 
+                && !isVisible() && !watchGame)) {
             setGameOverState((Hub.getLocalPlayer().hasLost())
                     ? GameOverState.LOST
                     : GameOverState.WON);

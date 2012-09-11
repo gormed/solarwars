@@ -26,7 +26,7 @@
             childLayout="vertical" visibleToMouse="true" height="100%" width="80%">
                 <!-- HEADING -->
                 <panel id="solarwars_head_panel" align="center" backgroundColor="#0000" 
-                childLayout="center" visibleToMouse="false" height="20%" width="100%">
+                childLayout="center" visibleToMouse="false" height="15%" width="100%">
                     <text id="solarwars_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
                     color="#ffff" text="SolarWars" align="center" valign="center" width="100%" height="100%">
                         <effect>

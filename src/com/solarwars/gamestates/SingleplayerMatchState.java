@@ -13,8 +13,8 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: SingleplayerState.java
- * Type: com.solarwars.gamestates.lib.SingleplayerState
+ * File: SingleplayerMatchState.java
+ * Type: com.solarwars.gamestates.lib.SingleplayerMatchState
  * 
  * Documentation created: 14.07.2012 - 19:37:59 by Hans Ferchland
  * 
@@ -23,10 +23,12 @@ package com.solarwars.gamestates;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
 import com.solarwars.input.PausePopupController;
@@ -34,23 +36,27 @@ import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
+import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
 /**
- * The Class SingleplayerState.
+ * The Class SingleplayerMatchState.
  */
-public class SingleplayerState extends Gamestate {
+public class SingleplayerMatchState extends Gamestate {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
 
     private Level currentLevel;
     private Hub hub;
-    private PausePopupController pauseListener;
+    private PausePopupController pausePopup;
+    private ActionListener pauseToggle;
     private Element statsLayer;
     private GameStatsModule gameStatsModule;
+    private GameOverModule gameOverModule;
+    private boolean paused = false;
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
@@ -60,16 +66,26 @@ public class SingleplayerState extends Gamestate {
      *
      * @param game the game
      */
-    public SingleplayerState() {
+    public SingleplayerMatchState() {
         super(SolarWarsGame.SINGLEPLAYER_STATE);
         hub = Hub.getInstance();
+        pauseToggle = new ActionListener() {
+
+            @Override
+            public void onAction(String name, boolean isPressed, float tpf) {
+                if (!isPressed && name.equals(InputMappings.PAUSE_GAME)) {
+                    paused = !paused;
+                }
+            }
+        };
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         // create pause listener
-        pauseListener = new PausePopupController(niftyGUI);
+        pausePopup = new PausePopupController(niftyGUI);
+        gameOverModule = new GameOverModule(niftyGUI);
 
     }
 
@@ -83,7 +99,9 @@ public class SingleplayerState extends Gamestate {
         setupSingleplayer();
         // attach iso control
         application.attachIsoCameraControl();
-
+        application.getInputManager().addListener(
+                pauseToggle,
+                InputMappings.PAUSE_GAME);
         // Create Level and setup gameplay
         currentLevel = new Level(
                 application.getRootNode(),
@@ -105,10 +123,11 @@ public class SingleplayerState extends Gamestate {
      * Setup gui.
      */
     private void setupNiftyGUI() {
-        pauseListener.hidePopup();
+        pausePopup.hidePopup();
+        gameOverModule.hidePopup();
         // attach listener for pause layer
         application.getInputManager().addListener(
-                pauseListener,
+                pausePopup,
                 InputMappings.PAUSE_GAME);
         statsLayer = niftyGUI.getCurrentScreen().
                 findElementByName("stats");
@@ -131,11 +150,15 @@ public class SingleplayerState extends Gamestate {
     protected void unloadContent() {
         //pause gui
         gameStatsModule.destroy();
-        application.getInputManager().removeListener(pauseListener);
+        application.getInputManager().removeListener(pausePopup);
+        application.getInputManager().removeListener(pauseToggle);
         //level
         currentLevel.destroy();
         //3d controls
         application.detachIsoCameraControl();
+        gameStatsModule = null;
+        statsLayer = null;
+        paused = false;
     }
 
     /* (non-Javadoc)
@@ -144,8 +167,13 @@ public class SingleplayerState extends Gamestate {
     @Override
     public void update(float tpf) {
         if (isEnabled()) {
-            currentLevel.updateLevel(tpf);
+            if (!paused) {
+                currentLevel.updateLevel(tpf);
+            }
             updateNifty(tpf);
+            if (currentLevel.isGameOver()) {
+                gameOverModule.showPopup();
+            }
         }
     }
 
@@ -157,6 +185,7 @@ public class SingleplayerState extends Gamestate {
         niftyElement.getRenderer(TextRenderer.class).
                 setText(refreshPercentage() + "%");
         gameStatsModule.update(tpf);
+
     }
 
     /**
@@ -176,10 +205,28 @@ public class SingleplayerState extends Gamestate {
     }
 
     public void continueGame() {
-        pauseListener.hidePopup();
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        pausePopup.hidePopup();
     }
 
     public void quitGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        pausePopup.hidePopup();
+        switchToState(SolarWarsGame.MAINMENU_STATE);
+    }
+
+    public void onWatchGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        gameOverModule.setWatchGame(true);
+        gameOverModule.hidePopup();
+    }
+
+    public void onLeaveGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.MAINMENU_STATE);
     }
 }

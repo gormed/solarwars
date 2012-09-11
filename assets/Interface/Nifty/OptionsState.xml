@@ -8,9 +8,10 @@
             <panel id="options_menu_panel" height="95%" width="95%" 
             align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
                 <panel id="options_panel" align="center" backgroundColor="#00ff" 
-                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="5%">
+                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
                     <!-- HEADING -->
-                    <panel id="options_head_panel" align="center" backgroundColor="#0000" childLayout="center" visibleToMouse="false" height="20%" width="100%">
+                    <panel id="options_head_panel" align="center" backgroundColor="#0000" 
+                    childLayout="center" visibleToMouse="false" height="15%" width="100%">
                         <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
                         color="#ffff" text="Options" align="center" valign="center">
                             <effect>
@@ -26,12 +27,16 @@
 
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
+                    childLayout="center" visibleToMouse="false" height="1%" width="60%"/>
                     <!-- BOTTOM CONTROLS -->
-                    <panel id="options_bottom_align_h" childLayout="horizontal" height="25%">
-                        <panel id="options_back_align_v" childLayout="vertical" width="20%" padding="5%">
-                            <control id="back" name="button" label="BACK" 
-                                align="center" valign="center" width="100%"/>
+                    <panel id="options_bottom_align_h" childLayout="horizontal" 
+                    height="10%">
+                        <panel id="options_back_align_v" childLayout="vertical" 
+                        width="20%" padding="2%">
+                            <control id="back" name="sw-button" text="BACK" 
+                            align="center" valign="center" width="100%">
+                                <interact onClick="onBackButton()"/>
+                            </control>
                         </panel>
                     </panel>
                 </panel>

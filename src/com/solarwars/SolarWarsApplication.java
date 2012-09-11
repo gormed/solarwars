@@ -347,6 +347,7 @@ public class SolarWarsApplication extends Application {
         super.start(JmeContext.Type.Display);
     }
 
+
     /* (non-Javadoc)
      * @see com.jme3.app.Application#initialize()
      */
@@ -522,15 +523,6 @@ public class SolarWarsApplication extends Application {
 
     }
 
-    /* (non-Javadoc)
-     * @see com.jme3.app.Application#loseFocus()
-     */
-    @Override
-    public void loseFocus() {
-        super.loseFocus();
-        lostFocus = true;
-    }
-
     /**
      * Simple update.
      *
@@ -631,6 +623,15 @@ public class SolarWarsApplication extends Application {
      */
     public boolean isSyncronized() {
         return syncronized;
+    }
+
+    /* (non-Javadoc)
+     * @see com.jme3.app.Application#loseFocus()
+     */
+    @Override
+    public void loseFocus() {
+        super.loseFocus();
+        lostFocus = true;
     }
 
     /**

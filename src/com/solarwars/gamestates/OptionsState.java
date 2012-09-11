@@ -63,9 +63,7 @@ public class OptionsState extends Gamestate {
 
     }
     
-    @NiftyEventSubscriber(id = "back")
-    public void onBackButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onBackButton() {
         switchToState(SolarWarsGame.MAINMENU_STATE);
     }
 }

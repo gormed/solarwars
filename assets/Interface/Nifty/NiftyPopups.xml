@@ -9,51 +9,81 @@
                 direction="left" startDelay="0" inherit="true"/>
             <onCustom customKey="out" name="move" length="200" mode="out" 
                 direction="left" startDelay="0" inherit="true"/>
-        </effect>
-        <panel id="pause_panel" childLayout="center" height="25%" width="40%" 
+        </effect>        
+        <panel id="gameover_main_frame" childLayout="vertical">
+            <text id="add_server_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+        color="#ffff" text="PAUSED" align="center" 
+        valign="center" height ="30%">
+            </text>
+            <panel id="pause_panel" childLayout="center" height="25%" width="40%" 
         align="left" valign="center" backgroundColor="#fff8" padding="5px">
 
-            <panel id="pause_panel_frame" childLayout="vertical" align="center" 
+                <panel id="pause_panel_frame" childLayout="vertical" align="center" 
             valign="center" color="#ffff" backgroundColor="#00f8" padding="10%">
             <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" 
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
                 childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
             <!-- CONTINUE BUTTON -->
-                <panel id="pause_continue_panel_frame" align="right" backgroundColor="#ffff" 
-                childLayout="center" visibleToMouse="true" height="40%" width="60%" padding="3px">
-                    <panel id="pause_continue_panel" align="center" backgroundColor="#00ff" 
-                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
+                    <control id="pause_continue_panel" name="sw-button" text="CONTINUE GAME" 
+                    align="center" valign="center" width="100%">
                         <interact onClick="continueGame()"/>
-                        <text id="continue_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="continue" align="center" valign="center">
-                            <effect>
-                                <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                            </effect>
-                        </text>
-                        
-                    </panel>
-                </panel>
+                    </control>
             <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" 
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
                 childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
             <!-- QUIT BUTTON -->
-                <panel id="pause_quit_panel_frame" align="right" backgroundColor="#ffff" 
-                childLayout="center" visibleToMouse="true" height="40%" width="60%" padding="3px">
-                    <panel id="pause_quit_panel" align="center" backgroundColor="#00ff" 
-                    childLayout="center" visibleToMouse="true" height="100%" width="100%">
+                    <control id="pause_quit_panel_frame" name="sw-button" text="MAINMENU" 
+                align="center" valign="center" width="100%">
                         <interact onClick="quitGame()"/>
-                        <text id="quit_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="quit" align="center" valign="center">
-                            <effect>
-                                <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                            </effect>
-                        </text>
-                        
-                    </panel>
-                </panel>
+                    </control>
                 <!-- SPACER -->
-                <panel id="spacer" align="center" backgroundColor="#0000" 
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
                 childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+                </panel>
+            </panel>
+        </panel>
+    </popup>
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+<!-- game over popup -->
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <popup id="gameover_popup" childLayout="center" backgroundColor="#0000">
+        <effect>
+            <onCustom customKey="in" name="move" length="200" mode="in" 
+                direction="right" startDelay="0" inherit="true"/>
+            <onCustom customKey="out" name="move" length="200" mode="out" 
+                direction="right" startDelay="0" inherit="true"/>
+        </effect>
+        <panel id="gameover_main_frame" childLayout="vertical">
+            <text id="add_server_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+        color="#ffff" text="GAME OVER" align="center" 
+        valign="center" height ="30%">
+            </text>
+        
+            <panel id="gameover_panel" childLayout="center" height="25%" width="40%" 
+        align="right" valign="center" backgroundColor="#fff8" padding="5px">
+                <panel id="gameover_panel_frame" childLayout="vertical" align="center" 
+            valign="center" color="#ffff" backgroundColor="#00f8" padding="10%">
+
+            <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+            <!-- WATCH BUTTON -->
+                    <control id="gameover_continue" name="sw-button" text="WATCH GAME" 
+                    align="center" valign="center" width="100%">
+                        <interact onClick="onWatchGame()"/>
+                    </control>
+            <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+            <!-- QUIT BUTTON -->
+                    <control id="gameover_leave" name="sw-button" text="LEAVE GAME" 
+                align="center" valign="center" width="100%">
+                        <interact onClick="onLeaveGame()"/>
+                    </control>
+                <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+                </panel>
             </panel>
         </panel>
     </popup>
@@ -61,18 +91,21 @@
 <!-- add server popup -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <popup id="add_server_popup" childLayout="center" backgroundColor="#0000">
-        <panel id="pause_panel" childLayout="center" height="40%" width="40%" 
-        align="center" valign="center" backgroundColor="#fff8" padding="5px">
+        <panel id="pause_panel" childLayout="center" height="40%" width="50%" 
+        align="center" valign="center" backgroundColor="#fffb" padding="5px">
             <panel id="pause_panel_frame" childLayout="vertical" align="center" 
-            valign="center" color="#ffff" backgroundColor="#00f8" padding="5%"
+            valign="center" color="#ffff" backgroundColor="#00ff" padding="1%"
             height="100%" width="100%">
                 <text id="add_server_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
                         color="#ffff" text="ADD NEW SERVER" align="center" 
                         valign="center" height ="30%">
                     <effect>
-                        <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
+                        <onActive name="textSize" startSize="0.5" endSize="0.5" oneShot="true"/>
                     </effect>
                 </text>
+                <!-- SPACER -->
+                <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="5%" width="100%"/>
                 <control id="server_name" name="textfield" maxLength="20" 
                 text="New Server" align="center" valign="center" width="80%"/>
                 <!-- SPACER -->
@@ -83,14 +116,19 @@
                 <!-- SPACER -->
                 <panel id="spacer" align="center" backgroundColor="#0000" 
                 childLayout="center" visibleToMouse="false" height="15%" width="100%"/>
-                <panel id="add_server_horizontal" childLayout="horizontal" padding="5%">
-                    <control id="add_server_back" name="button" label="CANCEL" 
-                align="center" valign="center" width="40%" height="25%"/>
-                <!-- SPACER -->
+                <panel id="add_server_horizontal" childLayout="horizontal" 
+                padding="5%" height="25%">
+                    <control id="add_server_back" name="sw-button" text="CANCEL" 
+                            align="center" valign="center" width="45%">
+                        <interact onClick="onCancelAddServerButton()"/>
+                    </control>
+                    <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                childLayout="center" visibleToMouse="false" height="25%" width="20%"/>
-                    <control id="add_new_server" name="button" label="SAVE FAVORITE" 
-                align="center" valign="center" width="40%" height="25%"/>
+                    childLayout="center" visibleToMouse="false" height="25%" width="10%"/>
+                    <control id="add_new_server" name="sw-button" text="SAVE FAV" 
+                            align="center" valign="center" width="45%">
+                        <interact onClick="onAddNewServerButton()"/>
+                    </control>
                 </panel>
             </panel>
         </panel>

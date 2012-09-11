@@ -481,10 +481,8 @@ public class CreateServerState extends Gamestate
         }
         return serverSeed;
     }
-
-    @NiftyEventSubscriber(id = "start")
-    public void onStartServer(final String id,
-            final ButtonClickedEvent event) {
+    
+    public void onStartServer() {
         startServer();
     }
 
@@ -531,9 +529,7 @@ public class CreateServerState extends Gamestate
         gameStarted = true;
     }
 
-    @NiftyEventSubscriber(id = "cancel")
-    public void onCancelServer(final String id,
-            final ButtonClickedEvent event) {
+    public void onCancelServer() {
         cancelServer();
     }
 
@@ -578,15 +574,6 @@ public class CreateServerState extends Gamestate
         }
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
-    }
-
-    /**
-     * Removes the leaving player.
-     * 
-     * @param p
-     *            the p
-     */
-    private void removeLeavingPlayer(Player p) {
     }
 
     /*
@@ -634,7 +621,7 @@ public class CreateServerState extends Gamestate
         for (Player p : players.values()) {
             if (p != null) {
                 serverLobbyBox.addItem(
-                        new ConnectedPlayerItem(p.getName(), p.getColor()));
+                        new ConnectedPlayerItem(p.getName(), p.getColor().clone()));
             }
         }
         playersChanged = false;

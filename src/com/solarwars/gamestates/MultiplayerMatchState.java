@@ -29,7 +29,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 
-import com.jme3.input.controls.ActionListener;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
 import com.solarwars.AudioManager;
@@ -37,11 +36,12 @@ import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
+import com.solarwars.input.PausePopupController;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
-import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
@@ -53,9 +53,10 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 public class MultiplayerMatchState extends Gamestate {
 
     // GUI
-    private PauseActionListener pauseListener;
+    private PausePopupController pauseListener;
     private Element statsLayer;
     private GameStatsModule gameStatsModule;
+    private GameOverModule gameOverModule;
     // Network and game
     private Hub hub;
     private Level currentLevel;
@@ -71,6 +72,9 @@ public class MultiplayerMatchState extends Gamestate {
     public MultiplayerMatchState() {
         super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
         this.application = SolarWarsApplication.getInstance();
+        // create pause listener
+        pauseListener = new PausePopupController(niftyGUI);
+        gameOverModule = new GameOverModule(niftyGUI);
 
     }
 
@@ -84,6 +88,9 @@ public class MultiplayerMatchState extends Gamestate {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
                 updateNifty(tpf);
+                if (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost()) {
+                    gameOverModule.showPopup();
+                }
             } else if (lostConnection && !currentLevel.isGameOver()) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
@@ -99,7 +106,6 @@ public class MultiplayerMatchState extends Gamestate {
         // swap old with new text
         niftyElement.getRenderer(TextRenderer.class).
                 setText(refreshPercentage() + "%");
-
         gameStatsModule.update(tpf);
     }
     /* (non-Javadoc)
@@ -138,8 +144,8 @@ public class MultiplayerMatchState extends Gamestate {
         application.getInputManager().removeListener(pauseListener);
 
         lostConnection = false;
-        NetworkManager networkManager = NetworkManager.getInstance();
-        networkManager.getChatModule().destroy();
+//        NetworkManager networkManager = NetworkManager.getInstance();
+//        networkManager.getChatModule().destroy();
 
         Future<Thread> fut = application.enqueue(new Callable<Thread>() {
 
@@ -191,20 +197,55 @@ public class MultiplayerMatchState extends Gamestate {
      * Setup gui.
      */
     private void setupNiftyGUI() {
-        
+
+        pauseListener.hidePopup();
+        gameOverModule.hidePopup();
+        // attach listener for pause layer
+        application.getInputManager().addListener(
+                pauseListener,
+                InputMappings.PAUSE_GAME);
+
         statsLayer = niftyGUI.getCurrentScreen().
                 findElementByName("stats");
-        
+
         gameStatsModule = new GameStatsModule(statsLayer,
                 niftyGUI.getCurrentScreen().
                 findNiftyControl("game_stats_box_panel",
                 ListBox.class), currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
-        
+
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
         // applys the chat gui from the last to the next state (this)
 //        NetworkManager.getInstance().getChatModule().changeGUI(gui);
+    }
+
+    public void continueGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        pauseListener.hidePopup();
+    }
+
+    public void quitGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        pauseListener.hidePopup();
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+
+    }
+
+    public void onWatchGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        gameOverModule.setWatchGame(true);
+        gameOverModule.hidePopup();
+    }
+
+    public void onLeaveGame() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        gameOverModule.hidePopup();
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
     }
 
     public int refreshPercentage() {
@@ -248,33 +289,6 @@ public class MultiplayerMatchState extends Gamestate {
 //                if (c.equals(client)) {
 //                    noServerFound = true;
 //                }
-        }
-    }
-
-    /**
-     * The listener interface for receiving pauseAction events.
-     * The class that is interested in processing a pauseAction
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addPauseActionListener<code> method. When
-     * the pauseAction event occurs, that object's appropriate
-     * method is invoked.
-     *
-     * @see PauseActionEvent
-     */
-    private class PauseActionListener implements ActionListener {
-
-        /* (non-Javadoc)
-         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
-         */
-        @Override
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (isPressed) {
-                return;
-            }
-            if (name.equals(InputMappings.PAUSE_GAME)) {
-//                pause.togglePause();
-            }
         }
     }
 }

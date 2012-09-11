@@ -30,7 +30,6 @@ import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
@@ -41,10 +40,9 @@ import java.util.logging.Level;
  * The Class MultiplayerState.
  */
 public class MultiplayerState extends Gamestate {
-    
+
     private NetworkManager networkManager;
-    private String currentIPAddress = SolarWarsSettings.getInstance().
-            getIpAddressFavouriteServer();
+    private String currentIPAddress;
     private ListBox<SavedServerItem> serverListBox;
     private SavedServerItem localServer =
             new SavedServerItem("LOCAL", "127.0.0.1");
@@ -57,7 +55,8 @@ public class MultiplayerState extends Gamestate {
      */
     public MultiplayerState() {
         super(SolarWarsGame.MULTIPLAYER_STATE);
-
+        currentIPAddress = SolarWarsSettings.getInstance().
+            getIpAddressFavouriteServer();
     }
 
     /* (non-Javadoc)
@@ -77,15 +76,15 @@ public class MultiplayerState extends Gamestate {
         addServerPopup = new AddServerPopup(niftyGUI);
         serverListBox = screen.findNiftyControl(
                 "saved_servers_box", ListBox.class);
-        
+
         serverListBox.clear();
         serverListBox.addItem(localServer);
         serverListBox.addItem(lastServer);
-        
+
         // init network manager
         networkManager = NetworkManager.getInstance();
-        
-        
+
+
 //        playerName = new TextBox(
 //                ColorRGBA.Blue.clone(),
 //                new Vector3f(gui.getWidth() / 2, 7 * gui.getHeight() / 10, 0),
@@ -261,36 +260,35 @@ public class MultiplayerState extends Gamestate {
     /**
      * Adds a new server to the favs.
      */
-    @NiftyEventSubscriber(id = "add_new_server")
-    public void onAddNewServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onAddNewServerButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         serverListBox.addItem(new SavedServerItem(
                 addServerPopup.getNewServerName(),
                 addServerPopup.getNewServerIP()));
 
 //        serverListBox.addItem(addServerPopup.getNewServerName()
 //                + " - " + addServerPopup.getNewServerIP());
-        currentIPAddress = addServerPopup.getNewServerIP();
         addServerPopup.hidePopup();
     }
 
     /**
      * Cancels the adding of a new fav.
      */
-    @NiftyEventSubscriber(id = "add_server_back")
-    public void onCancelAddServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onCancelAddServerButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         addServerPopup.hidePopup();
     }
 
     /**
      * Opens the add server popup.
      */
-    @NiftyEventSubscriber(id = "delete_server")
-    public void onDeleteServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onDeleteServerButton() {
         Object s = serverListBox.getSelection().get(0);
         if (s != null && s instanceof SavedServerItem) {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_CLICK);
             serverListBox.removeItem((SavedServerItem) s);
         }
     }
@@ -298,9 +296,9 @@ public class MultiplayerState extends Gamestate {
     /**
      * Opens the add server popup.
      */
-    @NiftyEventSubscriber(id = "add_server")
-    public void onAddServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onAddServerButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         addServerPopup.showPopup();
     }
 
@@ -310,6 +308,8 @@ public class MultiplayerState extends Gamestate {
         List<SavedServerItem> selection = event.getSelection();
 
         if (!selection.isEmpty() && selection.get(0) != null) {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_CLICK);
             currentIPAddress = selection.get(0).getIp();
         }
     }
@@ -332,31 +332,31 @@ public class MultiplayerState extends Gamestate {
 //            }
 //        }
 //    }
-
     @NiftyEventSubscriber(id = "player_name")
     public void onPlayerNameChanged(final String id,
             final TextFieldChangedEvent event) {
         SolarWarsSettings.getInstance().setPlayerName(event.getText());
     }
-    
+
     /**
      * Creates the server.
      */
-    @NiftyEventSubscriber(id = "create_server")
-    public void onCreateServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onCreateServerButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.CREATE_SERVER_STATE);
     }
 
     /**
      * Join server.
      */
-    @NiftyEventSubscriber(id = "join_server")
-    public void onJoinServerButton(final String id,
-            final ButtonClickedEvent event) {
+    public void onJoinServerButton() {
         String ip = currentIPAddress;
-
+        
         if (NetworkManager.checkIP(ip)) {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_CLICK);
+            SolarWarsSettings.getInstance().setIpAddressFavouriteServer(ip);
             switchToState(SolarWarsGame.SERVER_LOBBY_STATE);
         } else {
             AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_ERROR);
@@ -366,9 +366,10 @@ public class MultiplayerState extends Gamestate {
         }
     }
 
-    @NiftyEventSubscriber(id = "back")
-    public void onBackButton(final String id,
-            final ButtonClickedEvent event) {
+//    @NiftyEventSubscriber(id = "back")
+    public void onBackButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.MAINMENU_STATE);
     }
 }

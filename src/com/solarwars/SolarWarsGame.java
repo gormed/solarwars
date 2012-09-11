@@ -31,7 +31,7 @@ import com.solarwars.gamestates.MultiplayerMatchState;
 import com.solarwars.gamestates.MultiplayerState;
 import com.solarwars.gamestates.OptionsState;
 import com.solarwars.gamestates.ServerLobbyState;
-import com.solarwars.gamestates.SingleplayerState;
+import com.solarwars.gamestates.SingleplayerMatchState;
 import com.solarwars.gamestates.TutorialState;
 import com.solarwars.gui.GameGUI;
 import com.solarwars.input.KeyInputManager;
@@ -150,7 +150,7 @@ public class SolarWarsGame {
      */
     public void start() {
         MainmenuState mainmenu = new MainmenuState();
-        SingleplayerState singleplayer = new SingleplayerState();
+        SingleplayerMatchState singleplayer = new SingleplayerMatchState();
         MultiplayerState multiplayer = new MultiplayerState();
         CreateServerState createServerState = new CreateServerState();
         ServerLobbyState serverLobbyState = new ServerLobbyState();

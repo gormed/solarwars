@@ -5,7 +5,7 @@
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- singleplayer screen -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
-    <screen id="singleplayer" controller="com.solarwars.gamestates.SingleplayerState">
+    <screen id="singleplayer" controller="com.solarwars.gamestates.SingleplayerMatchState">
         <layer id="none" backgroundColor="#0000" childLayout="center" >
 
         </layer>

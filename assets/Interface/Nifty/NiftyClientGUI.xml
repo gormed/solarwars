@@ -7,51 +7,30 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
     <useStyles filename="nifty-default-styles.xml" />
     <!-- SEVER BROWSER CONTROL -->
     <controlDefinition name="saved-server-line">
-        <panel childLayout="horizontal" width="90%" align="center" padding="3px">
-            <text id="#server-name-text" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="" align="center" valign="center" height="36px"
-                        width="40%">
-                <effect>
-                    <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                </effect>
-            </text>
-<!--            <control id="#server-name-text" name="label" 
-            align="center" textHAlign="center" height="30px" width="*" wrap="true" />-->
-            <text id="#server-ip-text" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="" align="center" valign="center" height="36px"
-                        width="40%">
-                <effect>
-                    <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                </effect>
-            </text>
-<!--            <control id="#server-ip-text" name="label" 
-            align="center" textHAlign="center" height="30px" width="*" wrap="true" />-->
+        <panel childLayout="horizontal" width="90%" align="left" padding="3px">
+            <text id="#server-name-text" font="Interface/Fonts/SolarWarsFont32.fnt" 
+            color="#ffff" text="" align="left" valign="center" height="36px"
+            width="40%"/>
+            
+            <text id="#server-ip-text" font="Interface/Fonts/SolarWarsFont32.fnt" 
+            color="#ffff" text="" align="left" valign="center" height="36px"
+            width="40%"/>
         </panel>
     </controlDefinition>
     <!-- SERVER LOBBY CONTROL -->
     <controlDefinition name="server-lobby-line">
         <panel childLayout="horizontal" width="100%" align="center" padding="3px">
-            <text id="#player-name-text" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="" align="center" valign="center" height="36px"
-                        width="50%">
-                <effect>
-                    <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                </effect>
-            </text>
-<!--            <control id="#player-name-text" name="label" 
-            align="center" textHAlign="center" height="36px" width="*" wrap="true" />-->
+            <text id="#player-name-text" font="Interface/Fonts/SolarWarsFont32.fnt" 
+            color="#ffff" text="" align="center" valign="top" height="36px"
+            width="50%"/>
             <panel childLayout="center" width="25%">
                 <panel id="#player-color-panel" height="32px" 
-            width="32px" align="center" backgroundColor="000f"/>
+            width="32px" align="center" valign="top" backgroundColor="000f"/>
             </panel>  
             <panel childLayout="center" width="25%" visibleToMouse="false">
-                <text id="#player-ready-text" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="not ready" align="center" valign="center" height="36px"
-                        width="100%">
-                    <effect>
-                        <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
-                    </effect>
-                </text>
+                <text id="#player-ready-text" font="Interface/Fonts/SolarWarsFont32.fnt" 
+                color="#ffff" text="not ready" align="center" valign="top" height="36px"
+                width="100%"/>
             </panel>
         </panel>
     </controlDefinition>
@@ -107,9 +86,35 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
         </panel>
         
     </controlDefinition>
+    
+    <controlDefinition name="sw-button">
+        <panel align="center" backgroundColor="#ffff" 
+                childLayout="center" padding="3px">
+            <panel align="center" backgroundColor="#00ff" 
+                    childLayout="center" height="100%" width="100%">
+                <text font="Interface/Fonts/SolarWarsFont32.fnt" 
+                color="#ffff" text="$text" align="center" valign="center"/>
+            </panel>
+        </panel>
+    </controlDefinition>
+    
+    <controlDefinition name="sw-big-button">
+        <panel align="center" backgroundColor="#ffff" 
+                childLayout="center" padding="3px">
+            <panel align="center" backgroundColor="#00ff" 
+                    childLayout="center" height="100%" width="100%">
+                <text font="Interface/Fonts/SolarWarsFont64.fnt" 
+                color="#ffff" text="$text" align="center" valign="center" wrap="true"/>
+            </panel>
+        </panel>
+    </controlDefinition>
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+<!-- STYLES -->
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
     <!-- FAVORITE LIST BOX ITEM STYLE -->
     <style id="favorite-listbox-item" base="nifty-label">
-        <attributes color="#000f" width="100%" align="left" textVAlign="center" textHAlign="left" />
+        <attributes color="#000f" width="100%" align="left" textVAlign="center" 
+        textHAlign="left" />
         <interact onClick="listBoxItemClicked()"/>
         <effect>
             <onCustom customKey="focus" name="colorBar" post="false" color="#009f" neverStopRendering="true" timeType="infinite" />
@@ -124,5 +129,10 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
     <style id="game-stats-style">
         <attributes width="100%" height="*" padding="10px" 
         backgroundColor="#0000" childLayout="center" />
+    </style>
+    <!-- SERVER BROWSER STYLE -->
+    <style id="server-browser-style">
+        <attributes width="100%" height="*" padding="5px" 
+        backgroundColor="#00fa" childLayout="center" />
     </style>
 </nifty>
