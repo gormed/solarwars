@@ -36,13 +36,12 @@ import java.util.ArrayList;
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
-public class GameStatsModule {
+public class GameStatsModule implements ActionListener {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
 
     private float refreshCounter = 0;
-    private TabActionListener actionListener = new TabActionListener();
     private final Element statsLayer;
     private ListBox<PlayerStatsItem> playerStateBox;
     private Level level;
@@ -56,9 +55,13 @@ public class GameStatsModule {
         this.statsLayer = statsLayer;
         this.playerStateBox = playerStateBox;
         this.level = level;
+        initialize();
         this.statsLayer.hide();
         this.playerStateBox.clear();
-        this.inputManager.addListener(actionListener, InputMappings.GAME_SCORES);
+    }
+
+    private void initialize() {
+        this.inputManager.addListener(this, InputMappings.GAME_SCORES);
     }
 
     public void update(float tpf) {
@@ -85,34 +88,21 @@ public class GameStatsModule {
 
     public void destroy() {
         if (inputManager != null) {
-            inputManager.removeListener(actionListener);
+            inputManager.removeListener(this);
         }
     }
 
-    /**
-     * The listener interface for receiving tabAction events.
-     * The class that is interested in processing a tabAction
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addTabActionListener<code> method. When
-     * the tabAction event occurs, that object's appropriate
-     * method is invoked.
-     *
-     * @see TabActionEvent
-     */
-    private class TabActionListener implements ActionListener {
 
-        /* (non-Javadoc)
-         * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
-         */
-        @Override
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals(InputMappings.GAME_SCORES)) {
-                if (isPressed) {
-                    statsLayer.show();
-                } else {
-                    statsLayer.hide();
-                }
+    /* (non-Javadoc)
+     * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+     */
+    @Override
+    public void onAction(String name, boolean isPressed, float tpf) {
+        if (name.equals(InputMappings.GAME_SCORES)) {
+            if (isPressed) {
+                statsLayer.show();
+            } else {
+                statsLayer.hide();
             }
         }
     }

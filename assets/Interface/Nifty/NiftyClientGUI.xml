@@ -84,9 +84,9 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                 </text>
             </panel>
         </panel>
-        
     </controlDefinition>
-    
+
+    <!-- SW BUTTON CONTROL -->
     <controlDefinition name="sw-button">
         <panel align="center" backgroundColor="#ffff" 
                 childLayout="center" padding="3px">
@@ -98,6 +98,7 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
         </panel>
     </controlDefinition>
     
+    <!-- SW BIG BUTTON CONTROL -->
     <controlDefinition name="sw-big-button">
         <panel align="center" backgroundColor="#ffff" 
                 childLayout="center" padding="3px">
@@ -108,6 +109,9 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
             </panel>
         </panel>
     </controlDefinition>
+    
+        
+
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- STYLES -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->

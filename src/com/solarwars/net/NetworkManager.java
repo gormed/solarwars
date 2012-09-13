@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.net;
 
+import com.solarwars.gamestates.gui.GameChatModule;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -158,7 +159,7 @@ public class NetworkManager {
     /** The this server. */
     private SolarWarsServer thisServer;
     /** The chat module. */
-    private ChatModule chatModule;
+    private GameChatModule chatModule;
     /** The client register listeners. */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
     /** The client listener. */
@@ -183,7 +184,7 @@ public class NetworkManager {
      * 
      * @return chat module from the current session
      */
-    public ChatModule getChatModule() {
+    public GameChatModule getChatModule() {
         return chatModule;
     }
 
@@ -294,8 +295,9 @@ public class NetworkManager {
             return null;
         }
         
-        // setup chat
-        this.chatModule = new ChatModule();
+        //TODO HANS setup chat
+        
+//        this.chatModule = new GameChatModule();
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(ChatMessage.class);

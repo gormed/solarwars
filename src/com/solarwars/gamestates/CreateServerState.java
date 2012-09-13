@@ -174,7 +174,8 @@ public class CreateServerState extends Gamestate
         refreshedPlayers = new HashMap<Integer, Player>();
 
         niftyGUI.gotoScreen("create_server");
-        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box", 
+                ListBox.class);
         // =========================================
         // SETUP SERVER
         // =========================================

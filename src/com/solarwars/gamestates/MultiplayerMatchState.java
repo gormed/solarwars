@@ -36,6 +36,7 @@ import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
@@ -43,9 +44,14 @@ import com.solarwars.input.PausePopupController;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
 import com.solarwars.net.NetworkManager;
+import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
+import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.screen.KeyInputHandler;
 
 /**
  * The Class MultiplayerMatchState.
@@ -214,6 +220,29 @@ public class MultiplayerMatchState extends Gamestate {
                 ListBox.class), currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
 
+        // CHAT ------------------------------------------
+        textInput = screen.findElementByName("chat_text_field");
+        chatArea = screen.findControl("game_chat_module", GameChatModule.class);
+        textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
+        
+                textInput.addInputHandler(new KeyInputHandler() {
+
+            @Override
+            public boolean keyEvent(NiftyInputEvent inputEvent) {
+                if (inputEvent == null) {
+                    return false;
+                }
+                switch (inputEvent) {
+                    case SubmitText:
+                        sendMessage();
+                        return true;
+                }
+                return false;
+            }
+        });
+        textInput.setFocus();
+        // CHAT ------------------------------------------
+
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
         // applys the chat gui from the last to the next state (this)
@@ -250,6 +279,32 @@ public class MultiplayerMatchState extends Gamestate {
 
     public int refreshPercentage() {
         return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
+    }
+    //==========================================================================
+    //===   Chat
+    //==========================================================================
+    private Element textInput;
+    private TextField textInputField;
+    private GameChatModule chatArea;
+
+    @NiftyEventSubscriber(id = "player_name")
+    public void onSendMessage(final String id,
+            final ButtonClickedEvent event) {
+        
+    }
+    
+    /**
+     * Sends a message to the chat area
+     */
+    public void sendMessage() {
+
+        if (chatArea.getText().isEmpty()) {
+            chatArea.append(textInputField.getText());
+        } else {
+            chatArea.append("\n" + textInputField.getText());
+        }
+        textInputField.setText("");
+        textInput.setFocus();
     }
 
     /**

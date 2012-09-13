@@ -37,7 +37,7 @@ import com.solarwars.gui.GameGUI;
 import com.solarwars.input.KeyInputManager;
 import com.solarwars.input.KeyboardListener;
 import com.solarwars.logic.Player;
-import com.solarwars.net.ChatModule;
+import com.solarwars.gamestates.gui.GameChatModule;
 
 import java.util.ArrayList;
 
@@ -57,7 +57,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
     /** The gui. */
     private GameGUI gui;
     /** The chat module. */
-    private ChatModule chatModule;
+    private GameChatModule chatModule;
     /** The text area. */
     private Panel textArea;
     /** The background. */
@@ -91,7 +91,7 @@ public class ChatGUI extends GUIElement implements ClickableGUI {
      * @param gui the gui
      * @param chatModule the chat module
      */
-    public ChatGUI(GameGUI gui, ChatModule chatModule) {
+    public ChatGUI(GameGUI gui, GameChatModule chatModule) {
         this.gui = gui;
         this.chatModule = chatModule;
 
