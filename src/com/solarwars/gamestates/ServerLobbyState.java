@@ -232,6 +232,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gameStarted = false;
         playersChanged = false;
 
+        gameChatModule.destroy();
         if (client != null) {
             client.removeMessageListener(
                     playerConnectionListener,
@@ -265,7 +266,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     //==========================================================================
     private Element textInput;
     private TextField textInputField;
-    private GameChatModule chatArea;
 
     /**
      * Sends a message to the chat area
@@ -456,6 +456,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;
+                gameChatModule.playerJoins(thisPlayer);
                 //refreshPlayers(players);
 
                 // PLAYER LEAVING
@@ -463,7 +464,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
                 p.setLeaver(true);
-                NetworkManager.getInstance().getChatModule().playerLeaves(p);
+                gameChatModule.playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;

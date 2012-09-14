@@ -26,6 +26,7 @@ import de.lessvoid.nifty.controls.ListBox.ListBoxViewConverter;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.PanelRenderer;
 import de.lessvoid.nifty.elements.render.TextRenderer;
+import de.lessvoid.nifty.layout.align.HorizontalAlign;
 import de.lessvoid.nifty.tools.Color;
 
 /**
@@ -73,14 +74,14 @@ public class ChatItemConverter implements
             } else if (item.getType() == ChatItem.ChatMsgType.SERVER) {
 
                 chatNameRenderer.setText("#SERVER");
-                chatTextRenderer.setText(item.getMessage() + "");
+                chatTextRenderer.setText(item.getMessage());
                 ColorRGBA color = ColorRGBA.Orange.clone();
                 chatTextRenderer.setColor(
                         new Color(color.r, color.g, color.b, color.a));
                 playerColorRenderer.setBackgroundColor(Color.WHITE);
             } else if (item.getType() == ChatItem.ChatMsgType.JOINS) {
                 chatNameRenderer.setText("#" + item.getName());
-                chatTextRenderer.setText("joins the game!");
+                chatTextRenderer.setText(item.getMessage());
                 ColorRGBA color = ColorRGBA.Green.clone();
                 chatTextRenderer.setColor(
                         new Color(color.r, color.g, color.b, color.a));
@@ -96,13 +97,15 @@ public class ChatItemConverter implements
                 ColorRGBA color = ColorRGBA.Red.clone();
                 chatTextRenderer.setColor(
                         new Color(color.r, color.g, color.b, color.a));
-            }else if (item.getType() == ChatItem.ChatMsgType.WIN) {
+            } else if (item.getType() == ChatItem.ChatMsgType.WIN) {
                 chatNameRenderer.setText("#" + item.getName());
-                chatTextRenderer.setText("wins the game! well done :)");
+                chatTextRenderer.setText(item.getMessage());
                 ColorRGBA color = ColorRGBA.Black.clone();
                 chatTextRenderer.setColor(
                         new Color(color.r, color.g, color.b, color.a));
             }
+
+            chatTextRenderer.setTextHAlign(HorizontalAlign.left);
         } else {
             chatNameRenderer.setText("");
             chatTextRenderer.setText("");

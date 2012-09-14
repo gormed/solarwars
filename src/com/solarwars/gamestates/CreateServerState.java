@@ -234,6 +234,7 @@ public class CreateServerState extends Gamestate
             e.printStackTrace();
         }
 
+        gameChatModule.destroy();
         if (serverClient != null) {
             serverClient.removeMessageListener(clientMessageListener);
         }
@@ -467,7 +468,6 @@ public class CreateServerState extends Gamestate
     //==========================================================================
     private Element textInput;
     private TextField textInputField;
-    private GameChatModule chatArea;
 
     /**
      * Sends a message to the chat area
@@ -633,6 +633,7 @@ public class CreateServerState extends Gamestate
                 } else {
                     Hub.getInstance().addPlayer(thisPlayer);
                 }
+                gameChatModule.playerJoins(thisPlayer);
 
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;

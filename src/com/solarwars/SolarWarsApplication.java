@@ -443,7 +443,6 @@ public class SolarWarsApplication extends Application {
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
             isoControl.addControlListener();
-            isoControl.createDragRectGeometry();
 
         }
         isoCam.reset();
@@ -530,7 +529,6 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleUpdate(float tpf) {
         try {
-
             if (isoCam != null && isoControl != null) {
                 isoControl.updateSelection(tpf);
                 if (isoCam.isDragged()) {

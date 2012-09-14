@@ -67,12 +67,12 @@
                 direction="right" startDelay="0" inherit="true"/>
             </effect>
             <panel id="chat_dialog" childLayout="center"
-            width="35%" height="60%" align="right" valign="center"
+            width="38%" height="60%" align="right" valign="center"
             visibleToMouse="true" backgroundColor="#fff8" padding="2px">
                 <panel childLayout="vertical" align="right" 
                 valign="center" backgroundColor="#00f8">
-                    <control id="chat_text_box"
-                    name="listBox" horizontal="optional" displayItems="16" 
+                    <control id="chat_text_box" style="chat-style"
+                    name="listBox" horizontal="optional" displayItems="15" 
                     height="80%" selectionMode="Disabled" 
                     forceSelection="false" vertical="optional" 
                     viewConverterClass=
@@ -80,12 +80,12 @@
                         <control name="chat-line"/>
                     </control>
                     <panel height="2%" />
-                    <panel childLayout="horizontal" height="18%">
+                    <panel childLayout="horizontal" height="*">
                         <control id ="chat_text_field" name="textfield" 
-                        width="70%" height="48px"/>
+                        width="70%" />
                         
                         <control id ="send_button" name="sw-button" 
-                        text="Send" width="30%" height="48px">
+                        text="Send" width="30%">
                             <interact onClick="sendMessage()" />
                         </control>
                     </panel>

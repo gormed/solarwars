@@ -27,6 +27,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
+import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
@@ -36,8 +37,6 @@ import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
-import de.lessvoid.nifty.EndNotify;
-import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
@@ -132,7 +131,8 @@ public class SingleplayerMatchState extends Gamestate {
         gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
         // creates the drag-rect geometry
-//        IsoControl.getInstance().createDragRectGeometry();
+        IsoControl.getInstance().
+                createDragRectGeometry();
 
     }
     /* (non-Javadoc)

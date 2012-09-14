@@ -22,7 +22,6 @@
 package com.solarwars.gamestates.gui;
 
 import com.jme3.math.ColorRGBA;
-import com.solarwars.logic.Player;
 
 /**
  * The class ChatItem.

@@ -40,10 +40,12 @@ public class Player {
 
     /** The Constant PLAYER_COLORS. */
     public static final ColorRGBA[] PLAYER_COLORS = {
-        new ColorRGBA(0.3f,0.3f,1.0f,1.0f), ColorRGBA.Red,
+        new ColorRGBA(0.3f, 0.3f, 1.0f, 1.0f), ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};
+    
+    private static Player winner;
 
     /**
      * Gets the unused color.
@@ -98,6 +100,31 @@ public class Player {
         }
         return Hub.playersByID.size() - 1 == lostPlayerCount;
     }
+    
+    public static Player getLastPlayer() {
+        int lostPlayerCount = 0;
+        int wonPlayerCount = 0;
+        Player last = null;
+        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+            Player p = entry.getValue();
+            if (p != null) {
+                if (p.hasLost()) {
+                    lostPlayerCount++;
+                } else {
+                    last = p;
+                    wonPlayerCount++;
+                }
+            }
+        }
+        if (wonPlayerCount == 1) {
+            return last;
+        }
+        return null;
+    }
+
+    public static Player getWinner() {
+        return winner;
+    }
 
     /**
      * Local player wins.
@@ -105,6 +132,7 @@ public class Player {
     static void localPlayerWins() {
         if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
+            winner = Hub.getLocalPlayer();
         } else {
             //TODO: Display: "You defeated..."
         }
@@ -116,6 +144,7 @@ public class Player {
      */
     static void localPlayerLooses() {
         if (isLastPlayer()) {
+            winner = getLastPlayer();
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         }
     }

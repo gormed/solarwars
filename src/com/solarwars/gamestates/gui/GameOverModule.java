@@ -99,6 +99,10 @@ public class GameOverModule {
             hideElement(gameOverPopup, closeNotify);
         }
     }
+    
+    public boolean isVisible() {
+        return (gameOverPopup != null && gameOverPopup.isVisible());
+    }
 
     public void showElement(final Element element, final EndNotify... endNotify) {
         element.showWithoutEffects();

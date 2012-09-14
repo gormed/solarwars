@@ -21,6 +21,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars;
 
+import com.jme3.app.state.AppStateManager;
+import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -49,6 +51,9 @@ import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.layout.BoxConstraints;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.tools.SizeValue;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -69,7 +74,7 @@ import jme3tools.optimize.GeometryBatchFactory;
  */
 public class IsoControl {
 
-    private static final boolean DEBUG_RAYCASTS = 
+    private static final boolean DEBUG_RAYCASTS =
             SolarWarsSettings.getInstance().isDEBUG_RAYCASTSEnabled();
     //==========================================================================
     //      Singleton
@@ -117,6 +122,7 @@ public class IsoControl {
     private ArrayList<MarkerNode> markerNodes;
     private boolean controlPressed = false;
     // Panels for rect
+    private DragRectangleGUI dragRectangle;
 //    private Panel leftDrag;
 //    private Panel topDrag;
 //    private Panel rightDrag;
@@ -143,51 +149,9 @@ public class IsoControl {
      * @param click2d 
      */
     public void createDragRectGeometry() {
-        ColorRGBA frame = ColorRGBA.Orange.clone();
-        frame.a = 0.35f;
-        ColorRGBA center = ColorRGBA.Orange.clone();
-        center.a = 0.09f;
-//        centerDrag = new Panel(
-//                "centerSel",
-//                new Vector3f(0, 0, 0),
-//                new Vector2f(10, 10),
-//                center);
-//
-//        leftDrag = new Panel(
-//                "leftSel",
-//                new Vector3f(0, 0, 0),
-//                new Vector2f(10, 10),
-//                frame);
-//
-//        topDrag = new Panel(
-//                "topSel",
-//                new Vector3f(0, 0, 0),
-//                new Vector2f(10, 10),
-//                frame);
-//
-//        rightDrag = new Panel(
-//                "rightSel",
-//                new Vector3f(0, 0, 0),
-//                new Vector2f(10, 10),
-//                frame);
-//
-//        bottomDrag = new Panel(
-//                "bottomSel",
-//                new Vector3f(0, 0, 0),
-//                new Vector2f(10, 10),
-//                frame);
-
-//        centerDrag.setVisible(false);
-//        leftDrag.setVisible(false);
-//        topDrag.setVisible(false);
-//        rightDrag.setVisible(false);
-//        bottomDrag.setVisible(false);
-//
-//        gui.addGUIElement(rightDrag);
-//        gui.addGUIElement(leftDrag);
-//        gui.addGUIElement(topDrag);
-//        gui.addGUIElement(bottomDrag);
-//        gui.addGUIElement(centerDrag);
+        
+        dragRectangle.setEnabled(true);
+        
     }
 
     /**
@@ -196,7 +160,10 @@ public class IsoControl {
      * @param rootNode the root node
      */
     private void initialize() {
-//        gui = GameGUI.getInstance();
+        dragRectangle = new DragRectangleGUI();
+        AppStateManager stateManager = SolarWarsApplication.getInstance().getStateManager();
+        stateManager.attach(dragRectangle);
+        
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
 
@@ -297,11 +264,12 @@ public class IsoControl {
                 markerNodes.clear();
             }
             updateDragRect(click2d);
-            centerDrag.setVisible(true);
-            leftDrag.setVisible(true);
-            topDrag.setVisible(true);
-            rightDrag.setVisible(true);
-            bottomDrag.setVisible(true);
+            dragRectangle.show();
+//            centerDrag.setVisible(true);
+//            leftDrag.setVisible(true);
+//            topDrag.setVisible(true);
+//            rightDrag.setVisible(true);
+//            bottomDrag.setVisible(true);
             markerNodes = new ArrayList<MarkerNode>();
             //                        startDrag = new Cross(assetManager);
             //                        startDrag.setLocalTranslation(startXZPlanePos);
@@ -542,15 +510,16 @@ public class IsoControl {
                 lastXZPlanePos = null;
                 startScreenPos = null;
                 startXZPlanePos = null;
+//                centerDrag.setVisible(false);
+//                leftDrag.setVisible(false);
+//                topDrag.setVisible(false);
+//                rightDrag.setVisible(false);
+//                bottomDrag.setVisible(false);
 
-                centerDrag.setVisible(false);
-                leftDrag.setVisible(false);
-                topDrag.setVisible(false);
-                rightDrag.setVisible(false);
-                bottomDrag.setVisible(false);
-
+                dragRectangle.hide();
                 return true;
             }
+            dragRectangle.hide();
         }
         return false;
     }
@@ -778,48 +747,24 @@ public class IsoControl {
     }
 
     private void updateDragRect(Vector2f click2d) {
+        if (dragRectangle == null) {
+            return;
+        }
+
         float width = click2d.x - startScreenPos.x;
         float height = click2d.y - startScreenPos.y;
 
-        centerDrag.setScreenPosition(new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                startScreenPos.y + (height) * 0.5f,
-                0));
-        centerDrag.setSize(new Vector2f(
-                Math.abs(width / 2),
-                Math.abs(height / 2)));
-
-        leftDrag.setScreenPosition(new Vector3f(
-                startScreenPos.x,
-                startScreenPos.y + (height) * 0.5f,
-                0));
-        leftDrag.setSize(new Vector2f(
-                1,
-                Math.abs(height / 2)));
-
-        topDrag.setScreenPosition(new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                startScreenPos.y,
-                0));
-        topDrag.setSize(new Vector2f(
-                Math.abs(width / 2),
-                1));
-
-        rightDrag.setScreenPosition(new Vector3f(
-                click2d.x,
-                startScreenPos.y + (height) * 0.5f,
-                0));
-        rightDrag.setSize(new Vector2f(
-                1,
-                Math.abs(height / 2)));
-
-        bottomDrag.setScreenPosition(new Vector3f(
-                startScreenPos.x + (width) * 0.5f,
-                click2d.y,
-                0));
-        bottomDrag.setSize(new Vector2f(
-                Math.abs(width / 2),
-                1));
+        dragRectangle.setWidth((int) width);
+        dragRectangle.setHeight((int) height);
+//        dragRectangle.setPaddingTop(
+//                new SizeValue((int) (startScreenPos.y + (height) * 0.5f)
+//                + "px"));
+//
+//        dragRectangle.setPaddingLeft(
+//                new SizeValue((int) (startScreenPos.x + (width) * 0.5f)
+//                + "px"));
+        dragRectangle.setX((int) (startScreenPos.x));
+        dragRectangle.setY((int) (startScreenPos.y));
     }
 
     /**
@@ -847,37 +792,8 @@ public class IsoControl {
         lastXZPlanePos = null;
         startScreenPos = null;
         startXZPlanePos = null;
-//        if (centerDrag != null) {
-//            gui.removeGUIElement(centerDrag);
-//            centerDrag = null;
-//        }
-//        if (leftDrag != null) {
-//            gui.removeGUIElement(leftDrag);
-//            leftDrag = null;
-//        }
-//        if (topDrag != null) {
-//            gui.removeGUIElement(topDrag);
-//            topDrag = null;
-//        }
-//        if (rightDrag != null) {
-//            gui.removeGUIElement(rightDrag);
-//            rightDrag = null;
-//        }
-//        if (bottomDrag != null) {
-//            gui.removeGUIElement(bottomDrag);
-//            bottomDrag = null;
-//        }
-//        if (startDrag != null) {
-//            rootNode.detachChild(startDrag);
-//        }
-//        if (endDrag != null) {
-//            rootNode.detachChild(endDrag);
-//        }
 
         dragging = false;
-
-
-
 
     }
 
@@ -885,8 +801,8 @@ public class IsoControl {
      * The Class MarkerNode.
      */
     private class MarkerNode extends Node {
-        public static final float MARKER_PLANET_ADJUST = 0.0f;
 
+        public static final float MARKER_PLANET_ADJUST = 0.0f;
         /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
         /** The scale. */
@@ -913,7 +829,7 @@ public class IsoControl {
         private float range = 1;
         private Spatial rangeBatch;
         private Node rangeNode;
-        private ColorRGBA rangeColor;
+        private ColorRGBA rangeColor = ColorRGBA.White.clone();
         private Material rangeMaterial;
         private Geometry rangeCylinder;
         private ShipGroup shipGroup;
@@ -976,11 +892,11 @@ public class IsoControl {
             rangeMaterial.setColor("Color", new ColorRGBA(MARKER_PLANET_ADJUST, MARKER_PLANET_ADJUST, 1, MARKER_PLANET_ADJUST));
             rangeMaterial.getAdditionalRenderState().
                     setBlendMode(BlendMode.Alpha);
-            
+
             rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
-            
+
 //            rangeMaterial.getAdditionalRenderState().setWireframe(true);
-rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
+            rangeMaterial.getAdditionalRenderState().setDepthWrite(false);
             float[] angles = {(float) Math.PI / 2, 0, 0};
 
             rangeCylinder = new Geometry("CollisionCylinderGeometry", c);

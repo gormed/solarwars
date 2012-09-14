@@ -57,6 +57,7 @@ public class GameChatModule implements ActionListener {
     /** The visible. */
     private boolean visible;
     private Element textInput;
+    private boolean hadWinner = false;
 
     //==========================================================================
     //===   Methods & Constructor
@@ -96,7 +97,6 @@ public class GameChatModule implements ActionListener {
      * Destroy.
      */
     public void destroy() {
-//        gameGUI.removeGUIElement(chatGUI);
         inputManager.removeListener(this);
     }
 
@@ -110,10 +110,6 @@ public class GameChatModule implements ActionListener {
         listBoxChat.addItem(new ChatItem(message,
                 ChatItem.ChatMsgType.PLAYER,
                 p.getName(), p.getColor()));
-//        chatGUI.playerSays(p, message);
-//        if (!chatGUI.isFadeDirection()) {
-//            chatGUI.peek();
-//        }
     }
 
     /**
@@ -123,16 +119,11 @@ public class GameChatModule implements ActionListener {
      */
     public void playerLeaves(Player p) {
         if (p.isLeaver()) {
-            listBoxChat.addItem(new ChatItem("leaves the game!",
+            listBoxChat.addItem(new ChatItem(p.getName() + " leaves the game!",
                     ChatItem.ChatMsgType.LEAVER,
-                    p.getName(), p.getColor()));
+                    "#SERVER", p.getColor()));
             chatLayer.show();
         }
-//        chatGUI.serverSays(
-//                p.getName() + " leaves the game...");
-//        if (!chatGUI.isFadeDirection()) {
-//            chatGUI.peek();
-//        }
     }
 
     /**
@@ -148,13 +139,24 @@ public class GameChatModule implements ActionListener {
                 ChatItem.ChatMsgType.DEFEAT,
                 "SERVER", ColorRGBA.White));
         chatLayer.show();
-//        chatGUI.serverSays(
-//                victorious.getName()
-//                + " defeats "
-//                + defeated.getName() + "!");
-//        if (!chatGUI.isFadeDirection()) {
-//            chatGUI.peek();
-//        }
+    }
+
+    public void playerJoins(Player thisPlayer) {
+        listBoxChat.addItem(new ChatItem(thisPlayer.getName() + " joins the game!",
+                ChatItem.ChatMsgType.JOINS,
+                "SERVER", thisPlayer.getColor()));
+        chatLayer.show();
+
+    }
+
+    public void playerWins(Player winner) {
+        if (!hadWinner) {
+            listBoxChat.addItem(new ChatItem(winner.getName() + " wins the game!",
+                    ChatItem.ChatMsgType.WIN,
+                    "SERVER", winner.getColor()));
+            chatLayer.show();
+            hadWinner = true;
+        }
     }
 
     /**
@@ -168,20 +170,6 @@ public class GameChatModule implements ActionListener {
         networkManager.getThisClient().send(chatMessage);
     }
 
-//    /**
-//     * Change gui.
-//     *
-//     * @param newGUI the new gui
-//     */
-//    public void changeGUI(GameGUI newGUI) {
-//        if (gameGUI != null) {
-//            gameGUI.removeGUIElement(chatGUI);
-//        }
-//        this.gameGUI = newGUI;
-//        gameGUI.addGUIElement(chatGUI);
-//        visible = false;
-//        chatGUI.hide();
-//    }
 
     /* (non-Javadoc)
      * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
@@ -196,14 +184,6 @@ public class GameChatModule implements ActionListener {
                 chatLayer.show();
                 textInput.setFocus();
             }
-//            visible = !visible;
-//            if (visible) {
-//                chatGUI.show();
-//                IsoCamera.getInstance().setEnabled(false);
-//            } else {
-//                chatGUI.hide();
-//                IsoCamera.getInstance().setEnabled(true);
-//            }
         }
     }
 }

@@ -36,7 +36,6 @@ import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.gui.ChatItem;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
@@ -44,10 +43,8 @@ import com.solarwars.input.InputMappings;
 import com.solarwars.input.PausePopupController;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
+import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
-import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
-import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
@@ -95,8 +92,10 @@ public class MultiplayerMatchState extends Gamestate {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
                 updateNifty(tpf);
-                if (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost()) {
+                if (!gameOverModule.isVisible() && 
+                        (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost())) {
                     gameOverModule.showPopup();
+                    gameChatModule.playerWins(Player.getWinner());
                 }
             } else if (lostConnection && !currentLevel.isGameOver()) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
@@ -154,6 +153,7 @@ public class MultiplayerMatchState extends Gamestate {
         lostConnection = false;
 //        NetworkManager networkManager = NetworkManager.getInstance();
 //        networkManager.getChatModule().destroy();
+        gameChatModule.destroy();
 
         Future<Thread> fut = application.enqueue(new Callable<Thread>() {
 
@@ -241,7 +241,8 @@ public class MultiplayerMatchState extends Gamestate {
         // CHAT ------------------------------------------
 
         // creates the drag-rect geometry
-        IsoControl.getInstance().createDragRectGeometry();
+        IsoControl.getInstance().
+                createDragRectGeometry();
     }
 
     public void continueGame() {
@@ -280,7 +281,6 @@ public class MultiplayerMatchState extends Gamestate {
     //==========================================================================
     private Element textInput;
     private TextField textInputField;
-    private GameChatModule chatArea;
 
     /**
      * Sends a message to the chat area
