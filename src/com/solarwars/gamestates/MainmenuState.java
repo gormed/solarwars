@@ -31,8 +31,8 @@ import de.lessvoid.nifty.screen.Screen;
  * The Class MainmenuState.
  */
 public class MainmenuState extends Gamestate {
-    private BeatBox beatBox;
 
+    private BeatBox beatBox;
 
     /**
      * Instantiates a new mainmenu state.
@@ -77,7 +77,6 @@ public class MainmenuState extends Gamestate {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.SINGLEPLAYER_STATE);
-//        GamestateManager.getInstance().enterState(GamestateManager.SINGLEPLAYER_STATE);
     }
 
     /**
@@ -87,21 +86,18 @@ public class MainmenuState extends Gamestate {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
-//        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
 
     public void openOptions() {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.OPTIONS_STATE);
-//        GamestateManager.getInstance().enterState(GamestateManager.OPTIONS_STATE);
     }
 
     public void openTutorial() {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.TUTORIAL_STATE);
-//        GamestateManager.getInstance().enterState(GamestateManager.TUTORIAL_STATE);
     }
 
     public void quitGame() {
@@ -111,6 +107,6 @@ public class MainmenuState extends Gamestate {
     @Override
     public void bind(Nifty nifty, Screen screen) {
         super.bind(nifty, screen);
-        
+
     }
 }

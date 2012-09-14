@@ -88,6 +88,7 @@ public class GameChatModule implements ActionListener {
         chatLayer = niftyGUI.getCurrentScreen().findElementByName("chat");
         chatLayer.hide();
         listBoxChat = niftyGUI.getCurrentScreen().findNiftyControl("chat_text_box", ListBox.class);
+        listBoxChat.clear();
         textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
         textInput.disableFocus();
         networkManager.setCurrentChatModule(this);
