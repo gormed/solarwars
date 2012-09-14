@@ -47,8 +47,8 @@ import com.jme3.network.Server;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.gui.ConnectedPlayerItem;
+import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ClientRegisterListener;
@@ -64,9 +64,12 @@ import com.solarwars.net.messages.StringMessage;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.screen.KeyInputHandler;
 import java.util.Random;
 
 /**
@@ -84,6 +87,7 @@ public class CreateServerState extends Gamestate
     private HashMap<Integer, Player> refreshedPlayers;
     private String seedString = SolarWarsSettings.getInstance().getSeed();
     private ListBox<ConnectedPlayerItem> serverLobbyBox;
+    private GameChatModule gameChatModule;
     // Network
     private ServerHub serverHub;
     private NetworkManager networkManager = NetworkManager.getInstance();
@@ -147,6 +151,35 @@ public class CreateServerState extends Gamestate
         // leavingPlayers.clear();
     }
 
+    private void setupNiftyGUI() {
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box",
+                ListBox.class);
+        // CHAT ------------------------------------------
+        // attach chat module
+        gameChatModule = new GameChatModule(niftyGUI, NetworkManager.getInstance());
+        // get input fields
+        textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
+        textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
+        // add input handler for button click to send message
+        textInput.addInputHandler(new KeyInputHandler() {
+
+            @Override
+            public boolean keyEvent(NiftyInputEvent inputEvent) {
+                if (inputEvent == null) {
+                    return false;
+                }
+                switch (inputEvent) {
+                    case SubmitText:
+                        sendMessage();
+                        return true;
+                }
+                return false;
+            }
+        });
+        textInput.setFocus();
+        // CHAT ------------------------------------------
+    }
+
     /**
      * Starts a multiplayer game as server.
      */
@@ -174,8 +207,8 @@ public class CreateServerState extends Gamestate
         refreshedPlayers = new HashMap<Integer, Player>();
 
         niftyGUI.gotoScreen("create_server");
-        serverLobbyBox = screen.findNiftyControl("server_lobby_box", 
-                ListBox.class);
+        setupNiftyGUI();
+
         // =========================================
         // SETUP SERVER
         // =========================================
@@ -186,204 +219,6 @@ public class CreateServerState extends Gamestate
             serverLobbyBox.addItem(
                     new ConnectedPlayerItem(host.getName(), host.getColor()));
         }
-//        networkManager.getChatModule().initialize(gui, networkManager);
-
-//        createServerLabel = new Label("CREATE SERVER", new Vector3f(
-//                gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4), new Vector3f(
-//                2, 2, 1), ColorRGBA.White, gui) {
-//
-//            private float time;
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//                time += tpf;
-//
-//                if (time < 0.2f) {
-//                    text.setText(title + "_");
-//                } else if (time < 0.4f) {
-//                    text.setText(title);
-//                } else {
-//                    time = 0;
-//                }
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        backgroundPanel = new Panel("BackgroundPanel", new Vector3f(
-//                gui.getWidth() / 2, gui.getHeight() / 2, 0), new Vector2f(
-//                gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-//                ColorRGBA.Blue);
-//
-//        linePanel = new Panel("Line", new Vector3f(gui.getWidth() / 2,
-//                8 * gui.getHeight() / 10, 0), new Vector2f(
-//                gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-//                ColorRGBA.White);
-//
-//        cancelButton = new Button("Cancel", new Vector3f(gui.getWidth() / 4,
-//                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-//                ColorRGBA.Orange, ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//                if (!isPressed) {
-//                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-//                    cancelServer();
-//                }
-//            }
-//        };
-//
-//        startButton = new Button("Start", new Vector3f(3 * gui.getWidth() / 4,
-//                1.5f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-//                ColorRGBA.Orange, ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//                if (!isPressed) {
-//                    AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-//                    startServer();
-//                }
-//            }
-//        };
-//
-//        yourIPLabel = new Label("Your IP:", new Vector3f(gui.getWidth() / 2,
-//                1.75f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-//                ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        seedLabel = new Label("Seed", new Vector3f(gui.getWidth() / 8,
-//                7f * gui.getHeight() / 10, 0), Vector3f.UNIT_XYZ,
-//                ColorRGBA.Orange, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        levelSeedBox = new TextBox(ColorRGBA.Blue, new Vector3f(
-//                4.0f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ, new Vector2f(gui.getWidth() / 6, 30),
-//                SolarWarsSettings.getInstance().getSeed(), ColorRGBA.White, gui, false) {
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//
-//            @Override
-//            protected void onKeyTrigger(String key, boolean isPressed,
-//                    float tpf) {
-//                char[] chars = caption.toCharArray();
-//                try {
-//                    serverSeed = 0;
-//                    for (Character c : chars) {
-//                        serverSeed += c.hashCode();
-//                    }
-//                } catch (Exception e) {
-//                    caption = serverSeed + "";
-//                }
-//
-//                SolarWarsSettings.getInstance().setSeed(caption);
-//            }
-//        };
-//
-//        maxPlayersLabel = new Label("Players", new Vector3f(
-//                7 * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ, ColorRGBA.Orange, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        playerCountBox = new TextBox(ColorRGBA.Blue, new Vector3f(
-//                8.5f * gui.getWidth() / 10, 7f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ, new Vector2f(40, 30),
-//                SolarWarsSettings.getInstance().getMaxPlayerNumber() + "", ColorRGBA.White,
-//                gui, true) {
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//
-//            @Override
-//            protected void onKeyTrigger(String key, boolean isPressed,
-//                    float tpf) {
-//                int players = 0;
-//                try {
-//                    players = Integer.parseInt(caption);
-//                } catch (NumberFormatException e) {
-//                    caption = "";
-//                }
-//                if (players < 2 || players > 8) {
-//                    caption = "";
-//                } else {
-//                    maxPlayerNumber = players;
-//                }
-//
-//                int playerNumber = 2;
-//                try {
-//                    if (caption.equals("")) {
-//                        playerNumber = 8;
-//                    } else {
-//                        playerNumber = Integer.parseInt(caption);
-//                    }
-//                } catch (Exception e) {
-//                    caption = playerNumber + "";
-//                } finally {
-//                    SolarWarsSettings.getInstance().setMaxPlayerNumber(playerNumber);
-//                }
-//            }
-//        };
-//
-//        playerPanel = new Panel("BackgroundPanel", new Vector3f(
-//                gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
-//                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
-//                ColorRGBA.White);
-//
-
-//
-//        addressLabel = new Label(
-//                networkManager.getServerIPAdress().getHostAddress(),
-//                new Vector3f(gui.getWidth() / 2, 1.25f * gui.getHeight() / 10,
-//                0), Vector3f.UNIT_XYZ, ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-
-        // gui.addGUIElement(chatGUI);
-
     }
 
     /*
@@ -482,7 +317,7 @@ public class CreateServerState extends Gamestate
         }
         return serverSeed;
     }
-    
+
     public void onStartServer() {
         startServer();
     }
@@ -626,6 +461,30 @@ public class CreateServerState extends Gamestate
             }
         }
         playersChanged = false;
+    }
+    //==========================================================================
+    //===   Chat
+    //==========================================================================
+    private Element textInput;
+    private TextField textInputField;
+    private GameChatModule chatArea;
+
+    /**
+     * Sends a message to the chat area
+     */
+    public void sendMessage() {
+        String message = textInputField.getText();
+        if (checkMessageStyle(message)) {
+            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
+            gameChatModule.playerSays(Hub.getLocalPlayer(), message);
+        }
+        textInputField.setText("");
+        textInput.setFocus();
+    }
+
+    private boolean checkMessageStyle(String message) {
+        boolean messageLengthOkay = message.length() >= 2;
+        return messageLengthOkay;
     }
 
     /**
@@ -779,7 +638,7 @@ public class CreateServerState extends Gamestate
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
                 p.setLeaver(true);
-                NetworkManager.getInstance().getChatModule().playerLeaves(p);
+                gameChatModule.playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;

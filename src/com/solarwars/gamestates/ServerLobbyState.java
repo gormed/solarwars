@@ -39,8 +39,8 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.gui.ConnectedPlayerItem;
+import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ClientRegisterListener;
@@ -50,11 +50,12 @@ import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.settings.SolarWarsSettings;
-import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
+import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.screen.KeyInputHandler;
 
 /**
  * The Class ServerLobbyState.
@@ -73,6 +74,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private ListBox<ConnectedPlayerItem> serverLobbyBox;
     private float animateConnectCounter = 0;
     private Element serverNameLabel;
+    private GameChatModule gameChatModule;
     // NETWORK
     private NetworkManager networkManager;
     private Client client;
@@ -114,8 +116,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 }
                 disconnect();
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
-//                GamestateManager.getInstance().
-//                        enterState(GamestateManager.MULTIPLAYER_STATE);
             }
             if (clientState == ClientConnectionState.CONNECTED) {
                 serverNameLabel.getRenderer(TextRenderer.class).
@@ -127,10 +127,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             if (gameStarted && clientState == ClientConnectionState.JOINED) {
                 startGame();
                 switchToState(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
-//                GamestateManager.getInstance().
-//                        enterState(GamestateManager.MULTIPLAYER_MATCH_STATE);
             } else if (clientState != ClientConnectionState.JOINED) {
-                
+
                 animateConnectCounter += tpf;
                 if (animateConnectCounter > 0.5f) {
                     String text = serverIPLabel.getRenderer(TextRenderer.class).
@@ -142,7 +140,41 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             }
             refreshPlayers(refreshedPlayers);
         }
-        //if (!client.isConnected())
+    }
+
+    private void setupNiftyGUI() {
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
+        serverNameLabel = screen.findElementByName("server_lobby_server_name_label");
+        serverIPLabel = screen.findElementByName("server_lobby_server_ip_label");
+
+        // swap old with new text
+        serverIPLabel.getRenderer(TextRenderer.class).
+                setText(serverIPAddress);
+
+        // CHAT ------------------------------------------
+        // attach chat module
+        gameChatModule = new GameChatModule(niftyGUI, NetworkManager.getInstance());
+        // get input fields
+        textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
+        textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
+        // add input handler for button click to send message
+        textInput.addInputHandler(new KeyInputHandler() {
+
+            @Override
+            public boolean keyEvent(NiftyInputEvent inputEvent) {
+                if (inputEvent == null) {
+                    return false;
+                }
+                switch (inputEvent) {
+                    case SubmitText:
+                        sendMessage();
+                        return true;
+                }
+                return false;
+            }
+        });
+        textInput.setFocus();
+        // CHAT ------------------------------------------
     }
 
     /**
@@ -177,14 +209,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         networkManager = NetworkManager.getInstance();
 
         niftyGUI.gotoScreen("server_lobby");
-
-        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
-        serverNameLabel = screen.findElementByName("server_lobby_server_name_label");
-        serverIPLabel = screen.findElementByName("server_lobby_server_ip_label");
-
-        // swap old with new text
-        serverIPLabel.getRenderer(TextRenderer.class).
-                setText(serverIPAddress);
+        setupNiftyGUI();
 
         connectorThread = new Thread("ConnectionThread") {
 
@@ -195,136 +220,6 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         };
 
         connectorThread.start();
-
-//        for (int i = 0; i < 8; i++) {
-//            playerNamePos.put(i, new Vector3f(
-//                    gui.getWidth() / 3,
-//                    (6 - i * 0.5f) * gui.getHeight() / 10,
-//                    0));
-//        }
-//
-//        lobbyLabel = new Label(
-//                "LOBBY",
-//                new Vector3f(gui.getWidth() / 2, 9 * gui.getHeight() / 10, 4),
-//                new Vector3f(2, 2, 1),
-//                ColorRGBA.White, gui) {
-//
-//            private float time;
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//                time += tpf;
-//
-//                if (time < 0.2f) {
-//                    text.setText(title + "_");
-//                } else if (time < 0.4f) {
-//                    text.setText(title);
-//                } else {
-//                    time = 0;
-//                }
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-//
-//        backgroundPanel = new Panel(
-//                "BackgroundPanel",
-//                new Vector3f(gui.getWidth() / 2, gui.getHeight() / 2, 0),
-//                new Vector2f(gui.getWidth() * 0.47f, gui.getHeight() * 0.47f),
-//                ColorRGBA.Blue);
-//
-//        line = new Panel("Line",
-//                new Vector3f(gui.getWidth() / 2, 8 * gui.getHeight() / 10, 0),
-//                new Vector2f(gui.getWidth() * 0.4f, gui.getHeight() * 0.005f),
-//                ColorRGBA.White);
-//
-//        leave = new Button("Leave",
-//                new Vector3f(gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-//                ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//                if (!isPressed) {
-//                    AudioManager.getInstance().
-//                            playSoundInstance(AudioManager.SOUND_CLICK);
-//                    leaveServer();
-//                }
-//            }
-//        };
-//
-//        ready = new Button("Ready",
-//                new Vector3f(3 * gui.getWidth() / 4, 1.5f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ, ColorRGBA.Orange,
-//                ColorRGBA.White, gui) {
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//                if (!isPressed) {
-//
-//                    AudioManager.getInstance().
-//                            playSoundInstance(AudioManager.SOUND_CLICK);
-//                }
-//            }
-//        };
-//
-//        serverName = new Label("Connecting to " + serverIPAddress,
-//                new Vector3f(gui.getWidth() / 2, 7f * gui.getHeight() / 10, 0),
-//                Vector3f.UNIT_XYZ,
-//                ColorRGBA.Orange,
-//                gui) {
-//
-//            private float time;
-//
-//            @Override
-//            public void updateGUI(float tpf) {
-//                if (clientState == ClientConnectionState.JOINED) {
-//                    return;
-//                }
-//                time += tpf;
-//
-//                if (time < 0.2f) {
-//                    text.setText(title + "_");
-//                } else if (time < 0.4f) {
-//                    text.setText(title);
-//                } else {
-//                    time = 0;
-//                }
-//            }
-//
-//            @Override
-//            public void onClick(Vector2f cursor, boolean isPressed, float tpf) {
-//            }
-//        };
-////        float w = serverName.getText().getLineWidth();
-////        float h = serverName.getText().getHeight();
-////        serverName.setAlginment(new Rectangle(0, 0, w, h), Align.Center);
-//
-//        playerPanel = new Panel(
-//                "BackgroundPanel",
-//                new Vector3f(gui.getWidth() / 2, 4.25f * gui.getHeight() / 10, 0),
-//                new Vector2f(gui.getWidth() * 0.35f, gui.getHeight() * 0.2f),
-//                ColorRGBA.White);
-//
-//
-//
-//        gui.addGUIElement(backgroundPanel);
-//        gui.addGUIElement(line);
-//        gui.addGUIElement(lobbyLabel);
-//        gui.addGUIElement(leave);
-//        gui.addGUIElement(serverName);
-//        gui.addGUIElement(playerPanel);
-//        gui.addGUIElement(ready);
 
     }
 
@@ -366,9 +261,33 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 playSoundInstance(AudioManager.SOUND_EXPLOSION);
     }
     //==========================================================================
+    //===   Chat
+    //==========================================================================
+    private Element textInput;
+    private TextField textInputField;
+    private GameChatModule chatArea;
+
+    /**
+     * Sends a message to the chat area
+     */
+    public void sendMessage() {
+        String message = textInputField.getText();
+        if (checkMessageStyle(message)) {
+            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
+            gameChatModule.playerSays(Hub.getLocalPlayer(), message);
+        }
+        textInputField.setText("");
+        textInput.setFocus();
+    }
+
+    private boolean checkMessageStyle(String message) {
+        boolean messageLengthOkay = message.length() >= 2;
+        return messageLengthOkay;
+    }
+
+    //==========================================================================
     //      INTERNAL GUI REQUESTS
     //==========================================================================
-
     /**
      * Leave server.
      */

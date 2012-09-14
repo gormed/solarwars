@@ -62,6 +62,7 @@ public class NetworkManager {
     public static final boolean WAIT_FOR_CLIENTS = true;
     public static final int MAXIMUM_DISCONNECT_TIMEOUT = 4;
 
+
     public enum ClientConnectionState {
         CONNECTING,
         CONNECTED,
@@ -183,11 +184,15 @@ public class NetworkManager {
      * Is generally needed to move the chat gui to the next GameGUI ingame.
      * 
      * @return chat module from the current session
+     * @deprecated DO NOT USE!
      */
     public GameChatModule getChatModule() {
         return chatModule;
     }
 
+    public void setCurrentChatModule(GameChatModule gameChatModule) {
+        this.chatModule = gameChatModule;
+    }
     /**
      * Gets the client ip adress.
      *

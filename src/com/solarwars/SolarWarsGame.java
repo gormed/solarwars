@@ -33,7 +33,6 @@ import com.solarwars.gamestates.OptionsState;
 import com.solarwars.gamestates.ServerLobbyState;
 import com.solarwars.gamestates.SingleplayerMatchState;
 import com.solarwars.gamestates.TutorialState;
-import com.solarwars.gui.GameGUI;
 import com.solarwars.input.KeyInputManager;
 import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.actions.ActionLib;
@@ -104,7 +103,6 @@ public class SolarWarsGame {
     private ActionLib actionLib;
     private AudioManager audioManager;
     private KeyInputManager keyInputManager;
-    private GameGUI gameGUI;
     private AppStateManager stateManager;
     private HashMap<String, Gamestate> gamestates = new HashMap<String, Gamestate>();
     private static AbstractGameplay currentGameplay;
@@ -140,7 +138,6 @@ public class SolarWarsGame {
         inputManager = app.getInputManager();
         keyInputManager = KeyInputManager.getInstance();
 
-        gameGUI = GameGUI.getInstance();
         logger.info("SolarWarsGame initialized!");
 
     }
@@ -253,7 +250,7 @@ public class SolarWarsGame {
      * @param timePerFrame
      */
     void update(float timePerFrame) {
-        gameGUI.updateGUIElements(timePerFrame);
+        
     }
 
     public static AbstractGameplay getCurrentGameplay() {

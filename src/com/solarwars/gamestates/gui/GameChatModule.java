@@ -25,41 +25,38 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.ColorRGBA;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.net.messages.ChatMessage;
 import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.controls.Controller;
-import de.lessvoid.nifty.controls.ScrollPanel;
-import de.lessvoid.nifty.controls.ScrollPanel.AutoScroll;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
-import de.lessvoid.nifty.elements.render.TextRenderer;
-import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.Screen;
-import de.lessvoid.xml.xpp3.Attributes;
-import java.util.Properties;
 
 /**
  * The Class GameChatModule.
  *
  * @author Hans
  */
-public class GameChatModule implements ActionListener, Controller {
+public class GameChatModule implements ActionListener {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
 
-    private ScrollPanel scrollPanel;
-    private Element textArea;
+    private Element chatLayer;
+    private ListBox<ChatItem> listBoxChat;
     private Screen screen;
     /** The input manager. */
     private InputManager inputManager;
     /** The network manager. */
     private NetworkManager networkManager;
+    private Nifty niftyGUI;
     /** The visible. */
     private boolean visible;
+    private Element textInput;
 
     //==========================================================================
     //===   Methods & Constructor
@@ -69,7 +66,8 @@ public class GameChatModule implements ActionListener, Controller {
      *
      * @param inputManager the input manager
      */
-    public GameChatModule(NetworkManager networkManager) {
+    public GameChatModule(Nifty niftyGUI, NetworkManager networkManager) {
+        this.niftyGUI = niftyGUI;
         initialize(networkManager);
     }
 
@@ -86,6 +84,12 @@ public class GameChatModule implements ActionListener, Controller {
             inputManager.addMapping(InputMappings.PLAYER_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
             inputManager.addListener(this, InputMappings.PLAYER_CHAT);
         }
+        chatLayer = niftyGUI.getCurrentScreen().findElementByName("chat");
+        chatLayer.hide();
+        listBoxChat = niftyGUI.getCurrentScreen().findNiftyControl("chat_text_box", ListBox.class);
+        textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
+        textInput.disableFocus();
+        networkManager.setCurrentChatModule(this);
     }
 
     /**
@@ -103,6 +107,9 @@ public class GameChatModule implements ActionListener, Controller {
      * @param message the message
      */
     public void playerSays(Player p, String message) {
+        listBoxChat.addItem(new ChatItem(message,
+                ChatItem.ChatMsgType.PLAYER,
+                p.getName(), p.getColor()));
 //        chatGUI.playerSays(p, message);
 //        if (!chatGUI.isFadeDirection()) {
 //            chatGUI.peek();
@@ -116,7 +123,10 @@ public class GameChatModule implements ActionListener, Controller {
      */
     public void playerLeaves(Player p) {
         if (p.isLeaver()) {
-            return;
+            listBoxChat.addItem(new ChatItem("leaves the game!",
+                    ChatItem.ChatMsgType.LEAVER,
+                    p.getName(), p.getColor()));
+            chatLayer.show();
         }
 //        chatGUI.serverSays(
 //                p.getName() + " leaves the game...");
@@ -132,6 +142,12 @@ public class GameChatModule implements ActionListener, Controller {
      * @param defeated the defeated
      */
     public void playerDefeats(Player victorious, Player defeated) {
+        listBoxChat.addItem(new ChatItem(victorious.getName()
+                + " defeats "
+                + defeated.getName() + "!",
+                ChatItem.ChatMsgType.DEFEAT,
+                "SERVER", ColorRGBA.White));
+        chatLayer.show();
 //        chatGUI.serverSays(
 //                victorious.getName()
 //                + " defeats "
@@ -173,6 +189,13 @@ public class GameChatModule implements ActionListener, Controller {
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
         if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
+            if (chatLayer.isVisible()) {
+                chatLayer.hide();
+                textInput.disableFocus();
+            } else {
+                chatLayer.show();
+                textInput.setFocus();
+            }
 //            visible = !visible;
 //            if (visible) {
 //                chatGUI.show();
@@ -182,52 +205,5 @@ public class GameChatModule implements ActionListener, Controller {
 //                IsoCamera.getInstance().setEnabled(true);
 //            }
         }
-    }
-
-    @Override
-    public void bind(Nifty nifty, Screen screen, Element element,
-            Properties parameter, Attributes controlDefinitionAttributes) {
-        this.screen = screen;
-        scrollPanel = element.findNiftyControl("scroll_panel", ScrollPanel.class);
-        textArea = element.findElementByName("text_area");
-    }
-
-    @Override
-    public void init(Properties parameter, Attributes controlDefinitionAttributes) {
-    }
-
-    @Override
-    public void onStartScreen() {
-    }
-
-    @Override
-    public void onFocus(boolean getFocus) {
-    }
-
-    @Override
-    public boolean inputEvent(NiftyInputEvent inputEvent) {
-        return false;
-    }
-
-    public void setAutoScroll(AutoScroll scroll) {
-        scrollPanel.setAutoScroll(scroll);
-    }
-
-    public AutoScroll getAutoScroll() {
-        return scrollPanel.getAutoScroll();
-    }
-
-    public void append(String text) {
-        setText(getText() + text);
-    }
-
-    public void setText(String text) {
-        textArea.getRenderer(TextRenderer.class).setText(text);
-        screen.layoutLayers();
-        textArea.setHeight(textArea.getRenderer(TextRenderer.class).getTextHeight());
-    }
-
-    public String getText() {
-        return textArea.getRenderer(TextRenderer.class).getOriginalText();
     }
 }

@@ -37,10 +37,8 @@ import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
-import com.solarwars.entities.LevelBackground;
 import com.solarwars.entities.ShipBatchManager;
 import com.solarwars.entities.ShipGroup;
-import com.solarwars.gui.elements.GameOverGUI;
 import com.solarwars.logic.level.GeneratorSquare;
 import com.solarwars.net.NetworkManager;
 
@@ -537,7 +535,6 @@ public class Level {
      * Destroy.
      */
     public void destroy() {
-        GameOverGUI.getInstance().hide();
         control.removeShootable(levelNode);
 
         this.rootNode.detachChild(labelNode);

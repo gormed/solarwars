@@ -99,5 +99,40 @@
                 </panel>
             </panel>
         </layer>
+        
+          <!-- CHAT LAYER -->
+        <layer id="chat" backgroundColor="#0000" childLayout="center" >
+            <effect>
+                <onShow name="move" length="200" mode="in" 
+                direction="right" startDelay="0" inherit="true"/>
+                <onHide name="move" length="200" mode="out" 
+                direction="right" startDelay="0" inherit="true"/>
+            </effect>
+            <panel id="chat_dialog" childLayout="center"
+            width="35%" height="60%" align="right" valign="center"
+            visibleToMouse="true" backgroundColor="#fff8" padding="2px">
+                <panel childLayout="vertical" align="right" 
+                valign="center" backgroundColor="#00f8">
+                    <control id="chat_text_box" style="game-stats-style"
+                    name="listBox" horizontal="off" displayItems="16" 
+                    height="80%" selectionMode="Disabled" 
+                    forceSelection="false" vertical="optional" 
+                    viewConverterClass=
+                    "com.solarwars.gamestates.gui.ChatItemConverter">
+                        <control name="chat-line"/>
+                    </control>
+                    <panel height="2%" />
+                    <panel childLayout="horizontal" height="18%">
+                        <control id ="chat_text_field" name="textfield" 
+                        width="70%" height="48px"/>
+                        
+                        <control id ="send_button" name="sw-button" 
+                        text="Send" width="30%" height="48px">
+                            <interact onClick="sendMessage()" />
+                        </control>
+                    </panel>
+                </panel>
+            </panel>
+        </layer>
     </screen>
 </nifty>

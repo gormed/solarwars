@@ -53,7 +53,6 @@ public class SingleplayerMatchState extends Gamestate {
     private Hub hub;
     private PausePopupController pausePopup;
     private ActionListener pauseToggle;
-    private Element statsLayer;
     private GameStatsModule gameStatsModule;
     private GameOverModule gameOverModule;
     private boolean paused = false;
@@ -129,14 +128,8 @@ public class SingleplayerMatchState extends Gamestate {
         application.getInputManager().addListener(
                 pausePopup,
                 InputMappings.PAUSE_GAME);
-        statsLayer = niftyGUI.getCurrentScreen().
-                findElementByName("stats");
 
-        gameStatsModule = new GameStatsModule(
-                statsLayer,
-                niftyGUI.getCurrentScreen().
-                findNiftyControl("game_stats_box_panel",
-                ListBox.class), currentLevel);
+        gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
         // creates the drag-rect geometry
 //        IsoControl.getInstance().createDragRectGeometry();
@@ -157,7 +150,6 @@ public class SingleplayerMatchState extends Gamestate {
         //3d controls
         application.detachIsoCameraControl();
         gameStatsModule = null;
-        statsLayer = null;
         paused = false;
     }
 

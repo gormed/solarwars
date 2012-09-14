@@ -44,8 +44,6 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.Panel;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
@@ -119,11 +117,11 @@ public class IsoControl {
     private ArrayList<MarkerNode> markerNodes;
     private boolean controlPressed = false;
     // Panels for rect
-    private Panel leftDrag;
-    private Panel topDrag;
-    private Panel rightDrag;
-    private Panel bottomDrag;
-    private Panel centerDrag;
+//    private Panel leftDrag;
+//    private Panel topDrag;
+//    private Panel rightDrag;
+//    private Panel bottomDrag;
+//    private Panel centerDrag;
     // debug
 //    private Cross startDrag;
 //    private Cross endDrag;
@@ -133,7 +131,6 @@ public class IsoControl {
     private TouchListener touchListener; // kommt von Android
     private InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
     private ActionLib actionLib;
-    private GameGUI gui;
     private static final Logger logger = Logger.getLogger(IsoControl.class.getName());
 
     // ==========================================================================
@@ -150,47 +147,47 @@ public class IsoControl {
         frame.a = 0.35f;
         ColorRGBA center = ColorRGBA.Orange.clone();
         center.a = 0.09f;
-        centerDrag = new Panel(
-                "centerSel",
-                new Vector3f(0, 0, 0),
-                new Vector2f(10, 10),
-                center);
+//        centerDrag = new Panel(
+//                "centerSel",
+//                new Vector3f(0, 0, 0),
+//                new Vector2f(10, 10),
+//                center);
+//
+//        leftDrag = new Panel(
+//                "leftSel",
+//                new Vector3f(0, 0, 0),
+//                new Vector2f(10, 10),
+//                frame);
+//
+//        topDrag = new Panel(
+//                "topSel",
+//                new Vector3f(0, 0, 0),
+//                new Vector2f(10, 10),
+//                frame);
+//
+//        rightDrag = new Panel(
+//                "rightSel",
+//                new Vector3f(0, 0, 0),
+//                new Vector2f(10, 10),
+//                frame);
+//
+//        bottomDrag = new Panel(
+//                "bottomSel",
+//                new Vector3f(0, 0, 0),
+//                new Vector2f(10, 10),
+//                frame);
 
-        leftDrag = new Panel(
-                "leftSel",
-                new Vector3f(0, 0, 0),
-                new Vector2f(10, 10),
-                frame);
-
-        topDrag = new Panel(
-                "topSel",
-                new Vector3f(0, 0, 0),
-                new Vector2f(10, 10),
-                frame);
-
-        rightDrag = new Panel(
-                "rightSel",
-                new Vector3f(0, 0, 0),
-                new Vector2f(10, 10),
-                frame);
-
-        bottomDrag = new Panel(
-                "bottomSel",
-                new Vector3f(0, 0, 0),
-                new Vector2f(10, 10),
-                frame);
-
-        centerDrag.setVisible(false);
-        leftDrag.setVisible(false);
-        topDrag.setVisible(false);
-        rightDrag.setVisible(false);
-        bottomDrag.setVisible(false);
-
-        gui.addGUIElement(rightDrag);
-        gui.addGUIElement(leftDrag);
-        gui.addGUIElement(topDrag);
-        gui.addGUIElement(bottomDrag);
-        gui.addGUIElement(centerDrag);
+//        centerDrag.setVisible(false);
+//        leftDrag.setVisible(false);
+//        topDrag.setVisible(false);
+//        rightDrag.setVisible(false);
+//        bottomDrag.setVisible(false);
+//
+//        gui.addGUIElement(rightDrag);
+//        gui.addGUIElement(leftDrag);
+//        gui.addGUIElement(topDrag);
+//        gui.addGUIElement(bottomDrag);
+//        gui.addGUIElement(centerDrag);
     }
 
     /**
@@ -199,7 +196,7 @@ public class IsoControl {
      * @param rootNode the root node
      */
     private void initialize() {
-        gui = GameGUI.getInstance();
+//        gui = GameGUI.getInstance();
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
 

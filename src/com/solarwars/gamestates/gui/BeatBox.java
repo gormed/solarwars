@@ -19,7 +19,7 @@
  * Documentation created: 14.07.2012 - 19:38:02 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.gui.elements;
+package com.solarwars.gamestates.gui;
 
 import com.jme3.audio.AudioNode;
 import com.solarwars.AudioManager;

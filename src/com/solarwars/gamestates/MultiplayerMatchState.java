@@ -36,6 +36,7 @@ import com.solarwars.Hub;
 import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.gamestates.gui.ChatItem;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
@@ -63,6 +64,7 @@ public class MultiplayerMatchState extends Gamestate {
     private Element statsLayer;
     private GameStatsModule gameStatsModule;
     private GameOverModule gameOverModule;
+    private GameChatModule gameChatModule;
     // Network and game
     private Hub hub;
     private Level currentLevel;
@@ -81,7 +83,6 @@ public class MultiplayerMatchState extends Gamestate {
         // create pause listener
         pauseListener = new PausePopupController(niftyGUI);
         gameOverModule = new GameOverModule(niftyGUI);
-
     }
 
     /* (non-Javadoc)
@@ -123,6 +124,7 @@ public class MultiplayerMatchState extends Gamestate {
 
         // NIFTY GUI
         niftyGUI.gotoScreen("multiplayer");
+        setupNiftyGUI();
 
         // LOGIC
         lostConnection = false;
@@ -135,7 +137,7 @@ public class MultiplayerMatchState extends Gamestate {
         currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
         currentLevel.generateLevel();
         //currentLevel.setupPlayers(Hub.playersByID);
-        setupNiftyGUI();
+
 
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
@@ -203,29 +205,24 @@ public class MultiplayerMatchState extends Gamestate {
      * Setup gui.
      */
     private void setupNiftyGUI() {
-
         pauseListener.hidePopup();
         gameOverModule.hidePopup();
         // attach listener for pause layer
         application.getInputManager().addListener(
                 pauseListener,
                 InputMappings.PAUSE_GAME);
-
-        statsLayer = niftyGUI.getCurrentScreen().
-                findElementByName("stats");
-
-        gameStatsModule = new GameStatsModule(statsLayer,
-                niftyGUI.getCurrentScreen().
-                findNiftyControl("game_stats_box_panel",
-                ListBox.class), currentLevel);
+        // attach stats module
+        gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
 
         // CHAT ------------------------------------------
-        textInput = screen.findElementByName("chat_text_field");
-        chatArea = screen.findControl("game_chat_module", GameChatModule.class);
+        // attach chat module
+        gameChatModule = new GameChatModule(niftyGUI, NetworkManager.getInstance());
+        // get input fields
+        textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
         textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
-        
-                textInput.addInputHandler(new KeyInputHandler() {
+        // add input handler for button click to send message
+        textInput.addInputHandler(new KeyInputHandler() {
 
             @Override
             public boolean keyEvent(NiftyInputEvent inputEvent) {
@@ -245,8 +242,6 @@ public class MultiplayerMatchState extends Gamestate {
 
         // creates the drag-rect geometry
         IsoControl.getInstance().createDragRectGeometry();
-        // applys the chat gui from the last to the next state (this)
-//        NetworkManager.getInstance().getChatModule().changeGUI(gui);
     }
 
     public void continueGame() {
@@ -287,24 +282,22 @@ public class MultiplayerMatchState extends Gamestate {
     private TextField textInputField;
     private GameChatModule chatArea;
 
-    @NiftyEventSubscriber(id = "player_name")
-    public void onSendMessage(final String id,
-            final ButtonClickedEvent event) {
-        
-    }
-    
     /**
      * Sends a message to the chat area
      */
     public void sendMessage() {
-
-        if (chatArea.getText().isEmpty()) {
-            chatArea.append(textInputField.getText());
-        } else {
-            chatArea.append("\n" + textInputField.getText());
+        String message = textInputField.getText();
+        if (checkMessageStyle(message)) {
+            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
+            gameChatModule.playerSays(Hub.getLocalPlayer(), message);
         }
         textInputField.setText("");
         textInput.setFocus();
+    }
+
+    private boolean checkMessageStyle(String message) {
+        boolean messageLengthOkay = message.length() >= 2;
+        return messageLengthOkay;
     }
 
     /**

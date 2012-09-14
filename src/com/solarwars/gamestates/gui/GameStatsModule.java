@@ -27,6 +27,7 @@ import com.solarwars.SolarWarsApplication;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
+import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.elements.Element;
 import java.util.ArrayList;
@@ -41,8 +42,9 @@ public class GameStatsModule implements ActionListener {
     //===   Private Fields
     //==========================================================================
 
+    private Nifty niftyGUI;
     private float refreshCounter = 0;
-    private final Element statsLayer;
+    private Element statsLayer;
     private ListBox<PlayerStatsItem> playerStateBox;
     private Level level;
     private InputManager inputManager =
@@ -51,9 +53,12 @@ public class GameStatsModule implements ActionListener {
     //===   Methods & Constructor
     //==========================================================================
 
-    public GameStatsModule(Element statsLayer, ListBox<PlayerStatsItem> playerStateBox, Level level) {
-        this.statsLayer = statsLayer;
-        this.playerStateBox = playerStateBox;
+    public GameStatsModule(Nifty niftyGUI, Level level) {
+        this.niftyGUI = niftyGUI;
+        this.statsLayer = niftyGUI.getCurrentScreen().findElementByName("stats");
+        this.playerStateBox = niftyGUI.getCurrentScreen().
+                findNiftyControl("game_stats_box_panel",
+                ListBox.class);
         this.level = level;
         initialize();
         this.statsLayer.hide();

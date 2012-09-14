@@ -1,48 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
-      <!-- CHAT CONTROL -->
-    <controlDefinition name="chatArea" 
-    controller="com.solarwars.gamestates.gui.GameChatModule">
-        <panel childLayout="center" width="$width" heigh="$height">
-            <control name="scrollPanel" id="scroll_panel" width="100%" 
-            height="100%" horizontal="$horizontal" vertical="$vertical" 
-            autoScroll="$autoScroll">
-                <text font="Interface/Fonts/SolarWarsStats.fnt" 
-                color="#ffff" text="$text" align="center" valign="center" 
-                textHAlign="left" textVAlign="top" wrap="true"/>
-<!--                <label text="$text" id="text_area" width="100%" height="100%"
-                wrap="true" textHAlign="left" textVAlign="top" align="left" />-->
-            </control>
-        </panel>
-    </controlDefinition>
+
   
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
   <!-- multiplayer match screen -->
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <screen id="multiplayer" 
     controller="com.solarwars.gamestates.MultiplayerMatchState">
-        <!-- CHAT LAYER -->
-        <layer id="chat" backgroundColor="#0000" childLayout="center" >
-            <panel id="chat_dialog" childLayout="center"
-            width="40%" height="60%" align="right" valign="center"
-            visibleToMouse="true" backgroundColor="#00f8">
-                <panel childLayout="vertical" align="center" valign="center">
-<!--                      Chat area = label surrounded by scroll panel -->
-                    <control name="chatArea" id="game_chat_module" width="90%" 
-                    height="80%" horizontal="false" autoScroll="bottom" 
-                    text="test" />
-                    <panel height="30px" />
-<!--                     Text input -->
-                    <panel childLayout="horizontal" height="20%">
-                        <control id ="chat_text_field" name="textfield" 
-                        width="70%" />
-                        <control id ="send_button" name="button" label="Send">
-                            <interact onClick="sendMessage()" />
-                        </control>
-                    </panel>
-                </panel>
-            </panel>
-        </layer>
+        
         <!-- STATS LAYER -->
         <layer id="stats" backgroundColor="#0000" childLayout="center" >
             <effect>
@@ -93,14 +58,48 @@
                 </panel>
             </panel>
         </layer>
-
+        <!-- CHAT LAYER -->
+        <layer id="chat" backgroundColor="#0000" childLayout="center" >
+            <effect>
+                <onShow name="move" length="200" mode="in" 
+                direction="right" startDelay="0" inherit="true"/>
+                <onHide name="move" length="200" mode="out" 
+                direction="right" startDelay="0" inherit="true"/>
+            </effect>
+            <panel id="chat_dialog" childLayout="center"
+            width="35%" height="60%" align="right" valign="center"
+            visibleToMouse="true" backgroundColor="#fff8" padding="2px">
+                <panel childLayout="vertical" align="right" 
+                valign="center" backgroundColor="#00f8">
+                    <control id="chat_text_box"
+                    name="listBox" horizontal="optional" displayItems="16" 
+                    height="80%" selectionMode="Disabled" 
+                    forceSelection="false" vertical="optional" 
+                    viewConverterClass=
+                    "com.solarwars.gamestates.gui.ChatItemConverter">
+                        <control name="chat-line"/>
+                    </control>
+                    <panel height="2%" />
+                    <panel childLayout="horizontal" height="18%">
+                        <control id ="chat_text_field" name="textfield" 
+                        width="70%" height="48px"/>
+                        
+                        <control id ="send_button" name="sw-button" 
+                        text="Send" width="30%" height="48px">
+                            <interact onClick="sendMessage()" />
+                        </control>
+                    </panel>
+                </panel>
+            </panel>
+        </layer>
+        <!-- HUD LAYER -->
         <layer id="hud" backgroundColor="#0000" childLayout="center">
             <panel id="percentage_panel_frame" height="7%" width="10%" align="right" valign="bottom" 
                 backgroundColor="#fff8" childLayout="center" visibleToMouse="false">
                 <panel id="percentage_panel" height="95%" width="98%" align="right" valign="bottom" 
                 backgroundColor="#00f8" childLayout="center" visibleToMouse="false">
                     <text id="percentage" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                    color="#f88f" text="${CALL.refreshPercentage()}%" align="center" valign="center"> 
+                    color="#f88f" text="50%" align="center" valign="center"> 
                         <effect>
                             <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                         </effect>

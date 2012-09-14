@@ -23,11 +23,7 @@ package com.solarwars.gamestates;
 
 import com.solarwars.AudioManager;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.gamestates.Gamestate;
-import com.solarwars.gui.GameGUI;
-import com.solarwars.gui.elements.BeatBox;
-import com.solarwars.gui.elements.Button;
-import com.solarwars.gui.elements.Label;
+import com.solarwars.gamestates.gui.BeatBox;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 
@@ -35,25 +31,8 @@ import de.lessvoid.nifty.screen.Screen;
  * The Class MainmenuState.
  */
 public class MainmenuState extends Gamestate {
-
-    /** The gui. */
-    private GameGUI gui;
-    /** The singleplayer button. */
-    private Button singleplayerButton;
-    /** The multiplayer button. */
-    private Button multiplayerButton;
-    /** The options button. */
-    private Button optionsButton;
-    /** The solarwars. */
-    private Label solarwars;
-    /** The quit button. */
-    private Button quitButton;
-    /** The beat box. */
     private BeatBox beatBox;
-    /** The tutorial button. */
-    private Button tutorialButton;
 
-    ;
 
     /**
      * Instantiates a new mainmenu state.
