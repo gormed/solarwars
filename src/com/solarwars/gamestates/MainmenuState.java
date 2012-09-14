@@ -83,8 +83,6 @@ public class MainmenuState extends Gamestate {
      * Start multiplayer.
      */
     public void startMultiplayer() {
-        AudioManager.getInstance().
-                playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
     }
 

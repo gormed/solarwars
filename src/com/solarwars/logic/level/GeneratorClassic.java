@@ -67,6 +67,7 @@ public class GeneratorClassic extends LevelGenerator {
      */
     public void generateClassic(long seed) {
         System.out.print("[" + seed + "] Generating level...");
+        levelLoaded = false;
         background =
                 new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
         level.getRootNode().attachChild(background);

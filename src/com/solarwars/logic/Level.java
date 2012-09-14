@@ -156,8 +156,8 @@ public class Level {
     private HashMap<Integer, Player> playersByID;
     /** The batch manager. */
     private ShipBatchManager batchManager;
-    /** Indicates that the level is fully loaded into scene-graph. */
-    private boolean levelLoaded = false;
+//    /** Indicates that the level is fully loaded into scene-graph. */
+//    private boolean levelLoaded = false;
     /** indicates that the game ended. */
     private boolean gameOver = false;
     /** The watch game. */
@@ -234,7 +234,7 @@ public class Level {
      * @return the state of level loading, true for loaded, false otherwise
      */
     public boolean isLevelLoaded() {
-        return levelLoaded;
+        return levelGenerator.isLevelLoaded();
     }
 
     /**
@@ -482,10 +482,9 @@ public class Level {
      */
     public void updateLevel(float tpf) {
 
-//        if (!levelLoaded || gameOver) {
-//            GameOverGUI.getInstance().display();
-//            return;
-//        }
+        if (!levelGenerator.isLevelLoaded()) {
+            return;
+        }
 
         // some code to reposition camera dependant on mouse position
         // added by roman

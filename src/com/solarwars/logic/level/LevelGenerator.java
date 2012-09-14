@@ -27,7 +27,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.entities.AbstractPlanet;
-import com.solarwars.entities.BasePlanet;
+import com.solarwars.entities.SimplePlanet;
 import com.solarwars.entities.LevelBackground;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
@@ -77,6 +77,10 @@ public abstract class LevelGenerator {
 
     public abstract boolean generate(long seed);
 
+    public boolean isLevelLoaded() {
+        return levelLoaded;
+    }
+    
     /**
      * Generate size.
      *
@@ -139,7 +143,7 @@ public abstract class LevelGenerator {
     protected AbstractPlanet createPlanet(float x, float z) {
         int size = generateSize();
         AbstractPlanet p =
-                new BasePlanet(assetManager,
+                new SimplePlanet(assetManager,
                 level, new Vector3f(x, 0, z), size);
         p.createPlanet();
         p.setShipCount(getRandomShipCount(size));
@@ -159,7 +163,7 @@ public abstract class LevelGenerator {
      */
     protected AbstractPlanet createPlanet(int size, float x,
             float z, int shipCount) {
-        AbstractPlanet p = new BasePlanet(assetManager, level, new Vector3f(x, 0, z), size);
+        AbstractPlanet p = new SimplePlanet(assetManager, level, new Vector3f(x, 0, z), size);
         p.createPlanet();
         p.setShipCount(shipCount);
         level.getPlanetList().put(p.getId(), p);
@@ -179,9 +183,9 @@ public abstract class LevelGenerator {
             float x, float z) {
         // set size to maximum
         int size = Level.PLANET_SIZES.length - 1;
-        // create BasePlanet for player on given position
+        // create SimplePlanet for player on given position
         AbstractPlanet p = 
-                new BasePlanet(assetManager, level, 
+                new SimplePlanet(assetManager, level, 
                         new Vector3f(x, 0, z), size);
         // init planet geometry
         p.createPlanet();

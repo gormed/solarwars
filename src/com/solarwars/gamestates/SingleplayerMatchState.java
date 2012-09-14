@@ -161,11 +161,11 @@ public class SingleplayerMatchState extends Gamestate {
         if (isEnabled()) {
             if (!paused) {
                 currentLevel.updateLevel(tpf);
+                if (currentLevel.isGameOver()) {
+                    gameOverModule.showPopup();
+                }
             }
             updateNifty(tpf);
-            if (currentLevel.isGameOver()) {
-                gameOverModule.showPopup();
-            }
         }
     }
 

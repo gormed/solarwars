@@ -50,7 +50,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     public static final int SPHERE_Z_SAMPLES = 10;
     public static final int SPHERE_RADIAL_SAMPLES = 10;
-    public static boolean PLANET_ANIMATE = true;
+    public static int OPTIONS_GRAPHIC_PLANET_QUALITY = 0;
     protected AssetManager assetManager;
     protected Material material;
     protected Geometry geometry;
@@ -462,7 +462,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      *            the tpf
      */
     public void updatePlanet(float tpf) {
-        if (PLANET_ANIMATE) {
+        if (OPTIONS_GRAPHIC_PLANET_QUALITY == 1) {
             material.setFloat("Shift", shift);
             shift += tpf * 0.08f / size;
         }

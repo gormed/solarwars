@@ -13,8 +13,8 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: BasePlanet.java
- * Type: com.solarwars.entities.BasePlanet
+ * File: SimplePlanet.java
+ * Type: com.solarwars.entities.SimplePlanet
  * 
  * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
  * 
@@ -33,10 +33,10 @@ import com.jme3.texture.Texture;
 import com.solarwars.logic.Level;
 
 /**
- * The Class BasePlanet.
+ * The Class SimplePlanet.
  */
-public class BasePlanet extends AbstractPlanet {
-    
+public class SimplePlanet extends AbstractPlanet {
+
     /**
      * Instantiates a new base planet.
      *
@@ -45,7 +45,7 @@ public class BasePlanet extends AbstractPlanet {
      * @param position the position
      * @param sizeID the size id
      */
-    public BasePlanet(AssetManager assetManager, 
+    public SimplePlanet(AssetManager assetManager,
             Level level, Vector3f position, int sizeID) {
         super(assetManager, level, position, sizeID);
         this.range = 3.0f;
@@ -56,9 +56,17 @@ public class BasePlanet extends AbstractPlanet {
      */
     @Override
     public void createPlanet() {
+        if (OPTIONS_GRAPHIC_PLANET_QUALITY == 0) {
+            createLQContent();
+        } else {
+            createHQContent();
+        }
+    }
+
+    private void createLQContent() {
         //<editor-fold defaultstate="collapsed" desc="OLD GEOMENTRY CREATION">
         //Geometry
-        
+
         /*
          * Sphere s = new Sphere(SPHERE_Z_SAMPLES, SPHERE_RADIAL_SAMPLES, size);
          * 
@@ -88,35 +96,61 @@ public class BasePlanet extends AbstractPlanet {
          * 
          */
         //</editor-fold>
-        geometry = new Geometry("BasePlanet_" + id, new Quad(size*2,size*2));
-        
-        float rot=(float)Math.random()*(float)Math.PI*2.0f;
+
+        geometry = new Geometry("BasePlanet_" + id, new Quad(size * 2, size * 2));
+
+        float rot = (float) Math.random() * (float) Math.PI * 2.0f;
         float angles[] = {
-            (float) -Math.PI / 2, rot,0
+            (float) -Math.PI / 2, rot, 0
         };
 
-        geometry.setLocalTranslation(size*(-(float)Math.cos(-rot)-(float)Math.sin(-rot)),0,
-                                     size*((float)Math.cos(-rot)-(float)Math.sin(-rot)));
+        geometry.setLocalTranslation(size * (-(float) Math.cos(-rot) - (float) Math.sin(-rot)), 0,
+                size * ((float) Math.cos(-rot) - (float) Math.sin(-rot)));
         geometry.setLocalRotation(new Quaternion(angles));
-        
+
+        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+
+        Texture surface = assetManager.loadTexture("Textures/Planets/planet_lq.png");
+
+        material.setTexture("ColorMap", surface);
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        material.getAdditionalRenderState().setAlphaTest(true);
+        material.getAdditionalRenderState().setAlphaFallOff(0.1f);
+        geometry.setMaterial(material);
+        transformNode.attachChild(geometry);
+
+    }
+
+    private void createHQContent() {
+        geometry = new Geometry("BasePlanet_" + id, new Quad(size * 2, size * 2));
+
+        float rot = (float) Math.random() * (float) Math.PI * 2.0f;
+        float angles[] = {
+            (float) -Math.PI / 2, rot, 0
+        };
+
+        geometry.setLocalTranslation(size * (-(float) Math.cos(-rot) - (float) Math.sin(-rot)), 0,
+                size * ((float) Math.cos(-rot) - (float) Math.sin(-rot)));
+        geometry.setLocalRotation(new Quaternion(angles));
+
         material = new Material(assetManager, "Shaders/planet.j3md");
-        
+
         Texture surface = assetManager.loadTexture("Textures/Planets/planet-surface.png");
         surface.setWrap(Texture.WrapMode.Repeat);
-        material.setTexture("ColorMap",surface);
-        
-        Texture transform=assetManager.loadTexture("Textures/Planets/planet-transform.png");
-        transform.setWrap(Texture.WrapMode.Repeat);
-        material.setTexture("TransformMap",transform);
+        material.setTexture("ColorMap", surface);
 
-        Texture halo=assetManager.loadTexture("Textures/Planets/planet-halo.png");
+        Texture transform = assetManager.loadTexture("Textures/Planets/planet-transform.png");
         transform.setWrap(Texture.WrapMode.Repeat);
-        material.setTexture("HaloMap",halo);
+        material.setTexture("TransformMap", transform);
 
-        material.setColor("Color",new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
-        
-        material.setFloat("VerticalShift",(float)Math.random());
-        
+        Texture halo = assetManager.loadTexture("Textures/Planets/planet-halo.png");
+        transform.setWrap(Texture.WrapMode.Repeat);
+        material.setTexture("HaloMap", halo);
+
+        material.setColor("Color", new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+
+        material.setFloat("VerticalShift", (float) Math.random());
+
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         material.getAdditionalRenderState().setAlphaTest(true);
         material.getAdditionalRenderState().setAlphaFallOff(0.1f);

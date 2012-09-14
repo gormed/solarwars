@@ -68,8 +68,8 @@ public class GeneratorSquare extends LevelGenerator {
 
     @Override
     public boolean generate(long seed) {
-        generateSquare(seed);
-        return levelLoaded;
+        levelLoaded = false;
+        return levelLoaded = generateSquare(seed);
     }
 
     /**
@@ -80,7 +80,7 @@ public class GeneratorSquare extends LevelGenerator {
      *
      * @param seed Zufallsvariable für den Aufbau.
      */
-    public void generateSquare(long seed) {
+    public boolean generateSquare(long seed) {
         System.out.print("[" + seed + "] Generating level...");
 
         background =
@@ -204,9 +204,9 @@ public class GeneratorSquare extends LevelGenerator {
         if (level.getControl() != null) {
             level.getControl().addShootable(level.getLevelNode());
         }
-        // setupPlayers(level.playersByID, r);
-        levelLoaded = true;
         System.out.println("Level generated!");
+        // setupPlayers(level.playersByID, r);
+        return levelLoaded = true;
     }
 
     /**
