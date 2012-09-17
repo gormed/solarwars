@@ -42,6 +42,7 @@ import com.solarwars.IsoCamera;
 import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
+import com.solarwars.settings.SolarWarsSettings;
 
 /**
  * The Class AbstractPlanet.
@@ -50,7 +51,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     public static final int SPHERE_Z_SAMPLES = 10;
     public static final int SPHERE_RADIAL_SAMPLES = 10;
-    public static int OPTIONS_GRAPHIC_PLANET_QUALITY = 0;
+    public static int PLANET_QUALITY = SolarWarsSettings.getInstance().getPlanetQuality();
     protected AssetManager assetManager;
     protected Material material;
     protected Geometry geometry;
@@ -462,7 +463,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      *            the tpf
      */
     public void updatePlanet(float tpf) {
-        if (OPTIONS_GRAPHIC_PLANET_QUALITY == 1) {
+        if (PLANET_QUALITY == 1) {
             material.setFloat("Shift", shift);
             shift += tpf * 0.08f / size;
         }

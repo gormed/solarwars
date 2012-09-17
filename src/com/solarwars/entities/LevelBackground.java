@@ -42,13 +42,14 @@ import com.jme3.texture.Texture2D;
 import com.jme3.util.BufferUtils;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.logic.FluidDynamics;
+import com.solarwars.settings.SolarWarsSettings;
 
 /**
  * The Class LevelBackground.
  */
 public class LevelBackground extends Node {
 
-    public static int OPTIONS_GRAPHIC_BACKGROUND_QUALITY = 1;
+    public static int BACKGROUND_QUALITY = SolarWarsSettings.getInstance().getBackgroundQuality();
     /** The Constant WIDTH. */
     public static final float WIDTH = 15;
     /** The Constant HEIGHT. */
@@ -76,15 +77,36 @@ public class LevelBackground extends Node {
         createBG(seed);
     }
 
+    public void update(float tpf) {
+        /* animate the star field */
+        int i;
+        timeframe += tpf;
+
+        if (BACKGROUND_QUALITY == 2) {
+            material.setVector2("Shift", new Vector2f(timeframe * 0.01f, (float) Math.cos(timeframe * 0.01f)));
+        }
+        if (BACKGROUND_QUALITY >= 1) {
+            for (i = 0; i < nstars; i++) {
+                stargeo[i].setLocalScale(((float) Math.cos(timeframe + (float) i) * 0.5f + 0.5f) * 0.2f * ((float) i / (float) nstars));
+            }
+        }
+    }
+
     /**
      * Creates the bg.
      */
     private void createBG(int seed) {
-        if (OPTIONS_GRAPHIC_BACKGROUND_QUALITY == 0) {
-            createLQContent();
-        } else if (OPTIONS_GRAPHIC_BACKGROUND_QUALITY == 1) {
+        BACKGROUND_QUALITY = SolarWarsSettings.getInstance().getBackgroundQuality();
+        if (BACKGROUND_QUALITY == 0) {
             createMQContent(seed);
-        } else if (OPTIONS_GRAPHIC_BACKGROUND_QUALITY == 2) {
+            for (int i = 0; i < nstars; i++) {
+                stargeo[i].setLocalScale(((float) 
+                        Math.cos(timeframe + (float) i) * 0.5f + 0.5f) * 
+                        0.2f * ((float) i / (float) nstars));
+            }
+        } else if (BACKGROUND_QUALITY == 1) {
+            createMQContent(seed);
+        } else if (BACKGROUND_QUALITY == 2) {
             createHQContent(seed);
         }
     }
@@ -265,20 +287,6 @@ public class LevelBackground extends Node {
             stargeo[i].setLocalTranslation(stary[i] * WIDTH / FluidDynamics.FLUID_RES - WIDTH / 2, -0.5f, starx[i] * HEIGHT / FluidDynamics.FLUID_RES - HEIGHT / 2);
             stargeo[i].setQueueBucket(Bucket.Transparent);
             this.attachChild(stargeo[i]);
-        }
-    }
-
-    public void update(float tpf) {
-        /* animate the star field */
-        int i;
-        timeframe += tpf;
-
-        if (OPTIONS_GRAPHIC_BACKGROUND_QUALITY == 2) {
-            material.setVector2("Shift", new Vector2f(timeframe * 0.01f, (float) Math.cos(timeframe * 0.01f)));
-        }
-
-        for (i = 0; i < nstars; i++) {
-            stargeo[i].setLocalScale(((float) Math.cos(timeframe + (float) i) * 0.5f + 0.5f) * 0.2f * ((float) i / (float) nstars));
         }
     }
 

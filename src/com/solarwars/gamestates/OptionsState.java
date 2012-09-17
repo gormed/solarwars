@@ -21,10 +21,19 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
+import com.solarwars.AudioManager;
+import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.settings.GameSettingsException;
+import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
-
+import de.lessvoid.nifty.controls.RadioButton;
+import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
+import de.lessvoid.nifty.controls.TextFieldChangedEvent;
+import de.lessvoid.nifty.screen.Screen;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class TutorialState.
@@ -32,6 +41,12 @@ import de.lessvoid.nifty.controls.ButtonClickedEvent;
  * @author Hans
  */
 public class OptionsState extends Gamestate {
+
+    private static final String BACKGROUND_QUALITY_HIGH = "background-quality-high";
+    private static final String BACKGROUND_QUALITY_LOW = "background-quality-low";
+    private static final String BACKGROUND_QUALITY_MEDIUM = "background-quality-medium";
+    private static final String PLANET_QUALITY_HIGH = "planet-quality-high";
+    private static final String PLANET_QUALITY_LOW = "planet-quality-low";
 
     /**
      * Instantiates a new tutorial state.
@@ -55,15 +70,103 @@ public class OptionsState extends Gamestate {
         niftyGUI.gotoScreen("options");
     }
 
+    @Override
+    public void bind(Nifty nifty, Screen screen) {
+        super.bind(nifty, screen);
+        initRadioButtons(screen);
+    }
+
+    private void initRadioButtons(Screen screen) {
+        int backgroundQuality = SolarWarsSettings.getInstance().getBackgroundQuality();
+        switch (backgroundQuality) {
+            case 1:
+                screen.findNiftyControl(BACKGROUND_QUALITY_MEDIUM,
+                        RadioButton.class).select();
+                break;
+            case 2:
+                screen.findNiftyControl(BACKGROUND_QUALITY_HIGH,
+                        RadioButton.class).select();
+                break;
+            case 0:
+            default:
+                screen.findNiftyControl(BACKGROUND_QUALITY_LOW,
+                        RadioButton.class).select();
+        }
+
+        int planetQuality = SolarWarsSettings.getInstance().getPlanetQuality();
+        switch (planetQuality) {
+            case 1:
+                screen.findNiftyControl(PLANET_QUALITY_HIGH,
+                        RadioButton.class).select();
+                break;
+            case 0:
+            default:
+                screen.findNiftyControl(PLANET_QUALITY_LOW,
+                        RadioButton.class).select();
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#unloadContent()
      */
     @Override
     protected void unloadContent() {
-
+        try {
+            SolarWarsSettings.getInstance().save();
+        } catch (GameSettingsException e) {
+            SolarWarsApplication.getClientLogger().
+                    log(Level.WARNING, "{0} caused by {1}",
+                    new Object[]{e.getMessage(), e.getCause().getMessage()});
+        }
     }
-    
+
     public void onBackButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.MAINMENU_STATE);
+    }
+
+    @NiftyEventSubscriber(id = "planet-quality")
+    public void onPlanetQualityChanged(final String id,
+            final RadioButtonGroupStateChangedEvent event) {
+        if (PLANET_QUALITY_LOW.equals(event.getSelectedId())) {
+            SolarWarsSettings.getInstance().setPlanetQuality(0);
+        } else if (PLANET_QUALITY_HIGH.equals(event.getSelectedId())) {
+            SolarWarsSettings.getInstance().setPlanetQuality(1);
+        }
+//        System.out.println("RadioButton [" + event.getSelectedId() + "] is now selected. The old selection was [" + event.getPreviousSelectedId() + "]");
+    }
+
+    @NiftyEventSubscriber(id = "background-quality")
+    public void onBackgroundQualityChanged(final String id,
+            final RadioButtonGroupStateChangedEvent event) {
+        if (BACKGROUND_QUALITY_LOW.equals(event.getSelectedId())) {
+            SolarWarsSettings.getInstance().setBackgroundQuality(0);
+        } else if (BACKGROUND_QUALITY_MEDIUM.equals(event.getSelectedId())) {
+            SolarWarsSettings.getInstance().setBackgroundQuality(1);
+        } else if (BACKGROUND_QUALITY_HIGH.equals(event.getSelectedId())) {
+            SolarWarsSettings.getInstance().setBackgroundQuality(2);
+        }
+    }
+
+    @NiftyEventSubscriber(id = "options-nw-port-text")
+    public void onPortTextChanged(final String id,
+            final TextFieldChangedEvent event) {
+        if (event.getText().length() > 0) {
+            try {
+                int port = Integer.parseInt(event.getText());
+                SolarWarsSettings.getInstance().setDefaultPort(port);
+            } catch (NumberFormatException formatException) {
+                event.getTextFieldControl().setText(SolarWarsSettings.getInstance().getDefaultPort() + "");
+                AudioManager.getInstance().
+                        playSoundInstance(AudioManager.SOUND_ERROR);
+                Logger.getLogger(OptionsState.class.getName()).warning("Wrong network port input!");
+//                SolarWarsSettings.getInstance().setDefaultPort(6142);
+            }
+        }
+    }
+
+    public String getDefaultPort() {
+        return "" + SolarWarsSettings.getInstance().getDefaultPort();
     }
 }

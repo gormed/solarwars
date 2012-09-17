@@ -173,10 +173,12 @@ public class SingleplayerMatchState extends Gamestate {
         // find old text
         Element niftyElement = niftyGUI.getCurrentScreen().
                 findElementByName("percentage");
-        // swap old with new text
-        niftyElement.getRenderer(TextRenderer.class).
-                setText(refreshPercentage() + "%");
-        gameStatsModule.update(tpf);
+        if (niftyElement != null) {
+            // swap old with new text
+            niftyElement.getRenderer(TextRenderer.class).
+                    setText(refreshPercentage() + "%");
+            gameStatsModule.update(tpf);
+        }
 
     }
 

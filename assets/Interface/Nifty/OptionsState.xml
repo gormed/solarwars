@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+  
+  
+    <useControls filename="nifty-default-controls.xml" />
+    <useStyles filename="nifty-default-styles.xml" />
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
   <!-- options screen -->
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
@@ -21,13 +25,100 @@
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
+                    childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                    <panel childLayout="center" padding="10px" height="42px" width="100%">
+                        <text id="nw-label" text="Graphics" 
+                            font="Interface/Fonts/SolarWarsFont32.fnt" 
+                            height="32px" align="left"/>
+                    </panel>
+                    <panel id="options_graphics_align_h" childLayout="horizontal" 
+                    height="20%" backgroundColor="#00ab">
+                        <effect>
+                            <onActive name="border" color="#0a8" />
+                        </effect>
+                        <panel childLayout="vertical" 
+                        width="50%" padding="2%" >
+                            <control id="planet-quality" name="radioButtonGroup"/>
+                            <panel childLayout="vertical" width="50%">
+                                <text id="planet-quality-label" text="Planet Quality" 
+                                    font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" 
+                                     height="20px"/>
+                                <panel width="50%" height="10px"/>
+                                <panel childLayout="vertical" backgroundColor="#0071" 
+                                    paddingLeft="7px" paddingRight="7px" paddingTop="4px" 
+                                    paddingBottom="4px">
+                                    <effect>
+                                        <onActive name="border" color="#0a8" />
+                                    </effect>
+                                    <panel childLayout="horizontal">
+                                        <control name="radioButton" id="planet-quality-low" group="planet-quality" />
+                                        <control name="label" text="Low" with="60px" />
+                                    </panel>
+                                    <panel childLayout="horizontal">
+                                        <control name="radioButton" id="planet-quality-high" group="planet-quality" />
+                                        <control name="label" text="High" with="60px" />
+                                    </panel>
+                                </panel>
+                            </panel>
+                        </panel>
+                        <panel childLayout="vertical" width="50%" padding="2%">
+                            <control id="background-quality" name="radioButtonGroup"/>
+                            <panel childLayout="vertical" width="50%">
+                                <text id="background-quality-label" text="Background Quality" 
+                                    font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" height="20px"/>
+                                <panel width="50%" height="10px"></panel>
+                                <panel childLayout="vertical" backgroundColor="#0071" paddingLeft="7px" 
+                                    paddingRight="7px" paddingTop="4px" paddingBottom="4px">
+                                    <effect>
+                                        <onActive name="border" color="#0a8" />
+                                    </effect>
+                                    <panel childLayout="horizontal">
+                                        <control name="radioButton" id="background-quality-low" 
+                                        group="background-quality" />
+                                        <control name="label" text="Low" with="60px" />
+                                    </panel>
+                                    <panel childLayout="horizontal">
+                                        <control name="radioButton" id="background-quality-medium" 
+                                        group="background-quality" />
+                                        <control name="label" text="Medium" with="60px" />
+                                    </panel>
+                                    <panel childLayout="horizontal">
+                                        <control name="radioButton" id="background-quality-high" 
+                                        group="background-quality" />
+                                        <control name="label" text="High" with="60px" />
+                                    </panel>
+                                </panel>
+                            </panel>
+                        </panel>
+                    </panel>
+                    <panel childLayout="center" padding="10px" height="42px" width="100%">
+                        <text id="nw-label" text="Network" 
+                            font="Interface/Fonts/SolarWarsFont32.fnt" 
+                            height="32px" align="left"/>
+                    </panel>
+                    <panel id="options_network_align_h" childLayout="horizontal" 
+                    height="15%" backgroundColor="#00ab">
+                        <effect>
+                            <onActive name="border" color="#0a8" />
+                        </effect>
 
-
-
+                        <panel childLayout="horizontal" width="50%" padding="2%">
+                            <text id="nw-port-label" text="PORT" 
+                            font="Interface/Fonts/SolarWarsFont20.fnt" 
+                            height="20px"/>
+                            <control name="textfield" id="options-nw-port-text" 
+                            maxLength="6" width="50%" text="${CALL.getDefaultPort()}" />
+                        </panel>
+                        <panel childLayout="horizontal" width="50%" padding="2%">
+                            <text id="nw-scan-label" text="Network-Scan" 
+                            font="Interface/Fonts/SolarWarsFont20.fnt" 
+                            height="20px"/>
+                            <control id="nw-scan" name="checkbox" />
+                        </panel>
+                    </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="1%" width="60%"/>
+                    childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                     <!-- BOTTOM CONTROLS -->
                     <panel id="options_bottom_align_h" childLayout="horizontal" 
                     height="10%">

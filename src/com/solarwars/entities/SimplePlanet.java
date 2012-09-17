@@ -31,6 +31,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
 import com.solarwars.logic.Level;
+import com.solarwars.settings.SolarWarsSettings;
 
 /**
  * The Class SimplePlanet.
@@ -56,7 +57,8 @@ public class SimplePlanet extends AbstractPlanet {
      */
     @Override
     public void createPlanet() {
-        if (OPTIONS_GRAPHIC_PLANET_QUALITY == 0) {
+        PLANET_QUALITY = SolarWarsSettings.getInstance().getPlanetQuality();
+        if (PLANET_QUALITY == 0) {
             createLQContent();
         } else {
             createHQContent();
