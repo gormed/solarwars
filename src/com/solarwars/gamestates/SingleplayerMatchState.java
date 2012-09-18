@@ -32,13 +32,13 @@ import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
-import com.solarwars.input.PausePopupController;
+import com.solarwars.gamestates.gui.PausePopup;
+import com.solarwars.gamestates.gui.PlayerStatsModule;
+import com.solarwars.gamestates.gui.StartGamePopup;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
-import de.lessvoid.nifty.elements.Element;
-import de.lessvoid.nifty.elements.render.TextRenderer;
 
 /**
  * The Class SingleplayerMatchState.
@@ -50,11 +50,14 @@ public class SingleplayerMatchState extends Gamestate {
 
     private Level currentLevel;
     private Hub hub;
-    private PausePopupController pausePopup;
+    private PausePopup pausePopup;
+    private StartGamePopup startGamePopup;
     private ActionListener pauseToggle;
     private GameStatsModule gameStatsModule;
+    private PlayerStatsModule playerStatsModule;
     private GameOverModule gameOverModule;
     private boolean paused = false;
+    private boolean started = false;
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
@@ -82,8 +85,9 @@ public class SingleplayerMatchState extends Gamestate {
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         // create pause listener
-        pausePopup = new PausePopupController(niftyGUI);
+        pausePopup = new PausePopup(niftyGUI);
         gameOverModule = new GameOverModule(niftyGUI);
+        startGamePopup = new StartGamePopup(niftyGUI);
 
     }
 
@@ -92,7 +96,9 @@ public class SingleplayerMatchState extends Gamestate {
      */
     @Override
     protected void loadContent() {
-
+        started = false;
+        // switch to singleplayer gui
+        niftyGUI.gotoScreen("singleplayer");
         // setup game for singleplayer
         setupSingleplayer();
         // attach iso control
@@ -108,13 +114,17 @@ public class SingleplayerMatchState extends Gamestate {
                 Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
-        // switch to singleplayer gui
-        niftyGUI.gotoScreen("singleplayer");
         // setup nifty properly
         setupNiftyGUI();
+        startGamePopup.showPopup();
+    }
+
+    public void startGame() {
         // play startup sound
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_LOAD);
+        started = true;
+        startGamePopup.hidePopup();
     }
 
     /**
@@ -123,6 +133,7 @@ public class SingleplayerMatchState extends Gamestate {
     private void setupNiftyGUI() {
         pausePopup.hidePopup();
         gameOverModule.hidePopup();
+        startGamePopup.hidePopup();
         // attach listener for pause layer
         application.getInputManager().addListener(
                 pausePopup,
@@ -130,9 +141,14 @@ public class SingleplayerMatchState extends Gamestate {
 
         gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
+        
+        playerStatsModule = new PlayerStatsModule(
+                niftyGUI, Hub.getLocalPlayer(), gameStatsModule);
         // creates the drag-rect geometry
         IsoControl.getInstance().
                 createDragRectGeometry();
+
+//        startGamePopup.showPopup();
 
     }
     /* (non-Javadoc)
@@ -150,6 +166,7 @@ public class SingleplayerMatchState extends Gamestate {
         //3d controls
         application.detachIsoCameraControl();
         gameStatsModule = null;
+        playerStatsModule = null;
         paused = false;
     }
 
@@ -158,7 +175,7 @@ public class SingleplayerMatchState extends Gamestate {
      */
     @Override
     public void update(float tpf) {
-        if (isEnabled()) {
+        if (isEnabled() && started) {
             if (!paused) {
                 currentLevel.updateLevel(tpf);
                 if (currentLevel.isGameOver()) {
@@ -170,16 +187,9 @@ public class SingleplayerMatchState extends Gamestate {
     }
 
     private void updateNifty(float tpf) {
-        // find old text
-        Element niftyElement = niftyGUI.getCurrentScreen().
-                findElementByName("percentage");
-        if (niftyElement != null) {
-            // swap old with new text
-            niftyElement.getRenderer(TextRenderer.class).
-                    setText(refreshPercentage() + "%");
-            gameStatsModule.update(tpf);
-        }
-
+        gameStatsModule.update(tpf);
+        // only after gamestats where updated!
+        playerStatsModule.update(tpf);
     }
 
     /**
@@ -194,9 +204,7 @@ public class SingleplayerMatchState extends Gamestate {
         hub.addPlayer(local);
     }
 
-    public int refreshPercentage() {
-        return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
-    }
+
 
     public void continueGame() {
         AudioManager.getInstance().

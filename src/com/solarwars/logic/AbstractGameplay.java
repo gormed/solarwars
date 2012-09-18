@@ -26,8 +26,7 @@ import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 
 /**
- * The class AbstractGameplay. Class is not itself abstract to work as a 
- * singleton.
+ * The class AbstractGameplay.
  * @author Hans Ferchland
  */
 public abstract class AbstractGameplay {
@@ -44,19 +43,6 @@ public abstract class AbstractGameplay {
     //==========================================================================
     //      Static Methods
     //==========================================================================
-    /**
-     * @param level (will be the currentLevel)
-     */
-    public void initialize(Level level) {
-        if (initialized) {
-            return;
-        }
-        currentLevel = level;
-        currentLevel.resetEntityIDs();
-        createGameplay();
-        initialized = true;
-    }
-
     /**
      * Gets the current game tick calculated for each client.
      * @see MultiplayerGameplay
@@ -90,6 +76,19 @@ public abstract class AbstractGameplay {
      * enable diffrent gameplay settings.
      */
     protected abstract void createGameplay();
+
+    /**
+     * @param level (will be the currentLevel)
+     */
+    public void initialize(Level level) {
+        if (initialized) {
+            return;
+        }
+        currentLevel = level;
+        currentLevel.resetEntityIDs();
+        createGameplay();
+        initialized = true;
+    }
 
     public boolean isInitialized() {
         return initialized;

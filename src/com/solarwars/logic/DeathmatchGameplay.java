@@ -72,7 +72,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
             @Override
             public boolean doAction(Object sender, long delay,
                     AbstractPlanet planet, Player p) {
-                if (planet == null || planet.getOwner() == null) {
+                if (planet == null || planet.getOwner() == null || planet.getOwner() != p) {
                     p.selectPlanet(null);
                     return true;
                 }

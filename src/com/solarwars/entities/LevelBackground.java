@@ -99,15 +99,16 @@ public class LevelBackground extends Node {
         BACKGROUND_QUALITY = SolarWarsSettings.getInstance().getBackgroundQuality();
         if (BACKGROUND_QUALITY == 0) {
             createMQContent(seed);
-            for (int i = 0; i < nstars; i++) {
-                stargeo[i].setLocalScale(((float) 
-                        Math.cos(timeframe + (float) i) * 0.5f + 0.5f) * 
-                        0.2f * ((float) i / (float) nstars));
-            }
+
         } else if (BACKGROUND_QUALITY == 1) {
             createMQContent(seed);
         } else if (BACKGROUND_QUALITY == 2) {
             createHQContent(seed);
+            material.setVector2("Shift", new Vector2f(timeframe * 0.01f, (float) Math.cos(timeframe * 0.01f)));
+        }
+        for (int i = 0; i < nstars; i++) {
+            stargeo[i].setLocalScale(((float) Math.cos(timeframe + (float) i) * 0.5f + 0.5f)
+                    * 0.2f * ((float) i / (float) nstars));
         }
     }
 

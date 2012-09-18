@@ -45,7 +45,7 @@ public class GameStatsModule implements ActionListener {
     private Nifty niftyGUI;
     private float refreshCounter = 0;
     private Element statsLayer;
-    private ListBox<PlayerStatsItem> playerStateBox;
+    private ListBox<PlayerStatsItem> playerStatsBox;
     private Level level;
     private InputManager inputManager =
             SolarWarsApplication.getInstance().getInputManager();
@@ -56,13 +56,13 @@ public class GameStatsModule implements ActionListener {
     public GameStatsModule(Nifty niftyGUI, Level level) {
         this.niftyGUI = niftyGUI;
         this.statsLayer = niftyGUI.getCurrentScreen().findElementByName("stats");
-        this.playerStateBox = niftyGUI.getCurrentScreen().
+        this.playerStatsBox = niftyGUI.getCurrentScreen().
                 findNiftyControl("game_stats_box_panel",
                 ListBox.class);
         this.level = level;
         initialize();
         this.statsLayer.hide();
-        this.playerStateBox.clear();
+        this.playerStatsBox.clear();
     }
 
     private void initialize() {
@@ -72,17 +72,17 @@ public class GameStatsModule implements ActionListener {
     public void update(float tpf) {
         refreshCounter += tpf;
         if (refreshCounter > 1f) {
-            for (PlayerStatsItem item : playerStateBox.getItems()) {
+            for (PlayerStatsItem item : playerStatsBox.getItems()) {
                 item.update(tpf);
 //            updatePlayer(item, item.getPlayer());
             }
-            playerStateBox.refresh();
+            playerStatsBox.refresh();
             refreshCounter = 0;
         }
     }
 
     private void addPlayer(Player player) {
-        playerStateBox.addItem(new PlayerStatsItem(player));
+        playerStatsBox.addItem(new PlayerStatsItem(player));
     }
 
     public void addPlayers(ArrayList<Player> players) {
@@ -97,6 +97,9 @@ public class GameStatsModule implements ActionListener {
         }
     }
 
+    public ListBox<PlayerStatsItem> getPlayerStatsBox() {
+        return playerStatsBox;
+    }
 
     /* (non-Javadoc)
      * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)

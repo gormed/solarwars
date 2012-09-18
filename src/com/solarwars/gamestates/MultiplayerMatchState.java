@@ -40,7 +40,7 @@ import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.input.InputMappings;
-import com.solarwars.input.PausePopupController;
+import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
 import com.solarwars.logic.Player;
@@ -57,7 +57,7 @@ import de.lessvoid.nifty.screen.KeyInputHandler;
 public class MultiplayerMatchState extends Gamestate {
 
     // GUI
-    private PausePopupController pauseListener;
+    private PausePopup pauseListener;
     private Element statsLayer;
     private GameStatsModule gameStatsModule;
     private GameOverModule gameOverModule;
@@ -78,7 +78,7 @@ public class MultiplayerMatchState extends Gamestate {
         super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
         this.application = SolarWarsApplication.getInstance();
         // create pause listener
-        pauseListener = new PausePopupController(niftyGUI);
+        pauseListener = new PausePopup(niftyGUI);
         gameOverModule = new GameOverModule(niftyGUI);
     }
 

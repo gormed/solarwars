@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
+<!-- start popup -->
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <popup id="start_game_popup" childLayout="center" backgroundColor="#0000" >      
+        <panel id="start_main_frame" childLayout="vertical">
+            <text id="start_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+        color="#ffff" text="PREPARE" align="center" 
+        valign="center" height ="30%">
+            </text><!-- SPACER -->
+            <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+            <panel id="start_panel" childLayout="center" height="25%" width="40%" 
+        align="center" valign="center" backgroundColor="#fff8" padding="5px">
+
+                <panel id="start_panel_frame" childLayout="vertical" align="center" 
+            valign="center" color="#ffff" backgroundColor="#00f8" padding="10%">
+            <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="20%" width="60%"/>
+            <!-- START BUTTON -->
+                    <control id="start_panel" name="sw-button" text="START GAME" 
+                    align="center" valign="center" width="100%" height="60%">
+                        <interact onClick="startGame()"/>
+                    </control>
+                <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                childLayout="center" visibleToMouse="false" height="20%" width="60%"/>
+                </panel>
+            </panel>
+        </panel>
+    </popup>
+
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
 <!-- pause popup -->
 <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <popup id="pause_popup" childLayout="center" backgroundColor="#0000" >
@@ -10,7 +42,7 @@
             <onCustom customKey="out" name="move" length="200" mode="out" 
                 direction="left" startDelay="0" inherit="true"/>
         </effect>        
-        <panel id="gameover_main_frame" childLayout="vertical">
+        <panel id="pause_main_frame" childLayout="vertical">
             <text id="add_server_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
         color="#ffff" text="PAUSED" align="center" 
         valign="center" height ="30%">
