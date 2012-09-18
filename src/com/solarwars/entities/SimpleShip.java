@@ -52,15 +52,7 @@ public class SimpleShip extends AbstractShip {
      */
     @Override
     public void createShip() {
-        material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setColor("Color", this.owner.getColor());
-        material.setColor("GlowColor", owner.getColor());
-        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        
-        shipBatchSpatial = level.getBatchManager().getShipBatch();
-        shipBatchSpatial.setMaterial(material);
-        
-//        transformNode.attachChild(shipBatchSpatial);
+        shipBatchSpatial = level.getBatchManager().getShipBatch(owner);
         shipBatchSpatial.setLocalTranslation(position);
     }
 }

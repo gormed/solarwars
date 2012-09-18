@@ -333,7 +333,7 @@ public class Level {
         }
 
         batchManager = new ShipBatchManager(this);
-        batchManager.initialize(Hub.playersByID.size() * 100);
+        batchManager.initialize(Hub.getPlayers());
     }
 
     /**

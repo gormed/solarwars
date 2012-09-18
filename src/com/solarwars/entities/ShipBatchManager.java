@@ -23,11 +23,11 @@ package com.solarwars.entities;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Line;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
@@ -35,6 +35,7 @@ import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import jme3tools.optimize.GeometryBatchFactory;
@@ -56,6 +57,19 @@ public class ShipBatchManager {
     /** The update timer. */
     private float updateTimer;
     private static final Logger logger = Logger.getLogger(ShipBatchManager.class.getName());
+    private Vector3f outOfScreen = new Vector3f(0, 0, 100);
+    /** The used batches. */
+    private HashMap<Integer, ArrayList<Spatial>> usedPlayerBatches =
+            new HashMap<Integer, ArrayList<Spatial>>();
+    /** The unused batches. */
+    private HashMap<Integer, ArrayList<Spatial>> unusedPlayerBatches =
+            new HashMap<Integer, ArrayList<Spatial>>();
+    /** The current ship count. */
+    private HashMap<Integer, Integer> currentShipCount = new HashMap<Integer, Integer>();
+    /** The desired ship count. */
+    private HashMap<Integer, Integer> desiredShipCount = new HashMap<Integer, Integer>();
+    private HashMap<Integer, Material> playerMaterialsHashMap =
+            new HashMap<Integer, Material>();
 
     /**
      * Instantiates a new ship batch manager.
@@ -63,31 +77,58 @@ public class ShipBatchManager {
     public ShipBatchManager(Level level) {
         level.getLevelNode().attachChild(shipBatchNode);
     }
-   
 
     /**
      * Initializes the.
      *
      * @param shipCount the ship count
      */
-    public void initialize(int shipCount) {
-        usedBatches.clear();
-        unusedBatches.clear();
-        currentShipCount = shipCount;
-        desiredShipCount = shipCount;
-        unusedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
-        usedBatches.ensureCapacity((int) (desiredShipCount * 1.5f));
-        for (int i = 0; i < shipCount; i++) {
-            Spatial s = createNextBatch();
-            s.setCullHint(CullHint.Always);
-            unusedBatches.add(s);
+    public void initialize(ArrayList<Player> players) {
+        usedPlayerBatches.clear();
+        unusedPlayerBatches.clear();
+        for (Player p : players) {
+            Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            material.setColor("Color", p.getColor());
+            material.setColor("GlowColor", p.getColor());
+            material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+            playerMaterialsHashMap.put(p.getId(), material);
         }
-        logger.log(java.util.logging.Level.INFO, "Created {0} Ship-Batches!", shipCount);
+        initDatastructure(players);
+        initBatchLists();
+    }
+
+    private void initBatchLists() {
+
+        for (Map.Entry<Integer, ArrayList<Spatial>> entry : 
+                unusedPlayerBatches.entrySet()) {
+            ArrayList<Spatial> playersBatches = entry.getValue();
+            int playerID = entry.getKey();
+            for (int i = 0; i < desiredShipCount.get(playerID); i++) {
+                Spatial s = createNextBatch(playerID);
+                s.setLocalTranslation(outOfScreen);
+                playersBatches.add(s);
+            }
+            logger.log(java.util.logging.Level.INFO,
+                    "Created {0} Ship-Batches for player id#{1}!",
+                    new Object[]{desiredShipCount.get(playerID), playerID});
+        }
+    }
+
+    private void initDatastructure(ArrayList<Player> players) {
+        for (Player p : players) {
+            currentShipCount.put(p.getId(), p.getShipCount());
+            desiredShipCount.put(p.getId(), p.getShipCount());
+
+            unusedPlayerBatches.put(p.getId(),
+                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getId()) * 1.5f)));
+            usedPlayerBatches.put(p.getId(),
+                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getId()) * 1.5f)));
+        }
     }
 
     public void destroy() {
-        usedBatches.clear();
-        unusedBatches.clear();
+        usedPlayerBatches.clear();
+        unusedPlayerBatches.clear();
     }
 
     /**
@@ -95,7 +136,7 @@ public class ShipBatchManager {
      *
      * @return the spatial
      */
-    private Spatial createNextBatch() {
+    private Spatial createNextBatch(int playerID) {
         Node shipBatchGeometry = new Node("ShipBatch");
         Vector3f v1 = new Vector3f(0, 0, -0.05f);
         Vector3f v2 = new Vector3f(0.125f, 0, 0);
@@ -114,48 +155,45 @@ public class ShipBatchManager {
         shipBatchGeometry.attachChild(line2);
         Spatial shipBatchSpatial =
                 GeometryBatchFactory.optimize(shipBatchGeometry);
-        Material mat =
-                new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        shipBatchSpatial.setMaterial(mat);
+        Material material = playerMaterialsHashMap.get(playerID);
+        
+        shipBatchSpatial.setMaterial(material);
 
         shipBatchNode.attachChild(shipBatchSpatial);
 
-
-
         return shipBatchSpatial;
     }
-    /** The used batches. */
-    private ArrayList<Spatial> usedBatches = new ArrayList<Spatial>();
-    /** The unused batches. */
-    private ArrayList<Spatial> unusedBatches = new ArrayList<Spatial>();
-    /** The current ship count. */
-    private int currentShipCount;
-    /** The desired ship count. */
-    private int desiredShipCount;
 
     /**
      * Gets the ship batch.
      *
      * @return the ship batch
      */
-    Spatial getShipBatch() {
-        if (unusedBatches.isEmpty()) {
-            Spatial s = createNextBatch();
-            usedBatches.add(s);
-            logger.warning("Created Ship-Batch at needs. Not that good!");
-            logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}", new Object[]{usedBatches.size(), unusedBatches.size()});
-            s.setCullHint(CullHint.Never);
-            return s;
+    Spatial getShipBatch(Player p) {
+        int playerID = p.getId();
+        if (unusedPlayerBatches.containsKey(playerID)
+                && usedPlayerBatches.containsKey(playerID)) {
+            if (unusedPlayerBatches.get(playerID).isEmpty()) {
+                Spatial s = createNextBatch(playerID);
+                usedPlayerBatches.get(playerID).add(s);
+                logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}",
+                        new Object[]{usedPlayerBatches.get(playerID).size(),
+                            unusedPlayerBatches.get(playerID).size()});
+                logger.warning("Created Ship-Batch at needs. Not that good!");
+                return s;
+            } else {
+                Spatial s = unusedPlayerBatches.get(playerID).
+                        get(unusedPlayerBatches.get(playerID).size() - 1);
+                unusedPlayerBatches.get(playerID).remove(s);
+                usedPlayerBatches.get(playerID).add(s);
+                logger.info("Aquired Ship-Batch at needs. Perfect!");
+                logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}",
+                        new Object[]{usedPlayerBatches.get(playerID).size(),
+                            unusedPlayerBatches.get(playerID).size()});
+                return s;
+            }
         }
-        Spatial s = unusedBatches.get(unusedBatches.size() - 1);
-        unusedBatches.remove(s);
-        usedBatches.add(s);
-        logger.info("Aquired Ship-Batch at needs. Perfect!");
-        logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}", new Object[]{usedBatches.size(), unusedBatches.size()});
-//        System.out.println("Activated unused Batch");
-//        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
-        s.setCullHint(CullHint.Never);
-        return s;
+        return null;
     }
 
     /**
@@ -163,10 +201,11 @@ public class ShipBatchManager {
      *
      * @param b the b
      */
-    void freeShipBatch(Spatial s) {
-        unusedBatches.add(s);
-        usedBatches.remove(s);
-        s.setCullHint(CullHint.Always);
+    void freeShipBatch(Player p, Spatial s) {
+        unusedPlayerBatches.get(p.getId()).add(s);
+        usedPlayerBatches.get(p.getId()).remove(s);
+//        s.setCullHint(CullHint.Always);
+        s.setLocalTranslation(outOfScreen);
 //        System.out.println("Freed Active Batch");
 //        System.out.println("Used: " + usedBatches.size() + " | Unused: " + unusedBatches.size());
     }
@@ -181,29 +220,41 @@ public class ShipBatchManager {
         updateTimer += tpf;
         if (updateTimer > 1f) {
 
-            int globalShips = 0;
+            int playerShips = 0;
             for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-                globalShips += entry.getValue().getShipCount();
-            }
 
-            desiredShipCount = globalShips;
-
-            unusedBatches.ensureCapacity((int) (desiredShipCount * 2f));
-            usedBatches.ensureCapacity((int) (desiredShipCount * 2f));
-            if (currentShipCount < desiredShipCount) {
-                int step = 10 * Hub.playersByID.size();
-                logger.log(java.util.logging.Level.INFO,
-                        "Creating {0} ShipBatches to reach desired count of {1} from current count of {2}.",
-                        new Object[]{step, desiredShipCount, currentShipCount});
-                Spatial s;
-                for (int i = 0; i < step; i++) {
-                    s = createNextBatch();
-                    s.setCullHint(CullHint.Always);
-                    unusedBatches.add(s);
-                    currentShipCount++;
+                int playerID = entry.getValue().getId();
+                if (!unusedPlayerBatches.containsKey(playerID)
+                        || !usedPlayerBatches.containsKey(playerID)) {
+                    continue;
                 }
 
+                playerShips = entry.getValue().getShipCount();
+                desiredShipCount.remove(playerID);
+                desiredShipCount.put(playerID, playerShips);
+
+                unusedPlayerBatches.get(playerID).ensureCapacity((int) (playerShips * 2f));
+                usedPlayerBatches.get(playerID).ensureCapacity((int) (playerShips * 2f));
+                if (currentShipCount.get(playerID) < desiredShipCount.get(playerID)) {
+                    int step = 10 * Hub.playersByID.size();
+                    logger.log(java.util.logging.Level.INFO,
+                            "Creating {0} ShipBatches to reach desired count of {1} from current count of {2}.",
+                            new Object[]{step, desiredShipCount.get(playerID),
+                                currentShipCount.get(playerID)});
+                    Spatial s;
+                    for (int i = 0; i < step; i++) {
+                        s = createNextBatch(playerID);
+                        s.setLocalTranslation(outOfScreen);
+                        unusedPlayerBatches.get(playerID).add(s);
+                        int temp = currentShipCount.get(playerID);
+                        currentShipCount.remove(playerID);
+                        currentShipCount.put(playerID, ++temp);
+                    }
+
+                }
             }
+
+
             updateTimer = 0;
         }
     }

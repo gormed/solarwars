@@ -237,6 +237,9 @@ public class SolarWarsSettings extends GameSettings {
         this.put(Game.LOG_LEVEL, level);
     }
 
+    
+    
+    
     /**
      * Checked if the bloom shader is turned on. 
      * </br>
@@ -246,13 +249,19 @@ public class SolarWarsSettings extends GameSettings {
     public boolean isBloomEnabled() {
         return this.getBoolean(Graphics.BLOOM_ENABLED);
     }
+    
+    public void setBloomEnabled(boolean value) {
+        this.put(Graphics.BLOOM_ENABLED, value);
+    }
 
     /**
      * Checked if the toon_shader is turned on. 
      * </br>
      * @return true, if the toon shader is enabled.
      * @author fxdapokalypse 
+     * @deprecated
      */
+    @Deprecated
     public boolean isToonEnabled() {
         return this.getBoolean(Graphics.TOON_SHADER);
     }

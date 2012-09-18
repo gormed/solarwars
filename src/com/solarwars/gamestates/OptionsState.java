@@ -28,6 +28,8 @@ import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
@@ -74,6 +76,15 @@ public class OptionsState extends Gamestate {
     public void bind(Nifty nifty, Screen screen) {
         super.bind(nifty, screen);
         initRadioButtons(screen);
+        screen.findNiftyControl("enable-bloom",
+                CheckBox.class).setChecked(
+                SolarWarsSettings.getInstance().isBloomEnabled());
+        screen.findNiftyControl("enable-sound",
+                CheckBox.class).setChecked(
+                SolarWarsSettings.getInstance().isSoundEnabled());
+        screen.findNiftyControl("enable-music",
+                CheckBox.class).setChecked(
+                SolarWarsSettings.getInstance().isMusicEnabled());
     }
 
     private void initRadioButtons(Screen screen) {
@@ -164,6 +175,30 @@ public class OptionsState extends Gamestate {
 //                SolarWarsSettings.getInstance().setDefaultPort(6142);
             }
         }
+    }
+
+    @NiftyEventSubscriber(id = "enable-bloom")
+    public void onEnableBloomChanged(final String id,
+            final CheckBoxStateChangedEvent event) {
+        SolarWarsSettings.getInstance().
+                setBloomEnabled(event.isChecked());
+
+    }
+
+    @NiftyEventSubscriber(id = "enable-sound")
+    public void onEnableSoundChanged(final String id,
+            final CheckBoxStateChangedEvent event) {
+        SolarWarsSettings.getInstance().
+                setSoundEnabled(event.isChecked());
+
+    }
+
+    @NiftyEventSubscriber(id = "enable-music")
+    public void onEnableMusicChanged(final String id,
+            final CheckBoxStateChangedEvent event) {
+        SolarWarsSettings.getInstance().
+                setMusicEnabled(event.isChecked());
+
     }
 
     public String getDefaultPort() {

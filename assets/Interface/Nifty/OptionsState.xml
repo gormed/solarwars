@@ -27,7 +27,7 @@
                     <panel id="spacer" align="center" backgroundColor="#0000" 
                     childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                     <panel childLayout="center" padding="10px" height="42px" width="100%">
-                        <text id="nw-label" text="Graphics" 
+                        <text id="nw-label" text="General" 
                             font="Interface/Fonts/SolarWarsFont32.fnt" 
                             height="32px" align="left"/>
                     </panel>
@@ -37,7 +37,34 @@
                             <onActive name="border" color="#0a8" />
                         </effect>
                         <panel childLayout="vertical" 
-                        width="50%" padding="2%" >
+                        width="30%" padding="2%" >
+                            <panel childLayout="horizontal" width="50%" padding="2%">
+                                <text id="bloom-label" text="Enable Bloom" 
+                            font="Interface/Fonts/SolarWarsFont20.fnt" 
+                            height="20px"/>
+                                <control id="enable-bloom" name="checkbox" />
+                            </panel>
+                            <!-- SPACER -->
+                            <panel id="spacer" align="center" backgroundColor="#0000" 
+                            childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                            <panel childLayout="horizontal" width="50%" padding="2%">
+                                <text id="music-label" text="Enable Music" 
+                            font="Interface/Fonts/SolarWarsFont20.fnt" 
+                            height="20px"/>
+                                <control id="enable-music" name="checkbox" />
+                            </panel>
+                            <!-- SPACER -->
+                            <panel id="spacer" align="center" backgroundColor="#0000" 
+                            childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                            <panel childLayout="horizontal" width="50%" padding="2%">
+                                <text id="sound-label" text="Enable Sound" 
+                            font="Interface/Fonts/SolarWarsFont20.fnt" 
+                            height="20px"/>
+                                <control id="enable-sound" name="checkbox" />
+                            </panel>
+                        </panel>
+                        <panel childLayout="vertical" 
+                        width="30%" padding="2%" >
                             <control id="planet-quality" name="radioButtonGroup"/>
                             <panel childLayout="vertical" width="50%">
                                 <text id="planet-quality-label" text="Planet Quality" 
@@ -61,7 +88,7 @@
                                 </panel>
                             </panel>
                         </panel>
-                        <panel childLayout="vertical" width="50%" padding="2%">
+                        <panel childLayout="vertical" width="40%" padding="2%">
                             <control id="background-quality" name="radioButtonGroup"/>
                             <panel childLayout="vertical" width="50%">
                                 <text id="background-quality-label" text="Background Quality" 

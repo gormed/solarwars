@@ -44,7 +44,6 @@ public class Player {
         ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};
-    
     private static Player winner;
 
     /**
@@ -100,7 +99,7 @@ public class Player {
         }
         return Hub.playersByID.size() - 1 == lostPlayerCount;
     }
-    
+
     public static Player getLastPlayer() {
         int lostPlayerCount = 0;
         int wonPlayerCount = 0;
@@ -357,8 +356,12 @@ public class Player {
     void selectPlanet(AbstractPlanet p) {
         state.multiSelectedPlanets.clear();
         state.multiSelectedShipGroups.clear();
-        state.selectedPlanetId = p.getId();
         state.selectedShipGroupId = -1;
+        if (p != null) {
+            state.selectedPlanetId = p.getId();
+        } else {
+            state.selectedPlanetId = -1;
+        }
     }
 
     /**
@@ -376,8 +379,11 @@ public class Player {
      * @return the selected planet
      */
     public AbstractPlanet getSelectedPlanet() {
-        return SolarWarsGame.getInstance().
-                getCurrentLevel().getPlanet(state.selectedPlanetId);
+        if (hasSelectedPlanet()) {
+            return SolarWarsGame.getInstance().
+                    getCurrentLevel().getPlanet(state.selectedPlanetId);
+        }
+        return null;
     }
 
     /**
@@ -531,8 +537,12 @@ public class Player {
     void selectShipGroup(ShipGroup g) {
         state.multiSelectedPlanets.clear();
         state.multiSelectedShipGroups.clear();
-        state.selectedShipGroupId = g.getId();
         state.selectedPlanetId = -1;
+        if (g != null) {
+            state.selectedShipGroupId = g.getId();
+        } else {
+            state.selectedShipGroupId = -1;
+        }
     }
 
     /**

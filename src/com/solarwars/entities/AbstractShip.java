@@ -153,7 +153,7 @@ public abstract class AbstractShip extends Node {
                     owner, 
                     DeathmatchGameplay.SHIP_ARRIVES);
         }
-        batchManager.freeShipBatch(shipBatchSpatial);
+        batchManager.freeShipBatch(owner, shipBatchSpatial);
         level.removeShip(owner, this);
     }
 

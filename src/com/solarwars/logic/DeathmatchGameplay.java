@@ -34,7 +34,6 @@ import com.solarwars.logic.actions.PlanetAction;
 import com.solarwars.logic.actions.ShipGroupAction;
 import com.solarwars.net.NetworkManager;
 
-
 /**
  * The Class DeathmatchGameplay implements the handling of 
  * deathmatch singleplayer and multiplayer matches.
@@ -42,6 +41,7 @@ import com.solarwars.net.NetworkManager;
  */
 public class DeathmatchGameplay extends AbstractGameplay {
     // Action Strings
+
     public static final String PLANET_SELECT = "SelectPlanet";
     public static final String PLANET_MULTI_SELECT = "MultiSelectPlanet";
     public static final String PLANET_ATTACK = "AttackPlanet";
@@ -54,8 +54,10 @@ public class DeathmatchGameplay extends AbstractGameplay {
 
     public DeathmatchGameplay() {
         super();
+//        SHIP_SPEED = 0.75f;
+//        PLANET_RANGE = 1.75f;
     }
-    
+
     /**
      * Implements the normal gameplay from first versions. Only deathmatch mode.
      */
@@ -70,6 +72,10 @@ public class DeathmatchGameplay extends AbstractGameplay {
             @Override
             public boolean doAction(Object sender, long delay,
                     AbstractPlanet planet, Player p) {
+                if (planet == null || planet.getOwner() == null) {
+                    p.selectPlanet(null);
+                    return true;
+                }
                 if (planet.getOwner() == p) {
                     p.clearPlanetMultiSelect();
                     p.selectPlanet(planet);
@@ -125,7 +131,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
 
             private boolean isDistanceToFar(Ranged rangedObject,
                     AbstractPlanet target) {
-                
+
                 float dist = rangedObject.getPosition().distance(target.getPosition());
                 if (dist > rangedObject.getRange() || !AbstractGameplay.RANGE_ENABLED) {
                     return true;

@@ -51,9 +51,6 @@ import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.settings.SolarWarsSettings;
-import de.lessvoid.nifty.layout.BoxConstraints;
-import de.lessvoid.nifty.screen.Screen;
-import de.lessvoid.nifty.tools.SizeValue;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -123,11 +120,6 @@ public class IsoControl {
     private boolean controlPressed = false;
     // Panels for rect
     private DragRectangleGUI dragRectangle;
-//    private Panel leftDrag;
-//    private Panel topDrag;
-//    private Panel rightDrag;
-//    private Panel bottomDrag;
-//    private Panel centerDrag;
     // debug
 //    private Cross startDrag;
 //    private Cross endDrag;
@@ -149,9 +141,18 @@ public class IsoControl {
      * @param click2d 
      */
     public void createDragRectGeometry() {
-        
+
         dragRectangle.setEnabled(true);
-        
+
+    }
+
+    private void clearMultiMarkers() {
+        if (markerNodes != null && !markerNodes.isEmpty()) {
+            for (MarkerNode mn : markerNodes) {
+                removeMarker(mn);
+            }
+            markerNodes.clear();
+        }
     }
 
     /**
@@ -163,7 +164,7 @@ public class IsoControl {
         dragRectangle = new DragRectangleGUI();
         AppStateManager stateManager = SolarWarsApplication.getInstance().getStateManager();
         stateManager.attach(dragRectangle);
-        
+
         shootablesNode = new Node("Shootables");
         rootNode.attachChild(shootablesNode);
 
@@ -257,12 +258,7 @@ public class IsoControl {
             startScreenPos = click2d.clone();
             planetSelection = new ArrayList<AbstractPlanet>();
             shipGroupSelection = new ArrayList<ShipGroup>();
-            if (markerNodes != null && !markerNodes.isEmpty()) {
-                for (MarkerNode mn : markerNodes) {
-                    removeMarker(mn);
-                }
-                markerNodes.clear();
-            }
+            clearMultiMarkers();
             updateDragRect(click2d);
             dragRectangle.show();
 //            centerDrag.setVisible(true);
@@ -310,7 +306,8 @@ public class IsoControl {
      */
     private boolean onButtonUp(String name, Vector2f point) {
         boolean attack = (name.equals(InputMappings.LEFT_CLICK_SELECT)
-                && (name.equals(InputMappings.LEFT_CLICK_SELECT) || name.equals(InputMappings.RIGHT_CLICK_ATTACK)))
+                && (name.equals(InputMappings.LEFT_CLICK_SELECT)
+                || name.equals(InputMappings.RIGHT_CLICK_ATTACK)))
                 ? false : true;
         if (name.equals(InputMappings.LEFT_CLICK_SELECT)
                 || name.equals(InputMappings.RIGHT_CLICK_ATTACK)) {
@@ -364,16 +361,13 @@ public class IsoControl {
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_SELECT);
-//                    final String planetSelectMsg = "Player selected planet id#" + nearestPlanet.getId();
-//                    logger.info(planetSelectMsg);
                     // finally set marker
                     repositMarker(nearestPlanet, markerNode);
+                    return true;
 
                 } // ...check for right botton click
                 // TODO: move hasLost check to actionLib
                 else if (attack && !Hub.getLocalPlayer().hasLost()) {
-
-
                     // invoke attack action
                     actionLib.invokePlanetAction(
                             null,
@@ -381,18 +375,23 @@ public class IsoControl {
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_ATTACK);
-//                    final String planetAttackMsg = "Player attacked/moved to planet id#"
-//                            + nearestPlanet.getId() + ", owned by "
-//                            + ((nearestPlanet.getOwner() != null)
-//                            ? nearestPlanet.getOwner().getName()
-//                            : "nobody");
-//                    logger.info(planetAttackMsg);
+                    return true;
                 }
-
-            } //</editor-fold>
+            } else {
+                actionLib.invokePlanetAction(
+                        null,
+                        0L,
+                        null,
+                        Hub.getLocalPlayer(),
+                        DeathmatchGameplay.PLANET_SELECT);
+                removeMarker(markerNode);
+                clearMultiMarkers();
+                return true;
+            }
+            //</editor-fold>
             // was shipgroup found
             //<editor-fold defaultstate="collapsed" desc="ShipGroup Found Section">
-            else if (nearestShipGroup != null) {
+            if (nearestShipGroup != null) {
                 // ...check if left button click
                 // TODO: move hasLost check to actionLib
                 if (!attack && !Hub.getLocalPlayer().hasLost()) {
@@ -404,13 +403,20 @@ public class IsoControl {
                             nearestShipGroup,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.SHIP_SELECT);
-//                    final String sgSelectMsg = "Player selected shipgroup id#" + nearestShipGroup.getId();
-//                    logger.info(sgSelectMsg);
                     repositMarker(nearestShipGroup, markerNode);
+                    return true;
                 }
-                //</editor-fold>
             }
+            //</editor-fold>
         }
+        actionLib.invokePlanetAction(
+                null,
+                0L,
+                null,
+                Hub.getLocalPlayer(),
+                DeathmatchGameplay.PLANET_SELECT);
+        removeMarker(markerNode);
+        clearMultiMarkers();
         return false;
     }
 
