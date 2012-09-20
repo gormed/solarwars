@@ -257,6 +257,14 @@ public class Player {
     void setLost() {
         state.hasLost = true;
     }
+    
+    public boolean isReady() {
+        return state.isReady;
+    }
+    
+    public void setReady(boolean value) {
+        state.isReady = value;
+    }
 
     /**
      * Gets the defeated player.

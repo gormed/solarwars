@@ -111,6 +111,9 @@ public class GameChatModule implements ActionListener {
         listBoxChat.addItem(new ChatItem(message,
                 ChatItem.ChatMsgType.PLAYER,
                 p.getName(), p.getColor()));
+        if (p.isHost()) {
+            chatLayer.show();
+        }
     }
 
     /**
@@ -158,6 +161,13 @@ public class GameChatModule implements ActionListener {
             chatLayer.show();
             hadWinner = true;
         }
+    }
+
+    public void serverSays(String string) {
+        listBoxChat.addItem(new ChatItem(string,
+                ChatItem.ChatMsgType.SERVER,
+                "SERVER", ColorRGBA.White));
+        chatLayer.show();
     }
 
     /**

@@ -40,9 +40,10 @@ public class ConnectedPlayerItem {
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
-    public ConnectedPlayerItem(String name, ColorRGBA color) {
+    public ConnectedPlayerItem(String name, ColorRGBA color, boolean ready) {
         this.name = name;
         this.color = color;
+        this.ready = ready;
 //        this.player = player;
     }
 

@@ -40,10 +40,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
+import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
+import com.jme3.post.Filter;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
@@ -59,6 +61,7 @@ import com.solarwars.net.SolarWarsServer;
 import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerConnectingMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
+import com.solarwars.net.messages.PlayerReadyMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.net.messages.StringMessage;
 import com.solarwars.settings.GameSettingsException;
@@ -216,8 +219,10 @@ public class CreateServerState extends Gamestate
 
         Player host = ServerHub.getHostPlayer();
         if (host != null) {
+            host.setReady(true);
             serverLobbyBox.addItem(
-                    new ConnectedPlayerItem(host.getName(), host.getColor()));
+                    new ConnectedPlayerItem(host.getName(),
+                    host.getColor(), true));
         }
     }
 
@@ -320,7 +325,18 @@ public class CreateServerState extends Gamestate
     }
 
     public void onStartServer() {
-        startServer();
+        boolean allReady = true;
+        for (Player p : ServerHub.getPlayers()) {
+            if (!p.isReady()) {
+                gameChatModule.serverSays("Not all players are ready!");
+                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId()
+                        , "Please get ready, " + p.getName() + "!");
+                allReady = false;
+            }
+        }
+        if (allReady) {
+            startServer();
+        }
     }
 
     @NiftyEventSubscriber(id = "server_seed")
@@ -424,6 +440,7 @@ public class CreateServerState extends Gamestate
     public void registerServerListener(Server gameServer) {
         gameServer.addConnectionListener(clientConnectedListener);
         gameServer.addMessageListener(serverMessageListener,
+                PlayerReadyMessage.class,
                 PlayerConnectingMessage.class,
                 StartGameMessage.class);
 
@@ -441,6 +458,7 @@ public class CreateServerState extends Gamestate
         client.addMessageListener(clientMessageListener,
                 PlayerAcceptedMessage.class,
                 PlayerLeavingMessage.class,
+                PlayerReadyMessage.class,
                 StartGameMessage.class);
     }
 
@@ -458,7 +476,10 @@ public class CreateServerState extends Gamestate
         for (Player p : players.values()) {
             if (p != null) {
                 serverLobbyBox.addItem(
-                        new ConnectedPlayerItem(p.getName(), p.getColor().clone()));
+                        new ConnectedPlayerItem(
+                        p.getName(),
+                        p.getColor().clone(),
+                        p.isReady()));
             }
         }
         playersChanged = false;
@@ -509,7 +530,8 @@ public class CreateServerState extends Gamestate
          */
         @Override
         public void connectionAdded(Server server, HostedConnection conn) {
-            if (!solarWarsServer.getServerState().equals(SolarWarsServer.ServerState.LOBBY)) {
+            if (!solarWarsServer.getServerState().
+                    equals(SolarWarsServer.ServerState.LOBBY)) {
                 conn.close(SERVER_NOT_IN_LOBBY_MSG);
             } else if (server.getConnections().size() > maxPlayerNumber) {
                 conn.close(SERVER_FULL_MSG);
@@ -566,15 +588,15 @@ public class CreateServerState extends Gamestate
         public void messageReceived(HostedConnection source, Message message) {
             if (message instanceof PlayerConnectingMessage) {
 
-                PlayerConnectingMessage pcm = (PlayerConnectingMessage) message;
+                PlayerConnectingMessage pcm =
+                        (PlayerConnectingMessage) message;
                 boolean isHost = pcm.isHost();
                 // creates a connecting player on the server
                 Player newPlayer;
                 if (!isHost) {
-                    newPlayer = new Player(pcm.getName(),
-                            Player.getUnusedColor(ServerHub.getPlayers(),
-                            source.getId()),
-                            // Player.PLAYER_COLORS[source.getId()],
+                    newPlayer = new Player(
+                            pcm.getName(),
+                            Player.getUnusedColor(ServerHub.getPlayers(), source.getId()),
                             source.getId());
                     // ServerHub.getContiniousPlayerID());
                 } else {
@@ -582,15 +604,18 @@ public class CreateServerState extends Gamestate
                 }
                 serverHub.addPlayer(newPlayer);
 
-
                 System.out.println("Player " + newPlayer.getName() + "[ID#"
                         + newPlayer.getId() + "] joined the Game.");
                 solarWarsServer.addConnectingPlayer(newPlayer, source);
 
-
                 refreshedPlayers = ServerHub.playersByID;
                 playersChanged = true;
-                // refreshPlayers(ServerHub.getPlayers());
+            } else if (message instanceof PlayerReadyMessage) {
+                PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
+                serverHub.getPlayer(source.getId()).setReady(readyMessage.isReady());
+                solarWarsServer.getGameServer().
+                        broadcast(Filters.notEqualTo(source), readyMessage);
+                playersChanged = true;
             }
         }
     }
@@ -644,12 +669,17 @@ public class CreateServerState extends Gamestate
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
-                ArrayList<Player> players = sgm.getPlayers();
+//                ArrayList<Player> players = sgm.getPlayers();
 
                 // SolarWarsApplication.getInstance().enqueue(null)
                 if (!gameStarted) {
                     startClient(seed);
                 }
+            } else if (message instanceof PlayerReadyMessage) {
+                PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
+                Player p = Hub.playersByID.get(source.getId());
+                p.setReady(readyMessage.isReady());
+                playersChanged = true;
             }
 
         }

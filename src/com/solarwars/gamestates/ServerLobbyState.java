@@ -48,6 +48,7 @@ import com.solarwars.net.NetworkManager;
 import com.solarwars.net.NetworkManager.ClientConnectionState;
 import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
+import com.solarwars.net.messages.PlayerReadyMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.controls.ListBox;
@@ -81,8 +82,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     private HashMap<Integer, Player> refreshedPlayers;
     private boolean playersChanged;
     private PlayerStateListener playerStateListener = new PlayerStateListener();
-    private PlayerConnectionListener playerConnectionListener =
-            new PlayerConnectionListener();
+    private ClientConnectionListener clientConnectionListener =
+            new ClientConnectionListener();
     private ClientConnectionState clientState = ClientConnectionState.CONNECTING;
     private Thread connectorThread = null;
     // LOGIC
@@ -235,10 +236,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         gameChatModule.destroy();
         if (client != null) {
             client.removeMessageListener(
-                    playerConnectionListener,
+                    clientConnectionListener,
                     PlayerAcceptedMessage.class,
                     PlayerLeavingMessage.class,
-                    StartGameMessage.class);
+                    StartGameMessage.class, 
+                PlayerReadyMessage.class);
             client.removeClientStateListener(playerStateListener);
         }
 
@@ -260,6 +262,11 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
     public void onReadyButton() {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_EXPLOSION);
+        Player p = Hub.getLocalPlayer();
+        p.setReady(!p.isReady());
+        networkManager.getThisClient().send(
+                new PlayerReadyMessage(p.getId(), p.isReady()));
+        playersChanged = true;
     }
     //==========================================================================
     //===   Chat
@@ -353,9 +360,10 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      */
     @Override
     public void registerClientListener(Client client) {
-        client.addMessageListener(playerConnectionListener,
+        client.addMessageListener(clientConnectionListener,
                 PlayerAcceptedMessage.class,
                 PlayerLeavingMessage.class,
+                PlayerReadyMessage.class,
                 StartGameMessage.class);
         client.addClientStateListener(playerStateListener);
 
@@ -376,7 +384,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
         for (Player p : players.values()) {
             if (p != null) {
                 serverLobbyBox.addItem(
-                        new ConnectedPlayerItem(p.getName(), p.getColor()));
+                        new ConnectedPlayerItem(p.getName(), p.getColor(), p.isReady()));
             }
         }
         playersChanged = false;
@@ -430,7 +438,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      *
      * @see PlayerConnectionEvent
      */
-    private class PlayerConnectionListener implements MessageListener<Client> {
+    private class ClientConnectionListener implements MessageListener<Client> {
 
         /* (non-Javadoc)
          * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
@@ -475,9 +483,12 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 ArrayList<Player> players = sgm.getPlayers();
 
                 startClient(seed);
+            } else if (message instanceof PlayerReadyMessage) {
+                PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
+                Player p = Hub.playersByID.get(source.getId());
+                p.setReady(readyMessage.isReady());
+                playersChanged = true;
             }
-
-
         }
     }
 }

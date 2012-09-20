@@ -50,6 +50,7 @@ import com.solarwars.net.messages.PlanetActionMessage;
 import com.solarwars.net.messages.PlayerAcceptedMessage;
 import com.solarwars.net.messages.PlayerConnectingMessage;
 import com.solarwars.net.messages.PlayerLeavingMessage;
+import com.solarwars.net.messages.PlayerReadyMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.net.messages.StringMessage;
 import com.solarwars.settings.SolarWarsSettings;
@@ -313,6 +314,7 @@ public class NetworkManager {
         Serializer.registerClass(PlanetActionMessage.class);
         Serializer.registerClass(GeneralActionMessage.class);
         Serializer.registerClass(LevelActionMessage.class);
+        Serializer.registerClass(PlayerReadyMessage.class);
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 

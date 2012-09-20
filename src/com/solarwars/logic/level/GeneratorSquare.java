@@ -25,6 +25,7 @@ import com.jme3.math.Vector2f;
 import com.solarwars.entities.LevelBackground;
 import com.solarwars.logic.Level;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * The class GeneratorSquare.
@@ -82,16 +83,16 @@ public class GeneratorSquare extends LevelGenerator {
      */
     public boolean generateSquare(long seed) {
         System.out.print("[" + seed + "] Generating level...");
-
+        
+        Logger.getLogger(GeneratorSquare.class.getName()).
+                log(java.util.logging.Level.INFO, 
+                "[{0}] Generating level...", seed);
         background =
                 new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
         level.getRootNode().attachChild(background);
 
         randomizer = new Random(seed);
-        //            int leftBottomX = Math.round(corners[0].x);
-        //            int leftBottomZ = Math.round(corners[0].z);
-        //            int topRightX = Math.round(corners[2].x);
-        //            int topRightZ = Math.round(corners[2].z);
+        
         int playerCount = level.getPlayersByID().size();
         int pointerX = 0;
         int pointerZ = 0;
