@@ -31,6 +31,7 @@ import com.solarwars.entities.ShipGroup;
 
 import java.util.ArrayList;
 import java.util.Map;
+import sun.security.action.GetLongAction;
 
 /**
  * The Class Player.
@@ -88,16 +89,17 @@ public class Player {
      * @return true, if successful
      */
     public static boolean isLastPlayer() {
-        int lostPlayerCount = 0;
-        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-            Player p = entry.getValue();
-            if (p != null) {
-                if (p.hasLost()) {
-                    lostPlayerCount++;
-                }
-            }
-        }
-        return Hub.playersByID.size() - 1 == lostPlayerCount;
+        return Hub.getLocalPlayer().equals(getLastPlayer());
+//        int lostPlayerCount = 0;
+//        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+//            Player p = entry.getValue();
+//            if (p != null) {
+//                if (p.hasLost()) {
+//                    lostPlayerCount++;
+//                }
+//            }
+//        }
+//        return Hub.playersByID.size() - 1 == lostPlayerCount;
     }
 
     public static Player getLastPlayer() {

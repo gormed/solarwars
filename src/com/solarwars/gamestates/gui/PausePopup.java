@@ -122,6 +122,7 @@ public class PausePopup implements ActionListener {
                         @Override
                         public void perform() {
                             niftyGUI.closePopup(pausePopup.getId());
+                            pausePopup = null;
                             paused = false;
                             fadeing = false;
                         }

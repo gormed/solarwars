@@ -29,19 +29,19 @@ import de.lessvoid.nifty.elements.Element;
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
-public class StartGamePopup {
+public class WaitingPopup {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
 
     private Nifty niftyGUI;
-    private Element startGamePopup;
+    private Element waitingPopup;
     private boolean visible = false;
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
 
-    public StartGamePopup(Nifty niftyGUI) {
+    public WaitingPopup(Nifty niftyGUI) {
         this.niftyGUI = niftyGUI;
     }
 
@@ -49,17 +49,17 @@ public class StartGamePopup {
         if (visible) {
             return;
         }
-        if (startGamePopup == null) {
-            startGamePopup = niftyGUI.createPopup("start_game_popup");
+        if (waitingPopup == null) {
+            waitingPopup = niftyGUI.createPopup("waiting_popup");
         }
-        niftyGUI.showPopup(niftyGUI.getCurrentScreen(), startGamePopup.getId(), null);
+        niftyGUI.showPopup(niftyGUI.getCurrentScreen(), waitingPopup.getId(), null);
         visible = true;
     }
 
     public void hidePopup() {
-        if (startGamePopup != null && visible) {
-            niftyGUI.closePopup(startGamePopup.getId());
-            startGamePopup = null;
+        if (waitingPopup != null && visible) {
+            niftyGUI.closePopup(waitingPopup.getId());
+            waitingPopup = null;
             visible = false;
         }
     }

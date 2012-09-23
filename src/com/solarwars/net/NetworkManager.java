@@ -63,8 +63,8 @@ public class NetworkManager {
     public static final boolean WAIT_FOR_CLIENTS = true;
     public static final int MAXIMUM_DISCONNECT_TIMEOUT = 4;
 
-
     public enum ClientConnectionState {
+
         CONNECTING,
         CONNECTED,
         ERROR,
@@ -72,7 +72,8 @@ public class NetworkManager {
         JOINED
     }
     /** The Constant DEFAULT_PORT. */
-    public static final int DEFAULT_PORT = SolarWarsSettings.getInstance().getDefaultPort();
+    public static final int DEFAULT_PORT =
+            SolarWarsSettings.getInstance().getDefaultPort();
     /** The instance. */
     private static NetworkManager instance;
 
@@ -194,6 +195,7 @@ public class NetworkManager {
     public void setCurrentChatModule(GameChatModule gameChatModule) {
         this.chatModule = gameChatModule;
     }
+
     /**
      * Gets the client ip adress.
      *
@@ -297,13 +299,9 @@ public class NetworkManager {
      */
     public Client setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
-        if (serverIPAdress == null || udpPort < 1) {
+        if (serverIPAdress == null) {
             return null;
         }
-        
-        //TODO HANS setup chat
-        
-//        this.chatModule = new GameChatModule();
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(ChatMessage.class);
@@ -318,12 +316,6 @@ public class NetworkManager {
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
-//        Serializer.registerClass(com.solarwars.entities.AbstractPlanet.class);
-//        Serializer.registerClass(com.solarwars.entities.AbstractShip.class);
-//        Serializer.registerClass(com.solarwars.entities.BasePlanet.class);
-//        Serializer.registerClass(com.solarwars.entities.ShipGroup.class);
-//        Serializer.registerClass(com.solarwars.entities.SimpleShip.class);
-
         thisClient = Network.connectToServer(
                 SolarWarsServer.SERVER_NAME,
                 SolarWarsServer.SERVER_VERSION,
@@ -336,9 +328,9 @@ public class NetworkManager {
         thisClient.start();
         isMultiplayerGame = true;
         try {
-            StringMessage s = new StringMessage(name + " joins the server!");
+//            StringMessage s = new StringMessage(name + " joins the server!");
             PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
-            thisClient.send(s);
+//            thisClient.send(s);
             thisClient.send(pcm);
             return thisClient;
         } catch (Exception e) {
@@ -384,7 +376,9 @@ public class NetworkManager {
 
             @Override
             public void run() {
-                if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
+                if (thisServer != null
+                        && thisServer.getGameServer() != null
+                        && thisServer.getGameServer().isRunning()) {
                     thisServer.stop(wait);
                 }
             }

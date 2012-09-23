@@ -107,5 +107,48 @@
                 </panel>
             </panel>
         </layer>
+        <!-- HUD LAYER -->
+        <layer id="player_stats_hud" backgroundColor="#0000" childLayout="vertical">
+            <panel id="spacer" height="5px" backgroundColor="#0000"/>
+            <panel id="player_stats_panel" height="42" width="35%" 
+                align="right" valign="top" backgroundColor="#008c" 
+                childLayout="vertical" visibleToMouse="true">
+                <panel height="5px" backgroundColor="#0000"/>
+                <panel height="5px" backgroundColor="#0000" childLayout="horizontal">
+                    <panel id="ship_icon_align" width="15%" childLayout="center">
+                        <image id="ship_icon" width="32" height="32"
+                            filename="Interface/ScoreIcons/ship_icon.png" filter="false"/>
+                    </panel>
+                    <panel width="15%" childLayout="center">
+                        <text id="ships_text" font="Interface/Fonts/SolarWarsFont20.fnt" 
+                        color="#ffff" text="0" align="center" valign="center" />
+                    </panel>
+                    <panel id="planet_icon_align" width="15%" childLayout="center">
+                        <image id="planet_icon" width="32" height="32"
+                        filename="Interface/ScoreIcons/planet_icon.png" filter="false"/>
+                    </panel>
+                    <panel width="5%" childLayout="center">
+                        <text id="planet_text" font="Interface/Fonts/SolarWarsFont20.fnt" 
+                        color="#ffff" text="0" align="center" valign="center" />
+                    </panel>                    
+                    <panel id="gain_icon_align" width="15%" childLayout="center">
+                        <image id="gain_icon" width="32" height="32"
+                        filename="Interface/ScoreIcons/gain_icon.png" filter="false"/>
+                    </panel>
+                    <panel width="5%" childLayout="center">
+                        <text id="gain_text" font="Interface/Fonts/SolarWarsFont20.fnt" 
+                        color="#ffff" text="0" align="center" valign="center" />
+                    </panel>                    
+                    <panel id="power_icon_align" width="15%" childLayout="center">
+                        <image id="power_icon" width="32" height="32"
+                        filename="Interface/ScoreIcons/power_icon.png" filter="false"/>
+                    </panel>
+                    <panel width="12%" childLayout="center">
+                        <text id="power_text" font="Interface/Fonts/SolarWarsFont20.fnt" 
+                        color="#ffff" text="0" align="center" valign="center" />
+                    </panel>                
+                </panel>
+            </panel>
+        </layer>
     </screen>
 </nifty>

@@ -222,7 +222,7 @@ public class Level {
     void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
         if (NetworkManager.getInstance().isMultiplayerGame()) {
-            MultiplayerGameplay.getInstance().removeGameplayListener();
+            MultiplayerGameplay.getInstance().destroy();
         }
     }
 

@@ -37,9 +37,9 @@ public class StartGameMessage extends AbstractMessage {
 
     /** The seed. */
     private long seed;
-    
     /** The players. */
     private ArrayList<Player> players;
+    private boolean ingame = false;
 
     /**
      * Gets the players.
@@ -59,6 +59,10 @@ public class StartGameMessage extends AbstractMessage {
         return seed;
     }
 
+    public boolean isIngame() {
+        return ingame;
+    }
+
     /**
      * Instantiates a new player accepted message.
      */
@@ -74,5 +78,9 @@ public class StartGameMessage extends AbstractMessage {
     public StartGameMessage(long seed, ArrayList<Player> players) {
         this.seed = seed;
         this.players = players;
+    }
+
+    public StartGameMessage(boolean ingame) {
+        this.ingame = ingame;
     }
 }

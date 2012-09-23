@@ -293,31 +293,6 @@ public class SolarWarsGame {
         }
     }
 
-//    public boolean attachGamestate(String name) {
-//        Gamestate gs = gamestates.get(name);
-//        if (gs != null) {
-//            if (stateManager.hasState(gs)) {
-//                return false;
-//            } else {
-//                stateManager.attach(gs);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public boolean detachGamestate(String name) {
-//        Gamestate gs = gamestates.get(name);
-//        if (gs != null) {
-//            if (stateManager.hasState(gs)) {
-//                stateManager.detach(gs);
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        }
-//        return false;
-//    }
     /**
      * Gets the application.
      *

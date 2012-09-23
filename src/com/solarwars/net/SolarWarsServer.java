@@ -204,7 +204,8 @@ public class SolarWarsServer extends SimpleApplication {
         gameServer.addMessageListener(
                 gameplayListener,
                 PlanetActionMessage.class,
-                GeneralActionMessage.class);
+                GeneralActionMessage.class,
+                StartGameMessage.class);
     }
 
     /**
@@ -580,7 +581,7 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getPlanetID());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
-                
+
                 final String planetActionMsg =
                         "Client@" + new Date(clientMessage.getClientTime()).toString()
                         + " | " + clientMessage.getActionName() + " from #"
@@ -607,6 +608,9 @@ public class SolarWarsServer extends SimpleApplication {
 //                        + " to #" + clientMessage.getReciever()
 //                        + "/" + clientMessage.getRecieverState().name;
                 logger.log(Level.INFO, serverMessage.getActionName(), serverMessage);
+            } else if (message instanceof StartGameMessage) {
+                StartGameMessage startGameMessage = (StartGameMessage) message;
+                gameServer.broadcast(startGameMessage);
             }
         }
     }

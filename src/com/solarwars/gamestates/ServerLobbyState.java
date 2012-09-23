@@ -480,12 +480,12 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
-                ArrayList<Player> players = sgm.getPlayers();
+//                ArrayList<Player> players = sgm.getPlayers();
 
                 startClient(seed);
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
-                Player p = Hub.playersByID.get(source.getId());
+                Player p = Hub.playersByID.get(readyMessage.getPlayerID());
                 p.setReady(readyMessage.isReady());
                 playersChanged = true;
             }

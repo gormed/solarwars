@@ -90,7 +90,7 @@ public class GameChatModule implements ActionListener {
         listBoxChat = niftyGUI.getCurrentScreen().findNiftyControl("chat_text_box", ListBox.class);
         listBoxChat.clear();
         textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
-        textInput.disableFocus();
+//        textInput.disableFocus();
         networkManager.setCurrentChatModule(this);
     }
 
@@ -190,10 +190,10 @@ public class GameChatModule implements ActionListener {
         if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
             if (chatLayer.isVisible()) {
                 chatLayer.hide();
-                textInput.disableFocus();
+//                textInput.disableFocus();
             } else {
                 chatLayer.show();
-                textInput.setFocus();
+//                textInput.setFocus();
             }
         }
     }

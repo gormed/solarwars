@@ -28,7 +28,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -40,12 +39,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
-import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
-import com.jme3.post.Filter;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
@@ -74,6 +71,7 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.KeyInputHandler;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The Class CreateServerState.
@@ -329,8 +327,7 @@ public class CreateServerState extends Gamestate
         for (Player p : ServerHub.getPlayers()) {
             if (!p.isReady()) {
                 gameChatModule.serverSays("Not all players are ready!");
-                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId()
-                        , "Please get ready, " + p.getName() + "!");
+                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId(), "Please get ready, " + p.getName() + "!");
                 allReady = false;
             }
         }
@@ -612,7 +609,7 @@ public class CreateServerState extends Gamestate
                 playersChanged = true;
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
-                serverHub.getPlayer(source.getId()).setReady(readyMessage.isReady());
+                serverHub.getPlayer(readyMessage.getPlayerID()).setReady(readyMessage.isReady());
                 solarWarsServer.getGameServer().
                         broadcast(Filters.notEqualTo(source), readyMessage);
                 playersChanged = true;

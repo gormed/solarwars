@@ -196,8 +196,12 @@ public class SingleplayerMatchState extends Gamestate {
      * Setup singleplayer.
      */
     private void setupSingleplayer() {
-        Player local = new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID(), true);
-        Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
+        Player local = new Player("Human", 
+                ColorRGBA.Blue.clone(), 
+                ServerHub.getContiniousPlayerID(), true);
+        Player ai = new Player("AI", 
+                ColorRGBA.Red.clone(), 
+                ServerHub.getContiniousPlayerID());
 
         hub.initialize(local, null);
         hub.addPlayer(ai);
