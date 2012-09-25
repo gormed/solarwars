@@ -303,6 +303,15 @@ public class SolarWarsServer extends SimpleApplication {
 
         logger.info("Closing server...");
         long t1 = System.currentTimeMillis();
+        for (HostedConnection connection : gameServer.getConnections()) {
+            final String shutdownMsg = "Shutting down connection to #" + connection.getId() + " ...";
+            logger.info(shutdownMsg);
+            connection.close("Shutting down...");
+        }
+        connectedPlayers.clear();
+        joinedPlayers.clear();
+        leavingPlayers.clear();
+        registerListeners.clear();
         super.stop(waitFor);
         long t2 = System.currentTimeMillis();
         final String timeMsg = "Time wasted disconnecting: " + (t2 - t1) + "ms";
@@ -318,18 +327,7 @@ public class SolarWarsServer extends SimpleApplication {
             logger.warning("Server is already closed!");
             return;
         }
-        connectedPlayers.clear();
-        joinedPlayers.clear();
-        leavingPlayers.clear();
-        registerListeners.clear();
-
-        for (HostedConnection connection : gameServer.getConnections()) {
-            final String shutdownMsg = "Shutting down connection to #" + connection.getId() + " ...";
-            logger.info(shutdownMsg);
-            connection.close("Shutting down...");
-        }
-
-
+        
         gameServer.close();
         gameServer = null;
         serverApp = null;
@@ -580,7 +578,7 @@ public class SolarWarsServer extends SimpleApplication {
                         clientMessage.getPlanetID());
 
                 gameServer.broadcast(Filters.notEqualTo(source), serverMessage);
-                
+
                 final String planetActionMsg =
                         "Client@" + new Date(clientMessage.getClientTime()).toString()
                         + " | " + clientMessage.getActionName() + " from #"

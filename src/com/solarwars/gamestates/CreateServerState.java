@@ -157,6 +157,7 @@ public class CreateServerState extends Gamestate
     private void setupNiftyGUI() {
         serverLobbyBox = screen.findNiftyControl("server_lobby_box",
                 ListBox.class);
+        serverLobbyBox.clear();
         // CHAT ------------------------------------------
         // attach chat module
         gameChatModule = new GameChatModule(niftyGUI, NetworkManager.getInstance());

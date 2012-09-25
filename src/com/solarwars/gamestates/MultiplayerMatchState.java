@@ -92,12 +92,12 @@ public class MultiplayerMatchState extends Gamestate {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
                 updateNifty(tpf);
-                if (!gameOverModule.isVisible() && 
-                        (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost())) {
+                if (!gameOverModule.isVisible()
+                        && (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost())) {
                     gameOverModule.showPopup();
                     gameChatModule.playerWins(Player.getWinner());
                 }
-            } else if (lostConnection && !currentLevel.isGameOver()) {
+            } else if (lostConnection) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
             }
@@ -159,7 +159,8 @@ public class MultiplayerMatchState extends Gamestate {
 
             @Override
             public Thread call() throws Exception {
-                return NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
+                return NetworkManager.getInstance().
+                        closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             }
         });
 

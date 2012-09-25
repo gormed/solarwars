@@ -60,8 +60,8 @@ import com.solarwars.settings.SolarWarsSettings;
  */
 public class NetworkManager {
 
-    public static final boolean WAIT_FOR_CLIENTS = true;
-    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 4;
+    public static final boolean WAIT_FOR_CLIENTS = false;
+    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 2;
 
 
     public enum ClientConnectionState {
@@ -385,6 +385,7 @@ public class NetworkManager {
             @Override
             public void run() {
                 if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
+//                    thisServer.getGameServer().
                     thisServer.stop(wait);
                 }
             }

@@ -145,6 +145,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     private void setupNiftyGUI() {
         serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
+        serverLobbyBox.clear();
         serverNameLabel = screen.findElementByName("server_lobby_server_name_label");
         serverIPLabel = screen.findElementByName("server_lobby_server_ip_label");
 
