@@ -300,6 +300,9 @@ public class DeathmatchGameplay extends AbstractGameplay {
                     victorious.setDefeatedPlayer(defeated.getId());
                     if (NetworkManager.getInstance().isMultiplayerGame()) {
                         NetworkManager.getInstance().getChatModule().playerDefeats(victorious, defeated);
+                        if (currentLevel.isGameOver()) {
+                            NetworkManager.getInstance().getChatModule().playerWins(victorious);
+                        }
                     }
                     return true;
                 }

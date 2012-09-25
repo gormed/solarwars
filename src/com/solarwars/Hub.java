@@ -160,4 +160,10 @@ public class Hub {
     public int getPlayerCount() {
         return playersByName.size();
     }
+
+    public void destroy() {
+        playersByID.clear();
+        playersByName.clear();
+        localPlayer = null;
+    }
 }

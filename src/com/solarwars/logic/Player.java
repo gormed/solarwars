@@ -28,9 +28,12 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
+import com.solarwars.gamestates.gui.GameChatModule;
+import com.solarwars.net.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.Map;
+import sun.security.action.GetLongAction;
 
 /**
  * The Class Player.
@@ -88,16 +91,17 @@ public class Player {
      * @return true, if successful
      */
     public static boolean isLastPlayer() {
-        int lostPlayerCount = 0;
-        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-            Player p = entry.getValue();
-            if (p != null) {
-                if (p.hasLost()) {
-                    lostPlayerCount++;
-                }
-            }
-        }
-        return Hub.playersByID.size() - 1 == lostPlayerCount;
+        return Hub.getLocalPlayer().equals(getLastPlayer());
+//        int lostPlayerCount = 0;
+//        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+//            Player p = entry.getValue();
+//            if (p != null) {
+//                if (p.hasLost()) {
+//                    lostPlayerCount++;
+//                }
+//            }
+//        }
+//        return Hub.playersByID.size() - 1 == lostPlayerCount;
     }
 
     public static Player getLastPlayer() {
@@ -132,10 +136,7 @@ public class Player {
         if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
             winner = Hub.getLocalPlayer();
-        } else {
-            //TODO: Display: "You defeated..."
         }
-
     }
 
     /**
@@ -147,6 +148,7 @@ public class Player {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         }
     }
+    
     private static boolean hostSet = false;
     /** The id. */
     private int id;
@@ -257,11 +259,11 @@ public class Player {
     void setLost() {
         state.hasLost = true;
     }
-    
+
     public boolean isReady() {
         return state.isReady;
     }
-    
+
     public void setReady(boolean value) {
         state.isReady = value;
     }

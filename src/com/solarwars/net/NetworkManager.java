@@ -185,7 +185,6 @@ public class NetworkManager {
      * Is generally needed to move the chat gui to the next GameGUI ingame.
      * 
      * @return chat module from the current session
-     * @deprecated DO NOT USE!
      */
     public GameChatModule getChatModule() {
         return chatModule;
