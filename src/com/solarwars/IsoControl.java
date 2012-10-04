@@ -22,7 +22,6 @@
 package com.solarwars;
 
 import com.jme3.app.state.AppStateManager;
-import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -46,12 +45,12 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
+import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.solarwars.input.InputMappings;
-import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
+import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.settings.SolarWarsSettings;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import jme3tools.optimize.GeometryBatchFactory;
 
 /**
@@ -357,7 +355,6 @@ public class IsoControl {
                     // invoke select action
                     actionLib.invokePlanetAction(
                             null,
-                            0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_SELECT);
@@ -371,7 +368,6 @@ public class IsoControl {
                     // invoke attack action
                     actionLib.invokePlanetAction(
                             null,
-                            0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_ATTACK);
@@ -380,7 +376,6 @@ public class IsoControl {
             } else {
                 actionLib.invokePlanetAction(
                         null,
-                        0L,
                         null,
                         Hub.getLocalPlayer(),
                         DeathmatchGameplay.PLANET_SELECT);
@@ -399,7 +394,6 @@ public class IsoControl {
                     // invoke ship redirect action
                     actionLib.invokeShipAction(
                             null,
-                            0,
                             nearestShipGroup,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.SHIP_SELECT);
@@ -411,7 +405,6 @@ public class IsoControl {
         }
         actionLib.invokePlanetAction(
                 null,
-                0L,
                 null,
                 Hub.getLocalPlayer(),
                 DeathmatchGameplay.PLANET_SELECT);
@@ -482,7 +475,6 @@ public class IsoControl {
                         }
                         actionLib.invokePlanetAction(
                                 IsoControl.getInstance(),
-                                0L,
                                 null,
                                 Hub.getLocalPlayer(),
                                 DeathmatchGameplay.PLANET_MULTI_SELECT);
@@ -503,7 +495,6 @@ public class IsoControl {
                         }
                         actionLib.invokeShipAction(
                                 IsoControl.getInstance(),
-                                0L,
                                 null,
                                 Hub.getLocalPlayer(),
                                 DeathmatchGameplay.SHIP_MULTI_SELECT);

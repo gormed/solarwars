@@ -213,6 +213,7 @@ public class MultiplayerMatchState extends Gamestate {
     private void setupNiftyGUI() {
         pauseListener.hidePopup();
         gameOverModule.hidePopup();
+        gameOverModule.setWatchGame(false);
         // attach listener for pause layer
         application.getInputManager().addListener(
                 pauseListener,

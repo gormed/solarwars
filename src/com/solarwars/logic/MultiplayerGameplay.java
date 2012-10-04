@@ -224,12 +224,9 @@ public class MultiplayerGameplay {
                 p.applyState(serverMessage.getPlayerState());
                 AbstractPlanet planet =
                         currentLevel.getPlanet(serverMessage.getPlanetID());
-                //TODO: Clean up the mess, nobody needs this anymore!
-                long delay = 0;
 
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
-                        delay,
                         planet,
                         p,
                         serverMessage.getActionName());
