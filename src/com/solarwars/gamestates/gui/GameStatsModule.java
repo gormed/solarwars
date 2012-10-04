@@ -71,7 +71,7 @@ public class GameStatsModule implements ActionListener {
 
     public void update(float tpf) {
         refreshCounter += tpf;
-        if (refreshCounter > 1f) {
+        if (refreshCounter > 0.2f) {
             for (PlayerStatsItem item : playerStatsBox.getItems()) {
                 item.update(tpf);
 //            updatePlayer(item, item.getPlayer());

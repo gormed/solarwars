@@ -458,15 +458,18 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 ArrayList<Player> players = pam.getPlayers();
 
                 if (isConnecting) {
-                    Hub.getInstance().initialize(thisPlayer, players);
+                    if (!Hub.getInstance().isInitialized()) {
+                        Hub.getInstance().initialize(thisPlayer, players);
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 } else {
-                    Hub.getInstance().addPlayer(thisPlayer);
+                    if (Hub.getInstance().addPlayer(thisPlayer)) {
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 }
 
                 refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
                 playersChanged = true;
-                gameChatModule.playerJoins(thisPlayer);
-                //refreshPlayers(players);
 
                 // PLAYER LEAVING
             } else if (message instanceof PlayerLeavingMessage) {

@@ -63,8 +63,8 @@ public class NetworkManager {
     public static final boolean WAIT_FOR_CLIENTS = false;
     public static final int MAXIMUM_DISCONNECT_TIMEOUT = 2;
 
-
     public enum ClientConnectionState {
+
         CONNECTING,
         CONNECTED,
         ERROR,
@@ -193,6 +193,7 @@ public class NetworkManager {
     public void setCurrentChatModule(GameChatModule gameChatModule) {
         this.chatModule = gameChatModule;
     }
+
     /**
      * Gets the client ip adress.
      *
@@ -226,27 +227,39 @@ public class NetworkManager {
      * @param rl the rl
      */
     public void removeClientRegisterListener(ClientRegisterListener rl) {
-        clientRegisterListeners.remove(rl);
+        if (rl != null) {
+            clientRegisterListeners.remove(rl);
+        }
     }
 
     public void clientRemoveClientStateListener(ClientStateListener csl) {
-        thisClient.removeClientStateListener(csl);
+        if (csl != null) {
+            thisClient.removeClientStateListener(csl);
+        }
     }
 
     public void clientRemoveErrorListener(ErrorListener<? super Client> el) {
-        thisClient.removeErrorListener(el);
+        if (el != null) {
+            thisClient.removeErrorListener(el);
+        }
     }
 
     public void clientRemoveMessageListener(MessageListener<? super Client> listener) {
-        thisClient.removeMessageListener(listener);
+        if (listener != null) {
+            thisClient.removeMessageListener(listener);
+        }
     }
 
     public void serverRemoveClientMessageListener(MessageListener<? super HostedConnection> listener) {
-        thisServer.removeClientMessageListener(listener);
+        if (listener != null) {
+            thisServer.removeClientMessageListener(listener);
+        }
     }
 
     public void serverRemoveConnectionListener(ConnectionListener listener) {
-        thisServer.removeConnectionListener(listener);
+        if (listener != null) {
+            thisServer.removeConnectionListener(listener);
+        }
     }
 
     /**
@@ -299,9 +312,9 @@ public class NetworkManager {
         if (serverIPAdress == null || udpPort < 1) {
             return null;
         }
-        
+
         //TODO HANS setup chat
-        
+
 //        this.chatModule = new GameChatModule();
 
         Serializer.registerClass(StringMessage.class);
@@ -327,7 +340,8 @@ public class NetworkManager {
                 SolarWarsServer.SERVER_NAME,
                 SolarWarsServer.SERVER_VERSION,
                 serverIPAdress.getHostAddress(), tcpPort, udpPort);
-        thisClient.addMessageListener(clientListener, StringMessage.class, ChatMessage.class);
+        thisClient.addMessageListener(clientListener,
+                StringMessage.class, ChatMessage.class);
         for (ClientRegisterListener rl : clientRegisterListeners) {
             rl.registerClientListener(thisClient);
         }
@@ -383,15 +397,14 @@ public class NetworkManager {
 
             @Override
             public void run() {
-                if (thisServer != null && thisServer.getGameServer() != null && thisServer.getGameServer().isRunning()) {
-//                    thisServer.getGameServer().
+                if (thisServer != null
+                        && thisServer.getGameServer() != null
+                        && thisServer.getGameServer().isRunning()) {
                     thisServer.stop(wait);
                 }
             }
         };
-//        thisServer = null;
         connectionCloser.start();
-
 
         isMultiplayerGame = false;
         return connectionCloser;

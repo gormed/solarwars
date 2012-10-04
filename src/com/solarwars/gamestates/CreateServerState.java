@@ -135,7 +135,9 @@ public class CreateServerState extends Gamestate
                 Server server = solarWarsServer.getGameServer();
                 server.removeMessageListener(serverMessageListener);
                 // server.removeConnectionListener(serverConnectionListener);
-                serverClient.removeMessageListener(clientMessageListener);
+                serverClient.removeMessageListener(clientMessageListener,
+                        PlayerAcceptedMessage.class, PlayerLeavingMessage.class,
+                        StartGameMessage.class, PlayerReadyMessage.class);
                 solarWarsServer.enterLevel();
                 startGame();
 
@@ -242,7 +244,9 @@ public class CreateServerState extends Gamestate
 
         gameChatModule.destroy();
         if (serverClient != null) {
-            serverClient.removeMessageListener(clientMessageListener);
+            serverClient.removeMessageListener(clientMessageListener,
+                    PlayerAcceptedMessage.class, PlayerLeavingMessage.class,
+                    StartGameMessage.class, PlayerReadyMessage.class);
         }
     }
 
@@ -291,6 +295,18 @@ public class CreateServerState extends Gamestate
                         ex);
             }
             serverEstablished = false;
+        } catch (Exception e) {
+
+            Logger.getLogger(
+                    CreateServerState.class.getName()).log(Level.SEVERE,
+                    e.getMessage(),
+                    e);
+            serverEstablished = false;
+        }
+        if (solarWarsServer != null) {
+            serverEstablished = true;
+        } else {
+            serverEstablished = false;
         }
     }
 
@@ -330,8 +346,7 @@ public class CreateServerState extends Gamestate
         for (Player p : ServerHub.getPlayers()) {
             if (!p.isReady()) {
                 gameChatModule.serverSays("Not all players are ready!");
-                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId()
-                        , "Please get ready, " + p.getName() + "!");
+                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId(), "Please get ready, " + p.getName() + "!");
                 allReady = false;
             }
         }
@@ -444,7 +459,6 @@ public class CreateServerState extends Gamestate
                 PlayerReadyMessage.class,
                 PlayerConnectingMessage.class,
                 StartGameMessage.class);
-
     }
 
     /*
@@ -640,6 +654,8 @@ public class CreateServerState extends Gamestate
          * @see
          * com.jme3.network.MessageListener#messageReceived(java.lang.Object,
          * com.jme3.network.Message)
+         * 
+         * 
          */
         @Override
         public void messageReceived(Client source, Message message) {
@@ -655,27 +671,33 @@ public class CreateServerState extends Gamestate
                 ArrayList<Player> players = pam.getPlayers();
 
                 if (isConnecting) {
-                    Hub.getInstance().initialize(thisPlayer, players);
+                    if (!Hub.getInstance().isInitialized()) {
+                        Hub.getInstance().initialize(thisPlayer, players);
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 } else {
-                    Hub.getInstance().addPlayer(thisPlayer);
+                    if (Hub.getInstance().addPlayer(thisPlayer)) {
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 }
-                gameChatModule.playerJoins(thisPlayer);
-
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
                 p.setLeaver(true);
                 gameChatModule.playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
+
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
-//                ArrayList<Player> players = sgm.getPlayers();
-
-                // SolarWarsApplication.getInstance().enqueue(null)
                 if (!gameStarted) {
                     startClient(seed);
                 }
+
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
                 Player p = Hub.playersByID.get(readyMessage.getID());

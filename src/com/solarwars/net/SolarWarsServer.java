@@ -43,6 +43,7 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
+import com.solarwars.Hub;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.logic.PlayerState;
@@ -147,6 +148,7 @@ public class SolarWarsServer extends SimpleApplication {
     private long seed;
     /** The gameplay listener. */
     private GameplayListener gameplayListener = new GameplayListener();
+    private ServerListener serverListener = new ServerListener();
     /** The server state. */
     private ServerState serverState = ServerState.INIT;
     /** The level sync. */
@@ -236,7 +238,11 @@ public class SolarWarsServer extends SimpleApplication {
                     SERVER_VERSION,
                     tcpPort, udpPort);
             gameServer.start();
-            gameServer.addMessageListener(new ServerListener(), StringMessage.class, ChatMessage.class);
+            gameServer.addMessageListener(
+                    serverListener, 
+                    StringMessage.class, 
+                    ChatMessage.class, 
+                    PlayerLeavingMessage.class);
             for (ServerRegisterListener rl : registerListeners) {
                 rl.registerServerListener(gameServer);
             }
@@ -327,8 +333,10 @@ public class SolarWarsServer extends SimpleApplication {
             logger.warning("Server is already closed!");
             return;
         }
-        
+        gameServer.removeMessageListener(gameplayListener);
+        gameServer.removeMessageListener(serverListener);
         gameServer.close();
+        connectedPlayers.clear();
         gameServer = null;
         serverApp = null;
         isRunning = false;
@@ -544,6 +552,14 @@ public class SolarWarsServer extends SimpleApplication {
                 gameServer.broadcast(Filters.notEqualTo(source), aPlayerSays);
                 final String chatMsg = "#" + chatMessage.getPlayerID() + " says " + chatMessage.getMessage();
                 logger.log(Level.INFO, chatMsg, chatMessage);
+            } else if (message instanceof PlayerLeavingMessage) {
+                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+                Player p = plm.getPlayer();
+                p.setLeaver(true);
+                ServerHub.getInstance().removePlayer(p);
+                gameServer.getConnection(source.getId()).
+                        close("You wanted to leave! Shame on you...");
+                gameServer.broadcast(Filters.notEqualTo(source), plm);
             }
         }
     }

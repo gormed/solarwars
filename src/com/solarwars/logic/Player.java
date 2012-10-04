@@ -28,12 +28,9 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
-import com.solarwars.gamestates.gui.GameChatModule;
-import com.solarwars.net.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.Map;
-import sun.security.action.GetLongAction;
 
 /**
  * The Class Player.
@@ -47,7 +44,6 @@ public class Player {
         ColorRGBA.Green, ColorRGBA.LightGray,
         ColorRGBA.Yellow, ColorRGBA.Cyan,
         new ColorRGBA(0.2f, 0.0f, 0.5f, 1.0f), ColorRGBA.Magenta};
-    private static Player winner;
 
     /**
      * Gets the unused color.
@@ -125,17 +121,12 @@ public class Player {
         return null;
     }
 
-    public static Player getWinner() {
-        return winner;
-    }
-
     /**
      * Local player wins.
      */
     static void localPlayerWins() {
         if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-            winner = Hub.getLocalPlayer();
         }
     }
 
@@ -144,11 +135,9 @@ public class Player {
      */
     static void localPlayerLooses() {
         if (isLastPlayer()) {
-            winner = getLastPlayer();
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
         }
     }
-    
     private static boolean hostSet = false;
     /** The id. */
     private int id;

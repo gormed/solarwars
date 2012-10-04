@@ -21,11 +21,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars;
 
+import com.solarwars.logic.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.solarwars.logic.Player;
 
 /**
  * The Class Hub.
@@ -52,6 +51,7 @@ public class Hub {
     private static HashMap<String, Player> playersByName;
     /** The local player. */
     private static Player localPlayer;
+    private boolean initialized = false;
 
     /**
      * Gets the local player.
@@ -91,6 +91,9 @@ public class Hub {
      * @param players the players
      */
     public void initialize(Player localPlayer, ArrayList<Player> players) {
+        if (initialized) {
+            return;
+        }
         playersByID = new HashMap<Integer, Player>();
         playersByName = new HashMap<String, Player>();
         Hub.localPlayer = localPlayer;
@@ -102,6 +105,7 @@ public class Hub {
                 }
             }
         }
+        initialized = true;
     }
 
     /**
@@ -109,9 +113,14 @@ public class Hub {
      *
      * @param p the p
      */
-    public void addPlayer(Player p) {
+    public boolean addPlayer(Player p) {
+        if (playersByID.containsKey(p.getId())
+                || playersByName.containsKey(p.getName())) {
+            return false;
+        }
         playersByName.put(p.getName(), p);
         playersByID.put(p.getId(), p);
+        return true;
     }
 
     /**
@@ -161,9 +170,17 @@ public class Hub {
         return playersByName.size();
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }    
+
     public void destroy() {
+        if (!initialized) {
+            return;
+        }
         playersByID.clear();
         playersByName.clear();
         localPlayer = null;
+        initialized = false;
     }
 }

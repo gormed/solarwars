@@ -25,7 +25,6 @@ import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
-import java.util.ArrayList;
 
 /**
  * The class GameOverModule.
@@ -46,6 +45,7 @@ public class GameOverModule {
     //==========================================================================
     public GameOverModule(Nifty niftyGUI) {
         this.niftyGUI = niftyGUI;
+        watchGame = false;
     }
 
     public void setWatchGame(boolean value) {

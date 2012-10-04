@@ -148,7 +148,7 @@ public class GameChatModule {
         if (p.isLeaver()) {
             listBoxChat.addItem(new ChatItem(p.getName() + " leaves the game!",
                     ChatItem.ChatMsgType.LEAVER,
-                    "#SERVER", p.getColor()));
+                    "SERVER", p.getColor()));
             chatLayer.show();
         }
     }
