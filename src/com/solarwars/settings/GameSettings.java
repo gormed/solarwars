@@ -28,6 +28,14 @@ public abstract class GameSettings implements Map<String, Object>, Cloneable {
 	private String settingsLoaderSaverType = SettingsLoaderSaverFactory.TYPE_JM3;
 	
 	/**
+	 * Define the path to the desired configuration file.
+	 * 
+	 * @return the path to the configuration file as File object.
+	 * 
+	 */
+	public abstract File getDefaulfConfigFile ();
+
+	/**
 	 * Convert the GameSettings to a Jmonkey AppSettings class.
 	 * 
 	 * @return 
@@ -53,14 +61,6 @@ public abstract class GameSettings implements Map<String, Object>, Cloneable {
 		}
 		
 	}
-	
-	/**
-	 * Define the path to the desired configuration file.
-	 * 
-	 * @return the path to the configuration file as File object.
-	 * 
-	 */
-	public abstract File getDefaulfConfigFile ();
 	
 	/**
 	 * Get the current save and loader type.
