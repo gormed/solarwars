@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,10 +40,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
+import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
+import com.jme3.post.Filter;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
@@ -71,7 +74,6 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.KeyInputHandler;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The Class CreateServerState.
@@ -133,7 +135,9 @@ public class CreateServerState extends Gamestate
                 Server server = solarWarsServer.getGameServer();
                 server.removeMessageListener(serverMessageListener);
                 // server.removeConnectionListener(serverConnectionListener);
-                serverClient.removeMessageListener(clientMessageListener);
+                serverClient.removeMessageListener(clientMessageListener,
+                        PlayerAcceptedMessage.class, PlayerLeavingMessage.class,
+                        StartGameMessage.class, PlayerReadyMessage.class);
                 solarWarsServer.enterLevel();
                 startGame();
 
@@ -155,6 +159,7 @@ public class CreateServerState extends Gamestate
     private void setupNiftyGUI() {
         serverLobbyBox = screen.findNiftyControl("server_lobby_box",
                 ListBox.class);
+        serverLobbyBox.clear();
         // CHAT ------------------------------------------
         // attach chat module
         gameChatModule = new GameChatModule(niftyGUI, NetworkManager.getInstance());
@@ -163,7 +168,6 @@ public class CreateServerState extends Gamestate
         textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
         // add input handler for button click to send message
         textInput.addInputHandler(new KeyInputHandler() {
-
             @Override
             public boolean keyEvent(NiftyInputEvent inputEvent) {
                 if (inputEvent == null) {
@@ -239,7 +243,9 @@ public class CreateServerState extends Gamestate
 
         gameChatModule.destroy();
         if (serverClient != null) {
-            serverClient.removeMessageListener(clientMessageListener);
+            serverClient.removeMessageListener(clientMessageListener,
+                    PlayerAcceptedMessage.class, PlayerLeavingMessage.class,
+                    StartGameMessage.class, PlayerReadyMessage.class);
         }
     }
 
@@ -247,6 +253,10 @@ public class CreateServerState extends Gamestate
      * Setup server.
      */
     private void setupServer() {
+        if (networkManager.isMultiplayerGame() || networkManager.isServerRunning()) {
+            serverEstablished = false;
+            return;
+        }
         ServerHub.resetPlayerID(0);
         int id = ServerHub.getContiniousPlayerID();
 
@@ -287,6 +297,18 @@ public class CreateServerState extends Gamestate
                         ex.getMessage(),
                         ex);
             }
+            serverEstablished = false;
+        } catch (Exception e) {
+
+            Logger.getLogger(
+                    CreateServerState.class.getName()).log(Level.SEVERE,
+                    e.getMessage(),
+                    e);
+            serverEstablished = false;
+        }
+        if (solarWarsServer != null) {
+            serverEstablished = true;
+        } else {
             serverEstablished = false;
         }
     }
@@ -356,9 +378,8 @@ public class CreateServerState extends Gamestate
 
     /**
      * Creates the level.
-     * 
-     * @param seed
-     *            the seed
+     *
+     * @param seed the seed
      */
     private void createLevel(long seed) {
         if (seed == 0) {
@@ -369,9 +390,8 @@ public class CreateServerState extends Gamestate
 
     /**
      * Starts the level.
-     * 
-     * @param seed
-     *            the level-seed
+     *
+     * @param seed the level-seed
      */
     private void startClient(long seed) {
 
@@ -395,7 +415,6 @@ public class CreateServerState extends Gamestate
 
         if (serverEstablished) {
             Future<Thread> fut = application.enqueue(new Callable<Thread>() {
-
                 @Override
                 public Thread call() throws Exception {
 
@@ -440,7 +459,6 @@ public class CreateServerState extends Gamestate
                 PlayerReadyMessage.class,
                 PlayerConnectingMessage.class,
                 StartGameMessage.class);
-
     }
 
     /*
@@ -513,7 +531,7 @@ public class CreateServerState extends Gamestate
      * <code>addServerConnectionListener<code> method. When
      * the serverConnection event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ServerConnectionEvent
      */
     private class ClientConnectedListener implements ConnectionListener {
@@ -568,7 +586,7 @@ public class CreateServerState extends Gamestate
      * <code>addServerMessageListener<code> method. When
      * the serverMessage event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ServerMessageEvent
      */
     private class ServerMessageListener implements
@@ -609,7 +627,7 @@ public class CreateServerState extends Gamestate
                 playersChanged = true;
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
-                serverHub.getPlayer(readyMessage.getPlayerID()).setReady(readyMessage.isReady());
+                serverHub.getPlayer(source.getId()).setReady(readyMessage.isReady());
                 solarWarsServer.getGameServer().
                         broadcast(Filters.notEqualTo(source), readyMessage);
                 playersChanged = true;
@@ -625,7 +643,7 @@ public class CreateServerState extends Gamestate
      * <code>addClientMessageListener<code> method. When
      * the clientMessage event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ClientMessageEvent
      */
     public class ClientMessageListener implements MessageListener<Client> {
@@ -636,6 +654,8 @@ public class CreateServerState extends Gamestate
          * @see
          * com.jme3.network.MessageListener#messageReceived(java.lang.Object,
          * com.jme3.network.Message)
+         * 
+         * 
          */
         @Override
         public void messageReceived(Client source, Message message) {
@@ -651,34 +671,39 @@ public class CreateServerState extends Gamestate
                 ArrayList<Player> players = pam.getPlayers();
 
                 if (isConnecting) {
-                    Hub.getInstance().initialize(thisPlayer, players);
+                    if (!Hub.getInstance().isInitialized()) {
+                        Hub.getInstance().initialize(thisPlayer, players);
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 } else {
-                    Hub.getInstance().addPlayer(thisPlayer);
+                    if (Hub.getInstance().addPlayer(thisPlayer)) {
+                        gameChatModule.playerJoins(thisPlayer);
+                    }
                 }
-                gameChatModule.playerJoins(thisPlayer);
-
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
             } else if (message instanceof PlayerLeavingMessage) {
                 PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
                 Player p = plm.getPlayer();
                 p.setLeaver(true);
                 gameChatModule.playerLeaves(p);
                 Hub.getInstance().removePlayer(p);
+
+                refreshedPlayers = new HashMap<Integer, Player>(Hub.playersByID);
+                playersChanged = true;
             } else if (message instanceof StartGameMessage) {
                 StartGameMessage sgm = (StartGameMessage) message;
                 long seed = sgm.getSeed();
-//                ArrayList<Player> players = sgm.getPlayers();
-
-                // SolarWarsApplication.getInstance().enqueue(null)
                 if (!gameStarted) {
                     startClient(seed);
                 }
+
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
-                Player p = Hub.playersByID.get(source.getId());
+                Player p = Hub.playersByID.get(readyMessage.getID());
                 p.setReady(readyMessage.isReady());
                 playersChanged = true;
             }
-
         }
     }
 }

@@ -108,10 +108,8 @@ public class GameStatsModule implements ActionListener {
     public void onAction(String name, boolean isPressed, float tpf) {
         if (name.equals(InputMappings.GAME_SCORES)) {
             if (isPressed) {
-//                statsLayer.setFocus();
                 statsLayer.show();
             } else {
-//                statsLayer.disableFocus();
                 statsLayer.hide();
             }
         }

@@ -13,10 +13,10 @@
  * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
  * Project: SolarWars
- * File: PlanetAction.java
- * Type: com.solarwars.logic.PlanetAction
+ * File: PlanetActionListener.java
+ * Type: com.solarwars.logic.PlanetActionListener
  * 
- * Documentation created: 14.07.2012 - 19:38:01 by Hans Ferchland
+ * Documentation created: 24.09.2012 - 02:41:41 by Hans Ferchland <hans.ferchland at gmx.de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic.actions;
@@ -25,22 +25,13 @@ import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.logic.Player;
 
 /**
- * The Class PlanetAction.
+ * The class PlanetActionListener.
+ *
+ * @author Hans Ferchland <hans.ferchland at gmx.de>
+ * @version
  */
-public abstract class PlanetAction {
+public interface PlanetActionListener {
 
-    private final String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public PlanetAction(String name) {
-        this.name = name;
-    }
-
-    //public abstract void doAction(Object sender, AbstractPlanet planet, Player p);
-
-   
-    public abstract boolean doAction(Object sender, AbstractPlanet planet, Player p);
+    public void onPlanetAction(Object sender, AbstractPlanet planet, Player p,
+            String actionName);
 }

@@ -24,11 +24,8 @@ package com.solarwars;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.solarwars.settings.SolarWarsSettings;
-
-
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * The Class AudioManager.
@@ -37,40 +34,53 @@ import java.util.Map;
  */
 public class AudioManager {
 
-    /** The Constant SOUND_BEEP. */
+    /**
+     * The Constant SOUND_BEEP.
+     */
     public static final String SOUND_BEEP = "Sounds/beep.ogg";
-    
-    /** The Constant SOUND_CLICK. */
+    /**
+     * The Constant SOUND_CLICK.
+     */
     public static final String SOUND_CLICK = "Sounds/click.ogg";
-    
-    /** The Constant SOUND_CYBER. */
+    /**
+     * The Constant SOUND_CYBER.
+     */
     public static final String SOUND_CYBER = "Sounds/cyber.ogg";
-    
-    /** The Constant SOUND_ERROR. */
+    /**
+     * The Constant SOUND_ERROR.
+     */
     public static final String SOUND_ERROR = "Sounds/error.ogg";
-    
-    /** The Constant SOUND_EXPLOSION. */
+    /**
+     * The Constant SOUND_EXPLOSION.
+     */
     public static final String SOUND_EXPLOSION = "Sounds/explosion.ogg";
-    
-    /** The Constant SOUND_HELI. */
+    /**
+     * The Constant SOUND_HELI.
+     */
     public static final String SOUND_HELI = "Sounds/heli.ogg";
-    
-    /** The Constant SOUND_LOAD. */
+    /**
+     * The Constant SOUND_LOAD.
+     */
     public static final String SOUND_LOAD = "Sounds/load.ogg";
-    
-    /** The Constant SOUND_ROCKET. */
+    /**
+     * The Constant SOUND_ROCKET.
+     */
     public static final String SOUND_ROCKET = "Sounds/rocket.ogg";
-    
-    /** The Constant SOUND_CAPTURE. */
+    /**
+     * The Constant SOUND_CAPTURE.
+     */
     public static final String SOUND_CAPTURE = "Sounds/capture.ogg";
-    
-    /** The instance. */
+    /**
+     * The instance.
+     */
     private static AudioManager instance;
-    
-    /** The application. */
+    /**
+     * The application.
+     */
     private SolarWarsApplication application;
-    
-    /** The audio nodes. */
+    /**
+     * The audio nodes.
+     */
     private HashMap<String, AudioNode> audioNodes;
 
     /**
@@ -98,7 +108,7 @@ public class AudioManager {
      */
     public void initialize() {
         final AssetManager assetManager = application.getAssetManager();
-        
+
         AudioNode beep = new AudioNode(
                 assetManager, SOUND_CLICK, false);
         beep.setVolume(0.25f);
@@ -116,17 +126,17 @@ public class AudioManager {
                 assetManager, SOUND_HELI, false);
         heli.setLooping(true);
         heli.setVolume(0.25f);
-        
+
         AudioNode load = new AudioNode(
                 assetManager, SOUND_LOAD, false);
         load.setVolume(0.25f);
         AudioNode rocket = new AudioNode(
                 assetManager, SOUND_ROCKET, false);
-        
+
         AudioNode capture = new AudioNode(
                 assetManager, SOUND_CAPTURE, false);
         capture.setVolume(0.3f);
-        
+
         audioNodes.put(SOUND_BEEP, beep);
         audioNodes.put(SOUND_CLICK, click);
         audioNodes.put(SOUND_CYBER, cyber);
@@ -144,7 +154,7 @@ public class AudioManager {
             }
         }
     }
-    
+
     /**
      * Gets the audio node.
      *
@@ -162,9 +172,10 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean playSound(String sound) {
-    	if(isSoundDisabled())
-      	   return true;
-    	if (audioNodes.containsKey(sound)) {
+        if (isSoundDisabled()) {
+            return true;
+        }
+        if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.play();
@@ -182,9 +193,10 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean pauseSound(String sound) {
-    	if(isSoundDisabled())
-       	   return true;
-    	if (audioNodes.containsKey(sound)) {
+        if (isSoundDisabled()) {
+            return true;
+        }
+        if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.pause();
@@ -202,9 +214,10 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean stopSound(String sound) {
-    	if(isSoundDisabled())
-        	   return true;
-    	if (audioNodes.containsKey(sound)) {
+        if (isSoundDisabled()) {
+            return true;
+        }
+        if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
 
             n.stop();
@@ -222,11 +235,12 @@ public class AudioManager {
      * @return true, if successful
      */
     public boolean playSoundInstance(String sound) {
-       if(isSoundDisabled())
-    	   return true;
-    	if (audioNodes.containsKey(sound)) {
+        if (isSoundDisabled()) {
+            return true;
+        }
+        if (audioNodes.containsKey(sound)) {
             AudioNode n = audioNodes.get(sound);
-            
+
             n.playInstance();
 
             return true;
@@ -234,12 +248,13 @@ public class AudioManager {
             return false;
         }
     }
+
     /**
      * Check if the sound is enabled.
-     * 
+     *
      * @return true, if the sound is enabled
      */
     private boolean isSoundDisabled() {
-    	return !SolarWarsSettings.getInstance().isSoundEnabled();
+        return !SolarWarsSettings.getInstance().isSoundEnabled();
     }
 }

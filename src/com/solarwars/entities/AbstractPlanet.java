@@ -34,6 +34,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.solarwars.FontLoader;
@@ -231,6 +232,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
         label.setText(shipIncrement + "");
         label.setAlignment(Align.Center);
         label.setCullHint(CullHint.Never);
+        label.setQueueBucket(Bucket.Transparent);
         // algins position of the font
         refreshFont();
     }

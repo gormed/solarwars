@@ -60,8 +60,9 @@ import com.solarwars.settings.SolarWarsSettings;
  */
 public class NetworkManager {
 
-    public static final boolean WAIT_FOR_CLIENTS = true;
-    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 4;
+    public static final boolean WAIT_FOR_CLIENTS = false;
+    public static final int MAXIMUM_DISCONNECT_TIMEOUT = 2;
+    public static final int USE_TCP_ONLY = -1;
 
     public enum ClientConnectionState {
 
@@ -71,10 +72,13 @@ public class NetworkManager {
         DISCONNECTED,
         JOINED
     }
-    /** The Constant DEFAULT_PORT. */
-    public static final int DEFAULT_PORT =
-            SolarWarsSettings.getInstance().getDefaultPort();
-    /** The instance. */
+    /**
+     * The Constant DEFAULT_PORT.
+     */
+    public static final int DEFAULT_PORT = SolarWarsSettings.getInstance().getDefaultPort();
+    /**
+     * The instance.
+     */
     private static NetworkManager instance;
 
     /**
@@ -147,25 +151,45 @@ public class NetworkManager {
             Logger.getLogger(NetworkManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    /** The udp port. */
+    /**
+     * The udp port.
+     */
     private int udpPort = DEFAULT_PORT;
-    /** The tcp port. */
+    /**
+     * The tcp port.
+     */
     private int tcpPort = DEFAULT_PORT;
-    /** The client ip adress. */
+    /**
+     * The client ip adress.
+     */
     private InetAddress clientIPAdress;
-    /** The server ip adress. */
+    /**
+     * The server ip adress.
+     */
     private InetAddress serverIPAdress;
-    /** The is multiplayer game. */
+    /**
+     * The is multiplayer game.
+     */
     private boolean isMultiplayerGame = false;
-    /** The this client. */
+    /**
+     * The this client.
+     */
     private Client thisClient;
-    /** The this server. */
+    /**
+     * The this server.
+     */
     private SolarWarsServer thisServer;
-    /** The chat module. */
+    /**
+     * The chat module.
+     */
     private GameChatModule chatModule;
-    /** The client register listeners. */
+    /**
+     * The client register listeners.
+     */
     private ArrayList<ClientRegisterListener> clientRegisterListeners;
-    /** The client listener. */
+    /**
+     * The client listener.
+     */
     private ClientListener clientListener = new ClientListener();
     private Thread connectionCloser = null;
 
@@ -179,14 +203,12 @@ public class NetworkManager {
     }
 
     /**
-     * Gets the chat module from the network manager. 
-     * Chat module controls the visibilty of the chat 
-     * gui and recieves messages from network.
-     * Only is valid in a network session!
-     * Is generally needed to move the chat gui to the next GameGUI ingame.
-     * 
+     * Gets the chat module from the network manager. Chat module controls the
+     * visibilty of the chat gui and recieves messages from network. Only is
+     * valid in a network session! Is generally needed to move the chat gui to
+     * the next GameGUI ingame.
+     *
      * @return chat module from the current session
-     * @deprecated DO NOT USE!
      */
     public GameChatModule getChatModule() {
         return chatModule;
@@ -233,23 +255,33 @@ public class NetworkManager {
     }
 
     public void clientRemoveClientStateListener(ClientStateListener csl) {
-        thisClient.removeClientStateListener(csl);
+        if (thisClient != null) {
+            thisClient.removeClientStateListener(csl);
+        }
     }
 
     public void clientRemoveErrorListener(ErrorListener<? super Client> el) {
-        thisClient.removeErrorListener(el);
+        if (thisClient != null) {
+            thisClient.removeErrorListener(el);
+        }
     }
 
     public void clientRemoveMessageListener(MessageListener<? super Client> listener) {
-        thisClient.removeMessageListener(listener);
+        if (thisClient != null) {
+            thisClient.removeMessageListener(listener);
+        }
     }
 
     public void serverRemoveClientMessageListener(MessageListener<? super HostedConnection> listener) {
-        thisServer.removeClientMessageListener(listener);
+        if (thisServer != null) {
+            thisServer.removeClientMessageListener(listener);
+        }
     }
 
     public void serverRemoveConnectionListener(ConnectionListener listener) {
-        thisServer.removeConnectionListener(listener);
+        if (thisServer != null) {
+            thisServer.removeConnectionListener(listener);
+        }
     }
 
     /**
@@ -299,9 +331,13 @@ public class NetworkManager {
      */
     public Client setupClient(String name, ColorRGBA color, boolean isHost)
             throws IOException {
-        if (serverIPAdress == null) {
+        if (serverIPAdress == null || udpPort < 1) {
             return null;
         }
+
+        //TODO HANS setup chat
+
+//        this.chatModule = new GameChatModule();
 
         Serializer.registerClass(StringMessage.class);
         Serializer.registerClass(ChatMessage.class);
@@ -316,26 +352,30 @@ public class NetworkManager {
         Serializer.registerClass(PlayerState.class);
         Serializer.registerClass(Player.class);
 
+//        Serializer.registerClass(com.solarwars.entities.AbstractPlanet.class);
+//        Serializer.registerClass(com.solarwars.entities.AbstractShip.class);
+//        Serializer.registerClass(com.solarwars.entities.BasePlanet.class);
+//        Serializer.registerClass(com.solarwars.entities.ShipGroup.class);
+//        Serializer.registerClass(com.solarwars.entities.SimpleShip.class);
+
         thisClient = Network.connectToServer(
                 SolarWarsServer.SERVER_NAME,
                 SolarWarsServer.SERVER_VERSION,
                 serverIPAdress.getHostAddress(), tcpPort, udpPort);
-        thisClient.addMessageListener(clientListener, StringMessage.class, ChatMessage.class);
+        thisClient.addMessageListener(clientListener,
+                StringMessage.class, ChatMessage.class);
         for (ClientRegisterListener rl : clientRegisterListeners) {
             rl.registerClientListener(thisClient);
         }
 
         thisClient.start();
+
         isMultiplayerGame = true;
-        try {
-//            StringMessage s = new StringMessage(name + " joins the server!");
-            PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
-//            thisClient.send(s);
-            thisClient.send(pcm);
-            return thisClient;
-        } catch (Exception e) {
-            return null;
-        }
+        StringMessage s = new StringMessage(name + " joins the server!");
+        PlayerConnectingMessage pcm = new PlayerConnectingMessage(name, color, isHost);
+        thisClient.send(s);
+        thisClient.send(pcm);
+        return thisClient;
 
     }
 
@@ -373,7 +413,6 @@ public class NetworkManager {
         thisClient = null;
 
         connectionCloser = new Thread("ConnectionCloserThread") {
-
             @Override
             public void run() {
                 if (thisServer != null
@@ -383,9 +422,7 @@ public class NetworkManager {
                 }
             }
         };
-//        thisServer = null;
         connectionCloser.start();
-
 
         isMultiplayerGame = false;
         return connectionCloser;
@@ -413,11 +450,11 @@ public class NetworkManager {
     }
 
     /**
-     * The listener interface for receiving client events.
-     * The class that is interested in processing a client
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addClientListener<code> method. When
+     * The listener interface for receiving client events. The class that is
+     * interested in processing a client event implements this interface, and
+     * the object created with that class is registered with a component using
+     * the component's
+     * <code>addClientListener<code> method. When
      * the client event occurs, that object's appropriate
      * method is invoked.
      *

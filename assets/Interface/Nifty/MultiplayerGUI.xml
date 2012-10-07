@@ -107,7 +107,6 @@
                 </panel>
             </panel>
         </layer>
-        <!-- HUD LAYER -->
         <layer id="player_stats_hud" backgroundColor="#0000" childLayout="vertical">
             <panel id="spacer" height="5px" backgroundColor="#0000"/>
             <panel id="player_stats_panel" height="42" width="35%" 

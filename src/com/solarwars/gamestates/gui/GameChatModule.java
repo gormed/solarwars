@@ -41,7 +41,7 @@ import de.lessvoid.nifty.screen.Screen;
  *
  * @author Hans
  */
-public class GameChatModule implements ActionListener {
+public class GameChatModule {
     //==========================================================================
     //===   Private Fields
     //==========================================================================
@@ -58,6 +58,7 @@ public class GameChatModule implements ActionListener {
     private boolean visible;
     private Element textInput;
     private boolean hadWinner = false;
+    private ActionListener keyboardAction;
 
     //==========================================================================
     //===   Methods & Constructor
@@ -69,6 +70,7 @@ public class GameChatModule implements ActionListener {
      */
     public GameChatModule(Nifty niftyGUI, NetworkManager networkManager) {
         this.niftyGUI = niftyGUI;
+
         initialize(networkManager);
     }
 
@@ -79,18 +81,38 @@ public class GameChatModule implements ActionListener {
      * @param networkManager the network manager
      */
     private void initialize(NetworkManager networkManager) {
+
         this.networkManager = networkManager;
         this.inputManager = SolarWarsApplication.getInstance().getInputManager();
-        if (inputManager != null) {
-            inputManager.addMapping(InputMappings.PLAYER_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
-            inputManager.addListener(this, InputMappings.PLAYER_CHAT);
-        }
+
         chatLayer = niftyGUI.getCurrentScreen().findElementByName("chat");
         chatLayer.hide();
         listBoxChat = niftyGUI.getCurrentScreen().findNiftyControl("chat_text_box", ListBox.class);
         listBoxChat.clear();
         textInput = niftyGUI.getCurrentScreen().findElementByName("chat_text_field");
-//        textInput.disableFocus();
+        textInput.disableFocus();
+        this.keyboardAction = new ActionListener() {
+            /* (non-Javadoc)
+             * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
+             */
+
+            @Override
+            public void onAction(String name, boolean isPressed, float tpf) {
+                if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
+                    if (chatLayer.isVisible()) {
+                        chatLayer.hide();
+                        textInput.disableFocus();
+                    } else {
+                        chatLayer.show();
+                        textInput.setFocus();
+                    }
+                }
+            }
+        };
+        if (inputManager != null) {
+            inputManager.addMapping(InputMappings.PLAYER_CHAT, new KeyTrigger(KeyInput.KEY_LMENU));
+            inputManager.addListener(keyboardAction, InputMappings.PLAYER_CHAT);
+        }
         networkManager.setCurrentChatModule(this);
     }
 
@@ -98,7 +120,8 @@ public class GameChatModule implements ActionListener {
      * Destroy.
      */
     public void destroy() {
-        inputManager.removeListener(this);
+        inputManager.removeListener(keyboardAction);
+        keyboardAction = null;
     }
 
     /**
@@ -125,7 +148,7 @@ public class GameChatModule implements ActionListener {
         if (p.isLeaver()) {
             listBoxChat.addItem(new ChatItem(p.getName() + " leaves the game!",
                     ChatItem.ChatMsgType.LEAVER,
-                    "#SERVER", p.getColor()));
+                    "SERVER", p.getColor()));
             chatLayer.show();
         }
     }
@@ -179,22 +202,5 @@ public class GameChatModule implements ActionListener {
     public void localPlayerSendChatMessage(int id, String message) {
         ChatMessage chatMessage = new ChatMessage(id, message);
         networkManager.getThisClient().send(chatMessage);
-    }
-
-
-    /* (non-Javadoc)
-     * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
-     */
-    @Override
-    public void onAction(String name, boolean isPressed, float tpf) {
-        if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
-            if (chatLayer.isVisible()) {
-                chatLayer.hide();
-//                textInput.disableFocus();
-            } else {
-                chatLayer.show();
-//                textInput.setFocus();
-            }
-        }
     }
 }

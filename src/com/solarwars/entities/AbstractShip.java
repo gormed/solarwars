@@ -147,8 +147,7 @@ public abstract class AbstractShip extends Node {
             return;
         } else {
             ActionLib.getInstance().invokeShipAction(
-                    this, 
-                    0,
+                    this,
                     shipGroup, 
                     owner, 
                     DeathmatchGameplay.SHIP_ARRIVES);
@@ -202,8 +201,7 @@ public abstract class AbstractShip extends Node {
                 // max time automaticly!
                 if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
-                            this, 
-                            0L,
+                            this,
                             order, 
                             owner, 
                             DeathmatchGameplay.PLANET_CAPTURE);

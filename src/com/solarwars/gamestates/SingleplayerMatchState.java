@@ -31,10 +31,10 @@ import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
-import com.solarwars.input.InputMappings;
 import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.gamestates.gui.PlayerStatsModule;
 import com.solarwars.gamestates.gui.StartGamePopup;
+import com.solarwars.input.InputMappings;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
@@ -163,6 +163,7 @@ public class SingleplayerMatchState extends Gamestate {
         application.getInputManager().removeListener(pauseToggle);
         //level
         currentLevel.destroy();
+        hub.destroy();
         //3d controls
         application.detachIsoCameraControl();
         gameStatsModule = null;
@@ -196,12 +197,8 @@ public class SingleplayerMatchState extends Gamestate {
      * Setup singleplayer.
      */
     private void setupSingleplayer() {
-        Player local = new Player("Human", 
-                ColorRGBA.Blue.clone(), 
-                ServerHub.getContiniousPlayerID(), true);
-        Player ai = new Player("AI", 
-                ColorRGBA.Red.clone(), 
-                ServerHub.getContiniousPlayerID());
+        Player local = new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID(), true);
+        Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
 
         hub.initialize(local, null);
         hub.addPlayer(ai);

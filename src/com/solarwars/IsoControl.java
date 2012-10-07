@@ -22,7 +22,6 @@
 package com.solarwars;
 
 import com.jme3.app.state.AppStateManager;
-import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -46,12 +45,12 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Quad;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
+import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.solarwars.input.InputMappings;
-import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
+import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.settings.SolarWarsSettings;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import jme3tools.optimize.GeometryBatchFactory;
 
 /**
@@ -323,10 +321,10 @@ public class IsoControl {
     private boolean playerReleases(CollisionResults results, boolean attack) {
         // use the results and check if there was something hit
         if (results.size() > 0) {
-            CollisionResult actual = null;
+            CollisionResult actual;
             ShipGroup nearestShipGroup = null;
             AbstractPlanet nearestPlanet = null;
-            Node temp = null;
+            Node temp;
             // order the collisions so that at 0 is the closest
             results.getClosestCollision();
             // iterate through collisions begin with the closest
@@ -357,7 +355,6 @@ public class IsoControl {
                     // invoke select action
                     actionLib.invokePlanetAction(
                             null,
-                            0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_SELECT);
@@ -371,7 +368,6 @@ public class IsoControl {
                     // invoke attack action
                     actionLib.invokePlanetAction(
                             null,
-                            0L,
                             nearestPlanet,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.PLANET_ATTACK);
@@ -380,7 +376,6 @@ public class IsoControl {
             } else {
                 actionLib.invokePlanetAction(
                         null,
-                        0L,
                         null,
                         Hub.getLocalPlayer(),
                         DeathmatchGameplay.PLANET_SELECT);
@@ -399,7 +394,6 @@ public class IsoControl {
                     // invoke ship redirect action
                     actionLib.invokeShipAction(
                             null,
-                            0,
                             nearestShipGroup,
                             Hub.getLocalPlayer(),
                             DeathmatchGameplay.SHIP_SELECT);
@@ -411,7 +405,6 @@ public class IsoControl {
         }
         actionLib.invokePlanetAction(
                 null,
-                0L,
                 null,
                 Hub.getLocalPlayer(),
                 DeathmatchGameplay.PLANET_SELECT);
@@ -471,7 +464,7 @@ public class IsoControl {
                     // select all planets in rectangle
                     selectPlanets(rect);
 
-                    MarkerNode markerNodeLoc = null;
+                    MarkerNode markerNodeLoc;
                     if (!planetSelection.isEmpty()) {
                         for (AbstractPlanet planet : planetSelection) {
 
@@ -482,7 +475,6 @@ public class IsoControl {
                         }
                         actionLib.invokePlanetAction(
                                 IsoControl.getInstance(),
-                                0L,
                                 null,
                                 Hub.getLocalPlayer(),
                                 DeathmatchGameplay.PLANET_MULTI_SELECT);
@@ -492,7 +484,7 @@ public class IsoControl {
                 } else {
                     selectShipGroups(rect);
 
-                    MarkerNode markerNodeLoc = null;
+                    MarkerNode markerNodeLoc;
                     if (!shipGroupSelection.isEmpty()) {
                         for (ShipGroup shipGroup : shipGroupSelection) {
 
@@ -503,7 +495,6 @@ public class IsoControl {
                         }
                         actionLib.invokeShipAction(
                                 IsoControl.getInstance(),
-                                0L,
                                 null,
                                 Hub.getLocalPlayer(),
                                 DeathmatchGameplay.SHIP_MULTI_SELECT);
@@ -809,30 +800,22 @@ public class IsoControl {
     private class MarkerNode extends Node {
 
         public static final float MARKER_PLANET_ADJUST = 0.0f;
-        /** The Constant SELECTION_ANIMATION_SPEED. */
         public static final int SELECTION_ANIMATION_SPEED = 2;
-        /** The scale. */
+        public static final float RANGE_FADE_BASE = 0.02f;
+        
         private float scale;
-        /** The fade scale. */
         private float fadeScale;
-        /** The running. */
         private float running;
-        /** The material. */
         private Material markerMaterial;
-        /** The geometry. */
         private Geometry markerGeometry;
-        /** The start. */
         private ColorRGBA start = ColorRGBA.Orange.clone();
-        /** The end. */
         private ColorRGBA end = ColorRGBA.White.clone();
-        /** The current fade color. */
         private ColorRGBA currentFadeColor = start.clone();
-        /** The fade dir. */
         private boolean fadeDir = true;
-        /** The tick. */
         private float tick = 0f;
         private float rangeFade = 0;
         private float range = 1;
+        
         private Spatial rangeBatch;
         private Node rangeNode;
         private ColorRGBA rangeColor = ColorRGBA.White.clone();
@@ -944,7 +927,7 @@ public class IsoControl {
             if (rangeFade > Math.PI) {
                 rangeFade = 0;
             }
-            float alpha = (0.0125f * (5f + (float) Math.sin((4f * rangeFade))));
+            float alpha = (RANGE_FADE_BASE * (5f + (float) Math.sin((4f * rangeFade))));
             rangeColor.a = alpha;
             rangeMaterial.setColor("Color", rangeColor);
         }
@@ -962,21 +945,8 @@ public class IsoControl {
         }
 
         private void updateColorFade(float tpf) {
-            //            if (fadeScale > scale + 0.1f) {
-            //
-            //                // size
-            //                fadeScale = 0.1f * (float) Math.sin((double) running);
-            //                geometry.setLocalScale(fadeScale);
-            //                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
-            //            } else if (fadeScale < scale - 0.1f) {
-            //                // size
-            //                fadeScale += 0.001f;
-            //                geometry.setLocalScale(fadeScale);
-            //                geometry.setLocalTranslation(-fadeScale / 2, 0, -fadeScale / 2);
-            //            }
             if (tick > 0.005f) {
                 if (fadeDir) {
-
                     // color
                     currentFadeColor = currentFadeColor.add(
                             new ColorRGBA(0.01f, 0.01f, 0.01f, 0));
@@ -998,11 +968,8 @@ public class IsoControl {
                         fadeDir = true;
                     }
                 }
-                //currentFadeColor = start.
-
                 tick = 0;
             }
-
             tick += tpf;
         }
 

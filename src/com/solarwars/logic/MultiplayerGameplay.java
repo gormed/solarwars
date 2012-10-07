@@ -59,6 +59,7 @@ public class MultiplayerGameplay {
                 PlanetActionMessage.class,
                 GeneralActionMessage.class,
                 LevelActionMessage.class);
+
         currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
 
     }
@@ -111,13 +112,21 @@ public class MultiplayerGameplay {
 
     }
 
-    private void removeGameplayListener() {
+    public void addGameplayListener() {
+        if (client != null && gameplayListener != null) {
+            client.addMessageListener(
+                    gameplayListener,
+                    PlanetActionMessage.class,
+                    GeneralActionMessage.class);
+        }
+    }
+
+    public void removeGameplayListener() {
         if (client != null && gameplayListener != null) {
             client.removeMessageListener(
                     gameplayListener,
                     PlanetActionMessage.class,
-                    GeneralActionMessage.class,
-                    LevelActionMessage.class);
+                    GeneralActionMessage.class);
         }
     }
     //==========================================================================
@@ -215,12 +224,9 @@ public class MultiplayerGameplay {
                 p.applyState(serverMessage.getPlayerState());
                 AbstractPlanet planet =
                         currentLevel.getPlanet(serverMessage.getPlanetID());
-                //TODO: Clean up the mess, nobody needs this anymore!
-                long delay = 0;
 
                 actionLib.invokePlanetAction(
                         MultiplayerGameplay.getInstance(),
-                        delay,
                         planet,
                         p,
                         serverMessage.getActionName());

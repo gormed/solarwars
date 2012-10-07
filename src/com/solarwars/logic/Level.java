@@ -21,14 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
-import com.solarwars.logic.level.LevelGenerator;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-
 import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.scene.Node;
@@ -40,7 +32,13 @@ import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.ShipBatchManager;
 import com.solarwars.entities.ShipGroup;
 import com.solarwars.logic.level.GeneratorSquare;
+import com.solarwars.logic.level.LevelGenerator;
 import com.solarwars.net.NetworkManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * The Class Level.
@@ -222,7 +220,7 @@ public class Level {
     void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
         if (NetworkManager.getInstance().isMultiplayerGame()) {
-            MultiplayerGameplay.getInstance().destroy();
+            MultiplayerGameplay.getInstance().removeGameplayListener();
         }
     }
 

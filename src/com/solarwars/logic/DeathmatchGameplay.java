@@ -70,7 +70,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         PlanetAction selectPlanet = new PlanetAction(PLANET_SELECT) {
 
             @Override
-            public boolean doAction(Object sender, long delay,
+            public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
                 if (planet == null || planet.getOwner() == null || planet.getOwner() != p) {
                     p.selectPlanet(null);
@@ -88,7 +88,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         PlanetAction multiSelectPlanet = new PlanetAction(PLANET_MULTI_SELECT) {
 
             @Override
-            public boolean doAction(Object sender, long delay,
+            public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
@@ -106,7 +106,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
 
             @Override
-            public boolean doAction(Object sender, long delay,
+            public boolean doAction(Object sender,
                     AbstractPlanet target, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
@@ -191,7 +191,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
         PlanetAction capturePlanet = new PlanetAction(PLANET_CAPTURE) {
 
             @Override
-            public boolean doAction(Object sender, long delay,
+            public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
@@ -298,9 +298,12 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 defeated.setLost();
                 if (victorious != null) {
                     victorious.setDefeatedPlayer(defeated.getId());
-//                    if (NetworkManager.getInstance().isMultiplayerGame()) {
-//                        NetworkManager.getInstance().getChatModule().playerDefeats(victorious, defeated);
-//                    }
+                    if (NetworkManager.getInstance().isMultiplayerGame()) {
+                        NetworkManager.getInstance().getChatModule().playerDefeats(victorious, defeated);
+                        if (currentLevel.isGameOver()) {
+                            NetworkManager.getInstance().getChatModule().playerWins(victorious);
+                        }
+                    }
                     return true;
                 }
                 return false;

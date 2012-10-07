@@ -21,16 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
-
-
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
 import com.jme3.network.Message;
@@ -43,21 +33,24 @@ import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
-import com.solarwars.input.InputMappings;
 import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.gamestates.gui.PlayerStatsModule;
-import com.solarwars.gamestates.gui.StartGamePopup;
-import com.solarwars.gamestates.gui.WaitingPopup;
+import com.solarwars.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.net.messages.PlayerLeavingMessage;
-import com.solarwars.net.messages.StartGameMessage;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.KeyInputHandler;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 /**
  * The Class MultiplayerMatchState.
@@ -71,21 +64,14 @@ public class MultiplayerMatchState extends Gamestate {
     private PlayerStatsModule playerStatsModule;
     private GameOverModule gameOverModule;
     private GameChatModule gameChatModule;
-    private StartGamePopup startGamePopup;
-    private WaitingPopup waitingPopup;
     // Network and game
     private Hub hub;
-    private NetworkManager networkManager;
     private Level currentLevel;
     private MultiplayerGameplay gameplay;
     private Client client;
-    private final SolarWarsApplication application;
-    private ClientActionListener clientActionListener =
-            new ClientActionListener();
-    private PlayerStateListener playerStateListener =
-            new PlayerStateListener();
+    private PlayerStateListener playerStateListener = new PlayerStateListener();
+    private ClientMessageListener clientMessageListener = new ClientMessageListener();
     private boolean lostConnection;
-    private boolean started = false;
 
     /**
      * Instantiates a new multiplayer match state.
@@ -93,20 +79,10 @@ public class MultiplayerMatchState extends Gamestate {
     public MultiplayerMatchState() {
         super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
         this.application = SolarWarsApplication.getInstance();
-        this.networkManager = NetworkManager.getInstance();
-
-    }
-
-    @Override
-    public void initialize(AppStateManager stateManager, Application app) {
-        super.initialize(stateManager, app);
         // create pause listener
         pauseListener = new PausePopup(niftyGUI);
         gameOverModule = new GameOverModule(niftyGUI);
-        startGamePopup = new StartGamePopup(niftyGUI);
-        waitingPopup = new WaitingPopup(niftyGUI);
     }
-
 
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#update(float)
@@ -114,40 +90,20 @@ public class MultiplayerMatchState extends Gamestate {
     @Override
     public void update(float tpf) {
         if (isEnabled()) {
-            if (!lostConnection && started) {
+            if (!gameOverModule.isVisible()
+                    && (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost())) {
+                gameOverModule.showPopup();
+
+            } else if (!lostConnection && !currentLevel.isGameOver()) {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
                 updateNifty(tpf);
-                if (!gameOverModule.isVisible()
-                        && (currentLevel.isGameOver()
-                        || Hub.getLocalPlayer().hasLost())) {
-                    gameOverModule.showPopup();
-                    if (currentLevel.isGameOver()) {
-                        gameChatModule.playerWins(Player.getWinner());
-                    }
-                }
-            } else if (lostConnection && !currentLevel.isGameOver()) {
+
+            } else if (lostConnection) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
             }
-        }
-    }
-
-    public void startGame() {
-        if (Hub.getLocalPlayer().isHost()) {
-            client.send(new StartGameMessage(true));
-        }
-    }
-
-    private void startMatch() {
-        // play startup sound
-        AudioManager.getInstance().
-                playSoundInstance(AudioManager.SOUND_LOAD);
-        started = true;
-        if (Hub.getLocalPlayer().isHost()) {
-            startGamePopup.hidePopup();
         } else {
-            waitingPopup.hidePopup();
         }
     }
 
@@ -162,29 +118,28 @@ public class MultiplayerMatchState extends Gamestate {
 
     @Override
     protected void loadContent() {
+
         // NIFTY GUI
         niftyGUI.gotoScreen("multiplayer");
         setupNiftyGUI();
 
         // LOGIC
         lostConnection = false;
-        started = false;
         hub = Hub.getInstance();
         application.setPauseOnLostFocus(false);
         client = NetworkManager.getInstance().getThisClient();
         client.addClientStateListener(playerStateListener);
-        client.addMessageListener(clientActionListener,
-                PlayerLeavingMessage.class, StartGameMessage.class);
+        client.addMessageListener(clientMessageListener, 
+                PlayerLeavingMessage.class);
         gameplay = MultiplayerGameplay.getInstance();
 
         currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
         currentLevel.generateLevel();
+        //currentLevel.setupPlayers(Hub.playersByID);
 
-        if (Hub.getLocalPlayer().isHost()) {
-            startGamePopup.showPopup();
-        } else {
-            waitingPopup.showPopup();
-        }
+
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_LOAD);
     }
 
     /* (non-Javadoc)
@@ -204,7 +159,8 @@ public class MultiplayerMatchState extends Gamestate {
 
             @Override
             public Thread call() throws Exception {
-                return NetworkManager.getInstance().closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
+                return NetworkManager.getInstance().
+                        closeAllConnections(NetworkManager.WAIT_FOR_CLIENTS);
             }
         });
 
@@ -224,25 +180,31 @@ public class MultiplayerMatchState extends Gamestate {
         } catch (TimeoutException ex) {
             Logger.getLogger(MultiplayerMatchState.class.getName()).
                     log(java.util.logging.Level.SEVERE,
-                    "Server-timeout: {0} {1}",
+                    "Server did not shut down in time: {0} {1}",
                     new Object[]{ex.getMessage(), ex});
         }
 
+//        GameOverGUI.getInstance().hide();
+//        application.getInputManager().removeListener(pauseListener);
+//        pauseListener = null;
+        hub.destroy();
         hub = null;
-        gameStatsModule = null;
+
         playerStatsModule = null;
+        gameStatsModule = null;
+        
         currentLevel.destroy();
 
         if (client != null) {
             client.removeClientStateListener(playerStateListener);
-            client.removeMessageListener(clientActionListener,
-                    StartGameMessage.class,
+            client.removeMessageListener(clientMessageListener, 
                     PlayerLeavingMessage.class);
         }
-
         gameplay.destroy();
         gameplay = null;
         application.detachIsoCameraControl();
+
+
     }
 
     /**
@@ -251,6 +213,7 @@ public class MultiplayerMatchState extends Gamestate {
     private void setupNiftyGUI() {
         pauseListener.hidePopup();
         gameOverModule.hidePopup();
+        gameOverModule.setWatchGame(false);
         // attach listener for pause layer
         application.getInputManager().addListener(
                 pauseListener,
@@ -258,7 +221,7 @@ public class MultiplayerMatchState extends Gamestate {
         // attach stats module
         gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
-
+        
         playerStatsModule = new PlayerStatsModule(
                 niftyGUI, Hub.getLocalPlayer(), gameStatsModule);
         // CHAT ------------------------------------------
@@ -283,6 +246,7 @@ public class MultiplayerMatchState extends Gamestate {
                 return false;
             }
         });
+        textInput.setFocus();
         // CHAT ------------------------------------------
 
         // creates the drag-rect geometry
@@ -301,6 +265,7 @@ public class MultiplayerMatchState extends Gamestate {
                 playSoundInstance(AudioManager.SOUND_CLICK);
         pauseListener.hidePopup();
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+
     }
 
     public void onWatchGame() {
@@ -343,32 +308,6 @@ public class MultiplayerMatchState extends Gamestate {
         boolean messageLengthOkay = message.length() >= 2;
         return messageLengthOkay;
     }
-    //==========================================================================
-    //===   Network Listener
-    //==========================================================================
-
-    private class ClientActionListener implements MessageListener<Client> {
-
-        /* (non-Javadoc)
-         * @see com.jme3.network.MessageListener#messageReceived(java.lang.Object, com.jme3.network.Message)
-         */
-        @Override
-        public void messageReceived(Client source, Message message) {
-
-            if (message instanceof StartGameMessage) {
-                StartGameMessage startGameMessage = (StartGameMessage) message;
-                if (startGameMessage.isIngame()) {
-                    startMatch();
-                }
-            } else if (message instanceof PlayerLeavingMessage) {
-                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
-                Player p = plm.getPlayer();
-                p.setLeaver(true);
-                gameChatModule.playerLeaves(p);
-                Hub.getInstance().removePlayer(p);
-            }
-        }
-    }
 
     /**
      * The listener interface for receiving playerState events.
@@ -398,11 +337,28 @@ public class MultiplayerMatchState extends Gamestate {
             System.out.print("[Client #" + c.getId() + "] - Disconnect from server: ");
 
             if (info != null) {
-                System.out.println(info.reason);
+                Logger.getLogger(MultiplayerMatchState.class.getName()).info(info.reason);
                 lostConnection = true;
             } else {
-                System.out.println("client closed");
+                Logger.getLogger(MultiplayerMatchState.class.getName()).info("client closed");
                 lostConnection = true;
+            }
+//                if (c.equals(client)) {
+//                    noServerFound = true;
+//                }
+        }
+    }
+
+    public class ClientMessageListener implements MessageListener<Client> {
+
+        @Override
+        public void messageReceived(Client source, Message message) {
+            if (message instanceof PlayerLeavingMessage) {
+                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+                Player p = plm.getPlayer();
+                p.setLeaver(true);
+                gameChatModule.playerLeaves(p);
+                Hub.getInstance().removePlayer(p);
             }
         }
     }
