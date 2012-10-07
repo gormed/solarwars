@@ -700,7 +700,7 @@ public class CreateServerState extends Gamestate
 
             } else if (message instanceof PlayerReadyMessage) {
                 PlayerReadyMessage readyMessage = (PlayerReadyMessage) message;
-                Player p = Hub.playersByID.get(readyMessage.getID());
+                Player p = Hub.playersByID.get(readyMessage.getPlayerID());
                 p.setReady(readyMessage.isReady());
                 playersChanged = true;
             }

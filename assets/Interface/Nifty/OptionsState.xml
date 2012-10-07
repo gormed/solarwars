@@ -4,20 +4,20 @@
   
     <useControls filename="nifty-default-controls.xml" />
     <useStyles filename="nifty-default-styles.xml" />
-  <!-- +++++++++++++++++++++++++++++++++++++++ -->
-  <!-- options screen -->
-  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- options screen -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <screen id="options" controller="com.solarwars.gamestates.OptionsState">
         <layer id="options_menu" backgroundColor="#0000" childLayout="center">
             <panel id="options_menu_panel" height="95%" width="95%" 
-            align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
+                   align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
                 <panel id="options_panel" align="center" backgroundColor="#00ff" 
-                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
+                       childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
                     <!-- HEADING -->
                     <panel id="options_head_panel" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="15%" width="100%">
+                           childLayout="center" visibleToMouse="false" height="15%" width="100%">
                         <text id="multiplayer_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="Options" align="center" valign="center">
+                              color="#ffff" text="Options" align="center" valign="center">
                             <effect>
                                 <onActive name="textSizePulsate" startSize="90%" endSize="100%"/>
                             </effect>
@@ -25,55 +25,55 @@
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                           childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                     <panel childLayout="center" padding="10px" height="42px" width="100%">
                         <text id="nw-label" text="General" 
-                            font="Interface/Fonts/SolarWarsFont32.fnt" 
-                            height="32px" align="left"/>
+                              font="Interface/Fonts/SolarWarsFont32.fnt" 
+                              height="32px" align="left"/>
                     </panel>
                     <panel id="options_graphics_align_h" childLayout="horizontal" 
-                    height="20%" backgroundColor="#00ab">
+                           height="20%" backgroundColor="#00ab">
                         <effect>
                             <onActive name="border" color="#0a8" />
                         </effect>
                         <panel childLayout="vertical" 
-                        width="30%" padding="2%" >
+                               width="30%" padding="2%" >
                             <panel childLayout="horizontal" width="50%" padding="2%">
                                 <text id="bloom-label" text="Enable Bloom" 
-                            font="Interface/Fonts/SolarWarsFont20.fnt" 
-                            height="20px"/>
+                                      font="Interface/Fonts/SolarWarsFont20.fnt" 
+                                      height="20px"/>
                                 <control id="enable-bloom" name="checkbox" />
                             </panel>
                             <!-- SPACER -->
                             <panel id="spacer" align="center" backgroundColor="#0000" 
-                            childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                                   childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                             <panel childLayout="horizontal" width="50%" padding="2%">
                                 <text id="music-label" text="Enable Music" 
-                            font="Interface/Fonts/SolarWarsFont20.fnt" 
-                            height="20px"/>
+                                      font="Interface/Fonts/SolarWarsFont20.fnt" 
+                                      height="20px"/>
                                 <control id="enable-music" name="checkbox" />
                             </panel>
                             <!-- SPACER -->
                             <panel id="spacer" align="center" backgroundColor="#0000" 
-                            childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                                   childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                             <panel childLayout="horizontal" width="50%" padding="2%">
                                 <text id="sound-label" text="Enable Sound" 
-                            font="Interface/Fonts/SolarWarsFont20.fnt" 
-                            height="20px"/>
+                                      font="Interface/Fonts/SolarWarsFont20.fnt" 
+                                      height="20px"/>
                                 <control id="enable-sound" name="checkbox" />
                             </panel>
                         </panel>
                         <panel childLayout="vertical" 
-                        width="30%" padding="2%" >
+                               width="30%" padding="2%" >
                             <control id="planet-quality" name="radioButtonGroup"/>
                             <panel childLayout="vertical" width="50%">
                                 <text id="planet-quality-label" text="Planet Quality" 
-                                    font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" 
-                                     height="20px"/>
+                                      font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" 
+                                      height="20px"/>
                                 <panel width="50%" height="10px"/>
                                 <panel childLayout="vertical" backgroundColor="#0071" 
-                                    paddingLeft="7px" paddingRight="7px" paddingTop="4px" 
-                                    paddingBottom="4px">
+                                       paddingLeft="7px" paddingRight="7px" paddingTop="4px" 
+                                       paddingBottom="4px">
                                     <effect>
                                         <onActive name="border" color="#0a8" />
                                     </effect>
@@ -92,26 +92,26 @@
                             <control id="background-quality" name="radioButtonGroup"/>
                             <panel childLayout="vertical" width="50%">
                                 <text id="background-quality-label" text="Background Quality" 
-                                    font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" height="20px"/>
+                                      font="Interface/Fonts/SolarWarsFont20.fnt" wrap="true" height="20px"/>
                                 <panel width="50%" height="10px"></panel>
                                 <panel childLayout="vertical" backgroundColor="#0071" paddingLeft="7px" 
-                                    paddingRight="7px" paddingTop="4px" paddingBottom="4px">
+                                       paddingRight="7px" paddingTop="4px" paddingBottom="4px">
                                     <effect>
                                         <onActive name="border" color="#0a8" />
                                     </effect>
                                     <panel childLayout="horizontal">
                                         <control name="radioButton" id="background-quality-low" 
-                                        group="background-quality" />
+                                                 group="background-quality" />
                                         <control name="label" text="Low" with="60px" />
                                     </panel>
                                     <panel childLayout="horizontal">
                                         <control name="radioButton" id="background-quality-medium" 
-                                        group="background-quality" />
+                                                 group="background-quality" />
                                         <control name="label" text="Medium" with="60px" />
                                     </panel>
                                     <panel childLayout="horizontal">
                                         <control name="radioButton" id="background-quality-high" 
-                                        group="background-quality" />
+                                                 group="background-quality" />
                                         <control name="label" text="High" with="60px" />
                                     </panel>
                                 </panel>
@@ -120,39 +120,39 @@
                     </panel>
                     <panel childLayout="center" padding="10px" height="42px" width="100%">
                         <text id="nw-label" text="Network" 
-                            font="Interface/Fonts/SolarWarsFont32.fnt" 
-                            height="32px" align="left"/>
+                              font="Interface/Fonts/SolarWarsFont32.fnt" 
+                              height="32px" align="left"/>
                     </panel>
                     <panel id="options_network_align_h" childLayout="horizontal" 
-                    height="15%" backgroundColor="#00ab">
+                           height="15%" backgroundColor="#00ab">
                         <effect>
                             <onActive name="border" color="#0a8" />
                         </effect>
 
                         <panel childLayout="horizontal" width="50%" padding="2%">
                             <text id="nw-port-label" text="PORT" 
-                            font="Interface/Fonts/SolarWarsFont20.fnt" 
-                            height="20px"/>
+                                  font="Interface/Fonts/SolarWarsFont20.fnt" 
+                                  height="20px"/>
                             <control name="textfield" id="options-nw-port-text" 
-                            maxLength="6" width="50%" text="${CALL.getDefaultPort()}" />
+                                     maxLength="6" width="50%" text="${CALL.getDefaultPort()}" />
                         </panel>
                         <panel childLayout="horizontal" width="50%" padding="2%">
                             <text id="nw-scan-label" text="Network-Scan" 
-                            font="Interface/Fonts/SolarWarsFont20.fnt" 
-                            height="20px"/>
+                                  font="Interface/Fonts/SolarWarsFont20.fnt" 
+                                  height="20px"/>
                             <control id="nw-scan" name="checkbox" />
                         </panel>
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                           childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
                     <!-- BOTTOM CONTROLS -->
                     <panel id="options_bottom_align_h" childLayout="horizontal" 
-                    height="10%">
+                           height="10%">
                         <panel id="options_back_align_v" childLayout="vertical" 
-                        width="20%" padding="2%">
+                               width="20%" padding="2%">
                             <control id="back" name="sw-button" text="BACK" 
-                            align="center" valign="center" width="100%">
+                                     align="center" valign="center" width="100%">
                                 <interact onClick="onBackButton()"/>
                             </control>
                         </panel>

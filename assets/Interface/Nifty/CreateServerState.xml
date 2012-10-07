@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
-<!-- +++++++++++++++++++++++++++++++++++++++ -->
-<!-- create server menu screen -->
-<!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- create server menu screen -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <screen id="create_server" controller="com.solarwars.gamestates.CreateServerState">
         <layer id="create_server_menu" backgroundColor="#0000" childLayout="center">
             <panel id="create_server_menu_panel" height="95%" width="95%" 
-            align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
+                   align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
                 <panel id="create_server_panel" align="center" backgroundColor="#00ff" 
-                childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
-                <!-- HEADING -->
+                       childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
+                    <!-- HEADING -->
                     <panel id="create_server_head_panel" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="15%" width="100%">
+                           childLayout="center" visibleToMouse="false" height="15%" width="100%">
                         <text id="create_server_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                        color="#ffff" text="Create Server" align="center" valign="center">
+                              color="#ffff" text="Create Server" align="center" valign="center">
                             <effect>
                                 <onActive name="textSizePulsate" startSize="90%" endSize="100%"/>
                             </effect>
@@ -21,30 +21,30 @@
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
+                           childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
                     <!-- SERVER NAME AND SEED -->
                     <panel id="server_lobby_server_name_align_h" childLayout="horizontal" height="15%">
                         <panel id="server_lobby_server_name_align_v" childLayout="vertical" width="50%">
                             <text id="server_lobby_server_name_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                                color="#ffff" text="${CALL.getServerName()} - ${CALL.getServerVersion()}" 
-                                align="center" valign="center" height="50%">
+                                  color="#ffff" text="${CALL.getServerName()} - ${CALL.getServerVersion()}" 
+                                  align="center" valign="center" height="50%">
                                 <effect>
                                     <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                                 </effect>
                             </text>
                             <text id="server_lobby_server_ip_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                                color="#ffff" text="${CALL.getServerIP()}" align="center" valign="center" 
-                                height="50%">
+                                  color="#ffff" text="${CALL.getServerIP()}" align="center" valign="center" 
+                                  height="50%">
                                 <effect>
                                     <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                                 </effect>
                             </text>
                         </panel>
-                            <!-- SEED -->
+                        <!-- SEED -->
                         <panel id="server_lobby_server_seed_align_v" childLayout="vertical" width="50%">
                             <panel id="algin_server_seed_control" childLayout="center" height="50%">
                                 <text id="server_lobby_server_seed_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
-                                color="#ffff" text="SEED?" align="center" valign="center">
+                                      color="#ffff" text="SEED?" align="center" valign="center">
                                     <effect>
                                         <onActive name="textSize" startSize="0.3" endSize="0.3" oneShot="true"/>
                                     </effect>
@@ -52,46 +52,46 @@
                             </panel>
                             <panel id="algin_server_seed_control" childLayout="center" height="50%">
                                 <control id="server_seed" name="textfield" maxLength="20" 
-                                    text="${CALL.getSeedString()}" align="center" valign="center" width="75%"/>
+                                         text="${CALL.getSeedString()}" align="center" valign="center" width="75%"/>
                             </panel>
                         </panel>
                         
                     </panel> 
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
+                           childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
                     <!-- SERVER LOBBY LIST -->
                     <panel id="server_lobby_players_align_h" childLayout="horizontal" height="45%" 
-                    backgroundColor="ffff" padding="5px">
+                           backgroundColor="ffff" padding="5px">
                         <!-- SERVER LIST BOX -->
                         <control id="server_lobby_box" style="server-browser-style" 
-                        name="listBox" horizontal="optional" displayItems="8" height="100%"
-                        selectionMode="Single" forceSelection="false" vertical="optional" 
-                        viewConverterClass=
+                                 name="listBox" horizontal="optional" displayItems="8" height="100%"
+                                 selectionMode="Single" forceSelection="false" vertical="optional" 
+                                 viewConverterClass=
                         "com.solarwars.gamestates.gui.ConnectedPlayerItemConverter">
                             <control name="server-lobby-line" style="favorite-listbox-item" />
                         </control>
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
-                    childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
+                           childLayout="center" visibleToMouse="false" height="10%" width="60%"/>
                     <!-- BACK & SERVER CONTROL BOTTOM LIST -->
                     <panel id="server_lobby_bottom_align_h" childLayout="horizontal" 
-                    height="10%">
+                           height="10%">
                         <panel id="server_lobby_leave_align_v" childLayout="vertical" 
-                        width="45%" padding="5%">
+                               width="45%" padding="5%">
                             <control id="cancel_server" name="sw-button" text="CANCEL SERVER" 
-                            align="center" valign="center" width="100%">
+                                     align="center" valign="center" width="100%">
                                 <interact onClick="onCancelServer()"/>
                             </control>
                         </panel>
                         <!-- SPACER -->
                         <panel id="spacer" align="center" backgroundColor="#0000" 
-                        childLayout="center" visibleToMouse="false" height="2%" width="10%"/>
+                               childLayout="center" visibleToMouse="false" height="2%" width="10%"/>
                         <panel id="server_lobby_start_server_align_v" childLayout="vertical" 
-                        width="45%" padding="5%">
+                               width="45%" padding="5%">
                             <control id="start_server" name="sw-button" text="START SERVER" 
-                            align="center" valign="center" width="100%">
+                                     align="center" valign="center" width="100%">
                                 <interact onClick="onStartServer()"/>
                             </control>
                         </panel>
@@ -100,34 +100,34 @@
             </panel>
         </layer>
         
-<!-- CHAT LAYER -->
+        <!-- CHAT LAYER -->
         <layer id="chat" backgroundColor="#0000" childLayout="center" >
             <effect>
                 <onShow name="move" length="200" mode="in" 
-                direction="right" startDelay="0" inherit="true"/>
+                        direction="right" startDelay="0" inherit="true"/>
                 <onHide name="move" length="200" mode="out" 
-                direction="right" startDelay="0" inherit="true"/>
+                        direction="right" startDelay="0" inherit="true"/>
             </effect>
             <panel id="chat_dialog" childLayout="center"
-            width="60%" height="60%" align="right" valign="center"
-            visibleToMouse="true" backgroundColor="#fff8" padding="2px">
+                   width="60%" height="60%" align="right" valign="center"
+                   visibleToMouse="true" backgroundColor="#fff8" padding="2px">
                 <panel childLayout="vertical" align="right" 
-                valign="center" backgroundColor="#00f8">
+                       valign="center" backgroundColor="#00f8">
                     <control id="chat_text_box" style="chat-style"
-                    name="listBox" horizontal="optional" displayItems="15" 
-                    height="80%" selectionMode="Disabled" 
-                    forceSelection="false" vertical="optional" 
-                    viewConverterClass=
+                             name="listBox" horizontal="optional" displayItems="15" 
+                             height="80%" selectionMode="Disabled" 
+                             forceSelection="false" vertical="optional" 
+                             viewConverterClass=
                     "com.solarwars.gamestates.gui.ChatItemConverter">
                         <control name="chat-line"/>
                     </control>
                     <panel height="2%" />
                     <panel childLayout="horizontal" height="*">
                         <control id ="chat_text_field" name="textfield" 
-                        width="70%" />
+                                 width="70%" />
                         
                         <control id ="send_button" name="sw-button" 
-                        text="Send" width="30%">
+                                 text="Send" width="30%">
                             <interact onClick="sendMessage()" />
                         </control>
                     </panel>
