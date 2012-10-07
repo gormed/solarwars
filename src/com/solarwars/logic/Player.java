@@ -134,9 +134,9 @@ public class Player {
      * Local player looses.
      */
     static void localPlayerLooses() {
-        if (isLastPlayer()) {
+//        if (isLastPlayer()) {
             SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-        }
+//        }
     }
     private static boolean hostSet = false;
     /** The id. */

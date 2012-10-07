@@ -168,7 +168,6 @@ public class CreateServerState extends Gamestate
         textInputField = textInput.findNiftyControl("chat_text_field", TextField.class);
         // add input handler for button click to send message
         textInput.addInputHandler(new KeyInputHandler() {
-
             @Override
             public boolean keyEvent(NiftyInputEvent inputEvent) {
                 if (inputEvent == null) {
@@ -254,6 +253,10 @@ public class CreateServerState extends Gamestate
      * Setup server.
      */
     private void setupServer() {
+        if (networkManager.isMultiplayerGame() || networkManager.isServerRunning()) {
+            serverEstablished = false;
+            return;
+        }
         ServerHub.resetPlayerID(0);
         int id = ServerHub.getContiniousPlayerID();
 
@@ -375,9 +378,8 @@ public class CreateServerState extends Gamestate
 
     /**
      * Creates the level.
-     * 
-     * @param seed
-     *            the seed
+     *
+     * @param seed the seed
      */
     private void createLevel(long seed) {
         if (seed == 0) {
@@ -388,9 +390,8 @@ public class CreateServerState extends Gamestate
 
     /**
      * Starts the level.
-     * 
-     * @param seed
-     *            the level-seed
+     *
+     * @param seed the level-seed
      */
     private void startClient(long seed) {
 
@@ -414,7 +415,6 @@ public class CreateServerState extends Gamestate
 
         if (serverEstablished) {
             Future<Thread> fut = application.enqueue(new Callable<Thread>() {
-
                 @Override
                 public Thread call() throws Exception {
 
@@ -531,7 +531,7 @@ public class CreateServerState extends Gamestate
      * <code>addServerConnectionListener<code> method. When
      * the serverConnection event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ServerConnectionEvent
      */
     private class ClientConnectedListener implements ConnectionListener {
@@ -586,7 +586,7 @@ public class CreateServerState extends Gamestate
      * <code>addServerMessageListener<code> method. When
      * the serverMessage event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ServerMessageEvent
      */
     private class ServerMessageListener implements
@@ -643,7 +643,7 @@ public class CreateServerState extends Gamestate
      * <code>addClientMessageListener<code> method. When
      * the clientMessage event occurs, that object's appropriate
      * method is invoked.
-     * 
+     *
      * @see ClientMessageEvent
      */
     public class ClientMessageListener implements MessageListener<Client> {
@@ -704,7 +704,6 @@ public class CreateServerState extends Gamestate
                 p.setReady(readyMessage.isReady());
                 playersChanged = true;
             }
-
         }
     }
 }

@@ -21,15 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ClientStateListener;
@@ -57,6 +48,13 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.KeyInputHandler;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class ServerLobbyState.
@@ -244,7 +242,8 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 PlayerReadyMessage.class);
             client.removeClientStateListener(playerStateListener);
         }
-
+        
+        
         this.networkManager = null;
         this.clientState = ClientConnectionState.DISCONNECTED;
 
@@ -305,12 +304,12 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
             client.close();
         }
 
-        try {
-            connectorThread.interrupt();
-        } catch (Exception e) {
-            Logger.getLogger(ServerLobbyState.class.getName()).
-                    log(Level.SEVERE, e.getMessage(), e);
-        }
+//        try {
+//            connectorThread.interrupt();
+//        } catch (Exception e) {
+//            Logger.getLogger(ServerLobbyState.class.getName()).
+//                    log(Level.SEVERE, e.getMessage(), e);
+//        }
         disconnect();
         clientState = ClientConnectionState.DISCONNECTED;
     }
@@ -353,6 +352,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
      * Disconnect.
      */
     private void disconnect() {
+        Hub.getInstance().destroy();
         networkManager.removeClientRegisterListener(this);
     }
 
