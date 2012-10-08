@@ -19,16 +19,23 @@
  * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package com.solarwars.logic.actions;
+package com.solarwars.logic;
 
-import java.util.HashMap;
-import java.util.logging.Logger;
-
+import com.solarwars.Hub;
+import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
-import com.solarwars.logic.MultiplayerGameplay;
-import com.solarwars.logic.Player;
+import com.solarwars.logic.actions.GeneralAction;
+import com.solarwars.logic.actions.GeneralActionListener;
+import com.solarwars.logic.actions.PlanetAction;
+import com.solarwars.logic.actions.PlanetActionListener;
+import com.solarwars.logic.actions.PlayerLostListener;
+import com.solarwars.logic.actions.PlayerWinsListener;
+import com.solarwars.logic.actions.ShipActionListener;
+import com.solarwars.logic.actions.ShipGroupAction;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 /**
  * The Class ActionLib.
@@ -47,6 +54,10 @@ public class ActionLib {
             new HashSet<ShipActionListener>();
     private HashSet<GeneralActionListener> generalActionMessageListeners =
             new HashSet<GeneralActionListener>();
+    protected HashSet<PlayerLostListener> playerLostListeners =
+            new HashSet<PlayerLostListener>();
+    protected HashSet<PlayerWinsListener> playerWinsListeners =
+            new HashSet<PlayerWinsListener>();
 
     /**
      * Gets the single instance of ActionLib.
@@ -101,6 +112,14 @@ public class ActionLib {
      */
     public HashMap<String, ShipGroupAction> getShipActions() {
         return shipActions;
+    }
+
+    HashSet<PlayerLostListener> getPlayerLostListeners() {
+        return playerLostListeners;
+    }
+
+    HashSet<PlayerWinsListener> getPlayerWinsListeners() {
+        return playerWinsListeners;
     }
 
     /**
@@ -224,6 +243,25 @@ public class ActionLib {
         logger.log(java.util.logging.Level.FINE, shipActionMsg, new Object[]{shipGroup, p});
     }
 
+    void invokePlayerLost(Player player, float tpf) {
+        for (PlayerLostListener pll : playerLostListeners) {
+            pll.onPlayerLost(player, tpf);
+        }
+        if (Hub.getLastPlayer() != null) {
+            SolarWarsGame.getCurrentGameplay().getCurrentLevel().setGameOver(true);
+        }
+    }
+
+    void invokePlayerWins(Player player, float tpf) {
+        for (PlayerWinsListener pwl : playerWinsListeners) {
+            pwl.onPlayerWins(player, tpf);
+        }
+        if (Hub.isLastPlayer()) {
+            SolarWarsGame.getCurrentGameplay().getCurrentLevel().setGameOver(true);
+        }
+        Hub.getLocalPlayer().setDefeatedPlayer(-1);
+    }
+
     //==========================================================================
     //          Action Listener Handling
     //==========================================================================
@@ -239,6 +277,14 @@ public class ActionLib {
         generalActionMessageListeners.add(gal);
     }
 
+    public void addPlayerLostListener(PlayerLostListener pll) {
+        playerLostListeners.add(pll);
+    }
+
+    public void addPlayerWinsListener(PlayerWinsListener pwl) {
+        playerWinsListeners.add(pwl);
+    }
+
     public void removePlanetActionListener(PlanetActionListener pal) {
         planetActionMessageListeners.remove(pal);
     }
@@ -249,5 +295,13 @@ public class ActionLib {
 
     public void removeGeneralActionListener(GeneralActionListener gal) {
         generalActionMessageListeners.remove(gal);
+    }
+
+    public void removePlayerLostListener(PlayerLostListener pll) {
+        playerLostListeners.remove(pll);
+    }
+
+    public void removePlayerWinsListener(PlayerWinsListener pwl) {
+        playerWinsListeners.remove(pwl);
     }
 }

@@ -51,6 +51,36 @@ public class Hub {
     private static HashMap<String, Player> playersByName;
     /** The local player. */
     private static Player localPlayer;
+
+    public static Player getLastPlayer() {
+        int lostPlayerCount = 0;
+        int wonPlayerCount = 0;
+        Player last = null;
+        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
+            Player p = entry.getValue();
+            if (p != null) {
+                if (p.hasLost()) {
+                    lostPlayerCount++;
+                } else {
+                    last = p;
+                    wonPlayerCount++;
+                }
+            }
+        }
+        if (wonPlayerCount == 1) {
+            return last;
+        }
+        return null;
+    }
+
+    /**
+     * Last player.
+     *
+     * @return true, if successful
+     */
+    public static boolean isLastPlayer() {
+        return Hub.getLocalPlayer().equals(Hub.getLastPlayer());
+    }
     private boolean initialized = false;
 
     /**

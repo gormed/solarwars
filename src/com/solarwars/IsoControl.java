@@ -49,7 +49,7 @@ import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.solarwars.input.InputMappings;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
-import com.solarwars.logic.actions.ActionLib;
+import com.solarwars.logic.ActionLib;
 import com.solarwars.settings.SolarWarsSettings;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

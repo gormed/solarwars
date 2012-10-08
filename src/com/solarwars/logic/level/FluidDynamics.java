@@ -1,5 +1,5 @@
 
-package com.solarwars.logic;
+package com.solarwars.logic.level;
 
 import java.nio.ByteBuffer;
 import java.util.Random;

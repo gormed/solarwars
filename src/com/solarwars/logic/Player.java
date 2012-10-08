@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
-import com.solarwars.logic.actions.ActionLib;
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
 import com.solarwars.Hub;
@@ -81,63 +80,6 @@ public class Player {
         }
     }
 
-    /**
-     * Last player.
-     *
-     * @return true, if successful
-     */
-    public static boolean isLastPlayer() {
-        return Hub.getLocalPlayer().equals(getLastPlayer());
-//        int lostPlayerCount = 0;
-//        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-//            Player p = entry.getValue();
-//            if (p != null) {
-//                if (p.hasLost()) {
-//                    lostPlayerCount++;
-//                }
-//            }
-//        }
-//        return Hub.playersByID.size() - 1 == lostPlayerCount;
-    }
-
-    public static Player getLastPlayer() {
-        int lostPlayerCount = 0;
-        int wonPlayerCount = 0;
-        Player last = null;
-        for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
-            Player p = entry.getValue();
-            if (p != null) {
-                if (p.hasLost()) {
-                    lostPlayerCount++;
-                } else {
-                    last = p;
-                    wonPlayerCount++;
-                }
-            }
-        }
-        if (wonPlayerCount == 1) {
-            return last;
-        }
-        return null;
-    }
-
-    /**
-     * Local player wins.
-     */
-    static void localPlayerWins() {
-        if (isLastPlayer()) {
-            SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-        }
-    }
-
-    /**
-     * Local player looses.
-     */
-    static void localPlayerLooses() {
-//        if (isLastPlayer()) {
-            SolarWarsGame.getInstance().getCurrentLevel().setGameOver(true);
-//        }
-    }
     private static boolean hostSet = false;
     /** The id. */
     private int id;

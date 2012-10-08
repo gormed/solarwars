@@ -94,12 +94,14 @@ public class MultiplayerMatchState extends Gamestate {
                     && (currentLevel.isGameOver() || Hub.getLocalPlayer().hasLost())) {
                 gameOverModule.showPopup();
 
-            } else if (!lostConnection && !currentLevel.isGameOver()) {
+            }
+            if (!lostConnection && !currentLevel.isGameOver()) {
                 gameplay.update(tpf);
                 currentLevel.updateLevel(tpf);
                 updateNifty(tpf);
 
-            } else if (lostConnection) {
+            }
+            if (lostConnection) {
                 switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //                GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
             }

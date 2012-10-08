@@ -148,6 +148,8 @@ public class Level {
     private ArrayList<AbstractShip> removeShipsList;
     /** The asset manager. */
     private AssetManager assetManager;
+    
+    private AbstractGameplay gameplay;
     /** The control. */
     private IsoControl control;
     /** The players by id. */
@@ -440,7 +442,7 @@ public class Level {
     }
 
     /**
-     * Gets the planet.
+     * Gets the desired planet by its id.
      *
      * @param id the id
      * @return the planet
@@ -450,7 +452,7 @@ public class Level {
     }
 
     /**
-     * Gets the ship group.
+     * Gets the desired ship group by id.
      *
      * @param id the id
      * @return the ship group
@@ -460,72 +462,76 @@ public class Level {
     }
 
     /**
-     * Gets the ship.
+     * Gets a ship by its unique id.
      *
      * @param id the id
-     * @return the ship
+     * @return the ship with the given id
      */
     public AbstractShip getShip(int id) {
         return shipList.get(id);
     }
 
+    /**
+     * Gets the manager for ship batches, means templates for ships that can
+     * be provided faster.
+     * @return the current manager
+     */
     public ShipBatchManager getBatchManager() {
         return batchManager;
     }
 
     /**
-     * Updates the level.
+     * Updates the  current level which is always bound to a gameplay.
      *
-     * @param tpf the tpf
+     * @param tpf the time per frame
      */
     public void updateLevel(float tpf) {
-
+        // if level wasnt loaded properly exit!
         if (!levelGenerator.isLevelLoaded()) {
             return;
         }
 
+        //<editor-fold defaultstate="collapsed" desc="Camera Reposit from roman">
         // some code to reposition camera dependant on mouse position
         // added by roman
-
+        
         /*Vector2f cp=SolarWarsApplication.getInstance().getInputManager().getCursorPosition();
-        Camera cam = SolarWarsApplication.getInstance().getCamera();
-        Vector3f loc=cam.getLocation().clone();
-        loc.x=-(float)(cp.x-512)*0.002f;
-        loc.z=(float)(cp.y-384)*0.002f-6.0f;
-        cam.setLocation(loc);
-        cam.lookAt(new Vector3f(0,-2.0f,0), new Vector3f(0,1,0));*/
+         * Camera cam = SolarWarsApplication.getInstance().getCamera();
+         * Vector3f loc=cam.getLocation().clone();
+         * loc.x=-(float)(cp.x-512)*0.002f;
+         * loc.z=(float)(cp.y-384)*0.002f-6.0f;
+         * cam.setLocation(loc);
+         * cam.lookAt(new Vector3f(0,-2.0f,0), new Vector3f(0,1,0));*/
+        //</editor-fold>
 
+        // update background of level
         levelGenerator.getBackground().update(tpf);
-
-        DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.getInstance().getRealTimePerFrame();
-
-        if (Hub.getLocalPlayer().hasLost()) {
-            Player.localPlayerLooses();
-        } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1 || Player.isLastPlayer()) {
-            Player.localPlayerWins();
-            Hub.getLocalPlayer().setDefeatedPlayer(-1);
-        }
-
+        // update current gameplay (eg player win or lost, the time)
+        gameplay.update(tpf);
+        // update all planets
         for (Map.Entry<Integer, AbstractPlanet> entry : getPlanetSet()) {
             entry.getValue().updatePlanet(tpf);
         }
-
+        // recalculate if new batches for ships are needed
         batchManager.refreshBatchSize(tpf);
-
+        // update all the ship-groups
         for (Map.Entry<Integer, ShipGroup> entry : shipGroupList.entrySet()) {
             entry.getValue().updateShipGroup(tpf);
         }
-
+        // update all the ships in all groups
         for (Map.Entry<Integer, AbstractShip> entry : shipList.entrySet()) {
             entry.getValue().updateShip(tpf);
         }
-
+        // destroy ships not needed
         for (AbstractShip s : removeShipsList) {
-            //s.destroyParticleEmitter();
             shipList.remove(s.getId());
         }
-
+        // clear ships
         removeShipsList.clear();
+    }
+    
+    public void initGameplay(AbstractGameplay gameplay) {
+        this.gameplay = gameplay;
     }
 
     /**

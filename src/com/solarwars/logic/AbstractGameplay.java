@@ -21,9 +21,10 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
-import com.solarwars.logic.actions.ActionLib;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.logic.actions.PlanetActionListener;
+import java.util.HashSet;
 
 /**
  * The class AbstractGameplay.
@@ -77,6 +78,8 @@ public abstract class AbstractGameplay {
      */
     protected abstract void createGameplay();
 
+    public abstract void update(float tpf);
+    
     /**
      * @param level (will be the currentLevel)
      */
@@ -85,6 +88,7 @@ public abstract class AbstractGameplay {
             return;
         }
         currentLevel = level;
+        currentLevel.initGameplay(this);
         currentLevel.resetEntityIDs();
         createGameplay();
         initialized = true;

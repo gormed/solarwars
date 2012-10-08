@@ -41,7 +41,7 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import com.jme3.util.BufferUtils;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.logic.FluidDynamics;
+import com.solarwars.logic.level.FluidDynamics;
 import com.solarwars.settings.SolarWarsSettings;
 
 /**

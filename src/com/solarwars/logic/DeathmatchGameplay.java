@@ -21,10 +21,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
-import java.util.ArrayList;
-
 import com.solarwars.AudioManager;
+import com.solarwars.Hub;
 import com.solarwars.IsoControl;
+import com.solarwars.SolarWarsApplication;
+import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.Ranged;
@@ -33,10 +34,12 @@ import com.solarwars.logic.actions.GeneralAction;
 import com.solarwars.logic.actions.PlanetAction;
 import com.solarwars.logic.actions.ShipGroupAction;
 import com.solarwars.net.NetworkManager;
+import java.util.ArrayList;
 
 /**
- * The Class DeathmatchGameplay implements the handling of 
- * deathmatch singleplayer and multiplayer matches.
+ * The Class DeathmatchGameplay implements the handling of deathmatch
+ * singleplayer and multiplayer matches.
+ *
  * @author Hans Ferchland
  */
 public class DeathmatchGameplay extends AbstractGameplay {
@@ -58,6 +61,17 @@ public class DeathmatchGameplay extends AbstractGameplay {
 //        PLANET_RANGE = 1.75f;
     }
 
+    @Override
+    public void update(float tpf) {
+        DeathmatchGameplay.GAMETICK += (double) SolarWarsApplication.
+                getInstance().getRealTimePerFrame();
+        if (Hub.getLocalPlayer().hasLost()) {
+            actionLib.invokePlayerLost(Hub.getLocalPlayer(), tpf);
+        } else if (Hub.getLocalPlayer().getDefeatedPlayer() > -1) {
+            actionLib.invokePlayerWins(Hub.getLocalPlayer(), tpf);
+        }
+    }
+
     /**
      * Implements the normal gameplay from first versions. Only deathmatch mode.
      */
@@ -68,7 +82,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         // ========================================================
 
         PlanetAction selectPlanet = new PlanetAction(PLANET_SELECT) {
-
             @Override
             public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
@@ -86,7 +99,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         };
 
         PlanetAction multiSelectPlanet = new PlanetAction(PLANET_MULTI_SELECT) {
-
             @Override
             public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
@@ -104,7 +116,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         };
 
         PlanetAction attackPlanet = new PlanetAction(PLANET_ATTACK) {
-
             @Override
             public boolean doAction(Object sender,
                     AbstractPlanet target, Player p) {
@@ -189,7 +200,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         };
 
         PlanetAction capturePlanet = new PlanetAction(PLANET_CAPTURE) {
-
             @Override
             public boolean doAction(Object sender,
                     AbstractPlanet planet, Player p) {
@@ -223,7 +233,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         // ========================================================
 
         ShipGroupAction redirectShipGroup = new ShipGroupAction(SHIP_SELECT) {
-
             @Override
             public boolean doAction(Object sender, ShipGroup shipGroup,
                     Player p) {
@@ -240,7 +249,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         };
 
         ShipGroupAction shipArrives = new ShipGroupAction(SHIP_ARRIVES) {
-
             @Override
             public boolean doAction(Object sender, ShipGroup shipGroup,
                     Player p) {
@@ -260,7 +268,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
 
         ShipGroupAction multiSelectShipGroup = new ShipGroupAction(
                 SHIP_MULTI_SELECT) {
-
             @Override
             public boolean doAction(Object sender, ShipGroup shipGroup, Player p) {
                 if (p.hasLost() || currentLevel.isGameOver()) {
@@ -286,7 +293,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         // ========================================================
 
         GeneralAction gameOver = new GeneralAction(GAME_OVER) {
-
             @Override
             public boolean doAction(Object sender, Player a, Player b) {
 
@@ -311,7 +317,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         };
 
         GeneralAction playerDefeated = new GeneralAction(DEFEATED) {
-
             @Override
             public boolean doAction(Object sender, Player a, Player b) {
                 return false;
@@ -322,4 +327,6 @@ public class DeathmatchGameplay extends AbstractGameplay {
         actionLib.getGeneralActions().put(DEFEATED, playerDefeated);
 
     }
+
+
 }
