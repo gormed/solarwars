@@ -28,6 +28,7 @@ import java.util.HashSet;
 
 /**
  * The class AbstractGameplay.
+ *
  * @author Hans Ferchland
  */
 public abstract class AbstractGameplay {
@@ -46,6 +47,7 @@ public abstract class AbstractGameplay {
     //==========================================================================
     /**
      * Gets the current game tick calculated for each client.
+     *
      * @see MultiplayerGameplay
      * @return the game tick as a double in millisecs
      */
@@ -73,31 +75,66 @@ public abstract class AbstractGameplay {
     //==========================================================================
 
     /**
-     * Should be overridden by subclasses to create own actions for ships to
+     * Has to get overridden by subclasses to create own actions for ships to
      * enable diffrent gameplay settings.
      */
     protected abstract void createGameplay();
 
-    public abstract void update(float tpf);
-    
     /**
+     * Updates the defined gameplay of the subclass.
+     *
+     * @param tpf the time per frame
+     */
+    public abstract void update(float tpf);
+
+    /**
+     * Initializes the gameplay with a given level and reversed. Creates the
+     * gameplay by excuting the createGameplay() method.
+     *
      * @param level (will be the currentLevel)
      */
     public void initialize(Level level) {
         if (initialized) {
             return;
         }
+        actionLib.initialize();
         currentLevel = level;
         currentLevel.initGameplay(this);
         currentLevel.resetEntityIDs();
         createGameplay();
         initialized = true;
     }
+    
+    /**
+     * Destroys the gameplay if not needed anymore.
+     */
+    public void destroy() {
+        if (!initialized) {
+            return;
+        }
+        actionLib.destroy();
+        actionLib = null;
+        currentLevel = null;
+        initialized = false;
+    }
 
+    /**
+     * Checks if the gameplay is already init.
+     *
+     * @return true if so, false otherwise
+     */
     public boolean isInitialized() {
         return initialized;
     }
 
+    /**
+     * Gets the current gameplay if already initialized. Throws a
+     * GameplayException otherwise.
+     *
+     * @return the current level given on init
+     * @throws GameplayException
+     * @see GameplayException
+     */
     public Level getCurrentLevel() throws GameplayException {
         if (isInitialized()) {
             return currentLevel;

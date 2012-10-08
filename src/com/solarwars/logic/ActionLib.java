@@ -85,6 +85,27 @@ public class ActionLib {
      * Initializes the.
      */
     public void initialize() {
+        generalActions.clear();
+        planetActions.clear();
+        shipActions.clear();
+        
+        playerLostListeners.clear();
+        playerWinsListeners.clear();
+        planetActionMessageListeners.clear();
+        shipActionMessageListeners.clear();
+        generalActionMessageListeners.clear();
+    }
+
+    void destroy() {
+        generalActions.clear();
+        planetActions.clear();
+        shipActions.clear();
+        
+        playerLostListeners.clear();
+        playerWinsListeners.clear();
+        planetActionMessageListeners.clear();
+        shipActionMessageListeners.clear();
+        generalActionMessageListeners.clear();
     }
 
     /**

@@ -563,9 +563,13 @@ public class Level {
         this.shipNodes.clear();
         this.removeShipsList.clear();
 
-        // Init needed system refs
+        // discard needed system refs
         this.rootNode = null;
         this.assetManager = null;
         this.control = null;
+        this.gameplay.destroy();
+        this.gameplay = null;
+        
+        
     }
 }
