@@ -30,10 +30,10 @@ import com.solarwars.logic.Player;
 import java.util.logging.Level;
 
 /**
- * The class StandardControl.
+ * The class StandardControl for keyboard- and mouse-interaction.
  *
  * @author Hans Ferchland <hans.ferchland at gmx dot de>
- * @version
+ * @version 2.1
  */
 public class StandardControl extends AbstractControl {
 
@@ -46,6 +46,9 @@ public class StandardControl extends AbstractControl {
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
+    /**
+     * Creates a control for mouse and keyboard interactions.
+     */
     public StandardControl() {
         // register action listener for right and left clicks 
         // and the mouse-weel
@@ -65,7 +68,7 @@ public class StandardControl extends AbstractControl {
 
             }
         };
-
+        // register listener for ctrl key to trigger the control-flag
         keyActionListener = new ActionListener() {
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
@@ -75,6 +78,12 @@ public class StandardControl extends AbstractControl {
 
     }
 
+    /**
+     * Listens for ctrl key to trigger the control-flag.
+     *
+     * @param name
+     * @param isPressed
+     */
     @Override
     protected void onControlModifier(String name, boolean isPressed) {
         if (name.equals(InputMappings.CONTROL_MODIFIER)) {
@@ -82,6 +91,12 @@ public class StandardControl extends AbstractControl {
         }
     }
 
+    /**
+     * Listens for left mouse click to drag the selection-rectangle.
+     *
+     * @param name
+     * @param point
+     */
     @Override
     protected void onSelectionPressed(String name, Vector2f point) {
         if (name.equals(InputMappings.LEFT_CLICK_SELECT)) {
@@ -92,6 +107,16 @@ public class StandardControl extends AbstractControl {
         }
     }
 
+    /**
+     * Listnens for left or right click to select or attack. This is multi-ship-
+     * and multi-planet-select as well as single select a shipgroup or planet or
+     * to attack.
+     *
+     * @param name the action-name for left or right mouse
+     * @param point the point clicked in screen-space
+     * @return true if there was a select or attack action, false if nothing was
+     * hit or selected.
+     */
     @Override
     protected boolean onSelectEntity(String name, Vector2f point) {
         boolean attack = (name.equals(InputMappings.LEFT_CLICK_SELECT)
@@ -105,6 +130,9 @@ public class StandardControl extends AbstractControl {
         return false;
     }
 
+    /**
+     * Adds the control listnener for keyboard an mouse.
+     */
     @Override
     public void addControlListener() {
         inputManager = SolarWarsApplication.getInstance().getInputManager();
@@ -122,6 +150,9 @@ public class StandardControl extends AbstractControl {
         }
     }
 
+    /**
+     * Removes the control listnener for keyboard an mouse.
+     */
     @Override
     public void removeControlListener() {
         inputManager = SolarWarsApplication.getInstance().getInputManager();
@@ -131,6 +162,10 @@ public class StandardControl extends AbstractControl {
         }
     }
 
+    /**
+     * Gets the current clicked point from the input manager.
+     * @return 
+     */
     @Override
     protected Vector2f getClickedPoint() {
         return inputManager.getCursorPosition();
@@ -154,7 +189,4 @@ public class StandardControl extends AbstractControl {
 
         logger.log(Level.FINE, percentageChangeS);
     }
-    //==========================================================================
-    //===   Inner Classes
-    //==========================================================================
 }

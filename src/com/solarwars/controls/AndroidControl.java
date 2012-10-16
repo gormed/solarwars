@@ -52,8 +52,7 @@ public class AndroidControl extends AbstractControl {
                 lastEvent = event;
                 float pressure;
                 if (event.getType() == TouchEvent.Type.DOWN) {
-                    onDragSelectEntity(getClickedPoint());
-                    pressure = event.getPressure();
+                    onSelectionPressed(name, getClickedPoint());
                 } else if (event.getType() == TouchEvent.Type.UP) {
                     onSelectEntity(name, getClickedPoint());
                 } else if (event.getType() == TouchEvent.Type.DOUBLETAP) {
@@ -72,6 +71,7 @@ public class AndroidControl extends AbstractControl {
 
     @Override
     protected void onControlModifier(String name, boolean isPressed) {
+        controlPressed = isPressed;
     }
 
     @Override

@@ -47,16 +47,18 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * The Class AbstractControl for the players interaction. actions.
+ * The Class AbstractControl for the interface to the players interactions.
+ * Extend this class if you need a new input-device supported!
  *
  * @author Hans Ferchland
  */
 public abstract class AbstractControl {
 
+    //==========================================================================
+    //      Protected and Private Fields
+    //==========================================================================
+    // logging
     protected static final Logger logger = Logger.getLogger(AbstractControl.class.getName());
-    //==========================================================================
-    //      Private Fields
-    //==========================================================================
     // general
     protected Node rootNode = SolarWarsApplication.getInstance().getRootNode();
     protected Node shootablesNode;
@@ -117,11 +119,20 @@ public abstract class AbstractControl {
         rootNode.attachChild(shootablesNode);
     }
 
+    /**
+     * Is executed to change the Strg/Ctrl trigger to indicate the difference
+     * between a drag for planets or ships.
+     *
+     * @param name the name of the action that should trigger the event
+     * @param isPressed true if action-key is down, false otherwise
+     */
     protected abstract void onControlModifier(String name, boolean isPressed);
 
     /**
-     * Is executed if the player clicks on left or right mouse button but not on
-     * its hold.
+     * Is executed if the player selects a planet or group.
+     *
+     * @param name the name of the action that should trigger the event
+     * @param point the point beeing clicked in sceen-space
      */
     protected abstract void onSelectionPressed(String name, Vector2f point);
 
@@ -129,15 +140,38 @@ public abstract class AbstractControl {
      * Is executed if the left or right mouse button is released. This can end
      * in a drag action that ended or a normal left click for selection or right
      * click for attack.
+     *
+     * @param name the name of the action that should trigger the event
+     * @param point the point beeing clicked in sceen-space
      */
     protected abstract boolean onSelectEntity(String name, Vector2f point);
 
+    /**
+     * Adds the listeners for the events that can occur. Means that here you
+     * need to register the listners for onSelectEntity, onSelectionPressed,
+     * onControlModifier and other you may have defined.
+     */
     public abstract void addControlListener();
 
+    /**
+     * Removes all listener so that no input can be processed anymore. Means
+     * that here you need to remove all the listners for onSelectEntity,
+     * onSelectionPressed, onControlModifier and other you may have defined.
+     */
     public abstract void removeControlListener();
 
+    /**
+     * Returns the point, that is clicked on screen.
+     *
+     * @return the point in screen-space
+     */
     protected abstract Vector2f getClickedPoint();
 
+    /**
+     * Is executed if the player is dragging a recatangle for multi-select.
+     *
+     * @param point the start point of the rectangle in screen-space
+     */
     protected void onDragSelectEntity(Vector2f point) {
         Vector2f click2d = point;
         Vector3f click3d = cam.getWorldCoordinates(
@@ -160,6 +194,13 @@ public abstract class AbstractControl {
         dragging = true;
     }
 
+    /**
+     * Is executed if the percentage should change. Must be called on the
+     * properiate event.
+     *
+     * @param amount
+     * @param down
+     */
     protected void onPercentageChange(float amount, boolean down) {
         if (!down) {
             amount *= -1.0f;
@@ -291,7 +332,7 @@ public abstract class AbstractControl {
                 if (!isControlPressed()) {
                     // select all planets in rectangle
                     selectPlanets(rect);
-
+                    // TODO Hans Documentate
                     MarkerNode markerNodeLoc;
                     if (!planetSelection.isEmpty()) {
                         for (AbstractPlanet planet : planetSelection) {
@@ -344,6 +385,15 @@ public abstract class AbstractControl {
         return false;
     }
 
+    /**
+     * Is executed if a player releases the event for attack or select. The flag
+     * attack signals if the event is an attack or select.
+     *
+     * @param point the point the event is released
+     * @param attack true if the evnet is an attack false if a selection
+     * @return true if player ends a dragging opeation or a normal release for
+     * selection or attack, false if nothing was selected or attacked
+     */
     protected boolean onAttackOrSelect(Vector2f point, boolean attack) {
         // reset drag flag
         dragging = false;
@@ -371,10 +421,22 @@ public abstract class AbstractControl {
         return false;
     }
 
+    /**
+     * Gets the value of the control state flag. See onControlModifier() method
+     * for more.
+     *
+     * @return true if control flag is raised, false otherwise
+     */
     public boolean isControlPressed() {
         return controlPressed;
     }
 
+    /**
+     * Gets the value of the dragging flag. Indicates if the player is currently
+     * performing a drag-action.
+     *
+     * @return true if player is dragging, false if not
+     */
     public boolean isDragging() {
         return dragging;
     }
@@ -540,6 +602,10 @@ public abstract class AbstractControl {
         updateDragRect(getClickedPoint());
     }
 
+    /**
+     * Updates the rectangle on screen.
+     * @param click2d the current cursor-pos
+     */
     private void updateDragRect(Vector2f click2d) {
         Vector3f click3d = cam.getWorldCoordinates(
                 new Vector2f(click2d.x, click2d.y), 0f).clone();
@@ -570,7 +636,7 @@ public abstract class AbstractControl {
     }
 
     /**
-     * Adds the shootable.
+     * Adds the shootable to the nodes that can be hit.
      *
      * @param spat the spat
      */
@@ -579,7 +645,7 @@ public abstract class AbstractControl {
     }
 
     /**
-     * Removes the shootable.
+     * Removes the shootable from the nodes that can be hit.
      *
      * @param spat the spat
      */
@@ -588,7 +654,7 @@ public abstract class AbstractControl {
     }
 
     /**
-     * Clean up.
+     * Clean up the control.
      */
     public void cleanUp() {
         lastXZPlanePos = null;
