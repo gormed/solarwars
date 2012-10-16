@@ -33,6 +33,7 @@ import com.solarwars.net.NetworkManager;
 import com.solarwars.net.messages.ChatMessage;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.Scrollbar;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 
@@ -48,13 +49,20 @@ public class GameChatModule {
 
     private Element chatLayer;
     private ListBox<ChatItem> listBoxChat;
+    private Scrollbar scrollbar;
     private Screen screen;
-    /** The input manager. */
+    /**
+     * The input manager.
+     */
     private InputManager inputManager;
-    /** The network manager. */
+    /**
+     * The network manager.
+     */
     private NetworkManager networkManager;
     private Nifty niftyGUI;
-    /** The visible. */
+    /**
+     * The visible.
+     */
     private boolean visible;
     private Element textInput;
     private boolean hadWinner = false;
@@ -85,6 +93,8 @@ public class GameChatModule {
         this.networkManager = networkManager;
         this.inputManager = SolarWarsApplication.getInstance().getInputManager();
 
+        scrollbar = niftyGUI.getCurrentScreen().
+                findNiftyControl("scrollbar", Scrollbar.class);
         chatLayer = niftyGUI.getCurrentScreen().findElementByName("chat");
         chatLayer.hide();
         listBoxChat = niftyGUI.getCurrentScreen().findNiftyControl("chat_text_box", ListBox.class);
@@ -95,7 +105,6 @@ public class GameChatModule {
             /* (non-Javadoc)
              * @see com.jme3.input.controls.ActionListener#onAction(java.lang.String, boolean, float)
              */
-
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
                 if (!isPressed && name.equals(InputMappings.PLAYER_CHAT)) {
@@ -124,6 +133,11 @@ public class GameChatModule {
         keyboardAction = null;
     }
 
+    private void autoScroll() {
+        listBoxChat.selectItemByIndex(listBoxChat.itemCount() - 1);
+//        scrollbar.
+    }
+
     /**
      * Player says.
      *
@@ -135,8 +149,11 @@ public class GameChatModule {
                 ChatItem.ChatMsgType.PLAYER,
                 p.getName(), p.getColor()));
         if (p.isHost()) {
-            chatLayer.show();
+            if (!chatLayer.isVisible()) {
+                chatLayer.show();
+            }
         }
+        autoScroll();
     }
 
     /**
@@ -149,7 +166,10 @@ public class GameChatModule {
             listBoxChat.addItem(new ChatItem(p.getName() + " leaves the game!",
                     ChatItem.ChatMsgType.LEAVER,
                     "SERVER", p.getColor()));
-            chatLayer.show();
+            if (!chatLayer.isVisible()) {
+                chatLayer.show();
+            }
+            autoScroll();
         }
     }
 
@@ -165,14 +185,20 @@ public class GameChatModule {
                 + defeated.getName() + "!",
                 ChatItem.ChatMsgType.DEFEAT,
                 "SERVER", ColorRGBA.White));
-        chatLayer.show();
+        if (!chatLayer.isVisible()) {
+            chatLayer.show();
+        }
+        autoScroll();
     }
 
     public void playerJoins(Player thisPlayer) {
         listBoxChat.addItem(new ChatItem(thisPlayer.getName() + " joins the game!",
                 ChatItem.ChatMsgType.JOINS,
                 "SERVER", thisPlayer.getColor()));
-        chatLayer.show();
+        if (!chatLayer.isVisible()) {
+            chatLayer.show();
+        }
+        autoScroll();
 
     }
 
@@ -181,7 +207,10 @@ public class GameChatModule {
             listBoxChat.addItem(new ChatItem(winner.getName() + " wins the game!",
                     ChatItem.ChatMsgType.WIN,
                     "SERVER", winner.getColor()));
-            chatLayer.show();
+            if (!chatLayer.isVisible()) {
+                chatLayer.show();
+            }
+            autoScroll();
             hadWinner = true;
         }
     }
@@ -190,7 +219,10 @@ public class GameChatModule {
         listBoxChat.addItem(new ChatItem(string,
                 ChatItem.ChatMsgType.SERVER,
                 "SERVER", ColorRGBA.White));
-        chatLayer.show();
+        if (!chatLayer.isVisible()) {
+            chatLayer.show();
+        }
+        autoScroll();
     }
 
     /**

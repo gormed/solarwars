@@ -29,6 +29,7 @@ import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
+import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
@@ -98,7 +99,6 @@ public class CreateServerState extends Gamestate
     // Logic
     private boolean gameStarted = false;
     private boolean serverEstablished = false;
-    private final SolarWarsApplication application;
     private long clientSeed;
     private boolean playersChanged;
     private long serverSeed = 42;
@@ -236,8 +236,6 @@ public class CreateServerState extends Gamestate
         } catch (GameSettingsException e) {
             e.printStackTrace();
         }
-
-        gameChatModule.destroy();
         if (serverClient != null) {
             serverClient.removeMessageListener(clientMessageListener,
                     PlayerAcceptedMessage.class, PlayerLeavingMessage.class,
@@ -341,6 +339,11 @@ public class CreateServerState extends Gamestate
     }
 
     public void onStartServer() {
+        if (solarWarsServer.getGameServer().getConnections().size() <= 1) {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_ERROR);
+            return;
+        }
         boolean allReady = true;
         for (Player p : ServerHub.getPlayers()) {
             if (!p.isReady()) {
@@ -351,6 +354,9 @@ public class CreateServerState extends Gamestate
         }
         if (allReady) {
             startServer();
+        } else {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_ERROR);
         }
     }
 
@@ -408,6 +414,7 @@ public class CreateServerState extends Gamestate
         networkManager.serverRemoveClientMessageListener(serverMessageListener);
         networkManager.serverRemoveConnectionListener(clientConnectedListener);
         networkManager.clientRemoveMessageListener(clientMessageListener);
+        gameChatModule.destroy();
 
         if (serverEstablished) {
             Future<Thread> fut = application.enqueue(new Callable<Thread>() {
@@ -437,6 +444,8 @@ public class CreateServerState extends Gamestate
                             ex});
             }
         }
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_ERROR);
         switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 //        GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
     }
@@ -505,7 +514,7 @@ public class CreateServerState extends Gamestate
      * Sends a message to the chat area
      */
     public void sendMessage() {
-        String message = textInputField.getText();
+        String message = textInputField.getRealText();
         if (checkMessageStyle(message)) {
             gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
             gameChatModule.playerSays(Hub.getLocalPlayer(), message);
@@ -669,8 +678,8 @@ public class CreateServerState extends Gamestate
                 if (isConnecting) {
                     if (!Hub.getInstance().isInitialized()) {
                         Hub.getInstance().initialize(thisPlayer, players);
-                        gameChatModule.playerJoins(thisPlayer);
                     }
+                    gameChatModule.playerJoins(thisPlayer);
                 } else {
                     if (Hub.getInstance().addPlayer(thisPlayer)) {
                         gameChatModule.playerJoins(thisPlayer);

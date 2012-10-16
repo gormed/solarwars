@@ -33,7 +33,6 @@ import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,31 +41,44 @@ import jme3tools.optimize.GeometryBatchFactory;
 
 /**
  * The Class ShipBatchManager creates and handles all ships displayed in game.
- * 
- * It is resposible for the creation of ships, gives an instance to a logical ship,
- * that needs to display. To keep aware of the global ship count it creates new 
- * batches if the players create more and more ships due their planets.
+ *
+ * It is resposible for the creation of ships, gives an instance to a logical
+ * ship, that needs to display. To keep aware of the global ship count it
+ * creates new batches if the players create more and more ships due their
+ * planets.
  *
  * @author Hans Ferchland
  */
 public class ShipBatchManager {
 
-    /** The asset manager. */
+    /**
+     * The asset manager.
+     */
     private AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
     private Node shipBatchNode = new Node("ShipBatchNode");
-    /** The update timer. */
+    /**
+     * The update timer.
+     */
     private float updateTimer;
     private static final Logger logger = Logger.getLogger(ShipBatchManager.class.getName());
     private Vector3f outOfScreen = new Vector3f(0, 0, 100);
-    /** The used batches. */
+    /**
+     * The used batches.
+     */
     private HashMap<Integer, ArrayList<Spatial>> usedPlayerBatches =
             new HashMap<Integer, ArrayList<Spatial>>();
-    /** The unused batches. */
+    /**
+     * The unused batches.
+     */
     private HashMap<Integer, ArrayList<Spatial>> unusedPlayerBatches =
             new HashMap<Integer, ArrayList<Spatial>>();
-    /** The current ship count. */
+    /**
+     * The current ship count.
+     */
     private HashMap<Integer, Integer> currentShipCount = new HashMap<Integer, Integer>();
-    /** The desired ship count. */
+    /**
+     * The desired ship count.
+     */
     private HashMap<Integer, Integer> desiredShipCount = new HashMap<Integer, Integer>();
     private HashMap<Integer, Material> playerMaterialsHashMap =
             new HashMap<Integer, Material>();
@@ -99,13 +111,14 @@ public class ShipBatchManager {
 
     private void initBatchLists() {
 
-        for (Map.Entry<Integer, ArrayList<Spatial>> entry : 
+        for (Map.Entry<Integer, ArrayList<Spatial>> entry :
                 unusedPlayerBatches.entrySet()) {
             ArrayList<Spatial> playersBatches = entry.getValue();
             int playerID = entry.getKey();
             for (int i = 0; i < desiredShipCount.get(playerID); i++) {
                 Spatial s = createNextBatch(playerID);
-                s.setLocalTranslation(outOfScreen);
+//                s.setLocalTranslation(outOfScreen);
+                s.setCullHint(Spatial.CullHint.Always);
                 playersBatches.add(s);
             }
             logger.log(java.util.logging.Level.INFO,
@@ -156,7 +169,7 @@ public class ShipBatchManager {
         Spatial shipBatchSpatial =
                 GeometryBatchFactory.optimize(shipBatchGeometry);
         Material material = playerMaterialsHashMap.get(playerID);
-        
+
         shipBatchSpatial.setMaterial(material);
 
         shipBatchNode.attachChild(shipBatchSpatial);
@@ -175,6 +188,7 @@ public class ShipBatchManager {
                 && usedPlayerBatches.containsKey(playerID)) {
             if (unusedPlayerBatches.get(playerID).isEmpty()) {
                 Spatial s = createNextBatch(playerID);
+                s.setCullHint(Spatial.CullHint.Dynamic);
                 usedPlayerBatches.get(playerID).add(s);
                 logger.log(java.util.logging.Level.INFO, "Used: {0} | Unused: {1}",
                         new Object[]{usedPlayerBatches.get(playerID).size(),
@@ -184,6 +198,7 @@ public class ShipBatchManager {
             } else {
                 Spatial s = unusedPlayerBatches.get(playerID).
                         get(unusedPlayerBatches.get(playerID).size() - 1);
+                s.setCullHint(Spatial.CullHint.Dynamic);
                 unusedPlayerBatches.get(playerID).remove(s);
                 usedPlayerBatches.get(playerID).add(s);
                 logger.info("Aquired Ship-Batch at needs. Perfect!");
@@ -244,7 +259,8 @@ public class ShipBatchManager {
                     Spatial s;
                     for (int i = 0; i < step; i++) {
                         s = createNextBatch(playerID);
-                        s.setLocalTranslation(outOfScreen);
+//                        s.setLocalTranslation(outOfScreen);
+                        s.setCullHint(Spatial.CullHint.Always);
                         unusedPlayerBatches.get(playerID).add(s);
                         int temp = currentShipCount.get(playerID);
                         currentShipCount.remove(playerID);

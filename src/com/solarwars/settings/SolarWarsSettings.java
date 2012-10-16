@@ -198,7 +198,6 @@ public class SolarWarsSettings extends GameSettings {
      * 
      * @return the current global log level.
      * @author fxdapokalypse
-     * @deprecated 
      * 
      */
     public Level getGlobalLogLevel() {
@@ -214,7 +213,6 @@ public class SolarWarsSettings extends GameSettings {
      * </br>
      * @param the Level constant
      * @author fxdapokalypse 
-     * @deprecated 
      * 
      */
     public void setGlobalLogLevel(Level level) {
@@ -226,8 +224,7 @@ public class SolarWarsSettings extends GameSettings {
      * </br>
      * @param level the log level e.g.: ["ALL", "INFO", "ERROR", "OFF", "WARNING"]
      * @throws IllegalArgumentException if the given log level isn't supported.
-     * @author fxdapokalypse 
-     * @deprecated 
+     * @author fxdapokalypse
      */
     public void setGlobalLogLevel(String level) {
         String supportedLevels[] = {"ALL", "INFO", "ERROR", "OFF", "WARNING"};
@@ -271,7 +268,6 @@ public class SolarWarsSettings extends GameSettings {
      * </br>
      * @return  true, if "ENABLE_LOG_FILES" is enabled.
      * @author fxdapokalypse 
-     * @deprecated
      */
     public boolean isFileLoggingEnabled() {
         return this.getBoolean(Game.ENABLE_LOG_FILES);

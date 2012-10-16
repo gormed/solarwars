@@ -261,7 +261,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
 
     public void onReadyButton() {
         AudioManager.getInstance().
-                playSoundInstance(AudioManager.SOUND_EXPLOSION);
+                playSoundInstance(AudioManager.SOUND_CLICK);
         Player p = Hub.getLocalPlayer();
         p.setReady(!p.isReady());
         networkManager.getThisClient().send(
