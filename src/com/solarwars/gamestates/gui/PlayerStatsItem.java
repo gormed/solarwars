@@ -25,6 +25,7 @@ import com.jme3.math.ColorRGBA;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
+import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import java.util.Map.Entry;
@@ -107,7 +108,7 @@ public class PlayerStatsItem {
 
         for (AbstractPlanet p : player.getPlanets()) {
             size = p.getSizeID();
-            growth += Level.PLANET_INCREMENT_TIME[p.getSizeID()];
+            growth += AbstractGameplay.PLANET_INCREMENT_TIME[p.getSizeID()];
             avgSize += size;
 
         }

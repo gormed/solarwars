@@ -32,6 +32,9 @@ import java.util.HashSet;
  * @author Hans Ferchland
  */
 public abstract class AbstractGameplay {
+    public static float[] PLANET_SIZES = {0.2F, 0.225F, 0.25F, 0.275F, 0.3F, 0.325F, 0.35F, 0.375F, 0.4F, 0.425F};
+    public static float[] PLANET_INCREMENT_TIME = {2.0F, 1.5F, 1.2F, 1.0F, 0.9F, 0.8F, 0.7F, 0.6F, 0.5F, 0.5F};
+    public static final int PLAYER_START_SHIP_COUNT = 100;
 
     /**
      * The constructor of AbstractGameplay.

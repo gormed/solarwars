@@ -21,31 +21,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.Client;
 import com.jme3.network.ConnectionListener;
-import com.jme3.network.Filters;
 import com.jme3.network.Filters;
 import com.jme3.network.HostedConnection;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.jme3.network.Server;
-import com.jme3.post.Filter;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
@@ -73,7 +56,20 @@ import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.input.NiftyInputEvent;
 import de.lessvoid.nifty.screen.KeyInputHandler;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class CreateServerState.
@@ -193,7 +189,7 @@ public class CreateServerState extends Gamestate
         com.solarwars.logic.Level mpLevel = new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getIsoControl(),
+                SolarWarsApplication.getInstance().getControl(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }

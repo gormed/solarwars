@@ -23,9 +23,8 @@ package com.solarwars.logic;
 
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
-import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
-import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.AbstractControl;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.Ranged;
@@ -105,8 +104,8 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
                 }
-                if (sender instanceof IsoControl) {
-                    IsoControl control = (IsoControl) sender;
+                if (sender instanceof AbstractControl) {
+                    AbstractControl control = (AbstractControl) sender;
                     ArrayList<AbstractPlanet> selection = control.getSelectedPlanets();
                     p.multiSelectPlanets(selection);
                     return true;
@@ -273,8 +272,8 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
                 }
-                if (sender instanceof IsoControl) {
-                    IsoControl control = (IsoControl) sender;
+                if (sender instanceof AbstractControl) {
+                    AbstractControl control = (AbstractControl) sender;
                     ArrayList<ShipGroup> selection = control.getSelectedShipGroups();
                     p.multiSelectShipGroup(selection);
                     return true;

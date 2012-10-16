@@ -186,7 +186,7 @@ public class ServerLobbyState extends Gamestate implements ClientRegisterListene
                 new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getIsoControl(),
+                SolarWarsApplication.getInstance().getControl(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }

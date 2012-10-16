@@ -29,41 +29,46 @@ import java.util.HashMap;
  * The Class FontLoader.
  */
 public class FontLoader {
-    
-    /** The instance. */
+
+    /**
+     * The instance.
+     */
     private static FontLoader instance;
-    
+
     /**
      * Gets the single instance of FontLoader.
      *
      * @return single instance of FontLoader
      */
     public static FontLoader getInstance() {
-        if (instance != null)
+        if (instance != null) {
             return instance;
+        }
         return instance = new FontLoader();
-    }    
-    
+    }
+
     /**
      * Instantiates a new font loader.
      */
     private FontLoader() {
         this.fonts = new HashMap<String, BitmapFont>();
     }
-    
-    /** The asset manager. */
+    /**
+     * The asset manager.
+     */
     private AssetManager assetManager = null;
-    
-    /** The font names. */
+    /**
+     * The font names.
+     */
     private final String[] fontNames = {
         "SolarWarsFont32",
-            "SolarWarsFont64"
+        "SolarWarsFont64"
     };
-    
-    /** The fonts. */
+    /**
+     * The fonts.
+     */
     private HashMap<String, BitmapFont> fonts;
 
-    
     /**
      * Initializes the.
      *
@@ -73,29 +78,29 @@ public class FontLoader {
         this.assetManager = assetManager;
         loadFonts();
     }
-    
+
     /**
      * Load fonts.
      */
     private void loadFonts() {
-        for(String s : fontNames) {
+        for (String s : fontNames) {
             loadFont(s);
         }
     }
-    
+
     /**
      * Load font.
      *
      * @param fontName the font name
      */
     private void loadFont(String fontName) {
-        
+
         BitmapFont fnt = assetManager.loadFont(
                 "Interface/Fonts/" + fontName + ".fnt");
         fonts.put(fontName, fnt);
-        
+
     }
-    
+
     /**
      * Gets the font.
      *
@@ -105,5 +110,4 @@ public class FontLoader {
     public BitmapFont getFont(String fontName) {
         return fonts.get(fontName);
     }
-    
 }

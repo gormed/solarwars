@@ -27,7 +27,6 @@ import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
-import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameChatModule;
@@ -252,8 +251,7 @@ public class MultiplayerMatchState extends Gamestate {
         // CHAT ------------------------------------------
 
         // creates the drag-rect geometry
-        IsoControl.getInstance().
-                createDragRectGeometry();
+        game.getApplication().getControl().createDragRectGeometry();
     }
 
     public void continueGame() {

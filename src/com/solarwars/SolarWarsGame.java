@@ -24,8 +24,9 @@ package com.solarwars;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
-import com.solarwars.gamestates.Gamestate;
+import com.solarwars.controls.AbstractControl;
 import com.solarwars.gamestates.CreateServerState;
+import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.MainmenuState;
 import com.solarwars.gamestates.MultiplayerMatchState;
 import com.solarwars.gamestates.MultiplayerState;
@@ -41,7 +42,6 @@ import com.solarwars.logic.GameplayException;
 import com.solarwars.logic.Level;
 import com.solarwars.net.NetworkManager;
 import java.util.HashMap;
-
 import java.util.logging.Logger;
 
 /**
@@ -97,7 +97,7 @@ public class SolarWarsGame {
     private SolarWarsApplication application;
     private AssetManager assetManager;
     private NetworkManager networkManager;
-    private IsoControl isoControl;
+    private AbstractControl control;
     private InputManager inputManager;
     private FontLoader fontLoader;
     private ActionLib actionLib;
@@ -122,7 +122,7 @@ public class SolarWarsGame {
         assetManager = app.getAssetManager();
         stateManager = app.getStateManager();
 
-        isoControl = IsoControl.getInstance();
+        control = app.getControl();
 
         audioManager = AudioManager.getInstance();
         audioManager.initialize();

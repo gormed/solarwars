@@ -29,6 +29,7 @@ import com.solarwars.SolarWarsApplication;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.SimplePlanet;
 import com.solarwars.entities.LevelBackground;
+import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public abstract class LevelGenerator {
      * @return the int
      */
     protected int generateSize() {
-        return randomizer.nextInt(Level.PLANET_SIZES.length);
+        return randomizer.nextInt(AbstractGameplay.PLANET_SIZES.length);
     }
 
     /**
@@ -130,7 +131,7 @@ public abstract class LevelGenerator {
      */
     protected int getRandomShipCount(int size) {
         return randomizer.nextInt((int) ((size + 1) * 1.5F))
-                + (int) (20 / Level.PLANET_INCREMENT_TIME[size]);
+                + (int) (20 / AbstractGameplay.PLANET_INCREMENT_TIME[size]);
     }
 
     /**
@@ -182,7 +183,7 @@ public abstract class LevelGenerator {
     private AbstractPlanet createPlayerPlanet(Player owner,
             float x, float z) {
         // set size to maximum
-        int size = Level.PLANET_SIZES.length - 1;
+        int size = AbstractGameplay.PLANET_SIZES.length - 1;
         // create SimplePlanet for player on given position
         AbstractPlanet p = 
                 new SimplePlanet(assetManager, level, 
@@ -190,7 +191,7 @@ public abstract class LevelGenerator {
         // init planet geometry
         p.createPlanet();
         // set ships
-        p.setShipCount(Level.PLAYER_START_SHIP_COUNT);
+        p.setShipCount(AbstractGameplay.PLAYER_START_SHIP_COUNT);
         // owner aquires planet
         owner.capturePlanet(p);
         // add planet into list
@@ -245,7 +246,7 @@ public abstract class LevelGenerator {
         while (!found) {
             // TODO: change level generation
             if (planet.getOwner() == null && planet.getSize() >= 
-                    Level.PLANET_SIZES[Level.PLANET_SIZES.length - 2]) {
+                    AbstractGameplay.PLANET_SIZES[AbstractGameplay.PLANET_SIZES.length - 2]) {
                 found = true;
                 break;
             }
@@ -253,7 +254,7 @@ public abstract class LevelGenerator {
             planet = level.getPlanetList().get(idx);
         }
         p.capturePlanet(planet);
-        planet.setShipCount(Level.PLAYER_START_SHIP_COUNT);
+        planet.setShipCount(AbstractGameplay.PLAYER_START_SHIP_COUNT);
         return planet;
     }
     

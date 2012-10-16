@@ -21,11 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars;
 
-import java.util.StringTokenizer;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.jme3.app.Application;
 import com.jme3.app.StatsView;
 import com.jme3.font.BitmapFont;
@@ -49,11 +44,17 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
+import com.solarwars.controls.AbstractControl;
+import com.solarwars.controls.StandardControl;
 import com.solarwars.input.InputMappings;
 import com.solarwars.log.Logging;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.Nifty;
+import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class SolarWarsApplication.
@@ -156,7 +157,7 @@ public class SolarWarsApplication extends Application {
     protected StatsView statsView;
     protected IsoCamera isoCam;
     protected Vector2f lastScreenPos;
-    protected IsoControl isoControl;
+    protected AbstractControl control;
     protected boolean showSettings = true;
     private String pingString = "";
     private boolean showFps = true;
@@ -213,8 +214,8 @@ public class SolarWarsApplication extends Application {
      *
      * @return the iso control
      */
-    public IsoControl getIsoControl() {
-        return isoControl;
+    public AbstractControl getControl() {
+        return control;
     }
 
     public Nifty getNiftyGUI() {
@@ -381,12 +382,12 @@ public class SolarWarsApplication extends Application {
         // hide stats
         setDisplayStatView(false);
         setDisplayFps(false);
-
-        // setup lights
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
-        sun.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 0.7f));
-        rootNode.addLight(sun);
+        // setup the lighting
+        setupLights();
+        // setup control
+        control = new StandardControl();
+        control.initialize();
+        
         // load, init and start game
         game = SolarWarsGame.getInstance();
         game.initialize(this);
@@ -434,15 +435,13 @@ public class SolarWarsApplication extends Application {
     public void attachIsoCameraControl() {
         if (inputManager != null) {
             // Init controls
-            isoControl = IsoControl.getInstance();
-
             isoCam = IsoCamera.getInstance();
             isoCam.initialize(cam, rootNode);
             isoCam.setMoveSpeed(5f);
             isoCam.registerWithInput(inputManager);
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
-            isoControl.addControlListener();
+            control.addControlListener();
 
         }
         isoCam.reset();
@@ -455,8 +454,8 @@ public class SolarWarsApplication extends Application {
         if (inputManager != null && isoCam != null) {
             isoCam.destroy();
             isoCam = null;
-            isoControl.cleanUp();
-            isoControl.removeControlListener();
+            control.cleanUp();
+            control.removeControlListener();
         }
     }
 
@@ -529,8 +528,8 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleUpdate(float tpf) {
         try {
-            if (isoCam != null && isoControl != null) {
-                isoControl.updateSelection(tpf);
+            if (isoCam != null && control != null) {
+                control.updateSelection(tpf);
                 if (isoCam.isDragged()) {
                     Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
                     isoCam.dragCamera(tpf, currentSceenPos);
@@ -655,6 +654,14 @@ public class SolarWarsApplication extends Application {
      */
     public float getRealTimePerFrame() {
         return realTimePerFrame;
+    }
+
+    private void setupLights() {
+        // setup lights
+        DirectionalLight sun = new DirectionalLight();
+        sun.setDirection(new Vector3f(2, -10, 0).normalizeLocal());
+        sun.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 0.7f));
+        rootNode.addLight(sun);
     }
 
     /**                                                         

@@ -201,7 +201,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
             Vector3f position,
             int sizeID) {
         this.id = Level.getContiniousPlanetID();
-        this.size = Level.PLANET_SIZES[sizeID];
+        this.size = AbstractGameplay.PLANET_SIZES[sizeID];
         this.sizeID = sizeID;
         this.level = level;
         this.position = position;
@@ -216,7 +216,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
         this.attachChild(transformNode);
         level.getLabelNode().attachChild(label);
         // this.attachChild(label);
-        this.shipIncrement = Level.PLANET_INCREMENT_TIME[sizeID];
+        this.shipIncrement = AbstractGameplay.PLANET_INCREMENT_TIME[sizeID];
     }
 
     /**

@@ -27,7 +27,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
-import com.solarwars.IsoControl;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
@@ -71,7 +70,6 @@ public class SingleplayerMatchState extends Gamestate {
         super(SolarWarsGame.SINGLEPLAYER_STATE);
         hub = Hub.getInstance();
         pauseToggle = new ActionListener() {
-
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
                 if (!isPressed && name.equals(InputMappings.PAUSE_GAME)) {
@@ -110,7 +108,7 @@ public class SingleplayerMatchState extends Gamestate {
         currentLevel = new Level(
                 application.getRootNode(),
                 application.getAssetManager(),
-                application.getIsoControl(),
+                application.getControl(),
                 Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
@@ -141,13 +139,11 @@ public class SingleplayerMatchState extends Gamestate {
 
         gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
         gameStatsModule.addPlayers(Hub.getPlayers());
-        
+
         playerStatsModule = new PlayerStatsModule(
                 niftyGUI, Hub.getLocalPlayer(), gameStatsModule);
         // creates the drag-rect geometry
-        IsoControl.getInstance().
-                createDragRectGeometry();
-
+        game.getApplication().getControl().createDragRectGeometry();
 //        startGamePopup.showPopup();
 
     }
@@ -204,8 +200,6 @@ public class SingleplayerMatchState extends Gamestate {
         hub.addPlayer(ai);
         hub.addPlayer(local);
     }
-
-
 
     public void continueGame() {
         AudioManager.getInstance().

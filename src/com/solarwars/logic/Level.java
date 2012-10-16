@@ -25,8 +25,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.scene.Node;
 import com.solarwars.Hub;
-import com.solarwars.IsoControl;
-import com.solarwars.SolarWarsApplication;
+import com.solarwars.controls.AbstractControl;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.ShipBatchManager;
@@ -41,22 +40,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * The Class Level.
+ * The Class Level discribes a level for SolarWars. There may be only one level
+ * associated with only one gameplay.
+ *
+ * @author Hans Ferchland
  */
 public class Level {
 
-    public static final int PLAYER_START_SHIP_COUNT = 100;
-    public static final String[] LEVEL_SIZE_NAME = {
-        "NONE",
-        "ONE PLAYER",
-        "TWO PLAYER",
-        "THREE PLAYER",
-        "FOUR PLAYER",
-        "FIVE PLAYER",
-        "SIX PLAYER",
-        "SEVEN PLAYER",
-        "EIGHT PLAYER"
-    };
     public static float[] PLAYERS_CAMERA_HEIGHT = {
         8,
         10,
@@ -68,12 +58,6 @@ public class Level {
         16,
         16
     };
-    public static float[] PLANET_INCREMENT_TIME = {
-        2f, 1.5f, 1.2f, 1.0f, 0.9f,
-        0.8f, 0.7f, 0.6f, 0.50f, 0.50f};
-    public static float[] PLANET_SIZES = {
-        0.2f, 0.225f, 0.25f, 0.275f, 0.3f,
-        0.325f, 0.35f, 0.375f, 0.4f, 0.425f};
 
     /**
      * Gets the camera height for a given player count.
@@ -87,7 +71,9 @@ public class Level {
         }
         return PLAYERS_CAMERA_HEIGHT[0];
     }
-    /** The PLANE t_ id. */
+    /**
+     * The PLANE t_ id.
+     */
     private static int PLANET_ID = 0;
 
     /**
@@ -98,7 +84,9 @@ public class Level {
     public static int getContiniousPlanetID() {
         return PLANET_ID++;
     }
-    /** The SHI p_ id. */
+    /**
+     * The SHI p_ id.
+     */
     private static int SHIP_ID = 0;
 
     /**
@@ -109,7 +97,9 @@ public class Level {
     public static int getContiniousShipID() {
         return SHIP_ID++;
     }
-    /** The SHI p_ id. */
+    /**
+     * The SHI p_ id.
+     */
     private static int SHIP_GROUP_ID = 0;
 
     /**
@@ -120,49 +110,83 @@ public class Level {
     public static int getContiniousShipGroupID() {
         return SHIP_GROUP_ID++;
     }
-    /** The seed. */
+    /**
+     * The seed.
+     */
     private long seed = 0;
-    /** The root node. */
+    /**
+     * The root node.
+     */
     private Node rootNode;
-    /** The level node. */
+    /**
+     * The level node.
+     */
     private Node levelNode;
-    /** The planet nodes. */
+    /**
+     * The planet nodes.
+     */
     private HashMap<Player, Node> planetNodes;
-    /** The free planets node. */
+    /**
+     * The free planets node.
+     */
     private Node freePlanetsNode;
-    /** The label node. */
+    /**
+     * The label node.
+     */
     private Node labelNode;
-    /** The particle node for particle emitters of the planets. */
+    /**
+     * The particle node for particle emitters of the planets.
+     */
     private Node particleEmitters;
-    /** The all ships node. */
+    /**
+     * The all ships node.
+     */
     private Node allShipsNode;
-    /** The ship nodes. */
+    /**
+     * The ship nodes.
+     */
     private HashMap<Player, Node> shipNodes;
-    /** The planet list. */
+    /**
+     * The planet list.
+     */
     private HashMap<Integer, AbstractPlanet> planetList;
-    /** The ship list. */
+    /**
+     * The ship list.
+     */
     private HashMap<Integer, AbstractShip> shipList;
-    /** The ship group list. */
+    /**
+     * The ship group list.
+     */
     private HashMap<Integer, ShipGroup> shipGroupList;
-    /** The remove ships list. */
+    /**
+     * The remove ships list.
+     */
     private ArrayList<AbstractShip> removeShipsList;
-    /** The asset manager. */
+    /**
+     * The asset manager.
+     */
     private AssetManager assetManager;
-    
     private AbstractGameplay gameplay;
-    /** The control. */
-    private IsoControl control;
-    /** The players by id. */
+    /**
+     * The control.
+     */
+    private AbstractControl control;
+    /**
+     * The players by id.
+     */
     private HashMap<Integer, Player> playersByID;
-    /** The batch manager. */
+    /**
+     * The batch manager.
+     */
     private ShipBatchManager batchManager;
-//    /** Indicates that the level is fully loaded into scene-graph. */
-//    private boolean levelLoaded = false;
-    /** indicates that the game ended. */
+    /**
+     * indicates that the game ended.
+     */
     private boolean gameOver = false;
-    /** The watch game. */
+    /**
+     * The watch game.
+     */
     private boolean watchGame = false;
-    
     private LevelGenerator levelGenerator;
 
     /**
@@ -174,7 +198,7 @@ public class Level {
      * @param gui the gui
      * @param players the players
      */
-    public Level(Node rootNode, AssetManager assetManager, IsoControl control,
+    public Level(Node rootNode, AssetManager assetManager, AbstractControl control,
             HashMap<Integer, Player> players) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, System.currentTimeMillis());
@@ -191,13 +215,13 @@ public class Level {
      * @param seed the seed
      */
     public Level(Node rootNode, AssetManager assetManager,
-            IsoControl control, HashMap<Integer, Player> players, long seed) {
+            AbstractControl control, HashMap<Integer, Player> players, long seed) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, seed);
     }
 
     /**
-     * Reset entity i ds.
+     * Reset entity ids.
      */
     void resetEntityIDs() {
         SHIP_ID = 0;
@@ -207,6 +231,7 @@ public class Level {
 
     /**
      * Retrieve information about the game-end.
+     *
      * @return true if ended, false otherwise
      */
     public boolean isGameOver() {
@@ -214,9 +239,9 @@ public class Level {
     }
 
     /**
-     * 
+     *
      * Set game over flag.
-     * 
+     *
      * @param gameOver the value to set
      */
     void setGameOver(boolean gameOver) {
@@ -227,10 +252,10 @@ public class Level {
     }
 
     /**
-     * 
-     * Retruns the loading state of the level. 
-     * Do not update the level while not loaded properly.
-     * 
+     *
+     * Retruns the loading state of the level. Do not update the level while not
+     * loaded properly.
+     *
      * @return the state of level loading, true for loaded, false otherwise
      */
     public boolean isLevelLoaded() {
@@ -270,8 +295,8 @@ public class Level {
     public HashMap<Player, Node> getPlanetNodes() {
         return planetNodes;
     }
-    
-    public IsoControl getControl() {
+
+    public AbstractControl getControl() {
         return control;
     }
 
@@ -286,7 +311,7 @@ public class Level {
     public Node getRootNode() {
         return rootNode;
     }
-    
+
     /**
      * Setup.
      *
@@ -295,7 +320,7 @@ public class Level {
      * @param control the control
      * @param seed the seed
      */
-    private void setup(Node rootNode, AssetManager assetManager, IsoControl control, long seed) {
+    private void setup(Node rootNode, AssetManager assetManager, AbstractControl control, long seed) {
         this.seed = seed;
 
         // Init needed system refs
@@ -314,7 +339,7 @@ public class Level {
         // create base-nodes
         this.labelNode = new Node("Planet Labels");
         this.rootNode.attachChild(labelNode);
-        
+
         this.levelNode = new Node("Level Node");
         this.freePlanetsNode = new Node("Free Planets Node");
         this.levelNode.attachChild(freePlanetsNode);
@@ -387,9 +412,6 @@ public class Level {
      * @param s the s
      */
     public void removeShip(Player p, AbstractShip s) {
-//        Node shipNode = shipNodes.get(p);
-//        shipNode.detachChild(s);
-
         removeShipsList.add(s);
     }
 
@@ -472,8 +494,9 @@ public class Level {
     }
 
     /**
-     * Gets the manager for ship batches, means templates for ships that can
-     * be provided faster.
+     * Gets the manager for ship batches, means templates for ships that can be
+     * provided faster.
+     *
      * @return the current manager
      */
     public ShipBatchManager getBatchManager() {
@@ -481,7 +504,7 @@ public class Level {
     }
 
     /**
-     * Updates the  current level which is always bound to a gameplay.
+     * Updates the current level which is always bound to a gameplay.
      *
      * @param tpf the time per frame
      */
@@ -494,7 +517,7 @@ public class Level {
         //<editor-fold defaultstate="collapsed" desc="Camera Reposit from roman">
         // some code to reposition camera dependant on mouse position
         // added by roman
-        
+
         /*Vector2f cp=SolarWarsApplication.getInstance().getInputManager().getCursorPosition();
          * Camera cam = SolarWarsApplication.getInstance().getCamera();
          * Vector3f loc=cam.getLocation().clone();
@@ -529,7 +552,7 @@ public class Level {
         // clear ships
         removeShipsList.clear();
     }
-    
+
     public void initGameplay(AbstractGameplay gameplay) {
         this.gameplay = gameplay;
     }
@@ -569,7 +592,7 @@ public class Level {
         this.control = null;
         this.gameplay.destroy();
         this.gameplay = null;
-        
-        
+
+
     }
 }
