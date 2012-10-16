@@ -308,6 +308,10 @@ public class Level {
         return seed;
     }
 
+    public LevelGenerator getLevelGenerator() {
+        return levelGenerator;
+    }
+
     public Node getRootNode() {
         return rootNode;
     }
@@ -592,7 +596,5 @@ public class Level {
         this.control = null;
         this.gameplay.destroy();
         this.gameplay = null;
-
-
     }
 }

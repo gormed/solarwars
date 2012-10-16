@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 /**
  * The class GeneratorSquare.
+ *
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
@@ -39,10 +40,14 @@ public class GeneratorSquare extends LevelGenerator {
     //==========================================================================
 
     /* Anzahl der Ringe, die sich noch hinter einem Spieler befinden (außen) */
-    /** The ringe behind. */
+    /**
+     * The ringe behind.
+     */
     private int outerRings = 1;
     /* space coordinates */
-    /** The sp coord. */
+    /**
+     * The sp coord.
+     */
     private boolean[][] spCoord;
     //==========================================================================
     //===   Methods & Constructor
@@ -74,25 +79,26 @@ public class GeneratorSquare extends LevelGenerator {
     }
 
     /**
-     * Baut das Level mit einem quadratischen Spielfeld auf, bei dem
-     * jeder Spieler den gleichen Abstand bis zum nächsten hat.
-     * Startpositionen sind dabei zufällig und die Anzahl der Ringe ist
-     * abhängig von der Spieleranzahl bzw. von dem Datenfeld ringeBehind!
+     * Baut das Level mit einem quadratischen Spielfeld auf, bei dem jeder
+     * Spieler den gleichen Abstand bis zum nächsten hat. Startpositionen sind
+     * dabei zufällig und die Anzahl der Ringe ist abhängig von der
+     * Spieleranzahl bzw. von dem Datenfeld ringeBehind!
      *
      * @param seed Zufallsvariable für den Aufbau.
      */
     public boolean generateSquare(long seed) {
         System.out.print("[" + seed + "] Generating level...");
-        
+
         Logger.getLogger(GeneratorSquare.class.getName()).
-                log(java.util.logging.Level.INFO, 
+                log(java.util.logging.Level.INFO,
                 "[{0}] Generating level...", seed);
+        
+        randomizer = new Random(seed);
+
         background =
                 new LevelBackground(com.solarwars.SolarWarsGame.getInstance(), (int) seed);
         level.getRootNode().attachChild(background);
 
-        randomizer = new Random(seed);
-        
         int playerCount = level.getPlayersByID().size();
         int pointerX = 0;
         int pointerZ = 0;
@@ -147,11 +153,10 @@ public class GeneratorSquare extends LevelGenerator {
             }
             // Planetenerzeugung
             // An einer zufälligen Stelle den ersten Spielerplanet erstellen
-            if (
-                    (counter < (playerCount * 2 + 1) && 
-                    randomTake() == true && startPlanet == false) || 
-                    (counter == playerCount * 2 + 1 && startPlanet == false) ||
-                    (counter == 8 && startPlanet == false)) {
+            if ((counter < (playerCount * 2 + 1)
+                    && randomTake() == true && startPlanet == false)
+                    || (counter == playerCount * 2 + 1 && startPlanet == false)
+                    || (counter == 8 && startPlanet == false)) {
                 playerPlanetPositions.push(new Vector2f(pointerX, pointerZ));
                 setSpCoordFalse(arrayX, arrayZ);
                 startPlanetNumber = counter;

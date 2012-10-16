@@ -261,6 +261,10 @@ public abstract class LevelGenerator {
     public LevelBackground getBackground() {
         return background;
     }
+
+    public Random getRandomizer() {
+        return randomizer;
+    }
     
     public abstract void dispose();
 }

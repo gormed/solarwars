@@ -147,7 +147,7 @@ public class LevelBackground extends Node {
 
         fd.init();
 
-        fd.start(seed);
+        fd.start(game.getCurrentLevel().getLevelGenerator().getRandomizer());
 
         int i, j;
 
@@ -302,7 +302,7 @@ public class LevelBackground extends Node {
 
         fd.init();
 
-        fd.start(seed);
+        fd.start(game.getCurrentLevel().getLevelGenerator().getRandomizer());
 
         int i, j;
 
