@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.texture;
 
 import com.jme3.export.*;
@@ -100,7 +99,10 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
          */
         Luminance16FAlpha16F(32,true),
 
+        @Deprecated
         Intensity8(8),
+        
+        @Deprecated
         Intensity16(16),
 
         /**
@@ -113,9 +115,7 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
          */
         RGB8(24),
         
-        /**
-         * 10-bit red, green, and blue.
-         */
+        @Deprecated
         RGB10(30),
         
         /**
@@ -324,10 +324,54 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
     protected transient Object efficientData;
     protected int multiSamples = 1;
 //    protected int mipOffset = 0;
+    
+    // attributes relating to GL object
+    protected boolean mipsWereGenerated = false;
+    protected boolean needGeneratedMips = false;
 
+    /**
+     * Internal use only. 
+     * The renderer marks which images have generated mipmaps in VRAM
+     * and which do not, so it can generate them as needed.
+     * 
+     * @param generated If mipmaps were generated or not.
+     */
+    public void setMipmapsGenerated(boolean generated) {
+        this.mipsWereGenerated = generated;
+    }
+    
+    /**
+     * Internal use only.
+     * Check if the renderer has generated mipmaps for this image in VRAM
+     * or not.
+     * 
+     * @return If mipmaps were generated already.
+     */
+    public boolean isMipmapsGenerated() {
+        return mipsWereGenerated;
+    }
+    
+    /**
+     * (Package private) Called by {@link Texture} when 
+     * {@link #isMipmapsGenerated() } is false in order to generate
+     * mipmaps for this image.
+     */
+    void setNeedGeneratedMipmaps() {
+        needGeneratedMips = true;
+    }
+    
+    /**
+     * @return True if the image needs to have mipmaps generated
+     * for it (as requested by the texture).
+     */
+    public boolean isGeneratedMipmapsRequired() {
+        return needGeneratedMips;
+    }
+    
     @Override
     public void resetObject() {
         this.id = -1;
+        this.mipsWereGenerated = false;
         setUpdateNeeded();
     }
 
@@ -388,6 +432,9 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
 
         if (mipMapSizes != null && mipMapSizes.length <= 1) {
             mipMapSizes = null;
+        } else {
+            needGeneratedMips = false;
+            mipsWereGenerated = true;
         }
 
         setFormat(format);
@@ -420,6 +467,9 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
 
         if (mipMapSizes != null && mipMapSizes.length <= 1) {
             mipMapSizes = null;
+        } else {
+            needGeneratedMips = false;
+            mipsWereGenerated = true;
         }
 
         setFormat(format);
@@ -571,6 +621,15 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
             mipMapSizes = null;
 
         this.mipMapSizes = mipMapSizes;
+
+        if (mipMapSizes != null) {
+             needGeneratedMips = false;
+             mipsWereGenerated = false;
+        } else {
+             needGeneratedMips = false;
+             mipsWereGenerated = true;
+        }
+
         setUpdateNeeded();
     }
 
@@ -792,6 +851,11 @@ public class Image extends NativeObject implements Savable /*, Cloneable*/ {
         mipMapSizes = capsule.readIntArray("mipMapSizes", null);
         multiSamples = capsule.readInt("multiSamples", 1);
         data = (ArrayList<ByteBuffer>) capsule.readByteBufferArrayList("data", null);
+
+        if (mipMapSizes != null) {
+            needGeneratedMips = false;
+            mipsWereGenerated = true;
+        }
     }
 
 }

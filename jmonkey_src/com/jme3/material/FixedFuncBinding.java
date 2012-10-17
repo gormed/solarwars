@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.material;
 
 /**
@@ -76,5 +75,11 @@ public enum FixedFuncBinding {
      * If lighting is disabled, vertex color is modulated with
      * {@link #Color material color}.
      */
-    UseVertexColor
+    UseVertexColor,
+    
+    /**
+     * Set the alpha threshold to discard pixels.
+     * @see RenderState#setAlphaFallOff
+     */
+    AlphaTestFallOff
 }

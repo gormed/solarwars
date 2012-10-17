@@ -152,9 +152,9 @@ public class CreateServerState extends Gamestate
         // leavingPlayers.clear();
     }
 
-    private void setupNiftyGUI() {
-        serverLobbyBox = screen.findNiftyControl("server_lobby_box",
-                ListBox.class);
+    @SuppressWarnings("unchecked")
+	private void setupNiftyGUI() {
+        serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
         serverLobbyBox.clear();
         // CHAT ------------------------------------------
         // attach chat module
@@ -173,8 +173,9 @@ public class CreateServerState extends Gamestate
                     case SubmitText:
                         sendMessage();
                         return true;
+                    default:
+                    	return false;
                 }
-                return false;
             }
         });
         textInput.setFocus();

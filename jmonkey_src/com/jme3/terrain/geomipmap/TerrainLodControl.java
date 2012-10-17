@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -158,6 +158,10 @@ public class TerrainLodControl extends AbstractControl {
 
     // do all of the LOD calculations
     protected void updateLOD(List<Vector3f> locations, LodCalculator lodCalculator) {
+        if(getSpatial() == null){
+            return;
+        }
+        
         // update any existing ones that need updating
         updateQuadLODs();
 

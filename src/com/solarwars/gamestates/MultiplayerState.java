@@ -69,7 +69,8 @@ public class MultiplayerState extends Gamestate {
     /* (non-Javadoc)
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected void loadContent() {
         // switch to multiplayer_menu gui
         niftyGUI.gotoScreen("multiplayer_menu");

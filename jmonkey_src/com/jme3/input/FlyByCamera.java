@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.input;
 
 import com.jme3.collision.MotionAllowedListener;
@@ -69,17 +68,21 @@ public class FlyByCamera implements AnalogListener, ActionListener {
             "FLYCAM_RotateDrag",
 
             "FLYCAM_Rise",
-            "FLYCAM_Lower"
+            "FLYCAM_Lower",
+            
+            "FLYCAM_InvertY"
         };
 
     protected Camera cam;
     protected Vector3f initialUpVec;
     protected float rotationSpeed = 1f;
     protected float moveSpeed = 3f;
+    protected float zoomSpeed = 1f;
     protected MotionAllowedListener motionAllowed = null;
     protected boolean enabled = true;
     protected boolean dragToRotate = false;
     protected boolean canRotate = false;
+    protected boolean invertY = false;
     protected InputManager inputManager;
     
     /**
@@ -133,6 +136,23 @@ public class FlyByCamera implements AnalogListener, ActionListener {
      */
     public float getRotationSpeed(){
         return rotationSpeed;
+    }
+    
+    /**
+     * Sets the zoom speed.
+     * @param zoomSpeed 
+     */
+    public void setZoomSpeed(float zoomSpeed) {
+        this.zoomSpeed = zoomSpeed;
+    }
+    
+    /**
+     * Gets the zoom speed.  The speed is a multiplier to increase/decrease
+     * the zoom rate.
+     * @return zoomSpeed
+     */
+    public float getZoomSpeed() {
+        return zoomSpeed;
     }
 
     /**
@@ -221,12 +241,39 @@ public class FlyByCamera implements AnalogListener, ActionListener {
 
         Joystick[] joysticks = inputManager.getJoysticks();
         if (joysticks != null && joysticks.length > 0){
-            Joystick joystick = joysticks[0];
-            joystick.assignAxis("FLYCAM_StrafeRight", "FLYCAM_StrafeLeft", JoyInput.AXIS_POV_X);
-            joystick.assignAxis("FLYCAM_Forward", "FLYCAM_Backward", JoyInput.AXIS_POV_Y);
-            joystick.assignAxis("FLYCAM_Right", "FLYCAM_Left", joystick.getXAxisIndex());
-            joystick.assignAxis("FLYCAM_Down", "FLYCAM_Up", joystick.getYAxisIndex());
+            for (Joystick j : joysticks) {
+                mapJoystick(j);
+            }
         }
+    }
+
+    protected void mapJoystick( Joystick joystick ) {
+        
+        // Map it differently if there are Z axis
+        if( joystick.getAxis( JoystickAxis.Z_ROTATION ) != null && joystick.getAxis( JoystickAxis.Z_AXIS ) != null ) {
+ 
+            // Make the left stick move
+            joystick.getXAxis().assignAxis( "FLYCAM_StrafeRight", "FLYCAM_StrafeLeft" );
+            joystick.getYAxis().assignAxis( "FLYCAM_Backward", "FLYCAM_Forward" );
+            
+            // And the right stick control the camera                       
+            joystick.getAxis( JoystickAxis.Z_ROTATION ).assignAxis( "FLYCAM_Down", "FLYCAM_Up" );
+            joystick.getAxis( JoystickAxis.Z_AXIS ).assignAxis(  "FLYCAM_Right", "FLYCAM_Left" );
+ 
+            // And let the dpad be up and down           
+            joystick.getPovYAxis().assignAxis("FLYCAM_Rise", "FLYCAM_Lower");
+ 
+            if( joystick.getButton( "Button 8" ) != null ) { 
+                // Let the stanard select button be the y invert toggle
+                joystick.getButton( "Button 8" ).assignButton( "FLYCAM_InvertY" );
+            }                
+            
+        } else {             
+            joystick.getPovXAxis().assignAxis("FLYCAM_StrafeRight", "FLYCAM_StrafeLeft");
+            joystick.getPovYAxis().assignAxis("FLYCAM_Forward", "FLYCAM_Backward");
+            joystick.getXAxis().assignAxis("FLYCAM_Right", "FLYCAM_Left");
+            joystick.getYAxis().assignAxis("FLYCAM_Down", "FLYCAM_Up");
+        }                
     }
 
     /**
@@ -294,7 +341,7 @@ public class FlyByCamera implements AnalogListener, ActionListener {
 
         float fovY = FastMath.atan(h / near)
                   / (FastMath.DEG_TO_RAD * .5f);
-        fovY += value * 0.1f;
+        fovY += value * 0.1f * zoomSpeed;
 
         h = FastMath.tan( fovY * FastMath.DEG_TO_RAD * .5f) * near;
         w = h * aspect;
@@ -345,9 +392,9 @@ public class FlyByCamera implements AnalogListener, ActionListener {
         }else if (name.equals("FLYCAM_Right")){
             rotateCamera(-value, initialUpVec);
         }else if (name.equals("FLYCAM_Up")){
-            rotateCamera(-value, cam.getLeft());
+            rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());
         }else if (name.equals("FLYCAM_Down")){
-            rotateCamera(value, cam.getLeft());
+            rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());
         }else if (name.equals("FLYCAM_Forward")){
             moveCamera(value, false);
         }else if (name.equals("FLYCAM_Backward")){
@@ -374,7 +421,12 @@ public class FlyByCamera implements AnalogListener, ActionListener {
         if (name.equals("FLYCAM_RotateDrag") && dragToRotate){
             canRotate = value;
             inputManager.setCursorVisible(!value);
-        }
+        } else if (name.equals("FLYCAM_InvertY")) {
+            // Toggle on the up.
+            if( !value ) {  
+                invertY = !invertY;
+            }
+        }        
     }
 
 }

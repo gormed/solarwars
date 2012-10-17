@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1169,11 +1169,11 @@ public class Camera implements Savable, Cloneable {
             float topSquared = frustumTop * frustumTop;
 
             float inverseLength = FastMath.invSqrt(nearSquared + leftSquared);
-            coeffLeft[0] = frustumNear * inverseLength;
+            coeffLeft[0] = -frustumNear * inverseLength;
             coeffLeft[1] = -frustumLeft * inverseLength;
 
             inverseLength = FastMath.invSqrt(nearSquared + rightSquared);
-            coeffRight[0] = -frustumNear * inverseLength;
+            coeffRight[0] = frustumNear * inverseLength;
             coeffRight[1] = frustumRight * inverseLength;
 
             inverseLength = FastMath.invSqrt(nearSquared + bottomSquared);

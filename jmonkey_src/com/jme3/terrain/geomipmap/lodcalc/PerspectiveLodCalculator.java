@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.terrain.geomipmap.lodcalc;
 
 import com.jme3.export.JmeExporter;
@@ -45,7 +44,6 @@ import java.util.List;
 
 public class PerspectiveLodCalculator implements LodCalculator {
 
-    private TerrainPatch patch;
     private Camera cam;
     private float[] entropyDistances;
     private float pixelError;
@@ -74,11 +72,7 @@ public class PerspectiveLodCalculator implements LodCalculator {
         return A / T;
     }
     
-    public boolean calculateLod(List<Vector3f> locations, HashMap<String, UpdatedTerrainPatch> updates) {
-        return calculateLod(patch, locations, updates);
-    }
-
-    public boolean calculateLod(TerrainPatch terrainPatch, List<Vector3f> locations, HashMap<String, UpdatedTerrainPatch> updates) {
+    public boolean calculateLod(TerrainPatch patch, List<Vector3f> locations, HashMap<String, UpdatedTerrainPatch> updates) {
         if (entropyDistances == null){
             // compute entropy distances
             float[] lodEntropies = patch.getLodEntropies();

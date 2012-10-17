@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1215,7 +1215,9 @@ public abstract class Spatial implements Savable, Cloneable, Collidable, Cloneab
             userData = new HashMap<String, Savable>();
         }
 
-        if (data instanceof Savable) {
+        if(data == null){
+            userData.remove(key);            
+        }else if (data instanceof Savable) {
             userData.put(key, (Savable) data);
         } else {
             userData.put(key, new UserData(UserData.getObjectType(data), data));

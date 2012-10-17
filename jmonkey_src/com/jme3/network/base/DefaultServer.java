@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network.base;
 
 import com.jme3.network.*;
@@ -51,7 +50,7 @@ import java.util.logging.Logger;
  *  A default implementation of the Server interface that delegates
  *  its network connectivity to kernel.Kernel.
  *
- *  @version   $Revision: 9114 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public class DefaultServer implements Server

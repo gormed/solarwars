@@ -110,9 +110,9 @@
             </effect>
             <panel id="chat_dialog" childLayout="center"
                    width="60%" height="60%" align="right" valign="center"
-                   visibleToMouse="true" backgroundColor="#fff8" padding="2px">
+                   visibleToMouse="true" backgroundColor="#fff8" padding="5px">
                 <panel childLayout="vertical" align="right" 
-                       valign="center" backgroundColor="#00f8">
+                       valign="center" backgroundColor="#00fa">
                     <control id="chat_text_box" style="chat-style"
                              name="listBox" horizontal="optional" displayItems="15" 
                              height="80%" selectionMode="Disabled" 

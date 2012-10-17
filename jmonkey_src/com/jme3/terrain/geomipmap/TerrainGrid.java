@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,9 +50,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -114,7 +119,8 @@ public class TerrainGrid extends TerrainQuad {
     protected Vector3f[] quadIndex;
     protected Set<TerrainGridListener> listeners = new HashSet<TerrainGridListener>();
     protected Material material;
-    protected LRUCache<Vector3f, TerrainQuad> cache = new LRUCache<Vector3f, TerrainQuad>(16);
+    //cache  needs to be 1 row (4 cells) larger than what we care is cached
+    protected LRUCache<Vector3f, TerrainQuad> cache = new LRUCache<Vector3f, TerrainQuad>(20);
     protected int cellsLoaded = 0;
     protected int[] gridOffset;
     protected boolean runOnce = false;
@@ -159,16 +165,28 @@ public class TerrainGrid extends TerrainQuad {
                     }
                     cache.put(quadCell, q);
 
+                    
+                    final int quadrant = getQuadrant(quadIdx);
+                    final TerrainQuad newQuad = q;
+                    
                     if (isCenter(quadIdx)) {
                         // if it should be attached as a child right now, attach it
-                        final int quadrant = getQuadrant(quadIdx);
-                        final TerrainQuad newQuad = q;
-                        // back on the OpenGL thread:
                         getControl(UpdateControl.class).enqueue(new Callable() {
-
+                            // back on the OpenGL thread:
                             public Object call() throws Exception {
-                                attachQuadAt(newQuad, quadrant, quadCell);
-                                //newQuad.resetCachedNeighbours();
+                                if (newQuad.getParent() != null) {
+                                    attachQuadAt(newQuad, quadrant, quadCell, true);
+                                }
+                                else {
+                                    attachQuadAt(newQuad, quadrant, quadCell, false);
+                                }
+                                return null;
+                            }
+                        });
+                    } else {
+                        getControl(UpdateControl.class).enqueue(new Callable() {
+                            public Object call() throws Exception {
+                                removeQuad(newQuad);
                                 return null;
                             }
                         });
@@ -176,6 +194,22 @@ public class TerrainGrid extends TerrainQuad {
                 }
             }
 
+            getControl(UpdateControl.class).enqueue(new Callable() {
+                    // back on the OpenGL thread:
+                    public Object call() throws Exception {
+                        for (Spatial s : getChildren()) {
+                            if (s instanceof TerrainQuad) {
+                                TerrainQuad tq = (TerrainQuad)s;
+                                tq.resetCachedNeighbours();
+                            }
+                        }
+                        System.out.println("fixed normals "+location.clone().mult(size));
+                        setNeedToRecalculateNormals();
+                        //fixNormalEdges(new BoundingBox(location.clone().mult(size), size*2, Float.MAX_VALUE, size*2));
+                        // the edges are fixed once, but not with lod change
+                        return null;
+                    }
+            });
         }
     }
 
@@ -209,6 +243,9 @@ public class TerrainGrid extends TerrainQuad {
         terrainQuadGrid.setPatchSize(this.patchSize);
         terrainQuadGrid.setQuadSize(this.quadSize);
         addControl(new UpdateControl());
+        
+        fixNormalEdges(new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2));
+        addControl(new NormalRecalcControl(this));
     }
 
     public TerrainGrid(String name, int patchSize, int maxVisibleSize, Vector3f scale, TerrainGridTileLoader terrainQuadGrid) {
@@ -232,6 +269,9 @@ public class TerrainGrid extends TerrainQuad {
         this.heightMapGrid = heightMapGrid;
         heightMapGrid.setSize(this.quadSize);
         addControl(new UpdateControl());
+        
+        fixNormalEdges(new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2));
+        addControl(new NormalRecalcControl(this));
     }
 
     @Deprecated
@@ -292,40 +332,47 @@ public class TerrainGrid extends TerrainQuad {
         return gridTileLoader;
     }
     
-    protected void removeQuad(int idx) {
-        if (this.getQuad(idx) != null) {
+    protected void removeQuad(TerrainQuad q) {
+        if (q != null && ( (q.getQuadrant() > 0 && q.getQuadrant()<5) || q.getParent() != null) ) {
             for (TerrainGridListener l : listeners) {
-                l.tileDetached(getTileCell(this.getQuad(idx).getWorldTranslation()), this.getQuad(idx));
+                l.tileDetached(getTileCell(q.getWorldTranslation()), q);
             }
-            this.detachChild(this.getQuad(idx));
+            q.setQuadrant((short)0);
+            this.detachChild(q);
             cellsLoaded++; // For gridoffset calc., maybe the run() method is a better location for this.
         }
     }
 
     /**
      * Runs on the rendering thread
+     * @param shifted quads are still attached to the parent and don't need to re-load
      */
-    protected void attachQuadAt(TerrainQuad q, int quadrant, Vector3f quadCell) {
-        this.removeQuad(quadrant);
-
+    protected void attachQuadAt(TerrainQuad q, int quadrant, Vector3f quadCell, boolean shifted) {
+        
         q.setQuadrant((short) quadrant);
-        this.attachChild(q);
+        if (!shifted)
+            this.attachChild(q);
 
         Vector3f loc = quadCell.mult(this.quadSize - 1).subtract(quarterSize, 0, quarterSize);// quadrant location handled TerrainQuad automatically now
         q.setLocalTranslation(loc);
 
-        for (TerrainGridListener l : listeners) {
-            l.tileAttached(quadCell, q);
+        if (!shifted) {
+            for (TerrainGridListener l : listeners) {
+                l.tileAttached(quadCell, q);
+            }
         }
         updateModelBound();
         
-        for (Spatial s : getChildren()) {
+        /*for (Spatial s : getChildren()) {
             if (s instanceof TerrainQuad) {
                 TerrainQuad tq = (TerrainQuad)s;
                 tq.resetCachedNeighbours();
-                tq.fixNormalEdges(new BoundingBox(tq.getWorldTranslation(), totalSize*2, Float.MAX_VALUE, totalSize*2));
             }
         }
+        
+        System.out.println("fix normals "+loc);
+        fixNormalEdges(new BoundingBox(loc, totalSize*6, Float.MAX_VALUE, totalSize*6));
+        */
     }
 
     
@@ -374,6 +421,7 @@ public class TerrainGrid extends TerrainQuad {
                 cache.get(camCell.add(quadIndex[i * 4 + j]));
             }
         }
+        
         // ---------------------------------------------------
         // ---------------------------------------------------
 
@@ -440,15 +488,42 @@ public class TerrainGrid extends TerrainQuad {
         return terrain.getMaterial(worldLocation);
     }
 
+    /**
+     * This will print out any exceptions from the thread
+     */
     protected ExecutorService createExecutorService() {
-        return Executors.newSingleThreadExecutor(new ThreadFactory() {
+        final ThreadFactory threadFactory = new ThreadFactory() {
             public Thread newThread(Runnable r) {
                 Thread th = new Thread(r);
-                th.setName("jME Terrain Thread");
+                th.setName("jME TerrainGrid Thread");
                 th.setDaemon(true);
                 return th;
             }
-        });
+        };
+        ThreadPoolExecutor ex = new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>(), 
+                                    threadFactory) {
+            protected void afterExecute(Runnable r, Throwable t) {
+                super.afterExecute(r, t);
+                if (t == null && r instanceof Future<?>) {
+                    try {
+                        Future<?> future = (Future<?>) r;
+                        if (future.isDone())
+                            future.get();
+                    } catch (CancellationException ce) {
+                        t = ce;
+                    } catch (ExecutionException ee) {
+                        t = ee.getCause();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt(); // ignore/reset
+                    }
+                }
+                if (t != null)
+                    t.printStackTrace();
+            }
+        };
+        return ex;
     }
     
     @Override

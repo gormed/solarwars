@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.scene.plugins;
 
 import com.jme3.asset.*;
@@ -38,8 +37,8 @@ import com.jme3.material.MaterialList;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
-import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.*;
+import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.scene.mesh.IndexIntBuffer;
@@ -52,8 +51,8 @@ import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Map.Entry;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -255,6 +254,16 @@ public final class OBJLoader implements AssetLoader {
                 v = Integer.parseInt(split[0].trim());
                 vn = Integer.parseInt(split[2].trim());
             }
+            
+            if (v < 0) {
+                v = verts.size() + v + 1;
+            }
+            if (vt < 0) {
+                vt = texCoords.size() + vt + 1;
+            }
+            if (vn < 0) {
+                vn = norms.size() + vn + 1;
+            }
 
             Vertex vx = new Vertex();
             vx.v = verts.get(v - 1);
@@ -299,7 +308,7 @@ public final class OBJLoader implements AssetLoader {
         Vector2f v = new Vector2f();
 
         String line = scan.nextLine().trim();
-        String[] split = line.split("\\s");
+        String[] split = line.split("\\s+");
         v.setX( Float.parseFloat(split[0].trim()) );
         v.setY( Float.parseFloat(split[1].trim()) );
 

@@ -94,8 +94,8 @@ public class LwjglGL1Renderer implements GL1Renderer {
         glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         
-		// Enable rescaling/normaling of normal vectors.
-		// Fixes lighting issues with scaled models.
+        // Enable rescaling/normaling of normal vectors.
+        // Fixes lighting issues with scaled models.
         if (gl12){
             glEnable(GL12.GL_RESCALE_NORMAL);
         }else{
@@ -183,26 +183,32 @@ public class LwjglGL1Renderer implements GL1Renderer {
      * Applies fixed function bindings from the context to OpenGL
      */
     private void applyFixedFuncBindings(boolean forLighting){
-        if (forLighting){
+        if (forLighting) {
             glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, context.shininess);
-            setMaterialColor(GL_AMBIENT,  context.ambient,  ColorRGBA.DarkGray);
-            setMaterialColor(GL_DIFFUSE,  context.diffuse,  ColorRGBA.White);
+            setMaterialColor(GL_AMBIENT, context.ambient, ColorRGBA.DarkGray);
+            setMaterialColor(GL_DIFFUSE, context.diffuse, ColorRGBA.White);
             setMaterialColor(GL_SPECULAR, context.specular, ColorRGBA.Black);
-            
-            if (context.useVertexColor){
+
+            if (context.useVertexColor) {
                 glEnable(GL_COLOR_MATERIAL);
-            }else{
+            } else {
                 glDisable(GL_COLOR_MATERIAL);
             }
-        }else{
+        } else {
             // Ignore other values as they have no effect when 
             // GL_LIGHTING is disabled.
             ColorRGBA color = context.color;
-            if (color != null){
+            if (color != null) {
                 glColor4f(color.r, color.g, color.b, color.a);
-            }else{
-                glColor4f(1,1,1,1);
+            } else {
+                glColor4f(1, 1, 1, 1);
             }
+        }
+        if (context.alphaTestFallOff > 0f) {
+            glEnable(GL_ALPHA_TEST);
+            glAlphaFunc(GL_GREATER, context.alphaTestFallOff);
+        } else {
+            glDisable(GL_ALPHA_TEST);
         }
     }
     
@@ -210,6 +216,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
      * Reset fixed function bindings to default values.
      */
     private void resetFixedFuncBindings(){
+        context.alphaTestFallOff = 0f; // zero means disable alpha test!
         context.color = null;
         context.ambient = null;
         context.diffuse = null;
@@ -218,7 +225,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
         context.useVertexColor = false;
     }
     
-    public void setFixedFuncBinding(FixedFuncBinding ffBinding, Object val) {
+        public void setFixedFuncBinding(FixedFuncBinding ffBinding, Object val) {        
         switch (ffBinding) {
             case Color:
                 context.color = (ColorRGBA) val;
@@ -237,6 +244,9 @@ public class LwjglGL1Renderer implements GL1Renderer {
                 break;
             case UseVertexColor:
                 context.useVertexColor = (Boolean) val;
+                break;
+            case AlphaTestFallOff:
+                context.alphaTestFallOff = (Float) val;
                 break;
         }
     }
@@ -259,15 +269,12 @@ public class LwjglGL1Renderer implements GL1Renderer {
             context.depthTestEnabled = false;
         }
 
-        if (state.isAlphaTest() && !context.alphaTestEnabled) {
-            glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, state.getAlphaFallOff());
-            context.alphaTestEnabled = true;
-        } else if (!state.isAlphaTest() && context.alphaTestEnabled) {
-            glDisable(GL_ALPHA_TEST);
-            context.alphaTestEnabled = false;
+        if (state.isAlphaTest()) {
+            setFixedFuncBinding(FixedFuncBinding.AlphaTestFallOff, state.getAlphaFallOff());
+        } else {
+            setFixedFuncBinding(FixedFuncBinding.AlphaTestFallOff, 0f); // disable it
         }
-
+        
         if (state.isDepthWrite() && !context.depthWriteEnabled) {
             glDepthMask(true);
             context.depthWriteEnabled = true;
@@ -462,7 +469,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
 
     public void setLighting(LightList list) {
         // XXX: This is abuse of setLighting() to
-		// apply fixed function bindings
+        // apply fixed function bindings
         // and do other book keeping.
         if (list == null || list.size() == 0){
             glDisable(GL_LIGHTING);
@@ -702,7 +709,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
         }
     }
 
-    public void updateTexImageData(Image img, Texture.Type type, boolean mips, int unit) {
+    public void updateTexImageData(Image img, Texture.Type type, int unit) {
         int texId = img.getId();
         if (texId == -1) {
             // create texture
@@ -740,7 +747,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
             }
         }
 
-        if (!img.hasMipmaps() && mips) {
+        if (!img.hasMipmaps() && img.isGeneratedMipmapsRequired()) {
             // No pregenerated mips available,
             // generate from base level if required
 
@@ -750,6 +757,7 @@ public class LwjglGL1Renderer implements GL1Renderer {
             } else {
                 MipMapGenerator.generateMipMaps(img);
             }
+            img.setMipmapsGenerated(true);
         } else {
         }
 
@@ -787,8 +795,8 @@ public class LwjglGL1Renderer implements GL1Renderer {
         }
 
         Image image = tex.getImage();
-        if (image.isUpdateNeeded()) {
-            updateTexImageData(image, tex.getType(), tex.getMinFilter().usesMipMapLevels(), unit);
+        if (image.isUpdateNeeded() || (image.isGeneratedMipmapsRequired() && !image.isMipmapsGenerated()) ) {
+            updateTexImageData(image, tex.getType(), unit);
         }
 
         int texId = image.getId();
@@ -907,6 +915,11 @@ public class LwjglGL1Renderer implements GL1Renderer {
     }
 
     public void setVertexAttrib(VertexBuffer vb, VertexBuffer idb) {
+        if (vb.getBufferType() == VertexBuffer.Type.Color && !context.useVertexColor) {
+            // Ignore vertex color buffer if vertex color is disabled.
+            return;
+        }
+        
         int arrayType = convertArrayType(vb.getBufferType());
         if (arrayType == -1) {
             return; // unsupported

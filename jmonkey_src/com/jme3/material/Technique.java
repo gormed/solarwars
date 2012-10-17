@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -122,10 +122,10 @@ public class Technique /* implements Savable */ {
             
             if (value == null) {
                 // Clear the define.
-                needReload = defines.remove(defineName);
+                needReload = defines.remove(defineName) || needReload;
             } else {
                 // Set the define.
-                needReload = defines.set(defineName, type, value);
+                needReload = defines.set(defineName, type, value) || needReload;
             }
         }
     }

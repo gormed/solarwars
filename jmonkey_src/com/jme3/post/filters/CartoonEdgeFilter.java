@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@ import com.jme3.post.Filter.Pass;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Renderer;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.texture.Image.Format;
 
 /**
@@ -56,6 +57,8 @@ public class CartoonEdgeFilter extends Filter {
     private float normalSensitivity = 1.0f;
     private float depthSensitivity = 10.0f;
     private ColorRGBA edgeColor = new ColorRGBA(0, 0, 0, 1);
+    private RenderManager renderManager;
+    private ViewPort viewPort;
 
     /**
      * Creates a CartoonEdgeFilter
@@ -70,7 +73,7 @@ public class CartoonEdgeFilter extends Filter {
     }
 
     @Override
-    protected void postQueue(RenderManager renderManager, ViewPort viewPort) {
+    protected void postQueue(RenderQueue queue) {
         Renderer r = renderManager.getRenderer();
         r.setFrameBuffer(normalPass.getRenderFrameBuffer());
         renderManager.getRenderer().clearBuffers(true, true, true);
@@ -88,6 +91,8 @@ public class CartoonEdgeFilter extends Filter {
 
     @Override
     protected void initFilter(AssetManager manager, RenderManager renderManager, ViewPort vp, int w, int h) {
+        this.renderManager = renderManager;
+        this.viewPort = vp;
         normalPass = new Pass();
         normalPass.init(renderManager.getRenderer(), w, h, Format.RGBA8, Format.Depth);
         material = new Material(manager, "Common/MatDefs/Post/CartoonEdge.j3md");
@@ -102,7 +107,7 @@ public class CartoonEdgeFilter extends Filter {
 
     /**
      * Return the depth sensitivity<br>
-     * for more details see {@link setDepthSensitivity(float depthSensitivity)}
+     * for more details see {@link #setDepthSensitivity(float depthSensitivity)}
      * @return 
      */
     public float getDepthSensitivity() {
@@ -123,7 +128,7 @@ public class CartoonEdgeFilter extends Filter {
 
     /**
      * returns the depth threshold<br>
-     * for more details see {@link setDepthThreshold(float depthThreshold)}
+     * for more details see {@link #setDepthThreshold(float depthThreshold)}
      * @return 
      */
     public float getDepthThreshold() {
@@ -144,7 +149,7 @@ public class CartoonEdgeFilter extends Filter {
 
     /**
      * returns the edge intensity<br>
-     * for more details see {@link setEdgeIntensity(float edgeIntensity) }
+     * for more details see {@link #setEdgeIntensity(float edgeIntensity) }
      * @return 
      */
     public float getEdgeIntensity() {
@@ -185,7 +190,7 @@ public class CartoonEdgeFilter extends Filter {
 
     /**
      * returns the normals sensitivity<br>
-     * form more details see {@link setNormalSensitivity(float normalSensitivity)}
+     * form more details see {@link #setNormalSensitivity(float normalSensitivity)}
      * @return 
      */
     public float getNormalSensitivity() {
@@ -205,7 +210,7 @@ public class CartoonEdgeFilter extends Filter {
 
     /**
      * returns the normal threshold<br>
-     * for more details see {@link setNormalThreshold(float normalThreshold)}
+     * for more details see {@link #setNormalThreshold(float normalThreshold)}
      * 
      * @return 
      */

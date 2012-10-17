@@ -21,15 +21,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
+import java.util.ArrayList;
+
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
-import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * The Class Player.

@@ -1,31 +1,33 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine All rights reserved.
- * <p/>
+ * Copyright (c) 2009-2012 jMonkeyEngine
+ * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- * * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * <p/>
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
  * * Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * <p/>
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
  * * Neither the name of 'jMonkeyEngine' nor the names of its contributors
- * may be used to endorse or promote products derived from this software
- * without specific prior written permission.
- * <p/>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ *   may be used to endorse or promote products derived from this software
+ *   without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.jme3.shadow;
 
@@ -54,6 +56,8 @@ import com.jme3.texture.Texture.MinFilter;
 import com.jme3.texture.Texture.ShadowCompareMode;
 import com.jme3.texture.Texture2D;
 import com.jme3.ui.Picture;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * PssmShadow renderer use Parrallel Split Shadow Mapping technique (pssm)<br>
@@ -97,6 +101,11 @@ public class PssmShadowRenderer implements SceneProcessor {
          * 8x8 percentage-closer  filtering is used. Shadows will be smoother
          * at the cost of performance
          */
+        PCFPOISSON,
+        /**
+         * 8x8 percentage-closer  filtering is used. Shadows will be smoother
+         * at the cost of performance
+         */
         PCF8
     }
 
@@ -116,6 +125,7 @@ public class PssmShadowRenderer implements SceneProcessor {
         Hardware;
     }
     private int nbSplits = 3;
+    private float shadowMapSize;
     private float lambda = 0.65f;
     private float shadowIntensity = 0.7f;
     private float zFarOverride = 0;
@@ -142,9 +152,16 @@ public class PssmShadowRenderer implements SceneProcessor {
     private Vector3f[] points = new Vector3f[8];
     private boolean flushQueues = true;
     // define if the fallback material should be used.
-    private boolean needsfallBackMaterial = false;
+    protected boolean needsfallBackMaterial = false;
     //Name of the post material technique
     private String postTechniqueName = "PostShadow";
+    //flags to know when to change params in the materials
+    private boolean applyHWShadows = true;
+    private boolean applyFilterMode = true;
+    private boolean applyPCFEdge = true;
+    private boolean applyShadowIntensity = true;
+    //a list of material of the post shadow queue geometries.
+    private List<Material> matCache = new ArrayList<Material>();
 
     /**
      * Create a PSSM Shadow Renderer 
@@ -156,7 +173,6 @@ public class PssmShadowRenderer implements SceneProcessor {
      */
     public PssmShadowRenderer(AssetManager manager, int size, int nbSplits) {
         this(manager, size, nbSplits, new Material(manager, "Common/MatDefs/Shadow/PostShadowPSSM.j3md"));
-
     }
 
     /**
@@ -165,13 +181,15 @@ public class PssmShadowRenderer implements SceneProcessor {
      * @param manager the application asset manager
      * @param size the size of the rendered shadowmaps (512,1024,2048, etc...)
      * @param nbSplits the number of shadow maps rendered (the more shadow maps the more quality, the less fps). 
-     * @param postShadowMat the material used for post shadows if you need to override it      * 
+     * @param postShadowMat the material used for post shadows if you need to override it          
      */
-    //TODO remove the postShadowMat when we have shader injection....or remove this todo if we are in 2020.
-    public PssmShadowRenderer(AssetManager manager, int size, int nbSplits, Material postShadowMat) {
+    protected PssmShadowRenderer(AssetManager manager, int size, int nbSplits, Material postShadowMat) {
+
+        this.postshadowMat = postShadowMat;
         assetManager = manager;
         nbSplits = Math.max(Math.min(nbSplits, 4), 1);
         this.nbSplits = nbSplits;
+        shadowMapSize = size;
 
         shadowFB = new FrameBuffer[nbSplits];
         shadowMaps = new Texture2D[nbSplits];
@@ -184,7 +202,7 @@ public class PssmShadowRenderer implements SceneProcessor {
         dummyTex = new Texture2D(size, size, Format.RGBA8);
 
         preshadowMat = new Material(manager, "Common/MatDefs/Shadow/PreShadow.j3md");
-        this.postshadowMat = postShadowMat;
+        postshadowMat.setFloat("ShadowMapSize", size);
 
         for (int i = 0; i < nbSplits; i++) {
             lightViewProjectionsMatrices[i] = new Matrix4f();
@@ -213,7 +231,7 @@ public class PssmShadowRenderer implements SceneProcessor {
         for (int i = 0; i < points.length; i++) {
             points[i] = new Vector3f();
         }
-       
+
     }
 
     /**
@@ -243,6 +261,7 @@ public class PssmShadowRenderer implements SceneProcessor {
                 }
             }
         }
+        applyFilterMode = true;
     }
 
     /**
@@ -276,6 +295,7 @@ public class PssmShadowRenderer implements SceneProcessor {
             }
         }
         postshadowMat.setBoolean("HardwareShadows", compareMode == CompareMode.Hardware);
+        applyHWShadows = true;
     }
 
     //debug function that create a displayable frustrum
@@ -315,7 +335,7 @@ public class PssmShadowRenderer implements SceneProcessor {
         //checking for caps to chosse the appropriate post material technique
         if (renderManager.getRenderer().getCaps().contains(Caps.GLSL150)) {
             postTechniqueName = "PostShadow15";
-        }else{
+        } else {
             postTechniqueName = "PostShadow";
         }
     }
@@ -418,12 +438,12 @@ public class PssmShadowRenderer implements SceneProcessor {
     }
 
     //debug only : displays depth shadow maps
-    private void displayShadowMap(Renderer r) {
+    protected void displayShadowMap(Renderer r) {
         Camera cam = viewPort.getCamera();
         renderManager.setCamera(cam, true);
         int h = cam.getHeight();
         for (int i = 0; i < dispPic.length; i++) {
-            dispPic[i].setPosition(64 * (i + 1) + 128 * i, h / 20f);
+            dispPic[i].setPosition((128 * i) + (150 + 64 * (i + 1)), h / 20f);
             dispPic[i].setWidth(128);
             dispPic[i].setHeight(128);
             dispPic[i].updateGeometricState();
@@ -440,66 +460,103 @@ public class PssmShadowRenderer implements SceneProcessor {
     }
 
     public void postFrame(FrameBuffer out) {
-        Camera cam = viewPort.getCamera();
+
+        if (debug) {
+            displayShadowMap(renderManager.getRenderer());
+        }
         if (!noOccluders) {
             //setting params to recieving geometry list
             setMatParams();
+
+            Camera cam = viewPort.getCamera();
             //some materials in the scene does not have a post shadow technique so we're using the fall back material
             if (needsfallBackMaterial) {
                 renderManager.setForcedMaterial(postshadowMat);
             }
-            
-            //forcing the post shadow technique
+
+            //forcing the post shadow technique and render state
             renderManager.setForcedTechnique(postTechniqueName);
-            
+
             //rendering the post shadow pass
             viewPort.getQueue().renderShadowQueue(ShadowMode.Receive, renderManager, cam, flushQueues);
 
             //resetting renderManager settings
             renderManager.setForcedTechnique(null);
-            renderManager.setForcedMaterial(null);       
+            renderManager.setForcedMaterial(null);
             renderManager.setCamera(cam, false);
 
         }
-        if (debug) {
-            displayShadowMap(renderManager.getRenderer());
-        }
+
     }
 
     private void setMatParams() {
 
         GeometryList l = viewPort.getQueue().getShadowQueueContent(ShadowMode.Receive);
-        
-        //iteratin throught all the geometries of the list to set the material params
+
+        //iteration throught all the geometries of the list to gather the materials
+
+        matCache.clear();
         for (int i = 0; i < l.size(); i++) {
             Material mat = l.get(i).getMaterial();
-            //checking if the material has the post technique and setting the params.
+            //checking if the material has the post technique and adding it to the material cache
             if (mat.getMaterialDef().getTechniqueDef(postTechniqueName) != null) {
-                mat.setColor("Splits", splits);
-                postshadowMat.setColor("Splits", splits);
-                for (int j = 0; j < nbSplits; j++) {
-                    mat.setMatrix4("LightViewProjectionMatrix" + j, lightViewProjectionsMatrices[j]);
-                    mat.setTexture("ShadowMap" + j, shadowMaps[j]);
+                if (!matCache.contains(mat)) {
+                    matCache.add(mat);
                 }
-                mat.setBoolean("HardwareShadows", compareMode == CompareMode.Hardware);
-                mat.setInt("FilterMode", filterMode.ordinal());
-                mat.setFloat("PCFEdge", edgesThickness);
-                mat.setFloat("ShadowIntensity", shadowIntensity);
-            } else {                
+            } else {
                 needsfallBackMaterial = true;
             }
         }
 
+        //iterating through the mat cache and setting the parameters
+        for (Material mat : matCache) {
+            if (mat.getParam("Splits") == null) {
+                mat.setColor("Splits", splits);
+            }
+            if (mat.getParam("ShadowMapSize") == null) {
+                mat.setFloat("ShadowMapSize", shadowMapSize);
+            }
+            for (int j = 0; j < nbSplits; j++) {
+                mat.setMatrix4("LightViewProjectionMatrix" + j, lightViewProjectionsMatrices[j]);
+            }
+            if (mat.getParam("ShadowMap0") == null) {
+                for (int j = 0; j < nbSplits; j++) {
+                    mat.setTexture("ShadowMap" + j, shadowMaps[j]);
+                }
+            }
+            if (applyHWShadows || mat.getParam("HardwareShadows") == null) {
+                mat.setBoolean("HardwareShadows", compareMode == CompareMode.Hardware);
+                applyHWShadows = false;
+            }
+            if (applyFilterMode || mat.getParam("FilterMode") == null) {
+                mat.setInt("FilterMode", filterMode.ordinal());
+                applyFilterMode = false;
+            }
+            if (mat.getParam("PCFEdge") == null || applyPCFEdge) {
+                mat.setFloat("PCFEdge", edgesThickness);
+                applyPCFEdge = false;
+            }
+
+            if (mat.getParam("ShadowIntensity") == null || applyShadowIntensity) {
+                mat.setFloat("ShadowIntensity", shadowIntensity);
+                applyShadowIntensity = false;
+            }
+
+        }
 
         //At least one material of the receiving geoms does not support the post shadow techniques
         //so we fall back to the forced material solution (transparent shadows won't be supported for these objects)
         if (needsfallBackMaterial) {
-            postshadowMat.setColor("Splits", splits);
-            for (int j = 0; j < nbSplits; j++) {
-                postshadowMat.setMatrix4("LightViewProjectionMatrix" + j, lightViewProjectionsMatrices[j]);
-            }
+            setPostShadowParams();
         }
 
+    }
+
+    protected void setPostShadowParams() {
+        postshadowMat.setColor("Splits", splits);
+        for (int j = 0; j < nbSplits; j++) {
+            postshadowMat.setMatrix4("LightViewProjectionMatrix" + j, lightViewProjectionsMatrices[j]);
+        }
     }
 
     public void preFrame(float tpf) {
@@ -512,8 +569,8 @@ public class PssmShadowRenderer implements SceneProcessor {
     }
 
     /**
-     * returns the labda parameter<br>
-     * see {@link setLambda(float lambda)}
+     * returns the labda parameter
+     * see #setLambda(float lambda)
      * @return lambda
      */
     public float getLambda() {
@@ -534,7 +591,7 @@ public class PssmShadowRenderer implements SceneProcessor {
 
     /**
      * How far the shadows are rendered in the view
-     * see {@link setShadowZExtend(float zFar)}
+     * @see #setShadowZExtend(float zFar)
      * @return shadowZExtend
      */
     public float getShadowZExtend() {
@@ -551,8 +608,8 @@ public class PssmShadowRenderer implements SceneProcessor {
     }
 
     /**
-     * returns the shdaow intensity<br>
-     * see {@link setShadowIntensity(float shadowIntensity)}
+     * returns the shdaow intensity
+     * @see #setShadowIntensity(float shadowIntensity)
      * @return shadowIntensity
      */
     public float getShadowIntensity() {
@@ -569,11 +626,12 @@ public class PssmShadowRenderer implements SceneProcessor {
     final public void setShadowIntensity(float shadowIntensity) {
         this.shadowIntensity = shadowIntensity;
         postshadowMat.setFloat("ShadowIntensity", shadowIntensity);
+        applyShadowIntensity = true;
     }
 
     /**
-     * returns the edges thickness <br>
-     * see {@link setEdgesThickness(int edgesThickness)}
+     * returns the edges thickness
+     * @see #setEdgesThickness(int edgesThickness)
      * @return edgesThickness
      */
     public int getEdgesThickness() {
@@ -588,6 +646,7 @@ public class PssmShadowRenderer implements SceneProcessor {
         this.edgesThickness = Math.max(1, Math.min(edgesThickness, 10));
         this.edgesThickness *= 0.1f;
         postshadowMat.setFloat("PCFEdge", edgesThickness);
+        applyPCFEdge = true;
     }
 
     /**

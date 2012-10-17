@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network;
 
 
@@ -37,7 +36,7 @@ package com.jme3.network;
  *  Represents a remote connection to a server that can be used
  *  for sending and receiving messages.
  *
- *  @version   $Revision: 8938 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public interface Client extends MessageConnection

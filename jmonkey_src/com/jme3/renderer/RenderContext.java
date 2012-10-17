@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.renderer;
 
 import com.jme3.material.RenderState;
@@ -58,7 +57,7 @@ public class RenderContext {
     /**
      * @see RenderState#setAlphaTest(boolean) 
      */
-    public boolean alphaTestEnabled = false;
+    public float alphaTestFallOff = 0f;
 
     /**
      * @see RenderState#setDepthWrite(boolean) 
@@ -271,7 +270,7 @@ public class RenderContext {
     public void reset(){
         cullMode = RenderState.FaceCullMode.Off;
         depthTestEnabled = false;
-        alphaTestEnabled = false;
+        alphaTestFallOff = 0f;
         depthWriteEnabled = false;
         colorWriteEnabled = false;
         clipRectEnabled = false;

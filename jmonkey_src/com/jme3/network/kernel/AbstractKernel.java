@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network.kernel;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -45,7 +44,7 @@ import java.util.logging.Logger;
  *  and queuing any results for the caller to retrieve on their own
  *  thread.
  *
- *  @version   $Revision: 8843 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public abstract class AbstractKernel implements Kernel

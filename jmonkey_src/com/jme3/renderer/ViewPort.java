@@ -29,14 +29,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.renderer;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.post.SceneProcessor;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
 import com.jme3.texture.FrameBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +148,19 @@ public class ViewPort {
         }
         processors.remove(processor);
         processor.cleanup();
+    }
+    
+    /**
+     * Removes all {@link SceneProcessor scene processors} from this
+     * ViewPort. 
+     * 
+     * @see SceneProcessor
+     */
+    public void clearProcessors() {
+        for (SceneProcessor proc : processors) {
+            proc.cleanup();
+        }
+        processors.clear();
     }
 
     /**

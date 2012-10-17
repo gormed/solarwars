@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network.base;
 
 import com.jme3.network.Message;
@@ -46,7 +45,7 @@ import java.util.logging.Logger;
  *  Keeps track of message listeners registered to specific
  *  types or to any type.
  *
- *  @version   $Revision: 8843 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public class MessageListenerRegistry<S> implements MessageListener<S>
@@ -96,6 +95,8 @@ public class MessageListenerRegistry<S> implements MessageListener<S>
     
     public void addMessageListener( MessageListener<? super S> listener )
     {
+        if( listener == null )
+            throw new IllegalArgumentException( "Listener cannot be null." );
         listeners.add(listener);
     } 
 
@@ -106,6 +107,8 @@ public class MessageListenerRegistry<S> implements MessageListener<S>
 
     public void addMessageListener( MessageListener<? super S> listener, Class... classes )
     {
+        if( listener == null )
+            throw new IllegalArgumentException( "Listener cannot be null." );
         for( Class c : classes ) {
             getListeners(c, true).add(listener);
         }

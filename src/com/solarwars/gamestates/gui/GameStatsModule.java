@@ -53,7 +53,8 @@ public class GameStatsModule implements ActionListener {
     //===   Methods & Constructor
     //==========================================================================
 
-    public GameStatsModule(Nifty niftyGUI, Level level) {
+    @SuppressWarnings("unchecked")
+	public GameStatsModule(Nifty niftyGUI, Level level) {
         this.niftyGUI = niftyGUI;
         this.statsLayer = niftyGUI.getCurrentScreen().findElementByName("stats");
         this.playerStatsBox = niftyGUI.getCurrentScreen().

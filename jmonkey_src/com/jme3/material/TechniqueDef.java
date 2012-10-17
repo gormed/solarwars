@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.material;
 
 import com.jme3.export.*;
@@ -113,6 +112,8 @@ public class TechniqueDef implements Savable {
     private boolean usesShaders;
 
     private RenderState renderState;
+    private RenderState forcedRenderState;
+    
     private LightMode lightMode   = LightMode.Disable;
     private ShadowMode shadowMode = ShadowMode.Disable;
 
@@ -232,7 +233,8 @@ public class TechniqueDef implements Savable {
      * 
      * @param vertexShader The name of the vertex shader
      * @param fragmentShader The name of the fragment shader
-     * @param shaderLanguage The shader language
+     * @param vertLanguage The vertex shader language
+     * @param fragLanguage The fragment shader language
      */
     public void setShaderFile(String vertexShader, String fragmentShader, String vertLanguage, String fragLanguage){
         this.vertName = vertexShader;
@@ -376,6 +378,14 @@ public class TechniqueDef implements Savable {
         }
     }
 
+    public RenderState getForcedRenderState() {
+        return forcedRenderState;
+    }
+
+    public void setForcedRenderState(RenderState forcedRenderState) {
+        this.forcedRenderState = forcedRenderState;
+    }
+    
     /**
      * Returns a list of world parameters that are used by this
      * technique definition.

@@ -23,8 +23,6 @@ package com.solarwars.logic;
 
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
-import com.solarwars.logic.actions.PlanetActionListener;
-import java.util.HashSet;
 
 /**
  * The class AbstractGameplay.

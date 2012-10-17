@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network;
 
 import java.util.Set;
@@ -38,7 +37,7 @@ import java.util.Set;
  *  This is the connection back to a client that is being
  *  hosted in a server instance.  
  *
- *  @version   $Revision: 7485 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public interface HostedConnection extends MessageConnection

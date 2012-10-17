@@ -45,10 +45,8 @@ import com.jme3.scene.*;
 import com.jme3.shader.Uniform;
 import com.jme3.shader.UniformBinding;
 import com.jme3.shader.UniformBindingManager;
-import com.jme3.shader.VarType;
 import com.jme3.system.NullRenderer;
 import com.jme3.system.Timer;
-import com.jme3.util.TempVars;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,10 +65,8 @@ import java.util.logging.Logger;
 public class RenderManager {
 
     private static final Logger logger = Logger.getLogger(RenderManager.class.getName());
-    
     private Renderer renderer;
     private UniformBindingManager uniformBindingManager = new UniformBindingManager();
-    
     private ArrayList<ViewPort> preViewPorts = new ArrayList<ViewPort>();
     private ArrayList<ViewPort> viewPorts = new ArrayList<ViewPort>();
     private ArrayList<ViewPort> postViewPorts = new ArrayList<ViewPort>();
@@ -81,7 +77,6 @@ public class RenderManager {
     private boolean shader;
     private int viewX, viewY, viewWidth, viewHeight;
     private Matrix4f orthoMatrix = new Matrix4f();
-    
     private String tmpTech;
     private boolean handleTranlucentBucket = true;
 
@@ -447,7 +442,7 @@ public class RenderManager {
             renderer.setWorldMatrix(mat);
         }
     }
-    
+
     /**
      * Internal use only.
      * Updates the given list of uniforms with {@link UniformBinding uniform bindings}
@@ -502,9 +497,19 @@ public class RenderManager {
             if (g.getMaterial().getMaterialDef().getTechniqueDef(forcedTechnique) != null) {
                 tmpTech = g.getMaterial().getActiveTechnique() != null ? g.getMaterial().getActiveTechnique().getDef().getName() : "Default";
                 g.getMaterial().selectTechnique(forcedTechnique, this);
+                //saving forcedRenderState for future calls
+                RenderState tmpRs = forcedRenderState;
+                if (g.getMaterial().getActiveTechnique().getDef().getForcedRenderState() != null) {
+                    //forcing forced technique renderState
+                    forcedRenderState = g.getMaterial().getActiveTechnique().getDef().getForcedRenderState();
+                }
                 // use geometry's material
                 g.getMaterial().render(g, this);
                 g.getMaterial().selectTechnique(tmpTech, this);
+
+                //restoring forcedRenderState
+                forcedRenderState = tmpRs;
+
                 //Reverted this part from revision 6197
                 //If forcedTechnique does not exists, and frocedMaterial is not set, the geom MUST NOT be rendered
             } else if (forcedMaterial != null) {
@@ -629,13 +634,19 @@ public class RenderManager {
      * contain the flattened scene graph.
      */
     public void renderScene(Spatial scene, ViewPort vp) {
-        if (scene.getParent() == null) {
-            vp.getCamera().setPlaneState(0);
-        }
+        //reset of the camera plane state for proper culling (must be 0 for the first note of the scene to be rendered)
+        vp.getCamera().setPlaneState(0);
+        //rendering the scene
+        renderSubScene(scene, vp);
+    }
+    
+    // recursively renders the scene
+    private void renderSubScene(Spatial scene, ViewPort vp) {
+
         // check culling first.
         if (!scene.checkCulling(vp.getCamera())) {
             // move on to shadow-only render
-            if ((scene.getShadowMode() != RenderQueue.ShadowMode.Off || scene instanceof Node) && scene.getCullHint()!=Spatial.CullHint.Always) {
+            if ((scene.getShadowMode() != RenderQueue.ShadowMode.Off || scene instanceof Node) && scene.getCullHint() != Spatial.CullHint.Always) {
                 renderShadow(scene, vp.getQueue());
             }
             return;
@@ -643,19 +654,17 @@ public class RenderManager {
 
         scene.runControlRender(this, vp);
         if (scene instanceof Node) {
-            // recurse for all children
+            // Recurse for all children
             Node n = (Node) scene;
             List<Spatial> children = n.getChildren();
-            //saving cam state for culling
+            // Saving cam state for culling
             int camState = vp.getCamera().getPlaneState();
             for (int i = 0; i < children.size(); i++) {
-                //restoring cam state before proceeding children recusively
+                // Restoring cam state before proceeding children recusively
                 vp.getCamera().setPlaneState(camState);
-                renderScene(children.get(i), vp);
-
+                renderSubScene(children.get(i), vp);
             }
         } else if (scene instanceof Geometry) {
-
             // add to the render queue
             Geometry gm = (Geometry) scene;
             if (gm.getMaterial() == null) {
@@ -884,7 +893,7 @@ public class RenderManager {
     public void renderViewPortRaw(ViewPort vp) {
         setCamera(vp.getCamera(), false);
         List<Spatial> scenes = vp.getScenes();
-        for (int i = scenes.size() - 1; i >= 0; i--) {
+        for (int i = scenes.size() - 1; i >= 0; i--) {           
             renderScene(scenes.get(i), vp);
         }
         flushQueue(vp);
@@ -961,7 +970,7 @@ public class RenderManager {
         }
 
         List<Spatial> scenes = vp.getScenes();
-        for (int i = scenes.size() - 1; i >= 0; i--) {
+        for (int i = scenes.size() - 1; i >= 0; i--) {            
             renderScene(scenes.get(i), vp);
         }
 
@@ -984,6 +993,10 @@ public class RenderManager {
         clearQueue(vp);
     }
 
+    public void setUsingShaders(boolean usingShaders) { 
+        this.shader = usingShaders;
+    }
+    
     /**
      * Called by the application to render any ViewPorts
      * added to this RenderManager.
@@ -1006,19 +1019,19 @@ public class RenderManager {
 
         for (int i = 0; i < preViewPorts.size(); i++) {
             ViewPort vp = preViewPorts.get(i);
-            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive){
+            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive) {
                 renderViewPort(vp, tpf);
             }
         }
         for (int i = 0; i < viewPorts.size(); i++) {
             ViewPort vp = viewPorts.get(i);
-            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive){
+            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive) {
                 renderViewPort(vp, tpf);
             }
         }
         for (int i = 0; i < postViewPorts.size(); i++) {
             ViewPort vp = postViewPorts.get(i);
-            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive){
+            if (vp.getOutputFrameBuffer() != null || mainFrameBufferActive) {
                 renderViewPort(vp, tpf);
             }
         }

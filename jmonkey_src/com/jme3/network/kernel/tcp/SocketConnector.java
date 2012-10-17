@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network.kernel.tcp;
 
 import com.jme3.network.kernel.Connector;
@@ -49,7 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *  does not use any separate threading.  It relies completely on
  *  the buffering in the OS network layer.
  *
- *  @version   $Revision: 8843 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public class SocketConnector implements Connector

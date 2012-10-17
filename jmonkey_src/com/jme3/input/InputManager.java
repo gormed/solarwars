@@ -324,12 +324,28 @@ public class InputManager implements RawInputListener {
         } else if (value < 0) {
             int hash = JoyAxisTrigger.joyAxisHash(joyId, axis, true);
             int otherHash = JoyAxisTrigger.joyAxisHash(joyId, axis, false);
+            
+            // Clear the reverse direction's actions in case we
+            // crossed center too quickly            
+            Float otherVal = axisValues.get(otherHash);
+            if (otherVal != null && otherVal.floatValue() > axisDeadZone) {
+                invokeActions(otherHash, false);
+            }
+            
             invokeAnalogsAndActions(hash, -value, true);
             axisValues.put(hash, -value);
             axisValues.remove(otherHash);
         } else {
             int hash = JoyAxisTrigger.joyAxisHash(joyId, axis, false);
             int otherHash = JoyAxisTrigger.joyAxisHash(joyId, axis, true);
+            
+            // Clear the reverse direction's actions in case we
+            // crossed center too quickly            
+            Float otherVal = axisValues.get(otherHash);
+            if (otherVal != null && otherVal.floatValue() > axisDeadZone) {
+                invokeActions(otherHash, false);
+            }
+            
             invokeAnalogsAndActions(hash, value, true);
             axisValues.put(hash, value);
             axisValues.remove(otherHash);
@@ -387,6 +403,15 @@ public class InputManager implements RawInputListener {
         }
     }
 
+    /**
+     * Sets the mouse cursor image or animation.
+     * Set cursor to null to show default system cursor.
+     * To hide the cursor completely, use {@link #setCursorVisible(boolean) }.
+     *
+     * @param jmeCursor The cursor to set, or null to reset to system cursor.
+     *
+     * @see JmeCursor
+     */
     public void setMouseCursor(JmeCursor jmeCursor) {
         mouse.setNativeCursor(jmeCursor);
     }
@@ -429,6 +454,10 @@ public class InputManager implements RawInputListener {
         int hash = KeyTrigger.keyHash(evt.getKeyCode());
         invokeActions(hash, evt.isPressed());
         invokeTimedActions(hash, evt.getTime(), evt.isPressed());
+    }
+
+    public void simulateEvent( InputEvent evt ) {
+        inputQueue.add(evt);
     }
 
     /**

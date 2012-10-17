@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,8 @@ package com.jme3.system;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioRenderer;
 import com.jme3.input.SoftTextDialogInput;
+import com.jme3.texture.Image;
+import com.jme3.texture.image.ImageRaster;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,6 +132,11 @@ public class JmeSystem {
         checkDelegate();
         return systemDelegate.newAudioRenderer(settings);
     }
+    
+    public static ImageRaster createImageRaster(Image image, int slice) {
+        checkDelegate();
+        return systemDelegate.createImageRaster(image, slice);
+    }
 
     /**
      * Displays an error message to the user in whichever way the context
@@ -167,7 +174,7 @@ public class JmeSystem {
                     if (systemDelegate == null) {
                         // None of the system delegates were found ..
                         Logger.getLogger(JmeSystem.class.getName()).log(Level.SEVERE,
-                                "Failed to find a JmeSystem delegate!"
+                                "Failed to find a JmeSystem delegate!\n"
                                 + "Ensure either desktop or android jME3 jar is in the classpath.");
                     }
                 }

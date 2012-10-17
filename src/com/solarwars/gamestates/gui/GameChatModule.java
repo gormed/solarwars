@@ -88,6 +88,7 @@ public class GameChatModule {
      * @param gameGUI the game gui
      * @param networkManager the network manager
      */
+    @SuppressWarnings("unchecked")
     private void initialize(NetworkManager networkManager) {
 
         this.networkManager = networkManager;
@@ -135,7 +136,37 @@ public class GameChatModule {
 
     private void autoScroll() {
         listBoxChat.selectItemByIndex(listBoxChat.itemCount() - 1);
-//        scrollbar.
+    }
+
+    /**
+     * Prints to the text box and splits message if nessecary.
+     *
+     * @param p the sending player
+     * @param color the color of the message
+     * @param message the message content
+     * @param type the messages type
+     * @param server the flag indication if server is saying or player
+     */
+    private void printToTextbox(Player p, ColorRGBA color, String message, ChatItem.ChatMsgType type, boolean server) {
+        final int maxLength = 35;
+        int restLength = message.length();
+        int firstLength = 0;
+        while (restLength > maxLength) {
+            String messagePartOne = message.substring(firstLength, maxLength + firstLength);
+            firstLength += maxLength;
+            restLength -= maxLength;
+            listBoxChat.addItem(new ChatItem(messagePartOne,
+                    type,
+                    (server ? "SERVER" : p.getName()), color));
+
+//            String messagePartTwo = message.substring(maxLength, message.length() - 1);
+//            listBoxChat.addItem(new ChatItem(messagePartTwo,
+//                    type,
+//                    (server ? "SERVER" : p.getName()), color));
+        }
+        String messagePartTwo = message.substring(maxLength, message.length() - 1);
+        listBoxChat.addItem(new ChatItem(messagePartTwo, type,
+                (server ? "SERVER" : p.getName()), color));
     }
 
     /**
@@ -145,9 +176,11 @@ public class GameChatModule {
      * @param message the message
      */
     public void playerSays(Player p, String message) {
-        listBoxChat.addItem(new ChatItem(message,
-                ChatItem.ChatMsgType.PLAYER,
-                p.getName(), p.getColor()));
+        printToTextbox(p, p.getColor(), message,
+                ChatItem.ChatMsgType.PLAYER, false);
+//        listBoxChat.addItem(new ChatItem(message,
+//                ChatItem.ChatMsgType.PLAYER,
+//                p.getName(), p.getColor()));
         if (p.isHost()) {
             if (!chatLayer.isVisible()) {
                 chatLayer.show();
@@ -163,9 +196,8 @@ public class GameChatModule {
      */
     public void playerLeaves(Player p) {
         if (p.isLeaver()) {
-            listBoxChat.addItem(new ChatItem(p.getName() + " leaves the game!",
-                    ChatItem.ChatMsgType.LEAVER,
-                    "SERVER", p.getColor()));
+            printToTextbox(p, p.getColor(), p.getName() + " leaves the game!",
+                    ChatItem.ChatMsgType.LEAVER, true);
             if (!chatLayer.isVisible()) {
                 chatLayer.show();
             }
@@ -180,11 +212,14 @@ public class GameChatModule {
      * @param defeated the defeated
      */
     public void playerDefeats(Player victorious, Player defeated) {
-        listBoxChat.addItem(new ChatItem(victorious.getName()
+        printToTextbox(victorious, ColorRGBA.White.clone(), victorious.getName()
                 + " defeats "
-                + defeated.getName() + "!",
-                ChatItem.ChatMsgType.DEFEAT,
-                "SERVER", ColorRGBA.White));
+                + defeated.getName() + "!", ChatItem.ChatMsgType.DEFEAT, true);
+//        listBoxChat.addItem(new ChatItem(victorious.getName()
+//                + " defeats "
+//                + defeated.getName() + "!",
+//                ChatItem.ChatMsgType.DEFEAT,
+//                "SERVER", ColorRGBA.White.clone()));
         if (!chatLayer.isVisible()) {
             chatLayer.show();
         }
@@ -192,9 +227,12 @@ public class GameChatModule {
     }
 
     public void playerJoins(Player thisPlayer) {
-        listBoxChat.addItem(new ChatItem(thisPlayer.getName() + " joins the game!",
-                ChatItem.ChatMsgType.JOINS,
-                "SERVER", thisPlayer.getColor()));
+        printToTextbox(thisPlayer, thisPlayer.getColor(),
+                thisPlayer.getName() + " joins the game!",
+                ChatItem.ChatMsgType.JOINS, true);
+//        listBoxChat.addItem(new ChatItem(thisPlayer.getName() + " joins the game!",
+//                ChatItem.ChatMsgType.JOINS,
+//                "SERVER", thisPlayer.getColor()));
         if (!chatLayer.isVisible()) {
             chatLayer.show();
         }
@@ -204,9 +242,11 @@ public class GameChatModule {
 
     public void playerWins(Player winner) {
         if (!hadWinner) {
-            listBoxChat.addItem(new ChatItem(winner.getName() + " wins the game!",
-                    ChatItem.ChatMsgType.WIN,
-                    "SERVER", winner.getColor()));
+            printToTextbox(winner, winner.getColor(), winner.getName() + " wins the game!",
+                    ChatItem.ChatMsgType.WIN, true);
+//            listBoxChat.addItem(new ChatItem(winner.getName() + " wins the game!",
+//                    ChatItem.ChatMsgType.WIN,
+//                    "SERVER", winner.getColor()));
             if (!chatLayer.isVisible()) {
                 chatLayer.show();
             }
@@ -216,9 +256,11 @@ public class GameChatModule {
     }
 
     public void serverSays(String string) {
-        listBoxChat.addItem(new ChatItem(string,
-                ChatItem.ChatMsgType.SERVER,
-                "SERVER", ColorRGBA.White));
+        printToTextbox(null, ColorRGBA.White.clone(), string,
+                ChatItem.ChatMsgType.SERVER, true);
+//        listBoxChat.addItem(new ChatItem(string,
+//                ChatItem.ChatMsgType.SERVER,
+//                "SERVER", ColorRGBA.White.clone()));
         if (!chatLayer.isVisible()) {
             chatLayer.show();
         }
@@ -232,7 +274,9 @@ public class GameChatModule {
      * @param message the message
      */
     public void localPlayerSendChatMessage(int id, String message) {
+
         ChatMessage chatMessage = new ChatMessage(id, message);
         networkManager.getThisClient().send(chatMessage);
+
     }
 }

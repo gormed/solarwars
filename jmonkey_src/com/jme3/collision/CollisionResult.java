@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.collision;
 
 import com.jme3.math.Triangle;
@@ -99,12 +98,7 @@ public class CollisionResult implements Comparable<CollisionResult> {
     }
 
     public int compareTo(CollisionResult other) {
-        if (distance < other.distance)
-            return -1;
-        else if (distance > other.distance)
-            return 1;
-        else
-            return 0;
+        return Float.compare(distance, other.distance);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,23 +53,20 @@ public class LwjglOffscreenBuffer extends LwjglContext implements Runnable {
     private int width;
     private int height;
     private PixelFormat pixelFormat;
-    
+
     protected void initInThread(){
         if ((Pbuffer.getCapabilities() & Pbuffer.PBUFFER_SUPPORTED) == 0){
             logger.severe("Offscreen surfaces are not supported.");
             return;
         }
 
-        int samples = 0;
-        if (settings.getSamples() > 1) {
-            samples = settings.getSamples();
-        }
+        int samples = getNumSamplesToUse();
         pixelFormat = new PixelFormat(settings.getBitsPerPixel(),
                                       0,
                                       settings.getDepthBits(),
                                       settings.getStencilBits(),
-                                      settings.getSamples());
-        
+                                      samples);
+
         width = settings.getWidth();
         height = settings.getHeight();
         try{
@@ -121,10 +118,10 @@ public class LwjglOffscreenBuffer extends LwjglContext implements Runnable {
         }
 
         listener.update();
-        assert checkGLError();
-        
+        checkGLError();
+
         renderer.onFrame();
-        
+
         int frameRate = settings.getFrameRate();
         if (frameRate >= 1){
             Display.sync(frameRate);
@@ -133,11 +130,13 @@ public class LwjglOffscreenBuffer extends LwjglContext implements Runnable {
 
     protected void deinitInThread(){
         renderable.set(false);
-        
+
         listener.destroy();
         renderer.cleanup();
         pbuffer.destroy();
         logger.info("Offscreen buffer destroyed.");
+        
+        super.internalDestroy();
     }
 
     public void run(){
@@ -187,7 +186,7 @@ public class LwjglOffscreenBuffer extends LwjglContext implements Runnable {
     public JoyInput getJoyInput() {
         return null;
     }
-    
+
     public TouchInput getTouchInput() {
         return null;
     }

@@ -22,8 +22,6 @@
 package com.solarwars.gamestates;
 
 import com.solarwars.SolarWarsGame;
-import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ButtonClickedEvent;
 
 /**
  * The Class TutorialState.

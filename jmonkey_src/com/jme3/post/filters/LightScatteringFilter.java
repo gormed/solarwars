@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ import com.jme3.post.Filter;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import java.io.IOException;
 
 /**
@@ -62,6 +63,7 @@ public class LightScatteringFilter extends Filter {
     Vector3f viewLightPos = new Vector3f();
     private boolean display = true;
     private float innerLightDensity;
+    private ViewPort viewPort;
 
     /**
      * creates a lightScaterring filter
@@ -96,7 +98,7 @@ public class LightScatteringFilter extends Filter {
     }
 
     @Override
-    protected void postQueue(RenderManager renderManager, ViewPort viewPort) {
+    protected void postQueue(RenderQueue queue) {
         getClipCoordinates(lightPosition, screenLightPos, viewPort.getCamera());
         //  screenLightPos.x = screenLightPos.x / viewPort.getCamera().getWidth();
         //  screenLightPos.y = screenLightPos.y / viewPort.getCamera().getHeight();
@@ -128,12 +130,13 @@ public class LightScatteringFilter extends Filter {
 
     @Override
     protected void initFilter(AssetManager manager, RenderManager renderManager, ViewPort vp, int w, int h) {
+        this.viewPort = vp;
         material = new Material(manager, "Common/MatDefs/Post/LightScattering.j3md");
     }
 
     /**
      * returns the blur start of the scattering 
-     * see {@link  setBlurStart(float blurStart)}
+     * see {@link #setBlurStart(float blurStart)}
      * @return 
      */
     public float getBlurStart() {
@@ -151,7 +154,7 @@ public class LightScatteringFilter extends Filter {
 
     /**
      * returns the blur width<br>
-     * see {@link setBlurWidth(float blurWidth)}
+     * see {@link #setBlurWidth(float blurWidth)}
      * @return 
      */
     public float getBlurWidth() {
@@ -167,8 +170,8 @@ public class LightScatteringFilter extends Filter {
     }
 
     /**
-     * retiurns the light density<br>
-     * see {@link setLightDensity(float lightDensity)}
+     * returns the light density
+     * see {@link #setLightDensity(float lightDensity)}
      * 
      * @return 
      */

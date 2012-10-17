@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.audio;
 
 import com.jme3.asset.AssetManager;
@@ -63,6 +62,8 @@ import java.util.logging.Logger;
  */
 public class AudioNode extends Node {
 
+    //Version #1 : AudioKey is now stored into "audio_key" instead of "key"
+    public static final int SAVABLE_VERSION = 1;
     protected boolean loop = false;
     protected float volume = 1;
     protected float pitch = 1;

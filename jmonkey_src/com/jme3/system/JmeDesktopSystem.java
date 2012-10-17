@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,9 @@ import com.jme3.asset.AssetNotFoundException;
 import com.jme3.asset.DesktopAssetManager;
 import com.jme3.audio.AudioRenderer;
 import com.jme3.system.JmeContext.Type;
+import com.jme3.texture.Image;
+import com.jme3.texture.image.DefaultImageRaster;
+import com.jme3.texture.image.ImageRaster;
 import com.jme3.util.Screenshots;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
@@ -71,6 +74,12 @@ public class JmeDesktopSystem extends JmeSystemDelegate {
     }
 
     @Override
+    public ImageRaster createImageRaster(Image image, int slice) {
+        assert image.getEfficentData() == null;
+        return new DefaultImageRaster(image, slice);
+    }
+
+    @Override
     public AssetManager newAssetManager() {
         return new DesktopAssetManager(null);
     }
@@ -78,7 +87,7 @@ public class JmeDesktopSystem extends JmeSystemDelegate {
     @Override
     public void showErrorDialog(String message) {
         final String msg = message;
-        final String title = "Error in jMonkeyEngine app";
+        final String title = "Error in application";
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 JOptionPane.showMessageDialog(null, msg, title, JOptionPane.ERROR_MESSAGE);

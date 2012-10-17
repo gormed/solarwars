@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ public class TestSoftwareMouse extends SimpleApplication {
         }
         public void onKeyEvent(KeyInputEvent evt) {
         }
-        public void onTouchEvent(TouchEvent evt) {             
+        public void onTouchEvent(TouchEvent evt) {
         }
     };
 
@@ -93,7 +93,7 @@ public class TestSoftwareMouse extends SimpleApplication {
 //        inputManager.setCursorVisible(false);
 
         Texture tex = assetManager.loadTexture("Interface/Logo/Cursor.png");
-        
+
         cursor = new Picture("cursor");
         cursor.setTexture(assetManager, (Texture2D) tex, true);
         cursor.setWidth(64);

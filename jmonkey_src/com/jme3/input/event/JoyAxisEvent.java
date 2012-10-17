@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,27 +29,34 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.input.event;
 
 import com.jme3.input.InputManager;
 import com.jme3.input.Joystick;
+import com.jme3.input.JoystickAxis;
 
 /**
  * Joystick axis event.
  * 
- * @author Kirill Vainer
+ * @author Kirill Vainer, Paul Speed
  */
 public class JoyAxisEvent extends InputEvent {
 
-    private int joyIdx;
-    private int axisIdx;
+    private JoystickAxis axis;
     private float value;
 
-    public JoyAxisEvent(int joyIdx, int axisIdx, float value) {
-        this.joyIdx = joyIdx;
-        this.axisIdx = axisIdx;
+    public JoyAxisEvent(JoystickAxis axis, float value) {
+        this.axis = axis;
         this.value = value;
+    }
+
+    /**
+     * Returns the JoystickAxis that triggered this event.
+     *
+     * @see JoystickAxis#assignAxis(java.lang.String, java.lang.String, int) 
+     */
+    public JoystickAxis getAxis() {
+        return axis;
     }
 
     /**
@@ -60,7 +67,7 @@ public class JoyAxisEvent extends InputEvent {
      * @see Joystick#assignAxis(java.lang.String, java.lang.String, int) 
      */
     public int getAxisIndex() {
-        return axisIdx;
+        return axis.getAxisId();
     }
 
     /**
@@ -71,7 +78,7 @@ public class JoyAxisEvent extends InputEvent {
      * @see InputManager#getJoysticks() 
      */
     public int getJoyIndex() {
-        return joyIdx;
+        return axis.getJoystick().getJoyId();
     }
 
     /**

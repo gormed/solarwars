@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.network.kernel;
 
 
@@ -37,7 +36,7 @@ package com.jme3.network.kernel;
  *  Represents a client-side connection error, usually encapsulating
  *  an IOException as its cause.
  *
- *  @version   $Revision: 7009 $
+ *  @version   $Revision: 9856 $
  *  @author    Paul Speed
  */
 public class ConnectorException extends RuntimeException

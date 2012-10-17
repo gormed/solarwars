@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.terrain.geomipmap;
 
 import com.jme3.bounding.BoundingBox;
@@ -123,6 +122,10 @@ public class TerrainQuad extends Node implements Terrain {
      */
     public TerrainQuad(String name, int patchSize, int totalSize, float[] heightMap) {
         this(name, patchSize, totalSize, Vector3f.UNIT_XYZ, heightMap);
+                
+        affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2);
+        fixNormalEdges(affectedAreaBBox);
+        addControl(new NormalRecalcControl(this));
     }
     
     /**
@@ -135,6 +138,7 @@ public class TerrainQuad extends Node implements Terrain {
      * @param heightMap The height map to generate the terrain from (a flat
      * height map will be generated if this is null)
      */
+    @Deprecated
     public TerrainQuad(String name, int patchSize, int quadSize, int totalSize, float[] heightMap) {
         this(name, patchSize, totalSize, quadSize, Vector3f.UNIT_XYZ, heightMap);
     }
@@ -149,11 +153,12 @@ public class TerrainQuad extends Node implements Terrain {
      * @param heightMap The height map to generate the terrain from (a flat
      * height map will be generated if this is null)
      */
+    @Deprecated
     public TerrainQuad(String name, int patchSize, int size, Vector3f scale, float[] heightMap) {
         this(name, patchSize, size, scale, heightMap, size, new Vector2f(), 0);
-        affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2);
-        fixNormalEdges(affectedAreaBBox);
-        addControl(new NormalRecalcControl(this));
+        //affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2);
+        //fixNormalEdges(affectedAreaBBox);
+        //addControl(new NormalRecalcControl(this));
     }
     
     /**
@@ -167,11 +172,12 @@ public class TerrainQuad extends Node implements Terrain {
      * @param heightMap The height map to generate the terrain from (a flat
      * height map will be generated if this is null)
      */
+    @Deprecated
     public TerrainQuad(String name, int patchSize, int totalSize, int quadSize, Vector3f scale, float[] heightMap) {
         this(name, patchSize, quadSize, scale, heightMap, totalSize, new Vector2f(), 0);
-        affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), totalSize*2, Float.MAX_VALUE, totalSize*2);
-        fixNormalEdges(affectedAreaBBox);
-        addControl(new NormalRecalcControl(this));
+        //affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), totalSize*2, Float.MAX_VALUE, totalSize*2);
+        //fixNormalEdges(affectedAreaBBox);
+        //addControl(new NormalRecalcControl(this));
     }
 
     protected TerrainQuad(String name, int patchSize, int quadSize,
@@ -848,7 +854,7 @@ public class TerrainQuad extends Node implements Terrain {
         if (affectedAreaBBox != null)
             return true;
         if (!lastScale.equals(getWorldScale())) {
-            affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), size, Float.MAX_VALUE, size);
+            affectedAreaBBox = new BoundingBox(getWorldTranslation(), Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
             lastScale = getWorldScale();
             return true;
         }
@@ -859,7 +865,7 @@ public class TerrainQuad extends Node implements Terrain {
      * This will cause all normals for this terrain quad to be recalculated
      */
     protected void setNeedToRecalculateNormals() {
-        affectedAreaBBox = new BoundingBox(new Vector3f(0,0,0), size*2, Float.MAX_VALUE, size*2);
+        affectedAreaBBox = new BoundingBox(getWorldTranslation(), Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     public float getHeightmapHeight(Vector2f xz) {

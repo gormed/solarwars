@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.niftygui;
 
 import com.jme3.font.BitmapFont;
@@ -50,9 +49,6 @@ public class RenderFontJme implements RenderFont {
     public RenderFontJme(String name, NiftyJmeDisplay display) {
         this.display = display;
         font = display.getAssetManager().loadFont(name);
-        if (font == null) {
-            throw new RuntimeException( "Font not loaded:" + name );
-        }
         text = new BitmapText(font);
         actualSize = font.getPreferredSize();
         text.setSize(actualSize);
@@ -62,6 +58,10 @@ public class RenderFontJme implements RenderFont {
       return new BitmapText(font);
     }
 
+    public BitmapFont getFont() {
+        return font;
+    }
+    
     public BitmapText getText(){
         return text;
     }
@@ -80,8 +80,9 @@ public class RenderFontJme implements RenderFont {
      * @return width of the given text for the current font
      */
     public int getWidth(final String str) {
-        if (str.length() == 0)
+        if (str.length() == 0) {
             return 0;
+        }
  
         // Note: BitmapFont is now fixed to return the proper line width
         //       at least for now.  The older commented out (by someone else, not me)

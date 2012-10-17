@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.system;
 
 import com.jme3.input.JoyInput;
@@ -135,7 +134,7 @@ public class NullContext implements JmeContext, Runnable {
         }
 
         deinitInThread();
-        
+
         logger.info("NullContext destroyed.");
     }
 
@@ -173,7 +172,7 @@ public class NullContext implements JmeContext, Runnable {
     public JoyInput getJoyInput() {
         return null;
     }
-    
+
     public TouchInput getTouchInput() {
         return null;
     }
@@ -225,6 +224,6 @@ public class NullContext implements JmeContext, Runnable {
 
     public boolean isRenderable() {
         return true; // Doesn't really matter if true or false. Either way
-                     // RenderManager won't render anything. 
+                     // RenderManager won't render anything.
     }
 }

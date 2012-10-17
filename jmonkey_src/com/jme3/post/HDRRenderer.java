@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.post;
 
 import com.jme3.asset.AssetManager;
@@ -186,7 +185,6 @@ public class HDRRenderer implements SceneProcessor {
                        blockSize.y / pixelSize.y);
             numPixels = blocks.x * blocks.y;
         }
-        System.out.println(numPixels);
 
         mat.setBoolean("Blocks", true);
         if (mode == LUMMODE_ENCODE_LUM)

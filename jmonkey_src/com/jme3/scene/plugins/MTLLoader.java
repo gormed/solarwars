@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.scene.plugins;
 
 import com.jme3.asset.*;
@@ -219,8 +218,11 @@ public class MTLLoader implements AssetLoader {
             }
             
         }else if (cmd.equals("d") || cmd.equals("tr")){
-            alpha = scan.nextFloat();
-            transparent = true;
+            float tempAlpha = scan.nextFloat();
+            if (tempAlpha != 0){
+                alpha = tempAlpha;
+                transparent = true;
+            }
         }else if (cmd.equals("map_ka")){
             // ignore it for now
             return skipLine();

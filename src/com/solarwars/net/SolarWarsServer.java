@@ -21,17 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.net;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.Filters;
@@ -43,7 +32,6 @@ import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.JmeContext;
-import com.solarwars.Hub;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Player;
 import com.solarwars.logic.PlayerState;
@@ -57,6 +45,16 @@ import com.solarwars.net.messages.PlayerLeavingMessage;
 import com.solarwars.net.messages.PlayerReadyMessage;
 import com.solarwars.net.messages.StartGameMessage;
 import com.solarwars.net.messages.StringMessage;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class SolarWarsServer.
@@ -507,15 +505,14 @@ public class SolarWarsServer extends SimpleApplication {
 
             if (player.getName().equals(name) && p != player) {
                 long rand = System.currentTimeMillis() % 2000;
-                String s = "" + rand;
-                s.substring(0, s.length() / 2);
+                String s = rand + player.getName();
+                s = s.substring(0, s.length() / 2);
                 s = "" + s.hashCode();
-                s.substring(s.length() / 2);
+                s = s.substring(s.length() / 2);
                 p.getState().name = ("" + s);
                 return;
             }
         }
-        return;
     }
 
     /**

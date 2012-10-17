@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,15 +82,16 @@ public class LwjglDisplay extends LwjglAbstractDisplay {
             displayMode = new DisplayMode(settings.getWidth(), settings.getHeight());
         }
 
-        int samples = 0;
-        if (settings.getSamples() > 1){
-            samples = settings.getSamples();
-        }
+        int samples = getNumSamplesToUse();
         PixelFormat pf = new PixelFormat(settings.getBitsPerPixel(),
                                          0,
                                          settings.getDepthBits(),
                                          settings.getStencilBits(),
-                                         samples);
+                                         samples, 
+                                         0, 
+                                         0, 
+                                         0, 
+                                         settings.useStereo3D());
 
         frameRate = settings.getFrameRate();
         logger.log(Level.INFO, "Selected display mode: {0}", displayMode);
@@ -133,9 +134,9 @@ public class LwjglDisplay extends LwjglAbstractDisplay {
 
         if (!created.get() || pixelFormatChanged){
             ContextAttribs attr = createContextAttribs();
-            if (attr != null){
+            if (attr != null) {
                 Display.create(pixelFormat, attr);
-            }else{
+            } else {
                 Display.create(pixelFormat);
             }
             renderable.set(true);

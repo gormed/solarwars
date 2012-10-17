@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.material.plugins;
 
 import com.jme3.asset.*;
@@ -353,6 +352,15 @@ public class J3MLoader implements AssetLoader {
         renderState = null;
     }
     
+    private void readForcedRenderState(List<Statement> renderStates) throws IOException{
+        renderState = new RenderState();
+        for (Statement statement : renderStates){
+            readRenderStateStatement(statement.getLine());
+        }
+        technique.setForcedRenderState(renderState);
+        renderState = null;
+    }
+    
     // <DEFINENAME> [ ":" <PARAMNAME> ]
     private void readDefine(String statement) throws IOException{
         String[] split = statement.split(":");
@@ -384,8 +392,10 @@ public class J3MLoader implements AssetLoader {
             readShadowMode(statement.getLine());
         }else if (split[0].equals("WorldParameters")){
             readWorldParams(statement.getContents());
-        }else if (split[0].equals("RenderState")){
+        }else if (split[0].equals("RenderState")){  
             readRenderState(statement.getContents());
+        }else if (split[0].equals("ForcedRenderState")){  
+            readForcedRenderState(statement.getContents());
         }else if (split[0].equals("Defines")){
             readDefines(statement.getContents());
         }else{

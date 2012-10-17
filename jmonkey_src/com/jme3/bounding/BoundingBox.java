@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,6 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.math.*;
 import com.jme3.scene.Mesh;
-import com.jme3.util.BufferUtils;
 import com.jme3.util.TempVars;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -224,8 +223,8 @@ public class BoundingBox extends BoundingVolume {
         
         float[] tmpArray = vars.skinPositions;
 
-        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE, minZ = Float.MAX_VALUE;
-        float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE, maxZ = Float.MIN_VALUE;
+        float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY, minZ = Float.POSITIVE_INFINITY;
+        float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY, maxZ = Float.NEGATIVE_INFINITY;
         
         int iterations = (int) FastMath.ceil(points.limit() / ((float) tmpArray.length));
         for (int i = iterations - 1; i >= 0; i--) {
@@ -239,19 +238,22 @@ public class BoundingBox extends BoundingVolume {
                 
                 if (vars.vect1.x < minX) {
                     minX = vars.vect1.x;
-                } else if (vars.vect1.x > maxX) {
+                }
+                if (vars.vect1.x > maxX) {
                     maxX = vars.vect1.x;
                 }
 
                 if (vars.vect1.y < minY) {
                     minY = vars.vect1.y;
-                } else if (vars.vect1.y > maxY) {
+                }
+                if (vars.vect1.y > maxY) {
                     maxY = vars.vect1.y;
                 }
 
                 if (vars.vect1.z < minZ) {
                     minZ = vars.vect1.z;
-                } else if (vars.vect1.z > maxZ) {
+                }
+                if (vars.vect1.z > maxZ) {
                     maxZ = vars.vect1.z;
                 }
             }

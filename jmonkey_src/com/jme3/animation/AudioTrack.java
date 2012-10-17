@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,27 +36,33 @@ import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.util.TempVars;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * AudioTrack is a track to add to an existing animation, to paly a sound during an animations
- * for example : gun shot, foot step, shout, etc...
- * 
- * usage is 
+ * AudioTrack is a track to add to an existing animation, to paly a sound during
+ * an animations for example : gun shot, foot step, shout, etc...
+ *
+ * usage is
  * <pre>
  * AnimControl control model.getControl(AnimControl.class);
  * AudioTrack track = new AudioTrack(existionAudioNode, control.getAnim("TheAnim").getLength());
  * control.getAnim("TheAnim").addTrack(track);
  * </pre>
- * 
- * This is mostly intended for short sounds, playInstance will be called on the AudioNode at time 0 + startOffset. 
- * 
+ *
+ * This is mostly intended for short sounds, playInstance will be called on the
+ * AudioNode at time 0 + startOffset.
+ *
  *
  * @author Nehon
  */
-public class AudioTrack implements Track {
+public class AudioTrack implements ClonableTrack {
 
+    private static final Logger logger = Logger.getLogger(AudioTrack.class.getName());
     private AudioNode audio;
     private float startOffset = 0;
     private float length = 0;
@@ -71,7 +77,6 @@ public class AudioTrack implements Track {
         }
 
         public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-            stop();
         }
     }
 
@@ -83,19 +88,25 @@ public class AudioTrack implements Track {
 
     /**
      * Creates an AudioTrack
+     *
      * @param audio the AudioNode
-     * @param length the length of the track (usually the length of the animation you want to add the track to)
+     * @param length the length of the track (usually the length of the
+     * animation you want to add the track to)
      */
     public AudioTrack(AudioNode audio, float length) {
         this.audio = audio;
         this.length = length;
+        setUserData(this);
     }
 
     /**
      * Creates an AudioTrack
+     *
      * @param audio the AudioNode
-     * @param length the length of the track (usually the length of the animation you want to add the track to)
-     * @param startOffset the time in second when the sound will be played after the animation starts (default is 0)
+     * @param length the length of the track (usually the length of the
+     * animation you want to add the track to)
+     * @param startOffset the time in second when the sound will be played after
+     * the animation starts (default is 0)
      */
     public AudioTrack(AudioNode audio, float length, float startOffset) {
         this(audio, length);
@@ -104,10 +115,15 @@ public class AudioTrack implements Track {
 
     /**
      * Internal use only
-     * @see Track#setTime(float, float, com.jme3.animation.AnimControl, com.jme3.animation.AnimChannel, com.jme3.util.TempVars) 
+     *
+     * @see Track#setTime(float, float, com.jme3.animation.AnimControl,
+     * com.jme3.animation.AnimChannel, com.jme3.util.TempVars)
      */
     public void setTime(float time, float weight, AnimControl control, AnimChannel channel, TempVars vars) {
 
+        if (time == length) {
+            return;
+        }
         if (!initialized) {
             control.addListener(new OnEndListener());
             initialized = true;
@@ -126,6 +142,7 @@ public class AudioTrack implements Track {
 
     /**
      * Retruns the length of the track
+     *
      * @return length of the track
      */
     public float getLength() {
@@ -134,7 +151,8 @@ public class AudioTrack implements Track {
 
     /**
      * Clone this track
-     * @return 
+     *
+     * @return
      */
     @Override
     public Track clone() {
@@ -142,7 +160,124 @@ public class AudioTrack implements Track {
     }
 
     /**
+     * This method clone the Track and search for the cloned counterpart of the
+     * original audio node in the given cloned spatial. The spatial is assumed
+     * to be the Spatial holding the AnimControl controling the animation using
+     * this Track.
+     *
+     * @param spatial the Spatial holding the AnimControl
+     * @return the cloned Track with proper reference
+     */
+    public Track cloneForSpatial(Spatial spatial) {
+        AudioTrack audioTrack = new AudioTrack();
+        audioTrack.length = this.length;
+        audioTrack.startOffset = this.startOffset;
+
+        //searching for the newly cloned AudioNode
+        audioTrack.audio = findAudio(spatial);
+        if (audioTrack.audio == null) {
+            logger.log(Level.WARNING, "{0} was not found in {1} or is not bound to this track", new Object[]{audio.getName(), spatial.getName()});
+            audioTrack.audio = audio;
+        }
+
+        //setting user data on the new AudioNode and marking it with a reference to the cloned Track.
+        setUserData(audioTrack);
+
+        return audioTrack;
+    }
+
+    /**
+     * recursive function responsible for finding the newly cloned AudioNode
+     *
+     * @param spat
+     * @return
+     */
+    private AudioNode findAudio(Spatial spat) {
+        if (spat instanceof AudioNode) {
+            //spat is an AudioNode
+            AudioNode em = (AudioNode) spat;
+            //getting the UserData TrackInfo so check if it should be attached to this Track
+            TrackInfo t = (TrackInfo) em.getUserData("TrackInfo");
+            if (t != null && t.getTracks().contains(this)) {
+                return em;
+            }
+            return null;
+
+        } else if (spat instanceof Node) {
+            for (Spatial child : ((Node) spat).getChildren()) {
+                AudioNode em = findAudio(child);
+                if (em != null) {
+                    return em;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void setUserData(AudioTrack audioTrack) {
+        //fetching the UserData TrackInfo.
+        TrackInfo data = (TrackInfo) audioTrack.audio.getUserData("TrackInfo");
+
+        //if it does not exist, we create it and attach it to the AudioNode.
+        if (data == null) {
+            data = new TrackInfo();
+            audioTrack.audio.setUserData("TrackInfo", data);
+        }
+
+        //adding the given Track to the TrackInfo.
+        data.addTrack(audioTrack);
+    }
+
+    public void cleanUp() {
+        TrackInfo t = (TrackInfo) audio.getUserData("TrackInfo");
+        t.getTracks().remove(this);
+        if (!t.getTracks().isEmpty()) {
+            audio.setUserData("TrackInfo", null);
+        }
+    }
+
+    /**
+     *
+     * @return the audio node used by this track
+     */
+    public AudioNode getAudio() {
+        return audio;
+    }
+
+    /**
+     * sets the audio node to be used for this track
+     *
+     * @param audio
+     */
+    public void setAudio(AudioNode audio) {
+        if (this.audio != null) {
+            TrackInfo data = (TrackInfo) audio.getUserData("TrackInfo");
+            data.getTracks().remove(this);
+        }
+        this.audio = audio;
+        setUserData(this);
+    }
+
+    /**
+     *
+     * @return the start offset of the track
+     */
+    public float getStartOffset() {
+        return startOffset;
+    }
+
+    /**
+     * set the start offset of the track
+     *
+     * @param startOffset
+     */
+    public void setStartOffset(float startOffset) {
+        this.startOffset = startOffset;
+    }
+
+    /**
      * Internal use only serialization
+     *
      * @param ex exporter
      * @throws IOException exception
      */
@@ -155,6 +290,7 @@ public class AudioTrack implements Track {
 
     /**
      * Internal use only serialization
+     *
      * @param im importer
      * @throws IOException Exception
      */

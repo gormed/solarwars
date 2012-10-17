@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.scene;
 
 import com.jme3.bounding.BoundingBox;
@@ -434,8 +433,6 @@ public class Mesh implements Savable, Cloneable {
 
     /**
      * Get the mode start indices for {@link Mode#Hybrid} mesh mode.
-     * 
-     * @return mode start indices
      */
     public void setModeStart(int[] modeStart) {
         this.modeStart = modeStart;

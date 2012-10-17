@@ -1,3 +1,34 @@
+/*
+ * Copyright (c) 2009-2012 jMonkeyEngine
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
+ * * Neither the name of 'jMonkeyEngine' nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software
+ *   without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.jme3.app.state;
 
 import com.jme3.app.Application;
@@ -7,7 +38,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Renderer;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.system.NanoTimer;
+import com.jme3.system.Timer;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
@@ -47,10 +78,11 @@ public class VideoRecorderAppState extends AbstractAppState {
     private int numCpus = Runtime.getRuntime().availableProcessors();
     private ViewPort lastViewPort;
     private float quality;
+    private Timer oldTimer;
 
     /**
      * Using this constructor the video files will be written sequentially to the user's home directory with
-     * a quality of 0.8
+     * a quality of 0.8 and a framerate of 30fps.
      */
     public VideoRecorderAppState() {
         this(null, 0.8f);
@@ -65,8 +97,17 @@ public class VideoRecorderAppState extends AbstractAppState {
     }
 
     /**
+     * Using this constructor the video files will be written sequentially to the user's home directory.
+     * @param quality the quality of the jpegs in the video stream (0.0 smallest file - 1.0 largest file)
+     * @param framerate the frame rate of the resulting video, the application will be locked to this framerate
+     */
+    public VideoRecorderAppState(float quality, int framerate) {
+        this(null, quality, framerate);
+    }
+    
+    /**
      * This constructor allows you to specify the output file of the video. The quality is set
-     * to 0.8
+     * to 0.8 and framerate to 30 fps.
      * @param file the video file
      */
     public VideoRecorderAppState(File file) {
@@ -77,10 +118,23 @@ public class VideoRecorderAppState extends AbstractAppState {
      * This constructor allows you to specify the output file of the video as well as the quality
      * @param file the video file
      * @param quality the quality of the jpegs in the video stream (0.0 smallest file - 1.0 largest file)
+     * @param framerate the frame rate of the resulting video, the application will be locked to this framerate
      */
     public VideoRecorderAppState(File file, float quality) {
         this.file = file;
         this.quality = quality;
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "JME3 VideoRecorder running on {0} CPU's", numCpus);
+    }
+
+    /**
+     * This constructor allows you to specify the output file of the video as well as the quality
+     * @param file the video file
+     * @param quality the quality of the jpegs in the video stream (0.0 smallest file - 1.0 largest file)
+     */
+    public VideoRecorderAppState(File file, float quality, int framerate) {
+        this.file = file;
+        this.quality = quality;
+        this.framerate = framerate;
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "JME3 VideoRecorder running on {0} CPU's", numCpus);
     }
 
@@ -115,6 +169,7 @@ public class VideoRecorderAppState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         this.app = app;
+        this.oldTimer = app.getTimer();
         app.setTimer(new IsoTimer(framerate));
         if (file == null) {
             String filename = System.getProperty("user.home") + File.separator + "jMonkey-" + System.currentTimeMillis() / 1000 + ".avi";
@@ -135,7 +190,7 @@ public class VideoRecorderAppState extends AbstractAppState {
     @Override
     public void cleanup() {
         lastViewPort.removeProcessor(processor);
-        app.setTimer(new NanoTimer());
+        app.setTimer(oldTimer);
         initialized = false;
         file = null;
         super.cleanup();

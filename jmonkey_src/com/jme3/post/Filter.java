@@ -38,6 +38,7 @@ import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Renderer;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image.Format;
 import com.jme3.texture.Texture;
@@ -97,7 +98,7 @@ public abstract class Filter implements Savable {
         public void init(Renderer renderer, int width, int height, Format textureFormat, Format depthBufferFormat, int numSamples, boolean renderDepth) {
             Collection<Caps> caps = renderer.getCaps();
             if (numSamples > 1 && caps.contains(Caps.FrameBufferMultisample) && caps.contains(Caps.OpenGL31)) {
-                renderFrameBuffer = new FrameBuffer(width, height, numSamples);
+                renderFrameBuffer = new FrameBuffer(width, height, numSamples);                
                 renderedTexture = new Texture2D(width, height, numSamples, textureFormat);
                 renderFrameBuffer.setDepthBuffer(depthBufferFormat);
                 if (renderDepth) {
@@ -288,10 +289,9 @@ public abstract class Filter implements Savable {
 
     /**
      * Override this method if you want to make a pre pass, before the actual rendering of the frame
-     * @param renderManager
-     * @param viewPort
+     * @param queue
      */
-    protected void postQueue(RenderManager renderManager, ViewPort viewPort) {
+    protected void postQueue(RenderQueue queue) {
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.jme3.scene.shape;
 
 import com.jme3.export.InputCapsule;
@@ -84,9 +83,9 @@ public class Line extends Mesh {
      */
     public void updatePoints(Vector3f start, Vector3f end) {
         VertexBuffer posBuf = getBuffer(Type.Position);
-
+        
         FloatBuffer fb = (FloatBuffer) posBuf.getData();
-
+        fb.rewind();
         fb.put(start.x).put(start.y).put(start.z);
         fb.put(end.x).put(end.y).put(end.z);
         

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 jMonkeyEngine
+ * Copyright (c) 2009-2012 jMonkeyEngine
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -199,7 +199,7 @@ public class TestWalkingChar extends SimpleApplication implements ActionListener
         bulletCollisionShape = new SphereCollisionShape(0.4f);
         matBullet = new Material(getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         matBullet.setColor("Color", ColorRGBA.Green);
-        matBullet.setColor("m_GlowColor", ColorRGBA.Green);
+        matBullet.setColor("GlowColor", ColorRGBA.Green);
         getPhysicsSpace().addCollisionListener(this);
     }
 
