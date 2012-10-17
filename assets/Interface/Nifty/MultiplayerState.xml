@@ -48,7 +48,7 @@
                     <!-- SERVER LIST -->
                     <panel id="multiplayer_join_server_align_h" 
                            childLayout="horizontal" height="54%"
-                           backgroundColor="ffff" padding="5px">
+                           backgroundColor="#ffff" padding="5px">
                         <control id="saved_servers_box"
                                  name="listBox" horizontal="off" displayItems="10" 
                                  selectionMode="Single" forceSelection="true" vertical="optional" 

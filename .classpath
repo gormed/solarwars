@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="assets"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/eclipse-juno-64"/>
 	<classpathentry kind="lib" path="lib/eventbus.jar"/>
 	<classpathentry kind="lib" path="lib/j-ogg-oggd.jar"/>
 	<classpathentry kind="lib" path="lib/j-ogg-vorbisd.jar"/>

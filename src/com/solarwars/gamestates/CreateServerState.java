@@ -514,7 +514,7 @@ public class CreateServerState extends Gamestate
      * Sends a message to the chat area
      */
     public void sendMessage() {
-        String message = textInputField.getRealText();
+        String message = textInputField.getText();
         if (checkMessageStyle(message)) {
             gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
             gameChatModule.playerSays(Hub.getLocalPlayer(), message);

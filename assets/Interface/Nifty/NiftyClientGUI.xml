@@ -25,7 +25,7 @@ http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
                   width="50%"/>
             <panel childLayout="center" width="25%">
                 <panel id="#player-color-panel" height="32px" 
-                       width="32px" align="center" valign="top" backgroundColor="000f"/>
+                       width="32px" align="center" valign="top" backgroundColor="#000f"/>
             </panel>  
             <panel childLayout="center" width="25%" visibleToMouse="false">
                 <text id="#player-ready-text" font="Interface/Fonts/SolarWarsFont32.fnt" 

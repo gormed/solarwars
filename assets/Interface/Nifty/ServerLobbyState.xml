@@ -46,7 +46,7 @@
                            childLayout="center" visibleToMouse="false" height="2%" width="60%"/>
                     <!-- SERVER LOBBY LIST -->
                     <panel id="server_lobby_players_align_h" childLayout="horizontal" 
-                           height="45%" backgroundColor="ffff" padding="5px">
+                           height="45%" backgroundColor="#ffff" padding="5px">
 
                         <control id="server_lobby_box" name="listBox" 
                                  horizontal="optional" style="server-browser-style"
