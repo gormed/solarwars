@@ -148,7 +148,7 @@ public class GameChatModule {
      * @param server the flag indication if server is saying or player
      */
     private void printToTextbox(Player p, ColorRGBA color, String message, ChatItem.ChatMsgType type, boolean server) {
-        final int maxLength = 35;
+        final int maxLength = 30;
         int restLength = message.length();
         int firstLength = 0;
         while (restLength > maxLength) {
@@ -164,7 +164,7 @@ public class GameChatModule {
 //                    type,
 //                    (server ? "SERVER" : p.getName()), color));
         }
-        String messagePartTwo = message.substring(maxLength, message.length() - 1);
+        String messagePartTwo = message.substring(firstLength, message.length());
         listBoxChat.addItem(new ChatItem(messagePartTwo, type,
                 (server ? "SERVER" : p.getName()), color));
     }
