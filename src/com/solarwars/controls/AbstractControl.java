@@ -38,6 +38,7 @@ import com.solarwars.entities.ShipGroup;
 import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.solarwars.logic.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
+import com.solarwars.logic.Player;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -60,8 +61,7 @@ public abstract class AbstractControl {
     // logging
     protected static final Logger logger = Logger.getLogger(AbstractControl.class.getName());
     // general
-    protected Node rootNode = SolarWarsApplication.getInstance().getRootNode();
-    protected Node shootablesNode;
+    protected Player controllingPlayer;
     protected final AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
     protected MarkerNode markerNode;
     // planet & shipgroup selection
@@ -78,7 +78,8 @@ public abstract class AbstractControl {
     private Vector2f startScreenPos = Vector2f.ZERO.clone();
     // debug
     protected Camera cam = SolarWarsApplication.getInstance().getCamera();
-    protected InputManager inputManager = SolarWarsApplication.getInstance().getInputManager();
+    protected InputManager inputManager =
+            SolarWarsApplication.getInstance().getInputManager();
     protected ActionLib actionLib;
 
     //==========================================================================
@@ -90,6 +91,7 @@ public abstract class AbstractControl {
      * @param application the application
      */
     public AbstractControl() {
+        this.controllingPlayer = null;
         this.actionLib = ActionLib.getInstance();
         this.markerNode = new MarkerNode();
     }
@@ -111,12 +113,32 @@ public abstract class AbstractControl {
      * @param rootNode the root node
      */
     public void initialize() {
-        dragRectangle = new DragRectangleGUI();
-        AppStateManager stateManager = SolarWarsApplication.getInstance().getStateManager();
-        stateManager.attach(dragRectangle);
+        SolarWarsApplication.getInstance().
+                getStateManager().attach(dragRectangle = new DragRectangleGUI());
+    }
 
-        shootablesNode = new Node("Shootables");
-        rootNode.attachChild(shootablesNode);
+    void setControllingPlayer(Player controllingPlayer) {
+        this.controllingPlayer = controllingPlayer;
+    }
+    
+    /**
+     * Gets the value of the control state flag. See onControlModifier() method
+     * for more.
+     *
+     * @return true if control flag is raised, false otherwise
+     */
+    public boolean isControlPressed() {
+        return controlPressed;
+    }
+
+    /**
+     * Gets the value of the dragging flag. Indicates if the player is currently
+     * performing a drag-action.
+     *
+     * @return true if player is dragging, false if not
+     */
+    public boolean isDragging() {
+        return dragging;
     }
 
     /**
@@ -205,7 +227,7 @@ public abstract class AbstractControl {
         if (!down) {
             amount *= -1.0f;
         }
-        Hub.getLocalPlayer().refreshShipPercentage(amount);
+        controllingPlayer.refreshShipPercentage(amount);
     }
 
     /**
@@ -250,7 +272,7 @@ public abstract class AbstractControl {
                     actionLib.invokePlanetAction(
                             null,
                             nearestPlanet,
-                            Hub.getLocalPlayer(),
+                            controllingPlayer,
                             DeathmatchGameplay.PLANET_SELECT);
                     // finally set marker
                     repositMarker(nearestPlanet, markerNode);
@@ -258,12 +280,12 @@ public abstract class AbstractControl {
 
                 } // ...check for right botton click
                 // TODO: move hasLost check to actionLib
-                else if (attack && !Hub.getLocalPlayer().hasLost()) {
+                else if (attack && !controllingPlayer.hasLost()) {
                     // invoke attack action
                     actionLib.invokePlanetAction(
                             null,
                             nearestPlanet,
-                            Hub.getLocalPlayer(),
+                            controllingPlayer,
                             DeathmatchGameplay.PLANET_ATTACK);
                     return true;
                 }
@@ -271,7 +293,7 @@ public abstract class AbstractControl {
                 actionLib.invokePlanetAction(
                         null,
                         null,
-                        Hub.getLocalPlayer(),
+                        controllingPlayer,
                         DeathmatchGameplay.PLANET_SELECT);
                 removeMarker(markerNode);
                 clearMultiMarkers();
@@ -283,13 +305,13 @@ public abstract class AbstractControl {
             if (nearestShipGroup != null) {
                 // ...check if left button click
                 // TODO: move hasLost check to actionLib
-                if (!attack && !Hub.getLocalPlayer().hasLost()) {
+                if (!attack && !controllingPlayer.hasLost()) {
 
                     // invoke ship redirect action
                     actionLib.invokeShipAction(
                             null,
                             nearestShipGroup,
-                            Hub.getLocalPlayer(),
+                            controllingPlayer,
                             DeathmatchGameplay.SHIP_SELECT);
                     repositMarker(nearestShipGroup, markerNode);
                     return true;
@@ -300,7 +322,7 @@ public abstract class AbstractControl {
         actionLib.invokePlanetAction(
                 null,
                 null,
-                Hub.getLocalPlayer(),
+                controllingPlayer,
                 DeathmatchGameplay.PLANET_SELECT);
         removeMarker(markerNode);
         clearMultiMarkers();
@@ -345,7 +367,7 @@ public abstract class AbstractControl {
                         actionLib.invokePlanetAction(
                                 this,
                                 null,
-                                Hub.getLocalPlayer(),
+                                controllingPlayer,
                                 DeathmatchGameplay.PLANET_MULTI_SELECT);
                         final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
                         logger.info(multiSelectMsg);
@@ -365,7 +387,7 @@ public abstract class AbstractControl {
                         actionLib.invokeShipAction(
                                 this,
                                 null,
-                                Hub.getLocalPlayer(),
+                                controllingPlayer,
                                 DeathmatchGameplay.SHIP_MULTI_SELECT);
                         final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
                         logger.info(multiSelectMsg);
@@ -413,41 +435,12 @@ public abstract class AbstractControl {
         }
         // RAYCASTING
         // Collect intersections between Ray and Shootables in results list.
-        shootablesNode.collideWith(ray, results);
+        getShootablesNode().collideWith(ray, results);
         // if player releases not having dragged before
         if (playerReleases(results, attack)) {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Gets the value of the control state flag. See onControlModifier() method
-     * for more.
-     *
-     * @return true if control flag is raised, false otherwise
-     */
-    public boolean isControlPressed() {
-        return controlPressed;
-    }
-
-    /**
-     * Gets the value of the dragging flag. Indicates if the player is currently
-     * performing a drag-action.
-     *
-     * @return true if player is dragging, false if not
-     */
-    public boolean isDragging() {
-        return dragging;
-    }
-
-    /**
-     * Gets the shootables node.
-     *
-     * @return the shootables node
-     */
-    public Node getShootablesNode() {
-        return shootablesNode;
     }
 
     /**
@@ -520,7 +513,8 @@ public abstract class AbstractControl {
             // check if planet pos is in rectangle
             if (rectangle.contains(planetPos)) {
                 // if not owned by local player get the next planet in the planet set
-                if (planet.getOwner() == null || !planet.getOwner().equals(Hub.getLocalPlayer())) {
+                if (planet.getOwner() == null || 
+                        !planet.getOwner().equals(controllingPlayer)) {
                     continue;
                 }
                 // else add planet to the selection
@@ -540,22 +534,32 @@ public abstract class AbstractControl {
         Set<Entry<Integer, ShipGroup>> planetSet = SolarWarsGame.getInstance().getCurrentLevel().getShipGroupSet();
         // iterate through the sets planets each
         for (Map.Entry<Integer, ShipGroup> entry : planetSet) {
-            // get planet pos
+            // get shipgroup pos
             Vector3f pos = entry.getValue().getPosition().clone();
             // convert to 2D point
             Point2D shipGroupPos = new Point2D.Float(pos.x, pos.z);
-            // get the planet ref
+            // get the shipgroup ref
             ShipGroup shipGroup = entry.getValue();
-            // check if planet pos is in rectangle
+            // check if shipgroup pos is in rectangle
             if (rectangle.contains(shipGroupPos)) {
                 // if not owned by local player get the next planet in the planet set
-                if (shipGroup.getOwner() == null || !shipGroup.getOwner().equals(Hub.getLocalPlayer())) {
+                if (shipGroup.getOwner() == null || 
+                        !shipGroup.getOwner().equals(controllingPlayer)) {
                     continue;
                 }
                 // else add planet to the selection
                 shipGroupSelection.add(shipGroup);
             }
         }
+    }
+
+    /**
+     * Gets the shootables node.
+     *
+     * @return the shootables node
+     */
+    public Node getShootablesNode() {
+        return ControlManager.getInstance().getShootablesNode();
     }
 
     /**
@@ -578,6 +582,10 @@ public abstract class AbstractControl {
         ArrayList<ShipGroup> sgs = new ArrayList<ShipGroup>(shipGroupSelection);
         return sgs;
 
+    }
+
+    public Player getControllingPlayer() {
+        return controllingPlayer;
     }
 
     /**
@@ -604,6 +612,7 @@ public abstract class AbstractControl {
 
     /**
      * Updates the rectangle on screen.
+     *
      * @param click2d the current cursor-pos
      */
     private void updateDragRect(Vector2f click2d) {
@@ -633,24 +642,6 @@ public abstract class AbstractControl {
         dragRectangle.setY((int) (startScreenPos.y));
 
         lastXZPlanePos = currentXZPlanePos;
-    }
-
-    /**
-     * Adds the shootable to the nodes that can be hit.
-     *
-     * @param spat the spat
-     */
-    public void addShootable(Spatial spat) {
-        shootablesNode.attachChild(spat);
-    }
-
-    /**
-     * Removes the shootable from the nodes that can be hit.
-     *
-     * @param spat the spat
-     */
-    public void removeShootable(Spatial spat) {
-        shootablesNode.detachChild(spat);
     }
 
     /**

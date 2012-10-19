@@ -25,7 +25,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Player;
 import java.util.logging.Level;
 
@@ -175,7 +175,7 @@ public class StandardControl extends AbstractControl {
      * Is executed if the mouse-weel is scrolled.
      */
     protected void onMouseWeel(String name) {
-        Player local = Hub.getLocalPlayer();
+        Player local = controllingPlayer;
 
         if (!(name.equals(InputMappings.PERCENT_DOWN)
                 || name.equals(InputMappings.PERCENT_UP))) {

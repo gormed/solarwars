@@ -26,6 +26,7 @@ import com.jme3.effect.ParticleEmitter;
 import com.jme3.scene.Node;
 import com.solarwars.Hub;
 import com.solarwars.controls.AbstractControl;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
 import com.solarwars.entities.ShipBatchManager;
@@ -170,7 +171,7 @@ public class Level {
     /**
      * The control.
      */
-    private AbstractControl control;
+    private ControlManager control;
     /**
      * The players by id.
      */
@@ -198,7 +199,7 @@ public class Level {
      * @param gui the gui
      * @param players the players
      */
-    public Level(Node rootNode, AssetManager assetManager, AbstractControl control,
+    public Level(Node rootNode, AssetManager assetManager, ControlManager control,
             HashMap<Integer, Player> players) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, System.currentTimeMillis());
@@ -215,7 +216,7 @@ public class Level {
      * @param seed the seed
      */
     public Level(Node rootNode, AssetManager assetManager,
-            AbstractControl control, HashMap<Integer, Player> players, long seed) {
+            ControlManager control, HashMap<Integer, Player> players, long seed) {
         this.playersByID = players;
         setup(rootNode, assetManager, control, seed);
     }
@@ -296,7 +297,7 @@ public class Level {
         return planetNodes;
     }
 
-    public AbstractControl getControl() {
+    public ControlManager getControlManager() {
         return control;
     }
 
@@ -324,7 +325,8 @@ public class Level {
      * @param control the control
      * @param seed the seed
      */
-    private void setup(Node rootNode, AssetManager assetManager, AbstractControl control, long seed) {
+    private void setup(Node rootNode, AssetManager assetManager, 
+            ControlManager control, long seed) {
         this.seed = seed;
 
         // Init needed system refs

@@ -25,6 +25,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
 import com.solarwars.controls.AbstractControl;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.gamestates.CreateServerState;
 import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.MainmenuState;
@@ -34,7 +35,7 @@ import com.solarwars.gamestates.OptionsState;
 import com.solarwars.gamestates.ServerLobbyState;
 import com.solarwars.gamestates.SingleplayerMatchState;
 import com.solarwars.gamestates.TutorialState;
-import com.solarwars.input.KeyInputManager;
+import com.solarwars.controls.input.KeyInputManager;
 import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
@@ -97,7 +98,7 @@ public class SolarWarsGame {
     private SolarWarsApplication application;
     private AssetManager assetManager;
     private NetworkManager networkManager;
-    private AbstractControl control;
+    private ControlManager control;
     private InputManager inputManager;
     private FontLoader fontLoader;
     private ActionLib actionLib;
@@ -122,7 +123,7 @@ public class SolarWarsGame {
         assetManager = app.getAssetManager();
         stateManager = app.getStateManager();
 
-        control = app.getControl();
+        control = app.getControlManager();
 
         audioManager = AudioManager.getInstance();
         audioManager.initialize();

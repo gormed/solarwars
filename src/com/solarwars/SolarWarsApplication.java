@@ -45,16 +45,20 @@ import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
 import com.solarwars.controls.AbstractControl;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.controls.StandardControl;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.log.Logging;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.Nifty;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  * The Class SolarWarsApplication.
@@ -76,11 +80,15 @@ public class SolarWarsApplication extends Application {
     //      Static Fields
     //==========================================================================
     public static boolean TOON_ENABLED = SolarWarsSettings.getInstance().isToonEnabled();
-    /** Flag for Bloom-Effect */
+    /**
+     * Flag for Bloom-Effect
+     */
     public static boolean BLOOM_ENABLED = SolarWarsSettings.getInstance().isBloomEnabled();
     public static boolean NIFTY_LOGGING = false;
     public static boolean NIFTY_USE_COLORED_PANELS = false;
-    /** The logger for the complete client, called 'com.solarwars'*/
+    /**
+     * The logger for the complete client, called 'com.solarwars'
+     */
     private static final Logger clientLogger =
             Logger.getLogger(
             SolarWarsApplication.class.getPackage().getName() /* com.solarwars */);
@@ -124,8 +132,9 @@ public class SolarWarsApplication extends Application {
 
     /**
      * Instantiates a new solar wars application.
-     * @param thisHasNoUse Only here because we need a empty public 
-     * constructor for Android.
+     *
+     * @param thisHasNoUse Only here because we need a empty public constructor
+     * for Android.
      */
     private SolarWarsApplication(boolean thisHasNoUse) {
         super();
@@ -142,7 +151,9 @@ public class SolarWarsApplication extends Application {
     public SolarWarsApplication() {
         super();
     }
-    /** The instance. */
+    /**
+     * The instance.
+     */
     private static SolarWarsApplication instance;
     //==========================================================================
     //      Protected & Private Fields
@@ -157,7 +168,7 @@ public class SolarWarsApplication extends Application {
     protected StatsView statsView;
     protected IsoCamera isoCam;
     protected Vector2f lastScreenPos;
-    protected AbstractControl control;
+    protected ControlManager controlManager;
     protected boolean showSettings = true;
     private String pingString = "";
     private boolean showFps = true;
@@ -168,12 +179,16 @@ public class SolarWarsApplication extends Application {
     private SolarWarsGame game;
     private NiftyJmeDisplay niftyJmeDisplay;
     private boolean lostFocus = false;
-    /** value for the delay if in network */
+    /**
+     * value for the delay if in network
+     */
     private float tempDelay;
     private float lastDelay = 0;
     private float currentDelay = 0;
     private float interpolator = 0;
-    /** indicates that the application already is at current max delay */
+    /**
+     * indicates that the application already is at current max delay
+     */
     private boolean syncronized;
     private float realTimePerFrame;
     private float correctedTimePerFrame;
@@ -214,8 +229,8 @@ public class SolarWarsApplication extends Application {
      *
      * @return the iso control
      */
-    public AbstractControl getControl() {
-        return control;
+    public ControlManager getControlManager() {
+        return controlManager;
     }
 
     public Nifty getNiftyGUI() {
@@ -328,24 +343,35 @@ public class SolarWarsApplication extends Application {
      */
     @Override
     public void start() {
-        //initSettings();
-        // set some default settings in-case
-        // settings dialog is not shown
-        boolean loadSettings = false;
-        if (settings == null) {
-            setSettings(SolarWarsSettings.getInstance().toAppSettings());
-            loadSettings = true;
-        }
-
-        // show settings dialog
-        if (showSettings) {
-            if (!JmeSystem.showSettingsDialog(settings, loadSettings)) {
-                return;
+        try {
+            //initSettings();
+            // set some default settings in-case
+            // settings dialog is not shown
+            boolean loadSettings = false;
+            if (settings == null) {
+                setSettings(SolarWarsSettings.getInstance().toAppSettings());
+                loadSettings = true;
             }
+
+            // show settings dialog
+            if (showSettings) {
+                if (!JmeSystem.showSettingsDialog(settings, loadSettings)) {
+                    return;
+                }
+            }
+            BufferedImage buff16 = ImageIO.read(getClass().
+                    getResourceAsStream("/Interface/icon16.png"));
+            BufferedImage buff32 = ImageIO.read(getClass().
+                    getResourceAsStream("/Interface/icon32.png"));
+            settings.setIcons(new BufferedImage[]{buff16, buff32});
+            settings.setUseJoysticks(true);
+            //re-setting settings they can have been merged from the registry.
+            setSettings(settings);
+            super.start(JmeContext.Type.Display);
+        } catch (IOException ex) {
+            Logger.getLogger(SolarWarsApplication.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
         }
-        //re-setting settings they can have been merged from the registry.
-        setSettings(settings);
-        super.start(JmeContext.Type.Display);
     }
 
 
@@ -385,9 +411,11 @@ public class SolarWarsApplication extends Application {
         // setup the lighting
         setupLights();
         // setup control
-        control = new StandardControl();
-        control.initialize();
-        
+        controlManager = ControlManager.getInstance();
+        controlManager.initialize(inputManager, rootNode);
+//        control = new StandardControl();
+//        control.initialize();
+
         // load, init and start game
         game = SolarWarsGame.getInstance();
         game.initialize(this);
@@ -432,7 +460,7 @@ public class SolarWarsApplication extends Application {
     /**
      * Attach iso camera control.
      */
-    public void attachIsoCameraControl() {
+    public void attachCameraAndControl() {
         if (inputManager != null) {
             // Init controls
             isoCam = IsoCamera.getInstance();
@@ -441,7 +469,7 @@ public class SolarWarsApplication extends Application {
             isoCam.registerWithInput(inputManager);
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
-            control.addControlListener();
+            controlManager.attachControlListeners();//addControlListener();
 
         }
         isoCam.reset();
@@ -454,8 +482,8 @@ public class SolarWarsApplication extends Application {
         if (inputManager != null && isoCam != null) {
             isoCam.destroy();
             isoCam = null;
-            control.cleanUp();
-            control.removeControlListener();
+//            controlManager.cleanUp();
+            controlManager.detachControlListeners();
         }
     }
 
@@ -528,8 +556,8 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleUpdate(float tpf) {
         try {
-            if (isoCam != null && control != null) {
-                control.updateSelection(tpf);
+            if (isoCam != null && controlManager != null) {
+                controlManager.update(tpf);
                 if (isoCam.isDragged()) {
                     Vector2f currentSceenPos = inputManager.getCursorPosition().clone();
                     isoCam.dragCamera(tpf, currentSceenPos);
@@ -589,6 +617,7 @@ public class SolarWarsApplication extends Application {
 
     /**
      * Syncs the client to the server with the current delay.
+     *
      * @param delay the delay between server and this client.
      */
     public void syncronize(float delay) {
@@ -614,9 +643,10 @@ public class SolarWarsApplication extends Application {
     }
 
     /**
-     * Checks if the client is already synced in this frame. 
-     * Will be reset on frame-end.
-     * @return 
+     * Checks if the client is already synced in this frame. Will be reset on
+     * frame-end.
+     *
+     * @return
      */
     public boolean isSyncronized() {
         return syncronized;
@@ -633,7 +663,8 @@ public class SolarWarsApplication extends Application {
 
     /**
      * Checks if paused.
-     * @return 
+     *
+     * @return
      */
     public boolean isPaused() {
         return paused;
@@ -641,8 +672,10 @@ public class SolarWarsApplication extends Application {
 
     /**
      * Gets the corrected time, according to the delay to the server.
-     * correctedTimePerFrame = tpf + (lastDelay + currentDelay) * timer.getTimePerFrame
-     * @return 
+     * correctedTimePerFrame = tpf + (lastDelay + currentDelay) *
+     * timer.getTimePerFrame
+     *
+     * @return
      */
     public float getCorrectedTimePerFrame() {
         return correctedTimePerFrame;
@@ -650,7 +683,8 @@ public class SolarWarsApplication extends Application {
 
     /**
      * The time on this client needed for the frame.
-     * @return 
+     *
+     * @return
      */
     public float getRealTimePerFrame() {
         return realTimePerFrame;
@@ -664,12 +698,12 @@ public class SolarWarsApplication extends Application {
         rootNode.addLight(sun);
     }
 
-    /**                                                         
-     * The listener interface for receiving appAction events.
-     * The class that is interested in processing a appAction
-     * event implements this interface, and the object created
-     * with that class is registered with a component using the
-     * component's <code>addAppActionListener<code> method. When
+    /**
+     * The listener interface for receiving appAction events. The class that is
+     * interested in processing a appAction event implements this interface, and
+     * the object created with that class is registered with a component using
+     * the component's
+     * <code>addAppActionListener<code> method. When
      * the appAction event occurs, that object's appropriate
      * method is invoked.
      *

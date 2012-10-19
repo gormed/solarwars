@@ -24,7 +24,7 @@ package com.solarwars.gamestates.gui;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.InputListener;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import de.lessvoid.nifty.EndNotify;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.effects.EffectEventId;

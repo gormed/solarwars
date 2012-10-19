@@ -53,15 +53,12 @@ public class Hub {
     private static Player localPlayer;
 
     public static Player getLastPlayer() {
-        int lostPlayerCount = 0;
         int wonPlayerCount = 0;
         Player last = null;
         for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
             Player p = entry.getValue();
             if (p != null) {
-                if (p.hasLost()) {
-                    lostPlayerCount++;
-                } else {
+                if (!p.hasLost()) {
                     last = p;
                     wonPlayerCount++;
                 }

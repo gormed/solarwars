@@ -24,7 +24,7 @@ package com.solarwars.gamestates.gui;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.solarwars.SolarWarsApplication;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import de.lessvoid.nifty.Nifty;

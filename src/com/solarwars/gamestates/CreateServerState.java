@@ -33,6 +33,7 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.gamestates.gui.ConnectedPlayerItem;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.logic.DeathmatchGameplay;
@@ -186,11 +187,11 @@ public class CreateServerState extends Gamestate
      * Starts a multiplayer game as server.
      */
     private void startGame() {
-        application.attachIsoCameraControl();
+        application.attachCameraAndControl();
         com.solarwars.logic.Level mpLevel = new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
-                SolarWarsApplication.getInstance().getControl(),
+                SolarWarsApplication.getInstance().getControlManager(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
     }
@@ -260,7 +261,8 @@ public class CreateServerState extends Gamestate
 
         Player hostPlayer = new Player(hostPlayerName,
                 Player.PLAYER_COLORS[id], id, true);
-
+        hostPlayer.initialize(ControlManager.getInstance().getControl(hostPlayer), true);
+        
         serverHub.initialize(hostPlayer, null);
         // hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
@@ -619,6 +621,7 @@ public class CreateServerState extends Gamestate
                             pcm.getName(),
                             Player.getUnusedColor(ServerHub.getPlayers(), source.getId()),
                             source.getId());
+                    newPlayer.initialize(null, false);
                     // ServerHub.getContiniousPlayerID());
                 } else {
                     newPlayer = ServerHub.getHostPlayer();

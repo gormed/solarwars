@@ -207,8 +207,8 @@ public class GeneratorSquare extends LevelGenerator {
                 arrayX++;
             }
         }
-        if (level.getControl() != null) {
-            level.getControl().addShootable(level.getLevelNode());
+        if (level.getControlManager().isInitialized()) {
+            level.getControlManager().addShootable(level.getLevelNode());
         }
         System.out.println("Level generated!");
         // setupPlayers(level.playersByID, r);

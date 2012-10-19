@@ -34,7 +34,7 @@ import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.gamestates.gui.PlayerStatsModule;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
 import com.solarwars.logic.Player;
@@ -56,328 +56,324 @@ import java.util.logging.Logger;
  */
 public class MultiplayerMatchState extends Gamestate {
 
-	// GUI
-	private PausePopup pauseListener;
-	private Element statsLayer;
-	private GameStatsModule gameStatsModule;
-	private PlayerStatsModule playerStatsModule;
-	private GameOverModule gameOverModule;
-	private GameChatModule gameChatModule;
-	// Network and game
-	private Hub hub;
-	private Level currentLevel;
-	private MultiplayerGameplay gameplay;
-	private Client client;
-	private PlayerStateListener playerStateListener = new PlayerStateListener();
-	private ClientMessageListener clientMessageListener = new ClientMessageListener();
-	private boolean lostConnection;
+    // GUI
+    private PausePopup pauseListener;
+    private Element statsLayer;
+    private GameStatsModule gameStatsModule;
+    private PlayerStatsModule playerStatsModule;
+    private GameOverModule gameOverModule;
+    private GameChatModule gameChatModule;
+    // Network and game
+    private Hub hub;
+    private Level currentLevel;
+    private MultiplayerGameplay gameplay;
+    private Client client;
+    private PlayerStateListener playerStateListener = new PlayerStateListener();
+    private ClientMessageListener clientMessageListener = new ClientMessageListener();
+    private boolean lostConnection;
 
-	/**
-	 * Instantiates a new multiplayer match state.
-	 */
-	public MultiplayerMatchState() {
-		super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
-		this.application = SolarWarsApplication.getInstance();
-		// create pause listener
-		pauseListener = new PausePopup(niftyGUI);
-		gameOverModule = new GameOverModule(niftyGUI);
-	}
+    /**
+     * Instantiates a new multiplayer match state.
+     */
+    public MultiplayerMatchState() {
+        super(SolarWarsGame.MULTIPLAYER_MATCH_STATE);
+        this.application = SolarWarsApplication.getInstance();
+        // create pause listener
+        pauseListener = new PausePopup(niftyGUI);
+        gameOverModule = new GameOverModule(niftyGUI);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.solarwars.gamestates.Gamestate#update(float)
-	 */
-	@Override
-	public void update(float tpf) {
-		if (isEnabled()) {
-			if (!gameOverModule.isVisible()
-					&& (currentLevel.isGameOver() || Hub.getLocalPlayer()
-							.hasLost())) {
-				gameOverModule.showPopup();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.solarwars.gamestates.Gamestate#update(float)
+     */
+    @Override
+    public void update(float tpf) {
+        if (isEnabled()) {
+            if (!gameOverModule.isVisible()
+                    && (currentLevel.isGameOver() || Hub.getLocalPlayer()
+                    .hasLost())) {
+                gameOverModule.showPopup();
 
-			}
-			if (!lostConnection && !currentLevel.isGameOver()) {
-				gameplay.update(tpf);
-				currentLevel.updateLevel(tpf);
-				updateNifty(tpf);
+            }
+            if (!lostConnection && !currentLevel.isGameOver()) {
+                gameplay.update(tpf);
+                currentLevel.updateLevel(tpf);
+                updateNifty(tpf);
 
-			}
-			if (lostConnection) {
-				switchToState(SolarWarsGame.MULTIPLAYER_STATE);
-				// GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
-			}
-		} else {
-		}
-	}
+            }
+            if (lostConnection) {
+                switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+                // GamestateManager.getInstance().enterState(GamestateManager.MULTIPLAYER_STATE);
+            }
+        } else {
+        }
+    }
 
-	private void updateNifty(float tpf) {
-		gameStatsModule.update(tpf);
-		// only after gamestats where updated!
-		playerStatsModule.update(tpf);
-	}
+    private void updateNifty(float tpf) {
+        gameStatsModule.update(tpf);
+        // only after gamestats where updated!
+        playerStatsModule.update(tpf);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame
-	 * )
-	 */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame
+     * )
+     */
+    @Override
+    protected void loadContent() {
 
-	@Override
-	protected void loadContent() {
+        // NIFTY GUI
+        niftyGUI.gotoScreen("multiplayer");
+        setupNiftyGUI();
 
-		// NIFTY GUI
-		niftyGUI.gotoScreen("multiplayer");
-		setupNiftyGUI();
+        // LOGIC
+        lostConnection = false;
+        hub = Hub.getInstance();
+        application.setPauseOnLostFocus(false);
+        client = NetworkManager.getInstance().getThisClient();
+        client.addClientStateListener(playerStateListener);
+        client.addMessageListener(clientMessageListener,
+                PlayerLeavingMessage.class);
+        gameplay = MultiplayerGameplay.getInstance();
 
-		// LOGIC
-		lostConnection = false;
-		hub = Hub.getInstance();
-		application.setPauseOnLostFocus(false);
-		client = NetworkManager.getInstance().getThisClient();
-		client.addClientStateListener(playerStateListener);
-		client.addMessageListener(clientMessageListener,
-				PlayerLeavingMessage.class);
-		gameplay = MultiplayerGameplay.getInstance();
+        currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
+        currentLevel.generateLevel();
+        // currentLevel.setupPlayers(Hub.playersByID);
 
-		currentLevel = SolarWarsGame.getInstance().getCurrentLevel();
-		currentLevel.generateLevel();
-		// currentLevel.setupPlayers(Hub.playersByID);
+        AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_LOAD);
+    }
 
-		AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_LOAD);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.solarwars.gamestates.Gamestate#unloadContent()
+     */
+    @Override
+    protected void unloadContent() {
+        // pause gui
+        application.getInputManager().removeListener(pauseListener);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.solarwars.gamestates.Gamestate#unloadContent()
-	 */
-	@Override
-	protected void unloadContent() {
-		// pause gui
-		application.getInputManager().removeListener(pauseListener);
+        lostConnection = false;
+        // NetworkManager networkManager = NetworkManager.getInstance();
+        // networkManager.getChatModule().destroy();
+        gameChatModule.destroy();
 
-		lostConnection = false;
-		// NetworkManager networkManager = NetworkManager.getInstance();
-		// networkManager.getChatModule().destroy();
-		gameChatModule.destroy();
+        Future<Thread> fut = application.enqueue(new Callable<Thread>() {
+            @Override
+            public Thread call() throws Exception {
+                return NetworkManager.getInstance().closeAllConnections(
+                        NetworkManager.WAIT_FOR_CLIENTS);
+            }
+        });
 
-		Future<Thread> fut = application.enqueue(new Callable<Thread>() {
+        try {
+            Thread diconnector = fut
+                    .get(NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT,
+                    TimeUnit.SECONDS);
+            diconnector.interrupt();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).log(
+                    java.util.logging.Level.SEVERE, ex.getMessage(), ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).log(
+                    java.util.logging.Level.SEVERE, ex.getMessage(), ex);
+        } catch (TimeoutException ex) {
+            Logger.getLogger(MultiplayerMatchState.class.getName()).log(
+                    java.util.logging.Level.SEVERE,
+                    "Server did not shut down in time: {0} {1}",
+                    new Object[]{ex.getMessage(), ex});
+        }
 
-			@Override
-			public Thread call() throws Exception {
-				return NetworkManager.getInstance().closeAllConnections(
-						NetworkManager.WAIT_FOR_CLIENTS);
-			}
-		});
+        // GameOverGUI.getInstance().hide();
+        // application.getInputManager().removeListener(pauseListener);
+        // pauseListener = null;
+        hub.destroy();
+        hub = null;
 
-		try {
-			Thread diconnector = fut
-					.get(NetworkManager.MAXIMUM_DISCONNECT_TIMEOUT,
-							TimeUnit.SECONDS);
-			diconnector.interrupt();
-		} catch (InterruptedException ex) {
-			Logger.getLogger(MultiplayerMatchState.class.getName()).log(
-					java.util.logging.Level.SEVERE, ex.getMessage(), ex);
-		} catch (ExecutionException ex) {
-			Logger.getLogger(MultiplayerMatchState.class.getName()).log(
-					java.util.logging.Level.SEVERE, ex.getMessage(), ex);
-		} catch (TimeoutException ex) {
-			Logger.getLogger(MultiplayerMatchState.class.getName()).log(
-					java.util.logging.Level.SEVERE,
-					"Server did not shut down in time: {0} {1}",
-					new Object[] { ex.getMessage(), ex });
-		}
+        playerStatsModule = null;
+        gameStatsModule = null;
 
-		// GameOverGUI.getInstance().hide();
-		// application.getInputManager().removeListener(pauseListener);
-		// pauseListener = null;
-		hub.destroy();
-		hub = null;
+        currentLevel.destroy();
 
-		playerStatsModule = null;
-		gameStatsModule = null;
+        if (client != null) {
+            client.removeClientStateListener(playerStateListener);
+            client.removeMessageListener(clientMessageListener,
+                    PlayerLeavingMessage.class);
+        }
+        gameplay.destroy();
+        gameplay = null;
+        application.detachIsoCameraControl();
 
-		currentLevel.destroy();
+    }
 
-		if (client != null) {
-			client.removeClientStateListener(playerStateListener);
-			client.removeMessageListener(clientMessageListener,
-					PlayerLeavingMessage.class);
-		}
-		gameplay.destroy();
-		gameplay = null;
-		application.detachIsoCameraControl();
+    /**
+     * Setup gui.
+     */
+    private void setupNiftyGUI() {
+        pauseListener.hidePopup();
+        gameOverModule.hidePopup();
+        gameOverModule.setWatchGame(false);
+        // attach listener for pause layer
+        application.getInputManager().addListener(pauseListener,
+                InputMappings.PAUSE_GAME);
+        // attach stats module
+        gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
+        gameStatsModule.addPlayers(Hub.getPlayers());
 
-	}
+        playerStatsModule = new PlayerStatsModule(niftyGUI,
+                Hub.getLocalPlayer(), gameStatsModule);
+        // CHAT ------------------------------------------
+        // attach chat module
+        gameChatModule = new GameChatModule(niftyGUI,
+                NetworkManager.getInstance());
+        // get input fields
+        textInput = niftyGUI.getCurrentScreen().findElementByName(
+                "chat_text_field");
+        textInputField = textInput.findNiftyControl("chat_text_field",
+                TextField.class);
+        // add input handler for button click to send message
+        textInput.addInputHandler(new KeyInputHandler() {
+            @Override
+            public boolean keyEvent(NiftyInputEvent inputEvent) {
+                if (inputEvent == null) {
+                    return false;
+                }
+                switch (inputEvent) {
+                    case SubmitText:
+                        sendMessage();
+                        return true;
+                    default:
+                        return false;
+                }
 
-	/**
-	 * Setup gui.
-	 */
-	private void setupNiftyGUI() {
-		pauseListener.hidePopup();
-		gameOverModule.hidePopup();
-		gameOverModule.setWatchGame(false);
-		// attach listener for pause layer
-		application.getInputManager().addListener(pauseListener,
-				InputMappings.PAUSE_GAME);
-		// attach stats module
-		gameStatsModule = new GameStatsModule(niftyGUI, currentLevel);
-		gameStatsModule.addPlayers(Hub.getPlayers());
+            }
+        });
+        textInput.setFocus();
+        // CHAT ------------------------------------------
 
-		playerStatsModule = new PlayerStatsModule(niftyGUI,
-				Hub.getLocalPlayer(), gameStatsModule);
-		// CHAT ------------------------------------------
-		// attach chat module
-		gameChatModule = new GameChatModule(niftyGUI,
-				NetworkManager.getInstance());
-		// get input fields
-		textInput = niftyGUI.getCurrentScreen().findElementByName(
-				"chat_text_field");
-		textInputField = textInput.findNiftyControl("chat_text_field",
-				TextField.class);
-		// add input handler for button click to send message
-		textInput.addInputHandler(new KeyInputHandler() {
+        // creates the drag-rect geometry
+        game.getApplication().getControlManager().createDragRectGeometry();
+    }
 
-			@Override
-			public boolean keyEvent(NiftyInputEvent inputEvent) {
-				if (inputEvent == null) {
-					return false;
-				}
-				switch (inputEvent) {
-				case SubmitText:
-					sendMessage();
-					return true;
-				default:
-					return false;
-				}
+    public void continueGame() {
+        AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+        pauseListener.hidePopup();
+    }
 
-			}
-		});
-		textInput.setFocus();
-		// CHAT ------------------------------------------
+    public void quitGame() {
+        AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+        pauseListener.hidePopup();
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
 
-		// creates the drag-rect geometry
-		game.getApplication().getControl().createDragRectGeometry();
-	}
+    }
 
-	public void continueGame() {
-		AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-		pauseListener.hidePopup();
-	}
+    public void onWatchGame() {
+        AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+        gameOverModule.setWatchGame(true);
+        gameOverModule.hidePopup();
+    }
 
-	public void quitGame() {
-		AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-		pauseListener.hidePopup();
-		switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+    public void onLeaveGame() {
+        AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
+        gameOverModule.hidePopup();
+        switchToState(SolarWarsGame.MULTIPLAYER_STATE);
+    }
 
-	}
+    public int refreshPercentage() {
+        return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
+    }
+    // ==========================================================================
+    // === Chat
+    // ==========================================================================
+    private Element textInput;
+    private TextField textInputField;
 
-	public void onWatchGame() {
-		AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-		gameOverModule.setWatchGame(true);
-		gameOverModule.hidePopup();
-	}
+    /**
+     * Sends a message to the chat area
+     */
+    public void sendMessage() {
+        String message = textInputField.getText();
+        if (checkMessageStyle(message)) {
+            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer()
+                    .getId(), message);
+            gameChatModule.playerSays(Hub.getLocalPlayer(), message);
+        }
+        textInputField.setText("");
+        textInput.setFocus();
+    }
 
-	public void onLeaveGame() {
-		AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_CLICK);
-		gameOverModule.hidePopup();
-		switchToState(SolarWarsGame.MULTIPLAYER_STATE);
-	}
+    private boolean checkMessageStyle(String message) {
+        boolean messageLengthOkay = message.length() >= 2;
+        return messageLengthOkay;
+    }
 
-	public int refreshPercentage() {
-		return (int) (Hub.getLocalPlayer().getShipPercentage() * 100);
-	}
+    /**
+     * The listener interface for receiving playerState events. The class that
+     * is interested in processing a playerState event implements this
+     * interface, and the object created with that class is registered with a
+     * component using the component's
+     * <code>addPlayerStateListener<code> method. When
+     * the playerState event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see PlayerStateEvent
+     */
+    private class PlayerStateListener implements ClientStateListener {
 
-	// ==========================================================================
-	// === Chat
-	// ==========================================================================
-	private Element textInput;
-	private TextField textInputField;
+        /*
+         * (non-Javadoc)
+         * 
+         * @see
+         * com.jme3.network.ClientStateListener#clientConnected(com.jme3.network
+         * .Client)
+         */
+        @Override
+        public void clientConnected(Client c) {
+        }
 
-	/**
-	 * Sends a message to the chat area
-	 */
-	public void sendMessage() {
-		String message = textInputField.getText();
-		if (checkMessageStyle(message)) {
-			gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer()
-					.getId(), message);
-			gameChatModule.playerSays(Hub.getLocalPlayer(), message);
-		}
-		textInputField.setText("");
-		textInput.setFocus();
-	}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see
+         * com.jme3.network.ClientStateListener#clientDisconnected(com.jme3.
+         * network.Client, com.jme3.network.ClientStateListener.DisconnectInfo)
+         */
+        @Override
+        public void clientDisconnected(Client c, DisconnectInfo info) {
+            System.out.print("[Client #" + c.getId()
+                    + "] - Disconnect from server: ");
 
-	private boolean checkMessageStyle(String message) {
-		boolean messageLengthOkay = message.length() >= 2;
-		return messageLengthOkay;
-	}
+            if (info != null) {
+                Logger.getLogger(MultiplayerMatchState.class.getName()).info(
+                        info.reason);
+                lostConnection = true;
+            } else {
+                Logger.getLogger(MultiplayerMatchState.class.getName()).info(
+                        "client closed");
+                lostConnection = true;
+            }
+            // if (c.equals(client)) {
+            // noServerFound = true;
+            // }
+        }
+    }
 
-	/**
-	 * The listener interface for receiving playerState events. The class that
-	 * is interested in processing a playerState event implements this
-	 * interface, and the object created with that class is registered with a
-	 * component using the component's
-	 * <code>addPlayerStateListener<code> method. When
-	 * the playerState event occurs, that object's appropriate
-	 * method is invoked.
-	 * 
-	 * @see PlayerStateEvent
-	 */
-	private class PlayerStateListener implements ClientStateListener {
+    public class ClientMessageListener implements MessageListener<Client> {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.jme3.network.ClientStateListener#clientConnected(com.jme3.network
-		 * .Client)
-		 */
-		@Override
-		public void clientConnected(Client c) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * com.jme3.network.ClientStateListener#clientDisconnected(com.jme3.
-		 * network.Client, com.jme3.network.ClientStateListener.DisconnectInfo)
-		 */
-		@Override
-		public void clientDisconnected(Client c, DisconnectInfo info) {
-			System.out.print("[Client #" + c.getId()
-					+ "] - Disconnect from server: ");
-
-			if (info != null) {
-				Logger.getLogger(MultiplayerMatchState.class.getName()).info(
-						info.reason);
-				lostConnection = true;
-			} else {
-				Logger.getLogger(MultiplayerMatchState.class.getName()).info(
-						"client closed");
-				lostConnection = true;
-			}
-			// if (c.equals(client)) {
-			// noServerFound = true;
-			// }
-		}
-	}
-
-	public class ClientMessageListener implements MessageListener<Client> {
-
-		@Override
-		public void messageReceived(Client source, Message message) {
-			if (message instanceof PlayerLeavingMessage) {
-				PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
-				Player p = plm.getPlayer();
-				p.setLeaver(true);
-				gameChatModule.playerLeaves(p);
-				Hub.getInstance().removePlayer(p);
-			}
-		}
-	}
+        @Override
+        public void messageReceived(Client source, Message message) {
+            if (message instanceof PlayerLeavingMessage) {
+                PlayerLeavingMessage plm = (PlayerLeavingMessage) message;
+                Player p = plm.getPlayer();
+                p.setLeaver(true);
+                gameChatModule.playerLeaves(p);
+                Hub.getInstance().removePlayer(p);
+            }
+        }
+    }
 }

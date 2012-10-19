@@ -85,8 +85,8 @@ public class GeneratorClassic extends LevelGenerator {
                 }
             }
         }
-        if (level.getControl() != null) {
-            level.getControl().addShootable(level.getLevelNode());
+        if (level.getControlManager().isInitialized()) {
+            level.getControlManager().addShootable(level.getLevelNode());
         }
         setupPlayers(level.getPlayersByID());
         levelLoaded = true;

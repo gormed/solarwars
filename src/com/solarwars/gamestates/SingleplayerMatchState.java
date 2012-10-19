@@ -28,12 +28,13 @@ import com.jme3.math.ColorRGBA;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.ControlManager;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.gamestates.gui.PlayerStatsModule;
 import com.solarwars.gamestates.gui.StartGamePopup;
-import com.solarwars.input.InputMappings;
 import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
@@ -100,7 +101,7 @@ public class SingleplayerMatchState extends Gamestate {
         // setup game for singleplayer
         setupSingleplayer();
         // attach iso control
-        application.attachIsoCameraControl();
+        application.attachCameraAndControl();
         application.getInputManager().addListener(
                 pauseToggle,
                 InputMappings.PAUSE_GAME);
@@ -108,7 +109,7 @@ public class SingleplayerMatchState extends Gamestate {
         currentLevel = new Level(
                 application.getRootNode(),
                 application.getAssetManager(),
-                application.getControl(),
+                application.getControlManager(),
                 Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
         currentLevel.generateLevel(System.currentTimeMillis());
@@ -143,7 +144,7 @@ public class SingleplayerMatchState extends Gamestate {
         playerStatsModule = new PlayerStatsModule(
                 niftyGUI, Hub.getLocalPlayer(), gameStatsModule);
         // creates the drag-rect geometry
-        game.getApplication().getControl().createDragRectGeometry();
+        game.getApplication().getControlManager().createDragRectGeometry();
 //        startGamePopup.showPopup();
 
     }
@@ -194,8 +195,10 @@ public class SingleplayerMatchState extends Gamestate {
      */
     private void setupSingleplayer() {
         Player local = new Player("Human", ColorRGBA.Blue, ServerHub.getContiniousPlayerID(), true);
+        local.initialize(ControlManager.getInstance().getControl(local), true);
         Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
-
+        local.initialize(null, false);
+        
         hub.initialize(local, null);
         hub.addPlayer(ai);
         hub.addPlayer(local);

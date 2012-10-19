@@ -21,13 +21,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
-import java.util.ArrayList;
-
 import com.jme3.math.ColorRGBA;
 import com.jme3.network.serializing.Serializable;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.AbstractControl;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.ShipGroup;
+import java.util.ArrayList;
 
 /**
  * The Class Player.
@@ -35,7 +36,9 @@ import com.solarwars.entities.ShipGroup;
 @Serializable
 public class Player {
 
-    /** The Constant PLAYER_COLORS. */
+    /**
+     * The Constant PLAYER_COLORS.
+     */
     public static final ColorRGBA[] PLAYER_COLORS = {
         new ColorRGBA(0.3f, 0.3f, 1.0f, 1.0f), ColorRGBA.Red,
         ColorRGBA.Green, ColorRGBA.LightGray,
@@ -51,8 +54,8 @@ public class Player {
      */
     public static ColorRGBA getUnusedColor(ArrayList<Player> players, int start) {
         ColorRGBA color = ColorRGBA.randomColor();
-        for (int i = start; i < PLAYER_COLORS.length; i++) {
-            color = PLAYER_COLORS[i];
+        for (int i = start; i < PLAYER_COLORS.length;) {
+            color = PLAYER_COLORS[i++];
             for (Player p : players) {
                 if (p.getColor().equals(color)) {
                     continue;
@@ -77,20 +80,34 @@ public class Player {
                     invokeGeneralAction(null, victorious, defeated, DeathmatchGameplay.GAME_OVER);
         }
     }
-
+    private boolean initialized = false;
     private static boolean hostSet = false;
-    /** The id. */
+    /**
+     * The id.
+     */
     private int id;
-    /** The artificial. */
+    /**
+     * The artificial.
+     */
     private AI artificial;
-    /** The planets. */
+    /**
+     * The planets.
+     */
     private ArrayList<AbstractPlanet> planets;
-    /** The ship groups. */
+    /**
+     * The ship groups.
+     */
     private ArrayList<ShipGroup> shipGroups;
-    /** The is host. */
+    /**
+     * The is host.
+     */
     private boolean isHost;
-    /** defines the state of a player. */
+    private boolean localPlayer;
+    /**
+     * defines the state of a player.
+     */
     private PlayerState state = new PlayerState();
+    private AbstractControl control;
 
     /**
      * Instantiates a new player.
@@ -106,11 +123,11 @@ public class Player {
      * @param id the id
      */
     public Player(String name, ColorRGBA color, int id) {
-        state.name = name;
-        state.color = color;
+        this.state.name = name;
+        this.state.color = color;
         this.id = id;
-        planets = new ArrayList<AbstractPlanet>();
-        shipGroups = new ArrayList<ShipGroup>();
+        this.planets = new ArrayList<AbstractPlanet>();
+        this.shipGroups = new ArrayList<ShipGroup>();
     }
 
     /**
@@ -122,26 +139,69 @@ public class Player {
      * @param isHost the is host
      */
     public Player(String name, ColorRGBA color, int id, boolean isHost) {
-        state.name = name;
-        state.color = color;
+        this.state.name = name;
+        this.state.color = color;
+        this.isHost = hostSet = true;
         this.id = id;
-        planets = new ArrayList<AbstractPlanet>();
-        shipGroups = new ArrayList<ShipGroup>();
+        this.planets = new ArrayList<AbstractPlanet>();
+        this.shipGroups = new ArrayList<ShipGroup>();
     }
 
     /**
-     * Gets the state.
+     * Initializes the player with a controller if it is a local player,
+     * otherwise it will be a player connected via network.
      *
-     * @return the state
+     * @param control the control from the ControlManager, null if not a local
+     * player
+     * @param localPlayer true if locally playing, false if network player
+     */
+    public void initialize(AbstractControl control, boolean localPlayer) {
+        if (initialized) {
+            return;
+        }
+        if (!localPlayer) {
+            this.control = control;
+        } else {
+            this.control = null;
+        }
+        this.localPlayer = localPlayer;
+        initialized = true;
+    }
+
+    /**
+     * Destroys the player object.
+     */
+    public void destroy() {
+        if (!initialized) {
+            return;
+        }
+        control.cleanUp();
+        control = null;
+        initialized = false;
+    }
+
+    /**
+     * Checks if the player has a control.
+     *
+     * @return true if available, false otherwise
+     */
+    public boolean hasControl() {
+        return control != null;
+    }
+
+    /**
+     * Gets the state of the player.
+     *
+     * @return the current state
      */
     public PlayerState getState() {
         return state;
     }
 
     /**
-     * Apply state.
+     * Apply a new state to the player.
      *
-     * @param newState the new state
+     * @param newState the new state to apply
      */
     void applyState(PlayerState newState) {
         this.state = newState;
@@ -150,14 +210,14 @@ public class Player {
     /**
      * Gets the color.
      *
-     * @return the color
+     * @return the color of the palyer
      */
     public ColorRGBA getColor() {
         return state.color;
     }
 
     /**
-     * Checks if is host.
+     * Checks if is host-player (means the first one in general).
      *
      * @return true, if is host
      */
@@ -165,6 +225,11 @@ public class Player {
         return isHost;
     }
 
+    /**
+     * Sets the host, if not already set.
+     *
+     * @return true if not already set, false otherwise
+     */
     public boolean setHost() {
         if (hostSet) {
             return false;
@@ -173,9 +238,8 @@ public class Player {
     }
 
     /**
-     * 
      * Returns if the player is defeated and out of game.
-     * 
+     *
      * @return true if player lost, false if still playing.
      */
     public boolean hasLost() {
@@ -183,18 +247,37 @@ public class Player {
     }
 
     /**
-     * Sets the lost.
+     * Sets the lost-flag of this player.
      */
     void setLost() {
         state.hasLost = true;
     }
 
+    /**
+     * Checks if the player is ready to play.
+     *
+     * @return true if ready, false otherwise
+     */
     public boolean isReady() {
         return state.isReady;
     }
 
+    /**
+     * Sets the ready flag of the player.
+     *
+     * @param value
+     */
     public void setReady(boolean value) {
         state.isReady = value;
+    }
+
+    /**
+     * Checks if this player is a local one, means not a network-player.
+     *
+     * @return true if local, false if network
+     */
+    public boolean isLocalPlayer() {
+        return localPlayer;
     }
 
     /**
@@ -237,6 +320,10 @@ public class Player {
      * Updates the player.
      */
     public void updatePlayer() {
+    }
+
+    public AbstractControl getControl() {
+        return control;
     }
 
     /**
@@ -393,10 +480,47 @@ public class Player {
         return ships;
     }
 
+    /**
+     * Checks if is aI.
+     *
+     * @return true, if is aI
+     */
+    public boolean isAI() {
+        return artificial != null;
+    }
+
+    /**
+     * Gets the aI.
+     *
+     * @return the aI
+     */
+    public AI getAI() {
+        return artificial;
+    }
+
+    /**
+     * Sets the aI.
+     *
+     * @param ai the new aI
+     */
+    void setAI(AI ai) {
+        artificial = ai;
+    }
+
+    /**
+     * Marks the player as leaver.
+     *
+     * @return true if left the game, false if still connected.
+     */
     public boolean isLeaver() {
         return state.leaver;
     }
 
+    /**
+     * Marks the player as leaver.
+     *
+     * @param value true if leaver, false if not
+     */
     public void setLeaver(boolean value) {
         state.leaver = value;
     }
@@ -504,33 +628,6 @@ public class Player {
     }
 
     /**
-     * Checks if is aI.
-     *
-     * @return true, if is aI
-     */
-    public boolean isAI() {
-        return artificial != null;
-    }
-
-    /**
-     * Gets the aI.
-     *
-     * @return the aI
-     */
-    public AI getAI() {
-        return artificial;
-    }
-
-    /**
-     * Sets the aI.
-     *
-     * @param ai the new aI
-     */
-    void setAI(AI ai) {
-        artificial = ai;
-    }
-
-    /**
      * Creates the ship group.
      *
      * @param sg the sg
@@ -577,8 +674,8 @@ public class Player {
     }
 
     /**
-     * Gets the planets.
-     *  TODO: Change back to package visibility
+     * Gets the planets. TODO: Change back to package visibility
+     *
      * @return the planets
      */
     public ArrayList<AbstractPlanet> getPlanets() {

@@ -27,7 +27,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.ColorRGBA;
 import com.solarwars.SolarWarsApplication;
-import com.solarwars.input.InputMappings;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Player;
 import com.solarwars.net.NetworkManager;
 import com.solarwars.net.messages.ChatMessage;
