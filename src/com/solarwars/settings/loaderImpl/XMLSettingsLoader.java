@@ -14,6 +14,7 @@ import com.solarwars.settings.GameSettings;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import com.solarwars.settings.saverImpl.XMLSettingsSaver;
+import java.awt.image.BufferedImage;
 
 
 /**
@@ -144,6 +145,8 @@ public class XMLSettingsLoader extends BaseSettingsLoader {
 			settings.putFloat(setting, Float.parseFloat(value));
 		} else if(type.equals(Boolean.class.getSimpleName())) {
 			settings.putBoolean(setting, Boolean.valueOf(value));
+		} else if(type.equals(BufferedImage[].class.getSimpleName())) {
+                    
 		} else {
 			throw new GameSettingsException(String.format("The type %s isn't supported yet.", type));
 		} 

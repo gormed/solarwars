@@ -358,7 +358,7 @@ public class Level {
 
         for (Map.Entry<Integer, Player> entrySet : Hub.playersByID.entrySet()) {
             Player p = entrySet.getValue();
-            Node n = new Node("Player " + p.getId() + " ShipNode");
+            Node n = new Node("Player " + p.getID() + " ShipNode");
             this.shipNodes.put(p, n);
             this.allShipsNode.attachChild(n);
         }

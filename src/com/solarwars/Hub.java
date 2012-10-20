@@ -121,13 +121,11 @@ public class Hub {
         if (initialized) {
             return;
         }
-        playersByID = new HashMap<Integer, Player>();
-        playersByName = new HashMap<String, Player>();
         Hub.localPlayer = localPlayer;
         addPlayer(localPlayer);
         if (players != null) {
             for (Player p : players) {
-                if (p.getId() != localPlayer.getId()) {
+                if (p.getID() != localPlayer.getID()) {
                     addPlayer(p);
                 }
             }
@@ -141,12 +139,12 @@ public class Hub {
      * @param p the p
      */
     public boolean addPlayer(Player p) {
-        if (playersByID.containsKey(p.getId())
+        if (playersByID.containsKey(p.getID())
                 || playersByName.containsKey(p.getName())) {
             return false;
         }
         playersByName.put(p.getName(), p);
-        playersByID.put(p.getId(), p);
+        playersByID.put(p.getID(), p);
         return true;
     }
 
@@ -157,7 +155,7 @@ public class Hub {
      */
     public void removePlayer(Player p) {
         playersByName.remove(p.getName());
-        playersByID.remove(p.getId());
+        playersByID.remove(p.getID());
     }
 
     /**

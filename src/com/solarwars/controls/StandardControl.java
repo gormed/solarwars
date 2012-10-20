@@ -59,12 +59,10 @@ public class StandardControl extends AbstractControl {
                 Vector2f point = inputManager.getCursorPosition();
                 if (keyPressed) {
                     onSelectionPressed(name, point);
+                } else if (!keyPressed && onSelectEntity(name, point)) {
                 } else {
-                    if (onSelectEntity(name, point)) {
-                        return;
-                    }
+                    onMouseWeel(name);
                 }
-                onMouseWeel(name);
 
             }
         };
@@ -164,7 +162,8 @@ public class StandardControl extends AbstractControl {
 
     /**
      * Gets the current clicked point from the input manager.
-     * @return 
+     *
+     * @return
      */
     @Override
     protected Vector2f getClickedPoint() {

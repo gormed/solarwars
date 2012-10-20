@@ -162,7 +162,7 @@ public class MultiplayerGameplay {
                 new PlanetActionMessage(
                 System.currentTimeMillis(),
                 actionName,
-                Hub.getLocalPlayer().getId(),
+                Hub.getLocalPlayer().getID(),
                 Hub.getLocalPlayer().getState(),
                 id);
         client.send(planetActionMessage);
@@ -185,15 +185,15 @@ public class MultiplayerGameplay {
                     actionName,
                     -1,
                     null,
-                    reciever.getId(),
+                    reciever.getID(),
                     reciever.getState());
         } else {
 
             generalActionMessage = new GeneralActionMessage(
                     actionName,
-                    sender.getId(),
+                    sender.getID(),
                     sender.getState(),
-                    reciever.getId(),
+                    reciever.getID(),
                     reciever.getState());
         }
         client.send(generalActionMessage);

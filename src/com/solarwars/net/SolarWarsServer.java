@@ -192,12 +192,12 @@ public class SolarWarsServer extends SimpleApplication {
     public void enterLevel() {
         Player hostPlayer = ServerHub.getHostPlayer();
         host = connectedPlayers.get(hostPlayer);
-        final String hostMsg = "#" + hostPlayer.getId() + "/" + hostPlayer.getName() + " is host!";
+        final String hostMsg = "#" + hostPlayer.getID() + "/" + hostPlayer.getName() + " is host!";
         logger.log(Level.INFO, hostMsg, hostPlayer);
 
         for (Map.Entry<Player, HostedConnection> entrySet : connectedPlayers.entrySet()) {
             Player player = entrySet.getKey();
-            final String playerMsg = "#" + player.getId() + "/" + player.getName();
+            final String playerMsg = "#" + player.getID() + "/" + player.getName();
             logger.log(Level.INFO, playerMsg, player);
         }
         serverState = ServerState.INGAME;
@@ -458,11 +458,11 @@ public class SolarWarsServer extends SimpleApplication {
                     ServerHub.getPlayers(),
                     isHost, true);
             hc.setAttribute("PlayerObject", p);
-            hc.setAttribute("PlayerID", p.getId());
+            hc.setAttribute("PlayerID", p.getID());
             hc.setAttribute("PlayerName", p.getName());
 
             gameServer.broadcast(Filters.equalTo(hc), joiningPlayer);
-            final String connectMsg = "#" + p.getId() + "/" + p.getName() + " joined server.";
+            final String connectMsg = "#" + p.getID() + "/" + p.getName() + " joined server.";
             logger.log(Level.INFO, connectMsg, joiningPlayer);
             //Collection<HostedConnection> connections = gameServer.getConnections();
 
@@ -480,8 +480,8 @@ public class SolarWarsServer extends SimpleApplication {
                             false);
                     gameServer.broadcast(Filters.equalTo(connection), otherPlayer);
                     final String othersMsg =
-                            "Told #" + player.getId() + "/" + player.getName()
-                            + " that #" + p.getId() + "/" + p.getName()
+                            "Told #" + player.getID() + "/" + player.getName()
+                            + " that #" + p.getID() + "/" + p.getName()
                             + " joined server.";
                     logger.log(Level.INFO, othersMsg, joiningPlayer);
                 }
@@ -491,7 +491,7 @@ public class SolarWarsServer extends SimpleApplication {
             PlayerLeavingMessage plm = new PlayerLeavingMessage(p);
 
             gameServer.broadcast(Filters.notEqualTo(hc), plm);
-            final String leavingMsg = "#" + p.getId() + "/" + p.getName() + " left server.";
+            final String leavingMsg = "#" + p.getID() + "/" + p.getName() + " left server.";
             logger.log(Level.INFO, leavingMsg, plm);
 
             connectedPlayers.remove(p);

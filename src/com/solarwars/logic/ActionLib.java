@@ -165,7 +165,7 @@ public class ActionLib {
                     + "player via Network, type is "
                     + actionName
                     + " from #"
-                    + player1.getId() + "/" + player1.getName();
+                    + player1.getID() + "/" + player1.getName();
             logger.log(java.util.logging.Level.FINE, generalActionMsg,
                     new Object[]{player1, player2});
             // else if invoked from this client, send via network to server
@@ -180,7 +180,7 @@ public class ActionLib {
                     + ", type is "
                     + actionName
                     + " from #"
-                    + player1.getId()
+                    + player1.getID()
                     + "/"
                     + player1.getName();
             logger.log(java.util.logging.Level.FINE, generalActionMsg,
@@ -211,7 +211,7 @@ public class ActionLib {
             String planetActionMsg = "PlanetAction invoked for another "
                     + "player via Network, type is " + actionName;
             if (p != null && planet != null) {
-                planetActionMsg += " from #" + p.getId() + "/" + p.getName()
+                planetActionMsg += " from #" + p.getID() + "/" + p.getName()
                         + " to planet #" + planet.getId();
             }
             logger.log(java.util.logging.Level.FINE, planetActionMsg,
@@ -228,7 +228,7 @@ public class ActionLib {
             String planetActionMsg = "PlanetAction invoked for local player, "
                     + "type is " + actionName;
             if (p != null && planet != null) {
-                planetActionMsg += " from #" + p.getId() + "/" + p.getName()
+                planetActionMsg += " from #" + p.getID() + "/" + p.getName()
                         + " to planet #" + planet.getId();
             }
             logger.log(java.util.logging.Level.FINE, planetActionMsg,
@@ -256,7 +256,7 @@ public class ActionLib {
         final String shipActionMsg = "ShipAction is invoked for local player, type "
                 + actionName
                 + " for player #"
-                + p.getId()
+                + p.getID()
                 + "/"
                 + p.getName()
                 + " for shipgroup #"

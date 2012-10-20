@@ -30,6 +30,7 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.ControlManager;
 import com.solarwars.gamestates.gui.ConnectedPlayerItem;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.logic.DeathmatchGameplay;
@@ -272,7 +273,7 @@ public class ServerLobbyState extends Gamestate implements
         Player p = Hub.getLocalPlayer();
         p.setReady(!p.isReady());
         networkManager.getThisClient().send(
-                new PlayerReadyMessage(p.getId(), p.isReady()));
+                new PlayerReadyMessage(p.getID(), p.isReady()));
         playersChanged = true;
     }
     // ==========================================================================
@@ -288,7 +289,7 @@ public class ServerLobbyState extends Gamestate implements
         String message = textInputField.getText();
         if (checkMessageStyle(message)) {
             gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer()
-                    .getId(), message);
+                    .getID(), message);
             gameChatModule.playerSays(Hub.getLocalPlayer(), message);
         }
         textInputField.setText("");
@@ -481,11 +482,14 @@ public class ServerLobbyState extends Gamestate implements
 
                 if (isConnecting) {
                     if (!Hub.getInstance().isInitialized()) {
+                        thisPlayer.initialize(true);
+                        ControlManager.getInstance().pullControl(thisPlayer);
                         Hub.getInstance().initialize(thisPlayer, players);
                         gameChatModule.playerJoins(thisPlayer);
                     }
                 } else {
                     if (Hub.getInstance().addPlayer(thisPlayer)) {
+                        thisPlayer.initialize(false);
                         gameChatModule.playerJoins(thisPlayer);
                     }
                 }

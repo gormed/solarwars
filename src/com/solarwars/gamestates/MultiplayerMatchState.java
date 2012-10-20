@@ -300,7 +300,7 @@ public class MultiplayerMatchState extends Gamestate {
         String message = textInputField.getText();
         if (checkMessageStyle(message)) {
             gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer()
-                    .getId(), message);
+                    .getID(), message);
             gameChatModule.playerSays(Hub.getLocalPlayer(), message);
         }
         textInputField.setText("");

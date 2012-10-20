@@ -103,7 +103,7 @@ public class ShipBatchManager {
             material.setColor("Color", p.getColor());
             material.setColor("GlowColor", p.getColor());
             material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-            playerMaterialsHashMap.put(p.getId(), material);
+            playerMaterialsHashMap.put(p.getID(), material);
         }
         initDatastructure(players);
         initBatchLists();
@@ -129,13 +129,13 @@ public class ShipBatchManager {
 
     private void initDatastructure(ArrayList<Player> players) {
         for (Player p : players) {
-            currentShipCount.put(p.getId(), p.getShipCount());
-            desiredShipCount.put(p.getId(), p.getShipCount());
+            currentShipCount.put(p.getID(), p.getShipCount());
+            desiredShipCount.put(p.getID(), p.getShipCount());
 
-            unusedPlayerBatches.put(p.getId(),
-                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getId()) * 1.5f)));
-            usedPlayerBatches.put(p.getId(),
-                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getId()) * 1.5f)));
+            unusedPlayerBatches.put(p.getID(),
+                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getID()) * 1.5f)));
+            usedPlayerBatches.put(p.getID(),
+                    new ArrayList<Spatial>((int) (desiredShipCount.get(p.getID()) * 1.5f)));
         }
     }
 
@@ -183,7 +183,7 @@ public class ShipBatchManager {
      * @return the ship batch
      */
     Spatial getShipBatch(Player p) {
-        int playerID = p.getId();
+        int playerID = p.getID();
         if (unusedPlayerBatches.containsKey(playerID)
                 && usedPlayerBatches.containsKey(playerID)) {
             if (unusedPlayerBatches.get(playerID).isEmpty()) {
@@ -217,8 +217,8 @@ public class ShipBatchManager {
      * @param b the b
      */
     void freeShipBatch(Player p, Spatial s) {
-        unusedPlayerBatches.get(p.getId()).add(s);
-        usedPlayerBatches.get(p.getId()).remove(s);
+        unusedPlayerBatches.get(p.getID()).add(s);
+        usedPlayerBatches.get(p.getID()).remove(s);
 //        s.setCullHint(CullHint.Always);
         s.setLocalTranslation(outOfScreen);
 //        System.out.println("Freed Active Batch");
@@ -238,7 +238,7 @@ public class ShipBatchManager {
             int playerShips = 0;
             for (Map.Entry<Integer, Player> entry : Hub.playersByID.entrySet()) {
 
-                int playerID = entry.getValue().getId();
+                int playerID = entry.getValue().getID();
                 if (!unusedPlayerBatches.containsKey(playerID)
                         || !usedPlayerBatches.containsKey(playerID)) {
                     continue;

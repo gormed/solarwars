@@ -145,7 +145,7 @@ public class ServerHub {
      */
     public void addPlayer(Player p) {
         playersByName.put(p.getName(), p);
-        playersByID.put(p.getId(), p);
+        playersByID.put(p.getID(), p);
     }
 
     /**
@@ -155,7 +155,7 @@ public class ServerHub {
      */
     public void removePlayer(Player p) {
         playersByName.remove(p.getName());
-        playersByID.remove(p.getId());
+        playersByID.remove(p.getID());
     }
 
     /**

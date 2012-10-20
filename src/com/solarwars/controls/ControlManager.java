@@ -149,16 +149,45 @@ public class ControlManager {
     }
 
     public AbstractControl getControl(Player p) {
+        if (usedControllers.isEmpty()) {
+            return null;
+        }
+        return usedControllers.get(p);
+    }
+
+    public AbstractControl getControl(int playerID) {
+        if (usedControllers.isEmpty()) {
+            return null;
+        }
+        for (Map.Entry<Player, AbstractControl> e : usedControllers.entrySet()) {
+            if (e.getKey().getID() == playerID) {
+                return e.getValue();
+            }
+        }
+        return null;
+    }
+
+    public AbstractControl pullControl(Player p) {
         if (unusedControllers.isEmpty()) {
             return null;
         }
-        if (!p.hasControl()) {
+        if (p.isLocalPlayer() && usedControllers.get(p) == null) {
             AbstractControl c = unusedControllers.remove(unusedControllers.size() - 1);
             c.setControllingPlayer(p);
             usedControllers.put(p, c);
             return c;
         }
         return null;
+    }
+
+    public void pushControl(Player p) {
+        for (Map.Entry<Player, AbstractControl> e : usedControllers.entrySet()) {
+            if (e.getKey().getID() == p.getID()) {
+                AbstractControl c = getControl(p.getID());
+                usedControllers.remove(c.getControllingPlayer());
+                unusedControllers.add(c);
+            }
+        }
     }
 
     public void createDragRectGeometry() {

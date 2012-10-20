@@ -154,7 +154,7 @@ public class CreateServerState extends Gamestate
     }
 
     @SuppressWarnings("unchecked")
-	private void setupNiftyGUI() {
+    private void setupNiftyGUI() {
         serverLobbyBox = screen.findNiftyControl("server_lobby_box", ListBox.class);
         serverLobbyBox.clear();
         // CHAT ------------------------------------------
@@ -175,7 +175,7 @@ public class CreateServerState extends Gamestate
                         sendMessage();
                         return true;
                     default:
-                    	return false;
+                        return false;
                 }
             }
         });
@@ -261,8 +261,9 @@ public class CreateServerState extends Gamestate
 
         Player hostPlayer = new Player(hostPlayerName,
                 Player.PLAYER_COLORS[id], id, true);
-        hostPlayer.initialize(ControlManager.getInstance().getControl(hostPlayer), true);
-        
+        hostPlayer.initialize(true);
+        ControlManager.getInstance().pullControl(hostPlayer);
+
         serverHub.initialize(hostPlayer, null);
         // hub.initialize(new Player(hostPlayerName, hostPlayerColor), null);
         try {
@@ -351,7 +352,7 @@ public class CreateServerState extends Gamestate
         for (Player p : ServerHub.getPlayers()) {
             if (!p.isReady()) {
                 gameChatModule.serverSays("Not all players are ready!");
-                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getId(), "Please get ready, " + p.getName() + "!");
+                gameChatModule.localPlayerSendChatMessage(ServerHub.getHostPlayer().getID(), "Please get ready, " + p.getName() + "!");
                 allReady = false;
             }
         }
@@ -519,7 +520,7 @@ public class CreateServerState extends Gamestate
     public void sendMessage() {
         String message = textInputField.getText();
         if (checkMessageStyle(message)) {
-            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getId(), message);
+            gameChatModule.localPlayerSendChatMessage(Hub.getLocalPlayer().getID(), message);
             gameChatModule.playerSays(Hub.getLocalPlayer(), message);
         }
         textInputField.setText("");
@@ -621,7 +622,7 @@ public class CreateServerState extends Gamestate
                             pcm.getName(),
                             Player.getUnusedColor(ServerHub.getPlayers(), source.getId()),
                             source.getId());
-                    newPlayer.initialize(null, false);
+                    newPlayer.initialize(false);
                     // ServerHub.getContiniousPlayerID());
                 } else {
                     newPlayer = ServerHub.getHostPlayer();
@@ -629,7 +630,7 @@ public class CreateServerState extends Gamestate
                 serverHub.addPlayer(newPlayer);
 
                 System.out.println("Player " + newPlayer.getName() + "[ID#"
-                        + newPlayer.getId() + "] joined the Game.");
+                        + newPlayer.getID() + "] joined the Game.");
                 solarWarsServer.addConnectingPlayer(newPlayer, source);
 
                 refreshedPlayers = ServerHub.playersByID;
@@ -681,11 +682,14 @@ public class CreateServerState extends Gamestate
 
                 if (isConnecting) {
                     if (!Hub.getInstance().isInitialized()) {
+                        thisPlayer.initialize(true);
+                        ControlManager.getInstance().pullControl(thisPlayer);
                         Hub.getInstance().initialize(thisPlayer, players);
                     }
                     gameChatModule.playerJoins(thisPlayer);
                 } else {
                     if (Hub.getInstance().addPlayer(thisPlayer)) {
+                        thisPlayer.initialize(false);
                         gameChatModule.playerJoins(thisPlayer);
                     }
                 }

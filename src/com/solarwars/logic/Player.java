@@ -35,6 +35,9 @@ import java.util.ArrayList;
  */
 @Serializable
 public class Player {
+    //==========================================================================
+    //===   Static Functions
+    //==========================================================================
 
     /**
      * The Constant PLAYER_COLORS.
@@ -80,34 +83,20 @@ public class Player {
                     invokeGeneralAction(null, victorious, defeated, DeathmatchGameplay.GAME_OVER);
         }
     }
-    private boolean initialized = false;
+    //==========================================================================
+    //      Protected and Private Fields
+    //==========================================================================
     private static boolean hostSet = false;
-    /**
-     * The id.
-     */
     private int id;
-    /**
-     * The artificial.
-     */
     private AI artificial;
-    /**
-     * The planets.
-     */
     private ArrayList<AbstractPlanet> planets;
-    /**
-     * The ship groups.
-     */
     private ArrayList<ShipGroup> shipGroups;
-    /**
-     * The is host.
-     */
     private boolean isHost;
     private boolean localPlayer;
-    /**
-     * defines the state of a player.
-     */
     private PlayerState state = new PlayerState();
-    private AbstractControl control;
+    //==========================================================================
+    //===   Methods & Constructor
+    //==========================================================================
 
     /**
      * Instantiates a new player.
@@ -151,33 +140,19 @@ public class Player {
      * Initializes the player with a controller if it is a local player,
      * otherwise it will be a player connected via network.
      *
-     * @param control the control from the ControlManager, null if not a local
-     * player
      * @param localPlayer true if locally playing, false if network player
      */
-    public void initialize(AbstractControl control, boolean localPlayer) {
-        if (initialized) {
-            return;
-        }
-        if (!localPlayer) {
-            this.control = control;
-        } else {
-            this.control = null;
-        }
+    public void initialize(boolean localPlayer) {
+        ControlManager.getInstance().pushControl(this);
         this.localPlayer = localPlayer;
-        initialized = true;
+        
     }
 
     /**
      * Destroys the player object.
      */
     public void destroy() {
-        if (!initialized) {
-            return;
-        }
-        control.cleanUp();
-        control = null;
-        initialized = false;
+        this.localPlayer = false;
     }
 
     /**
@@ -185,9 +160,7 @@ public class Player {
      *
      * @return true if available, false otherwise
      */
-    public boolean hasControl() {
-        return control != null;
-    }
+
 
     /**
      * Gets the state of the player.
@@ -279,6 +252,10 @@ public class Player {
     public boolean isLocalPlayer() {
         return localPlayer;
     }
+    
+    public AbstractControl getControl() {
+        return ControlManager.getInstance().getControl(this);
+    }
 
     /**
      * Gets the defeated player.
@@ -303,7 +280,7 @@ public class Player {
      *
      * @return the id
      */
-    public int getId() {
+    public int getID() {
         return id;
     }
 
@@ -320,10 +297,6 @@ public class Player {
      * Updates the player.
      */
     public void updatePlayer() {
-    }
-
-    public AbstractControl getControl() {
-        return control;
     }
 
     /**
