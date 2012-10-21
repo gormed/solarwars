@@ -721,7 +721,7 @@ public class SolarWarsApplication extends Application {
             }
 
             if (name.equals(InputMappings.EXIT_GAME)) {
-                stop();
+//                stop();
             } else if (name.equals(InputMappings.DEBUG_CAMERA_POS)) {
                 if (cam != null) {
                     Vector3f loc = cam.getLocation();

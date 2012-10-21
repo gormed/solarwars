@@ -38,22 +38,24 @@ package com.solarwars.controls.input;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
+import com.jme3.input.controls.JoyAxisTrigger;
+import com.jme3.input.controls.JoyButtonTrigger;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.controls.TouchTrigger;
 
 /**
- * The singleton InputMappings for the com.solarwars game com.solarwars.input mappings for
- * keyboard and mouse.
- * 
+ * The singleton InputMappings for the com.solarwars game com.solarwars.input
+ * mappings for keyboard and mouse.
+ *
  * @author Hans Ferchland
  */
 public class InputMappings {
+
     // ==========================================================================
     // === Singleton
     // ==========================================================================
-
     /**
      * The hidden constructor of InputMappings.
      */
@@ -91,25 +93,37 @@ public class InputMappings {
     public static final String PERCENT_UP = "SOLARWARS_WheelUp";
     public static final String PERCENT_DOWN = "SOLARWARS_WheelDown";
     public static final String KEY_COPY_V = "SOLARWARS_KEY_V";
-    
+    public static final String AXIS_LS_DOWN = "Axis LS Down";
+    public static final String AXIS_LS_LEFT = "Axis LS Left";
+    public static final String AXIS_LS_RIGHT = "Axis LS Right";
+    public static final String AXIS_LS_UP = "Axis LS Up";
     private static boolean displayOSCursor = true;
     // ==========================================================================
     // === Methods
     // ==========================================================================
+
     public void initialize(InputManager inputManager) {
-        
+
         inputManager.setCursorVisible(displayOSCursor);
         // Map interface clicking for ingame and GUI and Debugging
         inputManager.addMapping(InputMappings.LEFT_CLICK_SELECT,
-                new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+                new MouseButtonTrigger(MouseInput.BUTTON_LEFT),
+                // Button A JOY0
+                new JoyButtonTrigger(0, 0));
         inputManager.addMapping(InputMappings.RIGHT_CLICK_ATTACK,
-                new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+                new MouseButtonTrigger(MouseInput.BUTTON_RIGHT),
+                // Button B JOY0
+                new JoyButtonTrigger(0, 1));
         inputManager.addMapping(InputMappings.PERCENT_DOWN,
                 new MouseAxisTrigger(MouseInput.AXIS_WHEEL,
-                false));
+                false),
+                // Button LT JOY0
+                new JoyButtonTrigger(0, 8));
         inputManager.addMapping(InputMappings.PERCENT_UP,
                 new MouseAxisTrigger(MouseInput.AXIS_WHEEL,
-                true));
+                true),
+                // Button RT JOY0
+                new JoyButtonTrigger(0, 9));
 
         inputManager.addMapping(InputMappings.DEBUG_CAMERA_POS,
                 new KeyTrigger(KeyInput.KEY_C));
@@ -121,18 +135,27 @@ public class InputMappings {
                 new KeyTrigger(KeyInput.KEY_F4));
 
         inputManager.addMapping(InputMappings.GAME_SCORES,
-                new KeyTrigger(KeyInput.KEY_TAB));
+                new KeyTrigger(KeyInput.KEY_TAB),
+                // Button BACK JOY0
+                new JoyButtonTrigger(0, 6));
         inputManager.addMapping(InputMappings.CONTROL_MODIFIER,
                 new KeyTrigger(KeyInput.KEY_LCONTROL),
                 new KeyTrigger(KeyInput.KEY_RCONTROL));
-        inputManager.addMapping(InputMappings.KEY_COPY_V,
-                new KeyTrigger(KeyInput.KEY_V));
-
-        inputManager.addMapping("Touch", new TouchTrigger(0));
         inputManager.addMapping(
                 InputMappings.PAUSE_GAME,
                 new KeyTrigger(KeyInput.KEY_P),
                 new KeyTrigger(KeyInput.KEY_PAUSE),
-                new KeyTrigger(KeyInput.KEY_ESCAPE));
+                new KeyTrigger(KeyInput.KEY_ESCAPE),
+                // Button START JOY0
+                new JoyButtonTrigger(0, 7));
+
+        inputManager.addMapping(AXIS_LS_UP, new JoyAxisTrigger(0, 0, true));
+        inputManager.addMapping(AXIS_LS_DOWN, new JoyAxisTrigger(0, 0, false));
+        inputManager.addMapping(AXIS_LS_LEFT, new JoyAxisTrigger(0, 1, true));
+        inputManager.addMapping(AXIS_LS_RIGHT, new JoyAxisTrigger(0, 1, false));
+
+
+        inputManager.addMapping("Touch", new TouchTrigger(0));
+
     }
 }

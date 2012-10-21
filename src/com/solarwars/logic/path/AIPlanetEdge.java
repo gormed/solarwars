@@ -21,18 +21,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic.path;
 
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 
 /**
  * The Class AIEdge.
  */
-public class AIEdge {
-    
-    private AINode from;
-    
-    private AINode to;
-    
+public class AIPlanetEdge {
+
+    private AIPlanetNode from;
+    private AIPlanetNode to;
     private float length;  //TODO Matthias 
+    private float angle;
 
     /**
      * Instantiates a new aI edge.
@@ -40,20 +40,43 @@ public class AIEdge {
      * @param from the from
      * @param to the to
      */
-    public AIEdge(AINode from, AINode to) {
+    public AIPlanetEdge(AIPlanetNode from, AIPlanetNode to) {
         this.from = from;
         this.to = to;
         calculateLength();
+        calculateAngle();
     }
-    
+
     /**
      * Calculate length.
      */
-    private void calculateLength() {  //TODO MB  distance  (vom Planeten...)
-        Vector3f l;
-        
-        l = to.getPlanet().getPosition().subtract(from.getPlanet().getPosition());
-        
-        length = l.length();
+    private void calculateLength() {
+        length = to.getPlanet().getPosition().distance(from.getPlanet().getPosition());
+    }
+
+    private void calculateAngle() {
+        Vector2f from2d = new Vector2f(
+                from.getPlanet().getPosition().x,
+                from.getPlanet().getPosition().z);
+        Vector2f to2d = new Vector2f(
+                to.getPlanet().getPosition().x,
+                to.getPlanet().getPosition().z);
+        angle = from2d.angleBetween(to2d);
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public float getLength() {
+        return length;
+    }
+
+    public AIPlanetNode getFrom() {
+        return from;
+    }
+
+    public AIPlanetNode getTo() {
+        return to;
     }
 }

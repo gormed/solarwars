@@ -155,7 +155,7 @@ public class MultiplayerGameplay {
         int id = -1;
         int ships = 0;
         if (planet != null) {
-            id = planet.getId();
+            id = planet.getID();
             ships = planet.getShipCount();
         }
         PlanetActionMessage planetActionMessage =

@@ -212,7 +212,7 @@ public class ActionLib {
                     + "player via Network, type is " + actionName;
             if (p != null && planet != null) {
                 planetActionMsg += " from #" + p.getID() + "/" + p.getName()
-                        + " to planet #" + planet.getId();
+                        + " to planet #" + planet.getID();
             }
             logger.log(java.util.logging.Level.FINE, planetActionMsg,
                     new Object[]{planet, p});
@@ -229,7 +229,7 @@ public class ActionLib {
                     + "type is " + actionName;
             if (p != null && planet != null) {
                 planetActionMsg += " from #" + p.getID() + "/" + p.getName()
-                        + " to planet #" + planet.getId();
+                        + " to planet #" + planet.getID();
             }
             logger.log(java.util.logging.Level.FINE, planetActionMsg,
                     new Object[]{planet, p});

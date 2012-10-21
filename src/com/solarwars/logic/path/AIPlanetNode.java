@@ -30,7 +30,7 @@ import com.solarwars.logic.Player;
 /**
  * The Class AINode.
  */
-public class AINode {
+public class AIPlanetNode {
 
     /** The planet. */
     private AbstractPlanet planet;
@@ -45,14 +45,14 @@ public class AINode {
     private Player owner;
     
     /** The edges. */
-    private ArrayList<AIEdge> edges;
+    private ArrayList<AIPlanetEdge> edges;
 
     /**
      * Instantiates a new aI node.
      *
      * @param planet the planet
      */
-    public AINode(AbstractPlanet planet) {
+    public AIPlanetNode(AbstractPlanet planet) {
         this.planet = planet;
         this.owner = planet.getOwner();
         this.size = planet.getSize();
@@ -65,8 +65,8 @@ public class AINode {
      *
      * @param connectors the connectors
      */
-    void connectPlanets(ArrayList<AINode> connectors) {
-        for (AINode n : connectors) {
+    void connectPlanets(ArrayList<AIPlanetNode> connectors) {
+        for (AIPlanetNode n : connectors) {
             createEdge(n);
         }
     }
@@ -76,8 +76,8 @@ public class AINode {
      *
      * @param node the node
      */
-    private void createEdge(AINode node) {
-        AIEdge e = new AIEdge(this, node);
+    private void createEdge(AIPlanetNode node) {
+        AIPlanetEdge e = new AIPlanetEdge(this, node);
         edges.add(e);
 
     }
@@ -87,7 +87,13 @@ public class AINode {
      *
      * @return the planet
      */
-    AbstractPlanet getPlanet() {
+    public AbstractPlanet getPlanet() {
         return planet;
     }
+
+    public ArrayList<AIPlanetEdge> getEdges() {
+        return new ArrayList<AIPlanetEdge>(edges);
+    }
+    
+    
 }

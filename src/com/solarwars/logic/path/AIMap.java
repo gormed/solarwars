@@ -28,19 +28,18 @@ import java.util.Map;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.logic.Level;
 
-
 /**
  * The Class AIMap.
  */
 public class AIMap {
 
-    private HashMap<Integer, AINode> map;
+    private HashMap<Integer, AIPlanetNode> map;
 
     /**
      * Instantiates a new aI map.
      */
     public AIMap() {
-        map = new HashMap<Integer, AINode>();
+        map = new HashMap<Integer, AIPlanetNode>();
     }
 
     /**
@@ -49,21 +48,28 @@ public class AIMap {
      * @param level the level
      */
     public void generateMap(Level level) {
-        ArrayList<AINode> planets = new ArrayList<AINode>();
-        
+        if (level == null) {
+            return;
+        }
+
+        ArrayList<AIPlanetNode> planets = new ArrayList<AIPlanetNode>();
+
         for (Map.Entry<Integer, AbstractPlanet> entry : level.getPlanetSet()) {
             AbstractPlanet p = entry.getValue();
-            AINode n = new AINode(p);
-            map.put(p.getId(), n);
+            AIPlanetNode n = new AIPlanetNode(p);
+            map.put(p.getID(), n);
             planets.add(n);
         }
 
 
-        for (Map.Entry<Integer, AINode> cursor : map.entrySet()) {
+        for (Map.Entry<Integer, AIPlanetNode> cursor : map.entrySet()) {
             cursor.getValue().connectPlanets(planets);
         }
         planets.clear();
-        planets = null;
-        
+
+    }
+    
+    public AIPlanetNode find(AbstractPlanet planet) {
+        return map.get(planet.getID());
     }
 }

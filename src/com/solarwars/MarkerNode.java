@@ -19,7 +19,6 @@
  * Documentation created: 09.10.2012 - 21:07:57 by Hans Ferchland <hans.ferchland at gmx dot de>
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 package com.solarwars;
 
 import com.jme3.asset.AssetManager;
@@ -41,6 +40,10 @@ import jme3tools.optimize.GeometryBatchFactory;
  * The Class MarkerNode.
  */
 public class MarkerNode extends Node {
+    //==========================================================================
+    //===   Private Fields
+    //==========================================================================
+
     public static final float MARKER_PLANET_ADJUST = 0.0f;
     public static final int SELECTION_ANIMATION_SPEED = 2;
     public static final float RANGE_FADE_BASE = 0.02f;
@@ -64,10 +67,10 @@ public class MarkerNode extends Node {
     private Geometry rangeCylinder;
     private ShipGroup shipGroup;
     private AbstractPlanet planet;
+    //==========================================================================
+    //===   Methods & Constructor
+    //==========================================================================
 
-    /**
-     * Instantiates a new marker node.
-     */
     /**
      * Instantiates a new marker node.
      */
@@ -234,15 +237,12 @@ public class MarkerNode extends Node {
             rangeMaterial.setColor("Color", rangeColor);
         }
     }
-    //==========================================================================
-    //===   Private Fields
-    //==========================================================================
-    
-    //==========================================================================
-    //===   Methods & Constructor
-    //==========================================================================
 
-    //==========================================================================
-    //===   Inner Classes
-    //==========================================================================
+    public AbstractPlanet getPlanet() {
+        return planet;
+    }
+
+    public ShipGroup getShipGroup() {
+        return shipGroup;
+    }
 }

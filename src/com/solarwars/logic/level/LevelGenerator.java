@@ -148,7 +148,7 @@ public abstract class LevelGenerator {
                 level, new Vector3f(x, 0, z), size);
         p.createPlanet();
         p.setShipCount(getRandomShipCount(size));
-        level.getPlanetList().put(p.getId(), p);
+        level.getPlanetList().put(p.getID(), p);
         level.getFreePlanetsNode().attachChild(p);
         return p;
     }
@@ -167,7 +167,7 @@ public abstract class LevelGenerator {
         AbstractPlanet p = new SimplePlanet(assetManager, level, new Vector3f(x, 0, z), size);
         p.createPlanet();
         p.setShipCount(shipCount);
-        level.getPlanetList().put(p.getId(), p);
+        level.getPlanetList().put(p.getID(), p);
         level.getFreePlanetsNode().attachChild(p);
         return p;
     }
@@ -195,7 +195,7 @@ public abstract class LevelGenerator {
         // owner aquires planet
         owner.capturePlanet(p);
         // add planet into list
-        level.getPlanetList().put(p.getId(), p);
+        level.getPlanetList().put(p.getID(), p);
         // create nodes for the player and add the planet
         setupPlayer(owner, p);
         return p;

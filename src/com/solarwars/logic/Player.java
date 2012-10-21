@@ -319,7 +319,7 @@ public class Player {
 
         ArrayList<Integer> planetIDs = new ArrayList<Integer>();
         for (AbstractPlanet p : planets) {
-            planetIDs.add(p.getId());
+            planetIDs.add(p.getID());
         }
         state.multiSelectedPlanets = planetIDs;
     }
@@ -357,7 +357,7 @@ public class Player {
         state.multiSelectedShipGroups.clear();
         state.selectedShipGroupId = -1;
         if (p != null) {
-            state.selectedPlanetId = p.getId();
+            state.selectedPlanetId = p.getID();
         } else {
             state.selectedPlanetId = -1;
         }

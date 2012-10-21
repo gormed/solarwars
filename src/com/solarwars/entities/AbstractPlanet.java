@@ -320,7 +320,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      * 
      * @return the id
      */
-    public int getId() {
+    public int getID() {
         return id;
     }
 
