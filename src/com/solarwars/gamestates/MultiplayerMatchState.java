@@ -207,7 +207,7 @@ public class MultiplayerMatchState extends Gamestate {
         }
         gameplay.destroy();
         gameplay = null;
-        application.detachIsoCameraControl();
+        application.detachCamera();
 
     }
 

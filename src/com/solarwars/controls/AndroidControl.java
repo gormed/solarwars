@@ -25,7 +25,6 @@ import com.jme3.input.controls.TouchListener;
 import com.jme3.input.event.TouchEvent;
 import com.jme3.math.Vector2f;
 import com.solarwars.SolarWarsApplication;
-import com.solarwars.logic.Player;
 import java.util.logging.Level;
 
 /**

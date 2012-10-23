@@ -34,18 +34,10 @@ public class AIPlanetNode {
 
     /** The planet. */
     private AbstractPlanet planet;
-    
-    /** The size. */
-    private float size;
-    
-    /** The population. */
-    private int population;
-    
-    /** The owner. */
-    private Player owner;
+
     
     /** The edges. */
-    private ArrayList<AIPlanetEdge> edges;
+    private ArrayList<AIPlanetEdge> edges = new ArrayList<AIPlanetEdge>();
 
     /**
      * Instantiates a new aI node.
@@ -54,10 +46,6 @@ public class AIPlanetNode {
      */
     public AIPlanetNode(AbstractPlanet planet) {
         this.planet = planet;
-        this.owner = planet.getOwner();
-        this.size = planet.getSize();
-        this.population = planet.getShipCount();
-
     }
 
     /**
@@ -94,6 +82,5 @@ public class AIPlanetNode {
     public ArrayList<AIPlanetEdge> getEdges() {
         return new ArrayList<AIPlanetEdge>(edges);
     }
-    
-    
+
 }

@@ -460,7 +460,7 @@ public class SolarWarsApplication extends Application {
     /**
      * Attach iso camera control.
      */
-    public void attachCameraAndControl() {
+    public void attachCamera() {
         if (inputManager != null) {
             // Init controls
             isoCam = IsoCamera.getInstance();
@@ -469,16 +469,20 @@ public class SolarWarsApplication extends Application {
             isoCam.registerWithInput(inputManager);
             lastScreenPos = new Vector2f(cam.getWidth() / 2, cam.getHeight() / 2);
 
-            controlManager.attachControlListeners();//addControlListener();
+            //addControlListener();
 
         }
         isoCam.reset();
+    }
+    
+    public void attachControls() {
+        ControlManager.getInstance().attachControlListeners();
     }
 
     /**
      * Detach iso camera control.
      */
-    public void detachIsoCameraControl() {
+    public void detachCamera() {
         if (inputManager != null && isoCam != null) {
             isoCam.destroy();
             isoCam = null;

@@ -23,7 +23,6 @@ package com.solarwars.controls;
 
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
-import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Player;
@@ -143,8 +142,6 @@ public class StandardControl extends AbstractControl {
 
             inputManager.addListener(keyActionListener,
                     InputMappings.CONTROL_MODIFIER);
-
-//            inputManager.addListener(touchListener, new String[]{"Touch"});
         }
     }
 

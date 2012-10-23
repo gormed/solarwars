@@ -187,13 +187,14 @@ public class CreateServerState extends Gamestate
      * Starts a multiplayer game as server.
      */
     private void startGame() {
-        application.attachCameraAndControl();
         com.solarwars.logic.Level mpLevel = new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
                 SolarWarsApplication.getInstance().getControlManager(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
+        application.attachCamera();
+        application.attachControls();
     }
 
     /*
@@ -685,8 +686,8 @@ public class CreateServerState extends Gamestate
                         thisPlayer.initialize(true);
                         ControlManager.getInstance().pullControl(thisPlayer);
                         Hub.getInstance().initialize(thisPlayer, players);
+                        gameChatModule.playerJoins(thisPlayer);
                     }
-                    gameChatModule.playerJoins(thisPlayer);
                 } else {
                     if (Hub.getInstance().addPlayer(thisPlayer)) {
                         thisPlayer.initialize(false);

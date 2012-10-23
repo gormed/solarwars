@@ -22,7 +22,6 @@
 package com.solarwars.logic.path;
 
 import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 
 /**
  * The Class AIEdge.
@@ -31,7 +30,7 @@ public class AIPlanetEdge {
 
     private AIPlanetNode from;
     private AIPlanetNode to;
-    private float length;  //TODO Matthias 
+    private float length; 
     private float angle;
 
     /**
@@ -51,7 +50,7 @@ public class AIPlanetEdge {
      * Calculate length.
      */
     private void calculateLength() {
-        length = to.getPlanet().getPosition().distance(from.getPlanet().getPosition());
+        length = from.getPlanet().getPosition().distance(to.getPlanet().getPosition());
     }
 
     private void calculateAngle() {
@@ -62,6 +61,7 @@ public class AIPlanetEdge {
                 to.getPlanet().getPosition().x,
                 to.getPlanet().getPosition().z);
         angle = from2d.angleBetween(to2d);
+        angle = Math.abs(angle);
     }
 
     public float getAngle() {

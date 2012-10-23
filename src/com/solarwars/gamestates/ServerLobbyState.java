@@ -190,13 +190,14 @@ public class ServerLobbyState extends Gamestate implements
      * Start game.
      */
     private void startGame() {
-        application.attachCameraAndControl();
         com.solarwars.logic.Level mpLevel = new com.solarwars.logic.Level(
                 SolarWarsApplication.getInstance().getRootNode(),
                 SolarWarsApplication.getInstance().getAssetManager(),
                 SolarWarsApplication.getInstance().getControlManager(),
                 Hub.playersByID, clientSeed);
         game.setupGameplay(new DeathmatchGameplay(), mpLevel);
+        application.attachCamera();
+        application.attachControls();
     }
 
     /*

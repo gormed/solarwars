@@ -25,6 +25,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.scene.Node;
 import com.solarwars.Hub;
+import com.solarwars.SolarWarsApplication;
 import com.solarwars.controls.AbstractControl;
 import com.solarwars.controls.ControlManager;
 import com.solarwars.entities.AbstractPlanet;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * The Class Level discribes a level for SolarWars. There may be only one level
@@ -325,7 +327,7 @@ public class Level {
      * @param control the control
      * @param seed the seed
      */
-    private void setup(Node rootNode, AssetManager assetManager, 
+    private void setup(Node rootNode, AssetManager assetManager,
             ControlManager control, long seed) {
         this.seed = seed;
 
@@ -371,8 +373,7 @@ public class Level {
      * Generate level.
      */
     public void generateLevel() {
-        levelGenerator = new GeneratorSquare(this);
-        levelGenerator.generate(seed);
+        generateLevel(this.seed);
     }
 
     /**
@@ -380,10 +381,10 @@ public class Level {
      *
      * @param seed the seed
      */
-    public void generateLevel(long seed) {
+    public void generateLevel(final long seed) {
         this.seed = seed;
         levelGenerator = new GeneratorSquare(this);
-        levelGenerator.generate(this.seed);
+        levelGenerator.generate(seed);
     }
 
     /**

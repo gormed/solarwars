@@ -36,6 +36,7 @@
 package com.solarwars.controls.input;
 
 import com.jme3.input.InputManager;
+import com.jme3.input.JoyInput;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.JoyAxisTrigger;
@@ -149,11 +150,15 @@ public class InputMappings {
                 // Button START JOY0
                 new JoyButtonTrigger(0, 7));
 
-        inputManager.addMapping(AXIS_LS_UP, new JoyAxisTrigger(0, 0, true));
-        inputManager.addMapping(AXIS_LS_DOWN, new JoyAxisTrigger(0, 0, false));
-        inputManager.addMapping(AXIS_LS_LEFT, new JoyAxisTrigger(0, 1, true));
-        inputManager.addMapping(AXIS_LS_RIGHT, new JoyAxisTrigger(0, 1, false));
+        inputManager.addMapping(AXIS_LS_LEFT, new JoyAxisTrigger(0, 6, true));
+        inputManager.addMapping(AXIS_LS_RIGHT, new JoyAxisTrigger(0, 6, false));
+        inputManager.addMapping(AXIS_LS_DOWN, new JoyAxisTrigger(0, 7, true));
+        inputManager.addMapping(AXIS_LS_UP, new JoyAxisTrigger(0, 7, false));
 
+//        inputManager.addMapping(AXIS_LS_UP, new JoyAxisTrigger(0, 0, true));
+//        inputManager.addMapping(AXIS_LS_DOWN, new JoyAxisTrigger(0, 0, false));
+//        inputManager.addMapping(AXIS_LS_LEFT, new JoyAxisTrigger(0, 1, true));
+//        inputManager.addMapping(AXIS_LS_RIGHT, new JoyAxisTrigger(0, 1, false));
 
         inputManager.addMapping("Touch", new TouchTrigger(0));
 

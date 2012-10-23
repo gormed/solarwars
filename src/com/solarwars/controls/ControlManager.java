@@ -173,7 +173,7 @@ public class ControlManager {
         }
         if (p.isLocalPlayer() && usedControllers.get(p) == null) {
             AbstractControl c = unusedControllers.remove(unusedControllers.size() - 1);
-            c.setControllingPlayer(p);
+            c.initialize(p);
             usedControllers.put(p, c);
             return c;
         }
@@ -210,7 +210,7 @@ public class ControlManager {
 
     public void update(float tpf) {
         for (Map.Entry<Player, AbstractControl> e : usedControllers.entrySet()) {
-            e.getValue().updateSelection(tpf);
+            e.getValue().update(tpf);
         }
     }
 
@@ -243,11 +243,19 @@ public class ControlManager {
     private void detectControllers() {
         if (MachineType.PC == machineType) {
             AbstractControl pc = new StandardControl();
-            pc.initialize();
             controllers.put(getUniqueControllerID(), pc);
         }
 
         joysticks.addAll(Arrays.asList(inputManager.getJoysticks()));
+
+        for (Joystick j : joysticks) {
+            if ("Wacom Virtual Hid Driver".equals(j.getName())) {
+                continue;
+            }
+            GamepadControl gamepad = new GamepadControl(j);
+            controllers.put(getUniqueControllerID(), gamepad);
+        }
+
         unusedControllers.addAll(controllers.values());
     }
 }

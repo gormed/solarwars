@@ -60,12 +60,18 @@ public abstract class AbstractControl {
     protected static final Logger logger = Logger.getLogger(AbstractControl.class.getName());
     // general
     protected Player controllingPlayer;
-    protected final AssetManager assetManager = SolarWarsApplication.getInstance().getAssetManager();
-    protected MarkerNode markerNode;
+    protected final AssetManager assetManager = 
+            SolarWarsApplication.getInstance().getAssetManager();
+    protected Camera cam = 
+            SolarWarsApplication.getInstance().getCamera();
+    protected InputManager inputManager =
+            SolarWarsApplication.getInstance().getInputManager();
+    protected ActionLib actionLib;
     // planet & shipgroup selection
     protected ArrayList<AbstractPlanet> planetSelection;
     protected ArrayList<ShipGroup> shipGroupSelection;
     protected ArrayList<MarkerNode> markerNodes;
+    protected MarkerNode markerNode;
     protected boolean controlPressed = false;
     // Panels for rect
     protected DragRectangleGUI dragRectangle;
@@ -75,10 +81,6 @@ public abstract class AbstractControl {
     private Vector3f startXZPlanePos;
     private Vector2f startScreenPos = Vector2f.ZERO.clone();
     // debug
-    protected Camera cam = SolarWarsApplication.getInstance().getCamera();
-    protected InputManager inputManager =
-            SolarWarsApplication.getInstance().getInputManager();
-    protected ActionLib actionLib;
 
     //==========================================================================
     //===   Methods & Constructor
@@ -106,19 +108,15 @@ public abstract class AbstractControl {
     }
 
     /**
-     * Initializes the players main controls.
-     *
-     * @param rootNode the root node
+     * 
+     * @param controllingPlayer 
      */
-    public void initialize() {
+    public void initialize(Player controllingPlayer) {
         SolarWarsApplication.getInstance().
                 getStateManager().attach(dragRectangle = new DragRectangleGUI());
-    }
-
-    void setControllingPlayer(Player controllingPlayer) {
         this.controllingPlayer = controllingPlayer;
     }
-    
+
     /**
      * Gets the value of the control state flag. See onControlModifier() method
      * for more.
@@ -511,8 +509,8 @@ public abstract class AbstractControl {
             // check if planet pos is in rectangle
             if (rectangle.contains(planetPos)) {
                 // if not owned by local player get the next planet in the planet set
-                if (planet.getOwner() == null || 
-                        !planet.getOwner().equals(controllingPlayer)) {
+                if (planet.getOwner() == null
+                        || !planet.getOwner().equals(controllingPlayer)) {
                     continue;
                 }
                 // else add planet to the selection
@@ -541,8 +539,8 @@ public abstract class AbstractControl {
             // check if shipgroup pos is in rectangle
             if (rectangle.contains(shipGroupPos)) {
                 // if not owned by local player get the next planet in the planet set
-                if (shipGroup.getOwner() == null || 
-                        !shipGroup.getOwner().equals(controllingPlayer)) {
+                if (shipGroup.getOwner() == null
+                        || !shipGroup.getOwner().equals(controllingPlayer)) {
                     continue;
                 }
                 // else add planet to the selection
@@ -591,7 +589,7 @@ public abstract class AbstractControl {
      *
      * @param tpf (the Time per Frame)
      */
-    public void updateSelection(float tpf) {
+    private void updateSelection(float tpf) {
         if (markerNode != null) {
             markerNode.updateMarker(tpf);
         }
@@ -606,6 +604,10 @@ public abstract class AbstractControl {
         }
 
         updateDragRect(getClickedPoint());
+    }
+    
+    public void update(float tpf) {
+        updateSelection(tpf);
     }
 
     /**

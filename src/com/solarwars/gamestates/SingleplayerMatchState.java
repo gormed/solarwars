@@ -39,6 +39,7 @@ import com.solarwars.logic.DeathmatchGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.net.ServerHub;
+import java.util.concurrent.Callable;
 
 /**
  * The Class SingleplayerMatchState.
@@ -100,8 +101,6 @@ public class SingleplayerMatchState extends Gamestate {
         niftyGUI.gotoScreen("singleplayer");
         // setup game for singleplayer
         setupSingleplayer();
-        // attach iso control
-        application.attachCameraAndControl();
         application.getInputManager().addListener(
                 pauseToggle,
                 InputMappings.PAUSE_GAME);
@@ -112,10 +111,22 @@ public class SingleplayerMatchState extends Gamestate {
                 application.getControlManager(),
                 Hub.playersByID);
         game.setupGameplay(new DeathmatchGameplay(), currentLevel);
-        currentLevel.generateLevel(System.currentTimeMillis());
+        // attach iso control
+        application.attachCamera();
+        application.enqueue(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+
+                // generate level
+                currentLevel.generateLevel(System.currentTimeMillis());
+                application.attachControls();
+                startGamePopup.showPopup();
+                return null;
+            }
+        });
         // setup nifty properly
         setupNiftyGUI();
-        startGamePopup.showPopup();
+
     }
 
     public void startGame() {
@@ -162,7 +173,7 @@ public class SingleplayerMatchState extends Gamestate {
         currentLevel.destroy();
         hub.destroy();
         //3d controls
-        application.detachIsoCameraControl();
+        application.detachCamera();
         gameStatsModule = null;
         playerStatsModule = null;
         paused = false;
@@ -199,6 +210,8 @@ public class SingleplayerMatchState extends Gamestate {
         ControlManager.getInstance().pullControl(local);
         Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
         ai.initialize(false);
+//        ControlManager.getInstance().pullControl(ai);
+
 
         hub.initialize(local, null);
         hub.addPlayer(ai);
