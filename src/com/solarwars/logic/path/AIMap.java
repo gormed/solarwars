@@ -21,6 +21,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic.path;
 
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.solarwars.SolarWarsApplication;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +37,15 @@ import com.solarwars.logic.Level;
 public class AIMap {
 
     private HashMap<Integer, AIPlanetNode> map;
+    private Node debugNode;
 
     /**
      * Instantiates a new aI map.
      */
     public AIMap() {
         map = new HashMap<Integer, AIPlanetNode>();
+        debugNode = new Node("AIMap Debug Node");
+        SolarWarsApplication.getInstance().getRootNode().attachChild(debugNode);
     }
 
     /**
@@ -58,18 +64,37 @@ public class AIMap {
             AbstractPlanet p = entry.getValue();
             AIPlanetNode n = new AIPlanetNode(p);
             map.put(p.getID(), n);
+            debugNode.attachChild(n.debugNode);
             planets.add(n);
         }
 
 
         for (Map.Entry<Integer, AIPlanetNode> cursor : map.entrySet()) {
+
             cursor.getValue().connectPlanets(planets);
         }
         planets.clear();
 
     }
-    
+
     public AIPlanetNode find(AbstractPlanet planet) {
         return map.get(planet.getID());
+    }
+
+    public void enabelDebugMode(boolean value) {
+        if (value) {
+            debugNode.setCullHint(Spatial.CullHint.Never);
+        } else {
+            debugNode.setCullHint(Spatial.CullHint.Always);
+        }
+    }
+
+    public void destroy() {
+        for (Map.Entry<Integer, AIPlanetNode> cursor : map.entrySet()) {
+            cursor.getValue().destroy();
+        }
+        map.clear();
+        debugNode.detachAllChildren();
+        SolarWarsApplication.getInstance().getRootNode().detachChild(debugNode);
     }
 }

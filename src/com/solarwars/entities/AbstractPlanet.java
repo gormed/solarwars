@@ -246,8 +246,10 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
         Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
         Vector3f dir = camPos.subtract(fontPos);
+//        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
 
         Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
+//        Vector3f left = Vector3f.UNIT_X.clone();
         dir.normalizeLocal();
         left.normalizeLocal();
         left.negateLocal();

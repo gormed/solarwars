@@ -80,6 +80,7 @@ public class GamepadControl extends AbstractControl {
             final float LEFT_TOP = (float) (Math.PI * 0.75f);
             final float LEFT_BOTTOM = (float) (Math.PI * 1.25f);
             final float RIGHT_BOTTOM = (float) (Math.PI * 1.75f);
+            final float TOLERANCE = (float) (Math.PI * 0.167f);
 
             @Override
             public void onAction(String name, boolean isPressed, float tpf) {
@@ -93,16 +94,17 @@ public class GamepadControl extends AbstractControl {
                         }
                     }
                     AbstractPlanet p = null;
-                    if (name.equals(InputMappings.AXIS_LS_DOWN)) {
+                    // Left and Right & Up and Down switched
+                    if (name.equals(InputMappings.AXIS_LS_UP)) {
                         p = select(0);
                     }
-                    if (name.equals(InputMappings.AXIS_LS_LEFT)) {
+                    if (name.equals(InputMappings.AXIS_LS_RIGHT)) {
                         p = select(1);
                     }
-                    if (name.equals(InputMappings.AXIS_LS_RIGHT)) {
+                    if (name.equals(InputMappings.AXIS_LS_LEFT)) {
                         p = select(2);
                     }
-                    if (name.equals(InputMappings.AXIS_LS_UP)) {
+                    if (name.equals(InputMappings.AXIS_LS_DOWN)) {
                         p = select(3);
                     }
                     if (p != null) {
@@ -116,7 +118,11 @@ public class GamepadControl extends AbstractControl {
 
             private AbstractPlanet select(int dir) {
                 ArrayList<AIPlanetEdge> valid = new ArrayList<AIPlanetEdge>();
+                System.out.println("ALL");
                 for (AIPlanetEdge edge : selectedNode.getEdges()) {
+                    System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
+                            + " to " + edge.getTo().getPlanet().getID()
+                            + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
                     if (dir == 0) {
                         selectDown(edge, valid);
                     } else if (dir == 1) {
@@ -130,7 +136,14 @@ public class GamepadControl extends AbstractControl {
                 if (valid.isEmpty()) {
                     return null;
                 } else {
-                    return getClosest(valid);
+                    AbstractPlanet p = getClosest(valid);
+                    System.out.println("VALID");
+                    for (AIPlanetEdge edge : valid) {
+                        System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
+                                + " to " + edge.getTo().getPlanet().getID()
+                                + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
+                    }
+                    return p;
                 }
             }
 
@@ -150,29 +163,29 @@ public class GamepadControl extends AbstractControl {
             }
 
             private void selectDown(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= LEFT_BOTTOM
-                        && edge.getAngle() < RIGHT_BOTTOM) {
+                if (edge.getAngle() >= LEFT_BOTTOM + TOLERANCE
+                        && edge.getAngle() < RIGHT_BOTTOM - TOLERANCE) {
                     valid.add(edge);
                 }
             }
 
             private void selectLeft(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= LEFT_TOP
-                        && edge.getAngle() < LEFT_BOTTOM) {
+                if (edge.getAngle() >= LEFT_TOP + TOLERANCE
+                        && edge.getAngle() < LEFT_BOTTOM - TOLERANCE) {
                     valid.add(edge);
                 }
             }
 
             private void selectRight(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() < RIGHT_TOP
-                        && edge.getAngle() >= RIGHT_BOTTOM) {
+                if (edge.getAngle() < RIGHT_TOP - TOLERANCE
+                        && edge.getAngle() >= RIGHT_BOTTOM + TOLERANCE) {
                     valid.add(edge);
                 }
             }
 
             private void selectTop(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= RIGHT_TOP
-                        && edge.getAngle() < LEFT_TOP) {
+                if (edge.getAngle() >= RIGHT_TOP + TOLERANCE
+                        && edge.getAngle() < LEFT_TOP - TOLERANCE) {
                     valid.add(edge);
                 }
             }
@@ -190,7 +203,13 @@ public class GamepadControl extends AbstractControl {
 
     public void onSelectPlanet(AbstractPlanet planet) {
         repositCursor(planet);
+        if (selectedNode != null) {
+            selectedNode.enabelDebugMode(false);
+        }
         selectedNode = map.find(planet);
+        if (selectedNode != null) {
+            selectedNode.enabelDebugMode(true);
+        }
     }
 
     /**
@@ -292,7 +311,7 @@ public class GamepadControl extends AbstractControl {
                 InputMappings.AXIS_LS_LEFT,
                 InputMappings.AXIS_LS_RIGHT,
                 InputMappings.AXIS_LS_UP);
-        
+
         if (!controllingPlayer.getPlanets().isEmpty()) {
             onSelectPlanet(controllingPlayer.getPlanets().get(0));
         }
@@ -300,8 +319,11 @@ public class GamepadControl extends AbstractControl {
 
     @Override
     public void removeControlListener() {
-
+        map.destroy();
+        map = null;
         inputManager.removeListener(gamepadListener);
+        inputManager.removeListener(selectionListener);
+        selectedNode = null;
     }
 
     @Override
@@ -318,7 +340,7 @@ public class GamepadControl extends AbstractControl {
         return new Vector2f(proj.x, proj.y);
     }
 
-        /**
+    /**
      * Reposit a marker on a selected planet.
      *
      * @param planet the planet
@@ -342,7 +364,7 @@ public class GamepadControl extends AbstractControl {
         }
 
     }
-    
+
     @Override
     public void update(float tpf) {
 //        cursor.updateMarker(tpf);
