@@ -34,6 +34,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -44,6 +45,7 @@ import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.settings.SolarWarsSettings;
+import java.util.Random;
 
 /**
  * The Class AbstractPlanet.
@@ -100,15 +102,11 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Emit impact particles.
-     * 
-     * @param start
-     *            the start
-     * @param end
-     *            the end
-     * @param pos
-     *            the pos
-     * @param dir
-     *            the dir
+     *
+     * @param start the start
+     * @param end the end
+     * @param pos the pos
+     * @param dir the dir
      */
     void emitImpactParticles(ColorRGBA start, ColorRGBA end, Vector3f pos,
             Vector3f dir) {
@@ -186,15 +184,11 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Instantiates a new abstract planet.
-     * 
-     * @param assetManager
-     *            the asset manager
-     * @param level
-     *            the level
-     * @param position
-     *            the position
-     * @param sizeID
-     *            the size id
+     *
+     * @param assetManager the asset manager
+     * @param level the level
+     * @param position the position
+     * @param sizeID the size id
      */
     public AbstractPlanet(AssetManager assetManager,
             Level level,
@@ -241,36 +235,57 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      * Refresh font.
      */
     private void refreshFont() {
-        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
-        Vector3f fontPos = position.clone();
-
-        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
-        Vector3f dir = camPos.subtract(fontPos);
-//        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
-
-        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
-//        Vector3f left = Vector3f.UNIT_X.clone();
-        dir.normalizeLocal();
-        left.normalizeLocal();
-        left.negateLocal();
+        Camera cam = IsoCamera.getInstance().getCam();
+//
+//        float width = label.getLineWidth();
+//        float height = label.getHeight();
+//
+//        
+        Vector3f pos = position.clone();
+//        pos.addLocal(new Vector3f(width / 2, .15f, -height / 2));
+//        pos.addLocal(position);
+        
+        Vector3f up = cam.getUp().clone();
+        Vector3f dir = cam.getDirection().
+                clone().negateLocal().normalizeLocal();
+        Vector3f left = cam.getLeft().
+                clone().normalizeLocal().negateLocal();
 
         Quaternion look = new Quaternion();
         look.fromAxes(left, up, dir);
 
-        Vector3f newPos = dir.clone();
-        newPos.normalizeLocal();
-        newPos.mult(size);
+        label.setLocalTransform(new Transform(pos, look));
+        
+//        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
+//        Vector3f fontPos = position.clone();
 
-        newPos = position.add(newPos);
-
-        Transform t = new Transform(newPos, look);
-
-        label.setLocalTransform(t);
+//        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
+//        Vector3f dir = camPos.subtract(fontPos);
+////        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
+//
+//        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
+////        Vector3f left = Vector3f.UNIT_X.clone();
+//        dir.normalizeLocal();
+//        left.normalizeLocal();
+//        left.negateLocal();
+//
+//        Quaternion look = new Quaternion();
+//        look.fromAxes(left, up, dir);
+//
+//        Vector3f newPos = dir.clone();
+//        newPos.normalizeLocal();
+//        newPos.mult(size);
+//
+//        newPos = position.add(newPos);
+//
+//        Transform t = new Transform(newPos, look);
+//
+//        label.setLocalTransform(t);
     }
 
     /**
      * Checks for owner.
-     * 
+     *
      * @return true, if successful
      */
     public boolean hasOwner() {
@@ -279,7 +294,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the owner.
-     * 
+     *
      * @return the owner
      */
     public Player getOwner() {
@@ -288,26 +303,25 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Sets the owner.
-     * 
-     * @param p
-     *            the new owner
+     *
+     * @param p the new owner
      */
     public void setOwner(Player p) {
         owner = p;
         label.setColor(ColorRGBA.White.clone());
         /*material.setColor("Specular", owner.getColor());
-        if (SolarWarsApplication.TOON_ENABLED)
-        {
-        material.setColor("Diffuse", ColorRGBA.LightGray);
-        }
-        else
-        {
-        material.setColor("Diffuse", owner.getColor());
-        }
-        if (SolarWarsApplication.BLOOM_ENABLED)
-        {
-        material.setColor("GlowColor", owner.getColor());
-        }*/
+         if (SolarWarsApplication.TOON_ENABLED)
+         {
+         material.setColor("Diffuse", ColorRGBA.LightGray);
+         }
+         else
+         {
+         material.setColor("Diffuse", owner.getColor());
+         }
+         if (SolarWarsApplication.BLOOM_ENABLED)
+         {
+         material.setColor("GlowColor", owner.getColor());
+         }*/
 
         material.setColor("Color", owner.getColor().mult(new ColorRGBA(2, 2, 2, 1)));
     }
@@ -319,7 +333,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the id.
-     * 
+     *
      * @return the id
      */
     public int getID() {
@@ -328,7 +342,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the size.
-     * 
+     *
      * @return the size
      */
     public float getSize() {
@@ -337,7 +351,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the size id.
-     * 
+     *
      * @return the size id
      */
     public int getSizeID() {
@@ -346,7 +360,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the geometry.
-     * 
+     *
      * @return the geometry
      */
     public Geometry getGeometry() {
@@ -355,7 +369,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the ships.
-     * 
+     *
      * @return the ships
      */
     public int getShipCount() {
@@ -368,9 +382,8 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Sets the ship count.
-     * 
-     * @param c
-     *            the new ship count
+     *
+     * @param c the new ship count
      */
     public void setShipCount(int c) {
         ships = c;
@@ -410,7 +423,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the position.
-     * 
+     *
      * @return the position
      */
     @Override
@@ -420,7 +433,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Gets the transform node.
-     * 
+     *
      * @return the transform node
      */
     public Node getTransformNode() {
@@ -429,9 +442,8 @@ public abstract class AbstractPlanet extends Node implements Ranged {
 
     /**
      * Updates the label.
-     * 
-     * @param tpf
-     *            the tpf
+     *
+     * @param tpf the tpf
      */
     private void updateLabel(float tpf) {
         boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()) || Hub.getLocalPlayer().hasLost());
@@ -462,16 +474,15 @@ public abstract class AbstractPlanet extends Node implements Ranged {
     // }
     /**
      * Updates the label.
-     * 
-     * @param tpf
-     *            the tpf
+     *
+     * @param tpf the tpf
      */
     public void updatePlanet(float tpf) {
         if (PLANET_QUALITY == 1) {
             material.setFloat("Shift", shift);
             shift += tpf * 0.08f / size;
         }
-        
+
         shipGainTime += tpf;
         if (owner != null && !level.isGameOver()) {
 

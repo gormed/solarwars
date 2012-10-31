@@ -24,12 +24,11 @@ package com.solarwars.logic.path;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.solarwars.SolarWarsApplication;
+import com.solarwars.entities.AbstractPlanet;
+import com.solarwars.logic.Level;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.solarwars.entities.AbstractPlanet;
-import com.solarwars.logic.Level;
 
 /**
  * The Class AIMap.
@@ -45,6 +44,8 @@ public class AIMap {
     public AIMap() {
         map = new HashMap<Integer, AIPlanetNode>();
         debugNode = new Node("AIMap Debug Node");
+        // TODO Hans Debugging?
+        enabelDebugMode(false);
         SolarWarsApplication.getInstance().getRootNode().attachChild(debugNode);
     }
 

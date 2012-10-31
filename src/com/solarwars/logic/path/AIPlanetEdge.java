@@ -21,7 +21,26 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic.path;
 
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
+import com.jme3.material.Material;
+import com.jme3.material.RenderState;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Transform;
 import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Line;
+import com.solarwars.FontLoader;
+import com.solarwars.IsoCamera;
+import com.solarwars.SolarWarsApplication;
+import com.solarwars.logic.Player;
+import java.util.Random;
 
 /**
  * The Class AIEdge.
@@ -30,8 +49,10 @@ public class AIPlanetEdge {
 
     private AIPlanetNode from;
     private AIPlanetNode to;
-    private float length; 
+    private float length;
     private float angle;
+    private BitmapText label;
+    private Geometry line;
 
     /**
      * Instantiates a new aI edge.
@@ -46,6 +67,43 @@ public class AIPlanetEdge {
         calculateAngle();
     }
 
+    Node createDebugGeometry() {
+        Line l = new Line(from.getPlanet().getPosition(), to.getPlanet().getPosition());
+
+        line = new Geometry("Line #" + from.getPlanet().getID()
+                + " to #" + to.getPlanet().getID(), l);
+
+        Material material = new Material(SolarWarsApplication.getInstance().
+                getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+
+        Player p = from.getPlanet().getOwner();
+        ColorRGBA c;
+        if (p == null) {
+            c = ColorRGBA.White.clone();
+            c.a = 0.5f;
+            material.setColor("Color", c);
+        } else {
+            c = p.getColor();
+            c.a = 0.5f;
+            material.setColor("Color", c);
+        }
+        material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        line.setMaterial(material);
+
+        createLabel();
+        Node lineNode = new Node(line.getName() + "_Node");
+        lineNode.attachChild(line);
+        lineNode.attachChild(label);
+//        Vector3f pos = to.getPlanet().getPosition().
+//                subtract(from.getPlanet().getPosition());
+//        lineNode.setLocalTranslation(pos.mult(0.5f));
+        return lineNode;
+    }
+
+    Geometry getLine() {
+        return line;
+    }
+
     /**
      * Calculate length.
      */
@@ -54,13 +112,21 @@ public class AIPlanetEdge {
     }
 
     private void calculateAngle() {
+        Vector3f start = from.getPlanet().getPosition().clone();
+        Vector3f end = to.getPlanet().getPosition().clone();
+        
+        
+        
+        
         Vector2f from2d = new Vector2f(
                 from.getPlanet().getPosition().x,
                 from.getPlanet().getPosition().z);
         Vector2f to2d = new Vector2f(
                 to.getPlanet().getPosition().x,
                 to.getPlanet().getPosition().z);
-        angle = from2d.angleBetween(to2d);
+        Vector2f dist = to2d.subtract(from2d);
+        Vector2f right = new Vector2f(-1, 0);
+        angle = dist.angleBetween(right);
         angle = Math.abs(angle);
     }
 
@@ -78,5 +144,74 @@ public class AIPlanetEdge {
 
     public AIPlanetNode getTo() {
         return to;
+    }
+
+    private void createLabel() {
+        BitmapFont f = FontLoader.getInstance().getFont("SolarWarsFont32");
+        label = new BitmapText(f, false);
+//        label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
+        // label.setQueueBucket(Bucket.Transparent);
+        label.setSize(0.175f);
+        label.setColor(ColorRGBA.Orange);
+        label.setText(String.format("a = %1.2f d = %2.2f",
+                getAngle(), getLength()));
+//        label.setAlignment(BitmapFont.Align.Center);
+        label.setCullHint(Spatial.CullHint.Never);
+        label.setQueueBucket(RenderQueue.Bucket.Transparent);
+        // algins position of the font
+        refreshFont();
+    }
+
+    private void refreshFont() {
+        Camera cam = IsoCamera.getInstance().getCam();
+
+
+        Vector3f start = from.getPlanet().getPosition();
+        Vector3f end = to.getPlanet().getPosition();
+
+        float width = label.getLineWidth();
+        Random r = new Random();
+//        float height = r.nextFloat() * end.subtract(start).z;
+
+        Vector3f position = new Vector3f(width / 2, .15f, 0);
+        Vector3f fontPos = start.add(end.subtract(start).mult(0.4f + 0.75f * r.nextFloat()));
+        position.addLocal(fontPos);
+
+        Vector3f up = cam.getUp().clone();
+        Vector3f dir = cam.getDirection().
+                clone().negateLocal().normalizeLocal();
+        Vector3f left = cam.getLeft().
+                clone().normalizeLocal().negateLocal();
+
+        Quaternion look = new Quaternion();
+        look.fromAxes(left, up, dir);
+
+        label.setLocalTransform(new Transform(position, look));
+
+//        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
+//        Vector3f fontPos = to.getPlanet().getPosition().
+//                subtract(from.getPlanet().getPosition());
+//        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
+//        Vector3f dir = camPos.subtract(fontPos);
+////        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
+//
+//        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
+//        dir.normalizeLocal();
+//        left.negateLocal();
+//        left.normalizeLocal();
+//        up.normalizeLocal();
+////        dir.negateLocal();
+//
+//        Quaternion look = new Quaternion();
+//        look.fromAxes(left, up, dir);
+//
+//        Vector3f newPos = to.getPlanet().getPosition().
+//                subtract(from.getPlanet().getPosition());
+//
+//        newPos.x -= label.getLineWidth() / 2;
+//
+//        Transform t = new Transform(newPos, look);
+//
+//        label.setLocalTransform(t);
     }
 }

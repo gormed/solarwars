@@ -137,8 +137,8 @@ public class StandardControl extends AbstractControl {
             inputManager.addListener(mouseActionListener,
                     InputMappings.LEFT_CLICK_SELECT,
                     InputMappings.RIGHT_CLICK_ATTACK,
-                    InputMappings.PERCENT_DOWN,
-                    InputMappings.PERCENT_UP);
+                    InputMappings.PERCENT_WEEL_DOWN,
+                    InputMappings.PERCENT_WEEL_UP);
 
             inputManager.addListener(keyActionListener,
                     InputMappings.CONTROL_MODIFIER);
@@ -173,11 +173,11 @@ public class StandardControl extends AbstractControl {
     protected void onMouseWeel(String name) {
         Player local = controllingPlayer;
 
-        if (!(name.equals(InputMappings.PERCENT_DOWN)
-                || name.equals(InputMappings.PERCENT_UP))) {
+        if (!(name.equals(InputMappings.PERCENT_WEEL_DOWN)
+                || name.equals(InputMappings.PERCENT_WEEL_UP))) {
             return;
         }
-        boolean down = (name.equals(InputMappings.PERCENT_DOWN)) ? true : false;
+        boolean down = (name.equals(InputMappings.PERCENT_WEEL_DOWN)) ? true : false;
         float amount = 0.05f;
 
         onPercentageChange(amount, down);

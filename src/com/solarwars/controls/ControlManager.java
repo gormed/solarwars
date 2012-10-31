@@ -249,7 +249,7 @@ public class ControlManager {
         joysticks.addAll(Arrays.asList(inputManager.getJoysticks()));
 
         for (Joystick j : joysticks) {
-            if ("Wacom Virtual Hid Driver".equals(j.getName())) {
+            if (!"Controller (XBOX 360 For Windows)".equals(j.getName())) {
                 continue;
             }
             GamepadControl gamepad = new GamepadControl(j);

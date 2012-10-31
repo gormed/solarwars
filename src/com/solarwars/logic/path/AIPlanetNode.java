@@ -23,23 +23,17 @@ package com.solarwars.logic.path;
 
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
-import com.jme3.font.Rectangle;
-import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Line;
 import com.solarwars.FontLoader;
 import com.solarwars.IsoCamera;
-import com.solarwars.SolarWarsApplication;
 import com.solarwars.entities.AbstractPlanet;
-import com.solarwars.logic.Player;
 import java.util.ArrayList;
 
 /**
@@ -88,8 +82,8 @@ public class AIPlanetNode {
         label = new BitmapText(f, false);
 //        label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
         // label.setQueueBucket(Bucket.Transparent);
-        label.setSize(0.25f);
-        label.setColor(ColorRGBA.Orange);
+        label.setSize(0.4f);
+        label.setColor(ColorRGBA.Red);
         label.setText("#" + planet.getID());
 //        label.setAlignment(BitmapFont.Align.Center);
         label.setCullHint(Spatial.CullHint.Never);
@@ -99,30 +93,49 @@ public class AIPlanetNode {
     }
 
     private void refreshFont() {
-        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
-        Vector3f fontPos = planet.getPosition().clone();
-        fontPos.z += planet.getSize() * 8.0f;
-        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
-        Vector3f dir = camPos.subtract(fontPos);
-//        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
+        Camera cam = IsoCamera.getInstance().getCam();
 
-        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
-        dir.normalizeLocal();
-        left.normalizeLocal();
-        left.negateLocal();
+        float width = label.getLineWidth();
+        float height = label.getHeight();
+
+        Vector3f pos = planet.getPosition().clone();
+        pos.addLocal(new Vector3f(-planet.getSize(), .15f, -planet.getSize()));
+
+        Vector3f up = cam.getUp().clone();
+        Vector3f dir = cam.getDirection().
+                clone().negateLocal().normalizeLocal();
+        Vector3f left = cam.getLeft().
+                clone().normalizeLocal().negateLocal();
 
         Quaternion look = new Quaternion();
         look.fromAxes(left, up, dir);
 
-        Vector3f newPos = dir.clone();
-        newPos.normalizeLocal();
-        newPos.mult(planet.getSize());
+        label.setLocalTransform(new Transform(pos, look));
 
-        newPos = planet.getPosition().add(newPos);
-
-        Transform t = new Transform(newPos, look);
-
-        label.setLocalTransform(t);
+//        Vector3f camPos = IsoCamera.getInstance().getCam().getLocation();
+//        Vector3f fontPos = planet.getPosition().clone();
+//        fontPos.z += planet.getSize() * 8.0f;
+//        Vector3f up = IsoCamera.getInstance().getCam().getUp().clone();
+//        Vector3f dir = camPos.subtract(fontPos);
+////        Vector3f dir = Vector3f.UNIT_Y.clone().subtract(fontPos);
+//
+//        Vector3f left = IsoCamera.getInstance().getCam().getLeft().clone();
+//        dir.normalizeLocal();
+//        left.normalizeLocal();
+//        left.negateLocal();
+//
+//        Quaternion look = new Quaternion();
+//        look.fromAxes(left, up, dir);
+//
+//        Vector3f newPos = dir.clone();
+//        newPos.normalizeLocal();
+//        newPos.mult(planet.getSize());
+//
+//        newPos = planet.getPosition().add(newPos);
+//
+//        Transform t = new Transform(newPos, look);
+//
+//        label.setLocalTransform(t);
     }
 
     /**
@@ -133,28 +146,8 @@ public class AIPlanetNode {
     private void createEdge(AIPlanetNode node) {
         AIPlanetEdge e = new AIPlanetEdge(this, node);
         edges.add(e);
-        Line l = new Line(this.getPlanet().getPosition(), node.getPlanet().getPosition());
 
-        Geometry line = new Geometry("Line #" + getPlanet().getID()
-                + " to #" + node.getPlanet().getID(), l);
-
-        Material material = new Material(SolarWarsApplication.getInstance().
-                getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-
-        Player p = getPlanet().getOwner();
-        ColorRGBA c;
-        if (p == null) {
-            c = ColorRGBA.White.clone();
-            c.a = 0.5f;
-            material.setColor("Color", c);
-        } else {
-            c = p.getColor();
-            c.a = 0.5f;
-            material.setColor("Color", c);
-        }
-        material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        line.setMaterial(material);
-        debugNode.attachChild(line);
+        debugNode.attachChild(e.createDebugGeometry());
         enabelDebugMode(false);
     }
 
@@ -178,10 +171,10 @@ public class AIPlanetNode {
             debugNode.setCullHint(Spatial.CullHint.Always);
         }
     }
-    
+
     public void destroy() {
         edges.clear();
         debugNode.detachAllChildren();
-        
+
     }
 }
