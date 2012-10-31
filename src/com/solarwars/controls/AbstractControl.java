@@ -60,9 +60,9 @@ public abstract class AbstractControl {
     protected static final Logger logger = Logger.getLogger(AbstractControl.class.getName());
     // general
     protected Player controllingPlayer;
-    protected final AssetManager assetManager = 
+    protected final AssetManager assetManager =
             SolarWarsApplication.getInstance().getAssetManager();
-    protected Camera cam = 
+    protected Camera cam =
             SolarWarsApplication.getInstance().getCamera();
     protected InputManager inputManager =
             SolarWarsApplication.getInstance().getInputManager();
@@ -108,8 +108,8 @@ public abstract class AbstractControl {
     }
 
     /**
-     * 
-     * @param controllingPlayer 
+     *
+     * @param controllingPlayer
      */
     public void initialize(Player controllingPlayer) {
         SolarWarsApplication.getInstance().
@@ -207,7 +207,7 @@ public abstract class AbstractControl {
             clearMultiMarkers();
             updateDragRect(click2d);
             dragRectangle.show();
-            markerNodes = new ArrayList<MarkerNode>();
+//            markerNodes = new ArrayList<MarkerNode>();
         }
         dragging = true;
     }
@@ -349,47 +349,16 @@ public abstract class AbstractControl {
                         leftX, topY, width, height);
                 if (!isControlPressed()) {
                     // select all planets in rectangle
-                    selectPlanets(rect);
-                    // TODO Hans Documentate
-                    MarkerNode markerNodeLoc;
-                    if (!planetSelection.isEmpty()) {
-                        for (AbstractPlanet planet : planetSelection) {
-
-                            markerNodeLoc = new MarkerNode();
-                            markerNodes.add(markerNodeLoc);
-                            repositMarker(planet, markerNodeLoc);
-
-                        }
-                        actionLib.invokePlanetAction(
-                                this,
-                                null,
-                                controllingPlayer,
-                                DeathmatchGameplay.PLANET_MULTI_SELECT);
-                        final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
-                        logger.info(multiSelectMsg);
+                    selectPlanetsInRect(rect);
+                    if (!applyPlanetSelection()) {
+                        return false;
                     }
                 } else {
-                    selectShipGroups(rect);
-
-                    MarkerNode markerNodeLoc;
-                    if (!shipGroupSelection.isEmpty()) {
-                        for (ShipGroup shipGroup : shipGroupSelection) {
-
-                            markerNodeLoc = new MarkerNode();
-                            markerNodes.add(markerNodeLoc);
-                            repositMarker(shipGroup, markerNodeLoc);
-
-                        }
-                        actionLib.invokeShipAction(
-                                this,
-                                null,
-                                controllingPlayer,
-                                DeathmatchGameplay.SHIP_MULTI_SELECT);
-                        final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
-                        logger.info(multiSelectMsg);
+                    selectShipGroupsInRect(rect);
+                    if (!applyShipGroupSelection()) {
+                        return false;
                     }
                 }
-                //
 
                 lastXZPlanePos = null;
                 startScreenPos = null;
@@ -401,6 +370,12 @@ public abstract class AbstractControl {
             dragRectangle.hide();
         }
         return false;
+    }
+
+    protected boolean selectAllPlanets() {
+        clearMultiMarkers();
+        selectPlanets(controllingPlayer.getPlanets());
+        return applyPlanetSelection();
     }
 
     /**
@@ -494,10 +469,12 @@ public abstract class AbstractControl {
      *
      * @param rectangle the rectangle
      */
-    private void selectPlanets(Rectangle2D rectangle) {
+    private void selectPlanetsInRect(Rectangle2D rectangle) {
 
         // gets the set of plantes as a ref
         Set<Entry<Integer, AbstractPlanet>> planetSet = SolarWarsGame.getInstance().getCurrentLevel().getPlanetSet();
+        ArrayList<AbstractPlanet> tempPlanetSelection = new ArrayList<AbstractPlanet>();
+
         // iterate through the sets planets each
         for (Map.Entry<Integer, AbstractPlanet> entry : planetSet) {
             // get planet pos
@@ -514,9 +491,14 @@ public abstract class AbstractControl {
                     continue;
                 }
                 // else add planet to the selection
-                planetSelection.add(planet);
+                tempPlanetSelection.add(planet);
             }
         }
+        selectPlanets(tempPlanetSelection);
+    }
+
+    protected void selectPlanets(ArrayList<AbstractPlanet> planets) {
+        planetSelection = new ArrayList<AbstractPlanet>(planets);
     }
 
     /**
@@ -525,9 +507,10 @@ public abstract class AbstractControl {
      *
      * @param rectangle the rectangle
      */
-    private void selectShipGroups(Rectangle2D rectangle) {
+    private void selectShipGroupsInRect(Rectangle2D rectangle) {
         // gets the set of plantes as a ref
         Set<Entry<Integer, ShipGroup>> planetSet = SolarWarsGame.getInstance().getCurrentLevel().getShipGroupSet();
+        ArrayList<ShipGroup> tempShipGroupSelection = new ArrayList<ShipGroup>();
         // iterate through the sets planets each
         for (Map.Entry<Integer, ShipGroup> entry : planetSet) {
             // get shipgroup pos
@@ -544,8 +527,62 @@ public abstract class AbstractControl {
                     continue;
                 }
                 // else add planet to the selection
-                shipGroupSelection.add(shipGroup);
+                tempShipGroupSelection.add(shipGroup);
             }
+        }
+        selectShipGroup(tempShipGroupSelection);
+    }
+
+    protected void selectShipGroup(ArrayList<ShipGroup> shipGroups) {
+        shipGroupSelection = new ArrayList<ShipGroup>(shipGroups);
+    }
+
+    private boolean applyShipGroupSelection() {
+        MarkerNode markerNodeLoc;
+        markerNodes = new ArrayList<MarkerNode>();
+        if (shipGroupSelection != null && !shipGroupSelection.isEmpty()) {
+            for (ShipGroup shipGroup : shipGroupSelection) {
+
+                markerNodeLoc = new MarkerNode();
+                markerNodes.add(markerNodeLoc);
+                repositMarker(shipGroup, markerNodeLoc);
+
+            }
+            actionLib.invokeShipAction(
+                    this,
+                    null,
+                    controllingPlayer,
+                    DeathmatchGameplay.SHIP_MULTI_SELECT);
+            final String multiSelectMsg = "Player multi selected " + shipGroupSelection.size() + " shipgroup(s).";
+            logger.info(multiSelectMsg);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean applyPlanetSelection() {
+        // TODO Hans Documentate
+        MarkerNode markerNodeLoc;
+        markerNodes = new ArrayList<MarkerNode>();
+        if (planetSelection != null && !planetSelection.isEmpty()) {
+            for (AbstractPlanet planet : planetSelection) {
+
+                markerNodeLoc = new MarkerNode();
+                markerNodes.add(markerNodeLoc);
+                repositMarker(planet, markerNodeLoc);
+
+            }
+            actionLib.invokePlanetAction(
+                    this,
+                    null,
+                    controllingPlayer,
+                    DeathmatchGameplay.PLANET_MULTI_SELECT);
+            final String multiSelectMsg = "Player multi selected " + planetSelection.size() + " planet(s).";
+            logger.info(multiSelectMsg);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -605,7 +642,7 @@ public abstract class AbstractControl {
 
         updateDragRect(getClickedPoint());
     }
-    
+
     public void update(float tpf) {
         updateSelection(tpf);
     }

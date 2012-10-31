@@ -209,7 +209,8 @@ public class SingleplayerMatchState extends Gamestate {
         local.initialize(true);
         ControlManager.getInstance().pullControl(local);
         Player ai = new Player("AI", ColorRGBA.Red, ServerHub.getContiniousPlayerID());
-        ai.initialize(false);
+        ai.initialize(true);
+        ControlManager.getInstance().pullControl(ai);
 //        ControlManager.getInstance().pullControl(ai);
 
 

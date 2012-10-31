@@ -96,45 +96,12 @@ public class GamepadControl extends AbstractControl {
                     if (dPadSelector(name)) {
                         return;
                     }
-
-                    if (name.equals(InputMappings.LB_SELECT) || name.equals(InputMappings.RB_SELECT)) {
-                        if (selectedNode == null 
-                                || (selectedNode != null 
-                                && selectedNode.getPlanet().getOwner() == null)) {
-                            if (!initSelection()) {
-                                return;
-                            }
-                        }
-                        ArrayList<AbstractPlanet> playerPlanets =
-                                controllingPlayer.getPlanets();
-                        if (name.equals(InputMappings.LB_SELECT)) {
-                            Comparator<AbstractPlanet> shipComarator =
-                                    new Comparator<AbstractPlanet>() {
-                                        @Override
-                                        public int compare(AbstractPlanet o1, AbstractPlanet o2) {
-                                            if (o1.getShipCount() <= o2.getShipCount()) {
-                                                return -1;
-                                            } else {
-                                                return 1;
-                                            }
-                                        }
-                                    };
-                            Collections.sort(playerPlanets, shipComarator);
-                        } else if (name.equals(InputMappings.RB_SELECT)) {
-                            Comparator<AbstractPlanet> shipComarator =
-                                    new Comparator<AbstractPlanet>() {
-                                        @Override
-                                        public int compare(AbstractPlanet o1, AbstractPlanet o2) {
-                                            if (o1.getShipCount() <= o2.getShipCount()) {
-                                                return 1;
-                                            } else {
-                                                return -1;
-                                            }
-                                        }
-                                    };
-                            Collections.sort(playerPlanets, shipComarator);
-                        }
-                        selectNextPlanet(playerPlanets);
+                    if (sequSelect(name)) {
+                        return;
+                    }
+                    
+                    if (name.equals(InputMappings.SELECT_ALL)) {
+                        selectAllPlanets();
                     }
 
                 } else {
@@ -240,6 +207,36 @@ public class GamepadControl extends AbstractControl {
                 }
             }
 
+            private void sortPlayerPlanets(String name, ArrayList<AbstractPlanet> playerPlanets) {
+                if (name.equals(InputMappings.LB_SELECT)) {
+                    Comparator<AbstractPlanet> shipComarator =
+                            new Comparator<AbstractPlanet>() {
+                                @Override
+                                public int compare(AbstractPlanet o1, AbstractPlanet o2) {
+                                    if (o1.getShipCount() <= o2.getShipCount()) {
+                                        return -1;
+                                    } else {
+                                        return 1;
+                                    }
+                                }
+                            };
+                    Collections.sort(playerPlanets, shipComarator);
+                } else if (name.equals(InputMappings.RB_SELECT)) {
+                    Comparator<AbstractPlanet> shipComarator =
+                            new Comparator<AbstractPlanet>() {
+                                @Override
+                                public int compare(AbstractPlanet o1, AbstractPlanet o2) {
+                                    if (o1.getShipCount() <= o2.getShipCount()) {
+                                        return 1;
+                                    } else {
+                                        return -1;
+                                    }
+                                }
+                            };
+                    Collections.sort(playerPlanets, shipComarator);
+                }
+            }
+
             private void selectNextPlanet(ArrayList<AbstractPlanet> playerPlanets) {
                 LinkedList<AbstractPlanet> list =
                         new LinkedList<AbstractPlanet>(playerPlanets);
@@ -263,6 +260,23 @@ public class GamepadControl extends AbstractControl {
                     return false;
                 }
                 return true;
+            }
+
+            private boolean sequSelect(String name) {
+                if (name.equals(InputMappings.LB_SELECT) || name.equals(InputMappings.RB_SELECT)) {
+                    if (selectedNode == null
+                            || (selectedNode != null
+                            && selectedNode.getPlanet().getOwner() == null)) {
+                        if (!initSelection()) {
+                            return true;
+                        }
+                    }
+                    ArrayList<AbstractPlanet> playerPlanets =
+                            new ArrayList<AbstractPlanet>(controllingPlayer.getPlanets());
+                    sortPlayerPlanets(name, playerPlanets);
+                    selectNextPlanet(playerPlanets);
+                }
+                return false;
             }
         };
 
@@ -387,7 +401,8 @@ public class GamepadControl extends AbstractControl {
                 InputMappings.DPAD_LS_RIGHT,
                 InputMappings.DPAD_LS_UP,
                 InputMappings.LB_SELECT,
-                InputMappings.RB_SELECT);
+                InputMappings.RB_SELECT,
+                InputMappings.SELECT_ALL);
 
         if (!controllingPlayer.getPlanets().isEmpty()) {
             onSelectPlanet(controllingPlayer.getPlanets().get(0));
