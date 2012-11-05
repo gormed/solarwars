@@ -446,7 +446,7 @@ public abstract class AbstractPlanet extends Node implements Ranged {
      * @param tpf the tpf
      */
     private void updateLabel(float tpf) {
-        boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()) || Hub.getLocalPlayer().hasLost());
+        boolean visible = (owner == null || owner.equals(Hub.getLocalPlayer()) || Hub.getLocalPlayer().hasLost() || owner.isLocalPlayer());
         label.setCullHint(visible ? CullHint.Never : CullHint.Always);
         if (visible) {
             refreshFont();

@@ -58,6 +58,7 @@ public class GamepadControl extends AbstractControl {
     private MarkerNode cursor;
     private AIPlanetNode selectedNode;
     private static AIMap map;
+    private boolean selectAllTrigger = false;
     //==========================================================================
     //===   Methods & Constructor
     //==========================================================================
@@ -99,9 +100,14 @@ public class GamepadControl extends AbstractControl {
                     if (sequSelect(name)) {
                         return;
                     }
-                    
+
                     if (name.equals(InputMappings.SELECT_ALL)) {
-                        selectAllPlanets();
+                        selectAllTrigger = !selectAllTrigger;
+                        if (selectAllTrigger) {
+                            selectAllPlanets();
+                        } else {
+                            deselectAllPlanets();
+                        }
                     }
 
                 } else {
@@ -285,7 +291,7 @@ public class GamepadControl extends AbstractControl {
     @Override
     public void initialize(Player controllingPlayer) {
         super.initialize(controllingPlayer);
-
+        dragRectangle.setEnabled(false);
         cursor = new MarkerNode();
 
     }
@@ -439,7 +445,9 @@ public class GamepadControl extends AbstractControl {
      * @param markerNode the marker node
      */
     private void repositCursor(AbstractPlanet planet) {
-        removeCursor();
+        if (cursor.getPlanet() != null) {
+            removeCursor();
+        }
         planet.getTransformNode().attachChild(cursor);
         cursor.setPlanet(planet);
     }
@@ -450,9 +458,8 @@ public class GamepadControl extends AbstractControl {
      * @param markerNode the marker node
      */
     private void removeCursor() {
-        Node parent = cursor.getParent();
-        if (parent != null) {
-            parent.detachChild(cursor);
+        if (cursor.getPlanet() != null) {
+            cursor.getPlanet().getTransformNode().detachChild(cursor);
         }
 
     }

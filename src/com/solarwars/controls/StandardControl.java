@@ -75,6 +75,11 @@ public class StandardControl extends AbstractControl {
 
     }
 
+    @Override
+    public void initialize(Player controllingPlayer) {
+        super.initialize(controllingPlayer);
+    }
+
     /**
      * Listens for ctrl key to trigger the control-flag.
      *

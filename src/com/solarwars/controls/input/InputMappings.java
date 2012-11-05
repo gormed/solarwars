@@ -95,7 +95,6 @@ public class InputMappings {
     public static final String RB_SELECT = "SOLARWARS_SequSelect_Forward";
     public static final String LB_SELECT = "SOLARWARS_SequSelect_Backward";
     public static final String SELECT_ALL = "SOLARWARS_SequSelect_Backward";
-    
     // Attack
     public static final String RIGHT_CLICK_ATTACK = "SOLARWARS_RightClickAttack";
     public static final String B_ATTACK = "SOLARWARS_BAttack";
@@ -165,21 +164,21 @@ public class InputMappings {
 //                new JoyButtonTrigger(2, 9), 
 //                new JoyButtonTrigger(3, 9));
 
-        inputManager.addMapping(InputMappings.LB_SELECT, 
-                new JoyButtonTrigger(0, 4), 
-                new JoyButtonTrigger(1, 4), 
-                new JoyButtonTrigger(2, 4), 
+        inputManager.addMapping(InputMappings.LB_SELECT,
+                new JoyButtonTrigger(0, 4),
+                new JoyButtonTrigger(1, 4),
+                new JoyButtonTrigger(2, 4),
                 new JoyButtonTrigger(3, 4));
-        inputManager.addMapping(InputMappings.RB_SELECT, 
-                new JoyButtonTrigger(0, 5), 
-                new JoyButtonTrigger(1, 5), 
-                new JoyButtonTrigger(2, 5), 
+        inputManager.addMapping(InputMappings.RB_SELECT,
+                new JoyButtonTrigger(0, 5),
+                new JoyButtonTrigger(1, 5),
+                new JoyButtonTrigger(2, 5),
                 new JoyButtonTrigger(3, 5));
-        
-        inputManager.addMapping(InputMappings.SELECT_ALL, 
-                new JoyButtonTrigger(0, 3), 
-                new JoyButtonTrigger(1, 3), 
-                new JoyButtonTrigger(2, 3), 
+
+        inputManager.addMapping(InputMappings.SELECT_ALL,
+                new JoyButtonTrigger(0, 3),
+                new JoyButtonTrigger(1, 3),
+                new JoyButtonTrigger(2, 3),
                 new JoyButtonTrigger(3, 3));
 
         inputManager.addMapping(InputMappings.DEBUG_CAMERA_POS,
@@ -210,6 +209,11 @@ public class InputMappings {
         inputManager.addMapping(DPAD_LS_RIGHT, new JoyAxisTrigger(0, 6, false));
         inputManager.addMapping(DPAD_LS_DOWN, new JoyAxisTrigger(0, 7, true));
         inputManager.addMapping(DPAD_LS_UP, new JoyAxisTrigger(0, 7, false));
+
+//        inputManager.addMapping(DPAD_LS_LEFT, new JoyAxisTrigger(0, JoyInput.AXIS_POV_X, true));
+//        inputManager.addMapping(DPAD_LS_RIGHT, new JoyAxisTrigger(1, JoyInput.AXIS_POV_X, false));
+//        inputManager.addMapping(DPAD_LS_DOWN, new JoyAxisTrigger(2, JoyInput.AXIS_POV_Y, true));
+//        inputManager.addMapping(DPAD_LS_UP, new JoyAxisTrigger(3, JoyInput.AXIS_POV_Y, false));
 
 //        inputManager.addMapping(DPAD_LS_UP, new JoyAxisTrigger(0, 0, true));
 //        inputManager.addMapping(DPAD_LS_DOWN, new JoyAxisTrigger(0, 0, false));

@@ -114,7 +114,7 @@ public class DragRectangleGUI extends AbstractAppState {
         dragMaterial.setColor("Color", ColorRGBA.Orange.clone());
         dragRectangle.setMaterial(dragMaterial);
         dragRectangle.setQueueBucket(Bucket.Gui);
-
+//        application.getRootNode().attachChild(dragRectangle);
     }
 
     public void hide() {
@@ -122,6 +122,7 @@ public class DragRectangleGUI extends AbstractAppState {
     }
 
     public void show() {
+        
         dragRectangle.setCullHint(CullHint.Never);
     }
 

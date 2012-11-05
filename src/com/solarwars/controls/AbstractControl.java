@@ -68,8 +68,8 @@ public abstract class AbstractControl {
             SolarWarsApplication.getInstance().getInputManager();
     protected ActionLib actionLib;
     // planet & shipgroup selection
-    protected ArrayList<AbstractPlanet> planetSelection;
-    protected ArrayList<ShipGroup> shipGroupSelection;
+    protected ArrayList<AbstractPlanet> planetSelection = new ArrayList<AbstractPlanet>();
+    protected ArrayList<ShipGroup> shipGroupSelection = new ArrayList<ShipGroup>();
     protected ArrayList<MarkerNode> markerNodes;
     protected MarkerNode markerNode;
     protected boolean controlPressed = false;
@@ -114,6 +114,7 @@ public abstract class AbstractControl {
     public void initialize(Player controllingPlayer) {
         SolarWarsApplication.getInstance().
                 getStateManager().attach(dragRectangle = new DragRectangleGUI());
+
         this.controllingPlayer = controllingPlayer;
     }
 
@@ -202,14 +203,14 @@ public abstract class AbstractControl {
         if (!dragging) {
             startXZPlanePos = currentXZPlanePos;
             startScreenPos = click2d.clone();
-            planetSelection = new ArrayList<AbstractPlanet>();
-            shipGroupSelection = new ArrayList<ShipGroup>();
+            planetSelection.clear();
+            shipGroupSelection.clear();
             clearMultiMarkers();
             updateDragRect(click2d);
             dragRectangle.show();
 //            markerNodes = new ArrayList<MarkerNode>();
         }
-        dragging = true;
+        dragRectangle.setEnabled(dragging = true);
     }
 
     /**
@@ -374,8 +375,16 @@ public abstract class AbstractControl {
 
     protected boolean selectAllPlanets() {
         clearMultiMarkers();
+        planetSelection.clear();
         selectPlanets(controllingPlayer.getPlanets());
         return applyPlanetSelection();
+    }
+
+    protected boolean deselectAllPlanets() {
+        clearMultiMarkers();
+        planetSelection.clear();
+//        deselectPlanets(controllingPlayer.getPlanets());
+        return planetSelection.isEmpty();
     }
 
     /**
@@ -434,6 +443,7 @@ public abstract class AbstractControl {
      */
     private void repositMarker(AbstractPlanet planet, MarkerNode markerNode) {
         removeMarker(markerNode);
+
         planet.getTransformNode().attachChild(markerNode);
         markerNode.setPlanet(planet);
     }
@@ -444,11 +454,9 @@ public abstract class AbstractControl {
      * @param markerNode the marker node
      */
     private void removeMarker(MarkerNode markerNode) {
-        Node parent = markerNode.getParent();
-        if (parent != null) {
-            parent.detachChild(markerNode);
+        if (markerNode.getPlanet() != null) {
+            markerNode.getPlanet().getTransformNode().detachChild(markerNode);
         }
-
     }
 
     /**
@@ -494,11 +502,16 @@ public abstract class AbstractControl {
                 tempPlanetSelection.add(planet);
             }
         }
+        planetSelection.clear();
         selectPlanets(tempPlanetSelection);
     }
 
     protected void selectPlanets(ArrayList<AbstractPlanet> planets) {
-        planetSelection = new ArrayList<AbstractPlanet>(planets);
+        planetSelection.addAll(planets);
+    }
+
+    protected void deselectPlanets(ArrayList<AbstractPlanet> planets) {
+        planetSelection.removeAll(planets);
     }
 
     /**
@@ -534,7 +547,11 @@ public abstract class AbstractControl {
     }
 
     protected void selectShipGroup(ArrayList<ShipGroup> shipGroups) {
-        shipGroupSelection = new ArrayList<ShipGroup>(shipGroups);
+        shipGroupSelection.addAll(shipGroups);
+    }
+
+    protected void deselectShipGroup(ArrayList<ShipGroup> shipGroups) {
+        shipGroupSelection.removeAll(shipGroups);
     }
 
     private boolean applyShipGroupSelection() {
@@ -640,7 +657,7 @@ public abstract class AbstractControl {
             return;
         }
 
-        updateDragRect(getClickedPoint());
+        updateDragRect(inputManager.getCursorPosition());
     }
 
     public void update(float tpf) {

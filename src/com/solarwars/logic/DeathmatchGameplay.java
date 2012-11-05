@@ -180,7 +180,8 @@ public class DeathmatchGameplay extends AbstractGameplay {
 
             private boolean singleAttackPlanet(AbstractPlanet selection,
                     AbstractPlanet target, Player p) {
-                if (selection.getOwner() == p && !selection.equals(target)) {
+                if (selection.getOwner() == null || 
+                        (selection.getOwner().getID() == p.getID() && !selection.equals(target))) {
 
                     if (isDistanceToFar(selection, target)) {
                         return false;
@@ -205,7 +206,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
                 }
-                if (planet.getOwner() == p) {
+                if (planet.getOwner() != null && planet.getOwner().getID() == p.getID()) {
                     planet.incrementShips();
                     AudioManager.getInstance().playSoundInstance(AudioManager.SOUND_BEEP);
                     return true;
@@ -238,7 +239,7 @@ public class DeathmatchGameplay extends AbstractGameplay {
                 if (p.hasLost() || currentLevel.isGameOver()) {
                     return false;
                 }
-                if (shipGroup.getOwner() == p) {
+                if (shipGroup.getOwner() == null || shipGroup.getOwner().getID() == p.getID()) {
                     p.clearShipGroupMultiSelect();
                     p.selectShipGroup(shipGroup);
                     return true;

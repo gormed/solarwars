@@ -199,14 +199,14 @@ public abstract class AbstractShip extends Node {
                 // TODO HANS predict ship position via time required for 
                 // distance at current ship-speed and fire event at given 
                 // max time automaticly!
-                if (owner.equals(Hub.getLocalPlayer())) {
+//                if (owner.equals(Hub.getLocalPlayer())) {
                     ActionLib.getInstance().invokePlanetAction(
                             this,
                             order, 
                             owner, 
                             DeathmatchGameplay.PLANET_CAPTURE);
 
-                }
+//                }
 
                 order.emitImpactParticles(this.owner.getColor(), ColorRGBA.BlackNoAlpha, impactPos, dir);
 
