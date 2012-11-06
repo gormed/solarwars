@@ -82,9 +82,9 @@ public class AIPlanetNode {
         label = new BitmapText(f, false);
 //        label.setBox(new Rectangle(-3f, 0.15f, 6f, 3f));
         // label.setQueueBucket(Bucket.Transparent);
-        label.setSize(0.4f);
+        label.setSize(0.3f);
         label.setColor(ColorRGBA.Red);
-        label.setText("#" + planet.getID());
+        label.setText("#" + planet.getID() + "@" + planet.getSizeID());
 //        label.setAlignment(BitmapFont.Align.Center);
         label.setCullHint(Spatial.CullHint.Never);
         label.setQueueBucket(RenderQueue.Bucket.Transparent);
@@ -99,7 +99,7 @@ public class AIPlanetNode {
         float height = label.getHeight();
 
         Vector3f pos = planet.getPosition().clone();
-        pos.addLocal(new Vector3f(-planet.getSize(), .15f, -planet.getSize()));
+        pos.addLocal(new Vector3f(-planet.getSize() + 0.15f, .15f, -planet.getSize() + 0.15f));
 
         Vector3f up = cam.getUp().clone();
         Vector3f dir = cam.getDirection().
@@ -143,12 +143,14 @@ public class AIPlanetNode {
      *
      * @param node the node
      */
-    private void createEdge(AIPlanetNode node) {
+    private AIPlanetEdge createEdge(AIPlanetNode node) {
         AIPlanetEdge e = new AIPlanetEdge(this, node);
         edges.add(e);
-
-        debugNode.attachChild(e.createDebugGeometry());
-        enabelDebugMode(false);
+        if (AIMap.DEBUG_MAP_EDGES) {
+            debugNode.attachChild(e.createDebugGeometry());
+        }
+        enabelDebugMode(AIMap.DEBUG_MAP_PLANET);
+        return e;
     }
 
     /**

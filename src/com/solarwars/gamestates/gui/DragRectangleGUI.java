@@ -36,6 +36,7 @@ import com.solarwars.SolarWarsApplication;
 
 /**
  * The class DragRectangleGUI.
+ *
  * @author Hans Ferchland <hans.ferchland at gmx.de>
  * @version
  */
@@ -122,7 +123,7 @@ public class DragRectangleGUI extends AbstractAppState {
     }
 
     public void show() {
-        
+
         dragRectangle.setCullHint(CullHint.Never);
     }
 

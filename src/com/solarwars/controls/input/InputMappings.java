@@ -94,7 +94,7 @@ public class InputMappings {
     public static final String A_SELECT = "SOLARWARS_ASelect";
     public static final String RB_SELECT = "SOLARWARS_SequSelect_Forward";
     public static final String LB_SELECT = "SOLARWARS_SequSelect_Backward";
-    public static final String SELECT_ALL = "SOLARWARS_SequSelect_Backward";
+    public static final String SELECT_ALL = "SOLARWARS_Select_All";
     // Attack
     public static final String RIGHT_CLICK_ATTACK = "SOLARWARS_RightClickAttack";
     public static final String B_ATTACK = "SOLARWARS_BAttack";

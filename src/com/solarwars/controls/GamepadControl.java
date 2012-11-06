@@ -25,11 +25,10 @@ import com.jme3.input.Joystick;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
-import com.solarwars.MarkerNode;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.controls.input.InputMappings;
 import com.solarwars.entities.AbstractPlanet;
+import com.solarwars.entities.SelectorNode;
 import com.solarwars.logic.Player;
 import com.solarwars.logic.path.AIMap;
 import com.solarwars.logic.path.AIPlanetEdge;
@@ -55,7 +54,7 @@ public class GamepadControl extends AbstractControl {
     private final Joystick joystick;
     private ActionListener gamepadListener;
     private ActionListener selectionListener;
-    private MarkerNode cursor;
+    private SelectorNode cursor;
     private AIPlanetNode selectedNode;
     private static AIMap map;
     private boolean selectAllTrigger = false;
@@ -93,22 +92,21 @@ public class GamepadControl extends AbstractControl {
                             return;
                         }
                     }
-                    // Left and Right & Up and Down switched
-                    if (dPadSelector(name)) {
-                        return;
-                    }
-                    if (sequSelect(name)) {
-                        return;
-                    }
 
                     if (name.equals(InputMappings.SELECT_ALL)) {
-                        selectAllTrigger = !selectAllTrigger;
-                        if (selectAllTrigger) {
+//                        selectAllTrigger = !selectAllTrigger;
+                        if (planetSelection.isEmpty()) {
                             selectAllPlanets();
                         } else {
                             deselectAllPlanets();
+
                         }
                     }
+                    if (dPadSelector(name)) {
+                    }
+                    if (sequSelect(name)) {
+                    }
+
 
                 } else {
 //                    System.out.println(name + " released");
@@ -206,6 +204,7 @@ public class GamepadControl extends AbstractControl {
                 }
                 System.out.println(name + " pressed");
                 if (p != null) {
+
                     onSelectPlanet(p);
                     return true;
                 } else {
@@ -279,6 +278,8 @@ public class GamepadControl extends AbstractControl {
                     }
                     ArrayList<AbstractPlanet> playerPlanets =
                             new ArrayList<AbstractPlanet>(controllingPlayer.getPlanets());
+//                    selectAllTrigger = false;
+                    deselectAllPlanets();
                     sortPlayerPlanets(name, playerPlanets);
                     selectNextPlanet(playerPlanets);
                 }
@@ -291,8 +292,7 @@ public class GamepadControl extends AbstractControl {
     @Override
     public void initialize(Player controllingPlayer) {
         super.initialize(controllingPlayer);
-        dragRectangle.setEnabled(false);
-        cursor = new MarkerNode();
+        cursor = new SelectorNode();
 
     }
 
@@ -369,6 +369,10 @@ public class GamepadControl extends AbstractControl {
     @Override
     protected void onSelectionPressed(String name, Vector2f point) {
         if (name.equals(InputMappings.A_SELECT)) {
+            if (!planetSelection.isEmpty()) {
+//                selectAllTrigger = false;
+                deselectAllPlanets();
+            }
             onDragSelectEntity(point);
             final String mouseDownMsg = "A-Button down @["
                     + point.x + "/" + point.y + "]";

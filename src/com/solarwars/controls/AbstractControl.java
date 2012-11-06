@@ -21,6 +21,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.controls;
 
+import com.solarwars.entities.MarkerNode;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -104,7 +105,7 @@ public abstract class AbstractControl {
      * @param click2d
      */
     public void createDragRectGeometry() {
-        dragRectangle.setEnabled(true);
+        dragRectangle.setEnabled(false);
     }
 
     /**
@@ -208,9 +209,9 @@ public abstract class AbstractControl {
             clearMultiMarkers();
             updateDragRect(click2d);
             dragRectangle.show();
+            dragging = true;
 //            markerNodes = new ArrayList<MarkerNode>();
         }
-        dragRectangle.setEnabled(dragging = true);
     }
 
     /**
@@ -352,11 +353,13 @@ public abstract class AbstractControl {
                     // select all planets in rectangle
                     selectPlanetsInRect(rect);
                     if (!applyPlanetSelection()) {
+                        dragRectangle.hide();
                         return false;
                     }
                 } else {
                     selectShipGroupsInRect(rect);
                     if (!applyShipGroupSelection()) {
+                        dragRectangle.hide();
                         return false;
                     }
                 }
@@ -410,7 +413,9 @@ public abstract class AbstractControl {
         // create ray for raycasting
         Ray ray = new Ray(click3d, dir);
         // check if play ended a drag and leave if so
-        if (playerEndsDragEntities()) {
+        boolean dragEnded = playerEndsDragEntities();
+        if (dragEnded) {
+            dragRectangle.setEnabled(dragging = false);
             return true;
         }
         // RAYCASTING

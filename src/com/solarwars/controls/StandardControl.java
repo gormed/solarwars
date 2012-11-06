@@ -103,6 +103,7 @@ public class StandardControl extends AbstractControl {
     protected void onSelectionPressed(String name, Vector2f point) {
         if (name.equals(InputMappings.LEFT_CLICK_SELECT)) {
             onDragSelectEntity(point);
+            dragRectangle.setEnabled(isDragging());
             final String mouseDownMsg = "Left mouse-button down @["
                     + point.x + "/" + point.y + "]";
             logger.log(Level.INFO, mouseDownMsg);

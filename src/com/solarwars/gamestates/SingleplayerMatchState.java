@@ -156,6 +156,7 @@ public class SingleplayerMatchState extends Gamestate {
                 niftyGUI, Hub.getLocalPlayer(), gameStatsModule);
         // creates the drag-rect geometry
         game.getApplication().getControlManager().createDragRectGeometry();
+        
 //        startGamePopup.showPopup();
 
     }
