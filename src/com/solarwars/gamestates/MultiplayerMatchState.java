@@ -29,12 +29,12 @@ import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
+import com.solarwars.controls.input.InputMappings;
 import com.solarwars.gamestates.gui.GameChatModule;
 import com.solarwars.gamestates.gui.GameOverModule;
 import com.solarwars.gamestates.gui.GameStatsModule;
 import com.solarwars.gamestates.gui.PausePopup;
 import com.solarwars.gamestates.gui.PlayerStatsModule;
-import com.solarwars.controls.input.InputMappings;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.MultiplayerGameplay;
 import com.solarwars.logic.Player;
@@ -157,7 +157,8 @@ public class MultiplayerMatchState extends Gamestate {
     protected void unloadContent() {
         // pause gui
         application.getInputManager().removeListener(pauseListener);
-
+        // free controllers
+        application.getControlManager().freeControllers();
         lostConnection = false;
         // NetworkManager networkManager = NetworkManager.getInstance();
         // networkManager.getChatModule().destroy();

@@ -560,7 +560,7 @@ public class SolarWarsApplication extends Application {
      */
     public void simpleUpdate(float tpf) {
         try {
-            if (isoCam != null && controlManager != null) {
+            if (isoCam != null && controlManager != null && controlManager.isInitialized()) {
                 controlManager.update(tpf);
                 if (isoCam.isDragged()) {
                     Vector2f currentSceenPos = inputManager.getCursorPosition().clone();

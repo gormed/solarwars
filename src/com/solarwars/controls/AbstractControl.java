@@ -68,6 +68,7 @@ public abstract class AbstractControl {
     protected InputManager inputManager =
             SolarWarsApplication.getInstance().getInputManager();
     protected ActionLib actionLib;
+    private boolean initialized = false;
     // planet & shipgroup selection
     protected ArrayList<AbstractPlanet> planetSelection = new ArrayList<AbstractPlanet>();
     protected ArrayList<ShipGroup> shipGroupSelection = new ArrayList<ShipGroup>();
@@ -113,10 +114,40 @@ public abstract class AbstractControl {
      * @param controllingPlayer
      */
     public void initialize(Player controllingPlayer) {
+        if (initialized) {
+            return;
+        }
         SolarWarsApplication.getInstance().
                 getStateManager().attach(dragRectangle = new DragRectangleGUI());
 
         this.controllingPlayer = controllingPlayer;
+        initialized = true;
+    }
+
+    /**
+     * Clean up the control.
+     */
+    protected void cleanUp() {
+        lastXZPlanePos = null;
+        startScreenPos = null;
+        startXZPlanePos = null;
+
+        dragging = false;
+
+        dragRectangle.setEnabled(false);
+        SolarWarsApplication.getInstance().
+                getStateManager().detach(dragRectangle);
+        dragRectangle.cleanup();
+
+        controllingPlayer = null;
+    }
+
+    void destroy() {
+        if (!initialized) {
+            return;
+        }
+        cleanUp();
+        initialized = false;
     }
 
     /**
@@ -146,7 +177,7 @@ public abstract class AbstractControl {
      * @param name the name of the action that should trigger the event
      * @param isPressed true if action-key is down, false otherwise
      */
-    protected abstract void onControlModifier(String name, boolean isPressed);
+    abstract void onControlModifier(String name, boolean isPressed);
 
     /**
      * Is executed if the player selects a planet or group.
@@ -154,7 +185,7 @@ public abstract class AbstractControl {
      * @param name the name of the action that should trigger the event
      * @param point the point beeing clicked in sceen-space
      */
-    protected abstract void onSelectionPressed(String name, Vector2f point);
+    abstract void onSelectionPressed(String name, Vector2f point);
 
     /**
      * Is executed if the left or right mouse button is released. This can end
@@ -164,21 +195,21 @@ public abstract class AbstractControl {
      * @param name the name of the action that should trigger the event
      * @param point the point beeing clicked in sceen-space
      */
-    protected abstract boolean onSelectEntity(String name, Vector2f point);
+    abstract boolean onSelectEntity(String name, Vector2f point);
 
     /**
      * Adds the listeners for the events that can occur. Means that here you
      * need to register the listners for onSelectEntity, onSelectionPressed,
      * onControlModifier and other you may have defined.
      */
-    public abstract void addControlListener();
+    abstract void addControlListener();
 
     /**
      * Removes all listener so that no input can be processed anymore. Means
      * that here you need to remove all the listners for onSelectEntity,
      * onSelectionPressed, onControlModifier and other you may have defined.
      */
-    public abstract void removeControlListener();
+    abstract void removeControlListener();
 
     /**
      * Returns the point, that is clicked on screen.
@@ -701,15 +732,5 @@ public abstract class AbstractControl {
         dragRectangle.setY((int) (startScreenPos.y));
 
         lastXZPlanePos = currentXZPlanePos;
-    }
-
-    /**
-     * Clean up the control.
-     */
-    public void cleanUp() {
-        lastXZPlanePos = null;
-        startScreenPos = null;
-        startXZPlanePos = null;
-        dragging = false;
     }
 }

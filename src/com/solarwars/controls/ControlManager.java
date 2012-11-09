@@ -113,14 +113,29 @@ public class ControlManager {
         initialized = true;
     }
 
-    /**
-     *
-     */
+    public void freeControllers() {
+        for (Map.Entry<Player, AbstractControl> entry : usedControllers.entrySet()) {
+            AbstractControl c = entry.getValue();
+            c.destroy();
+            unusedControllers.add(entry.getValue());
+        }
+        usedControllers.clear();
+    }
+
     public void destroy() {
         if (!initialized) {
             return;
         }
-
+        
+        freeControllers();
+        usedControllers.clear();
+        unusedControllers.clear();
+        controllers.clear();
+        joysticks.clear();
+        shootablesNode.detachAllChildren();
+        rootNode.detachChild(shootablesNode);
+        shootablesNode = null;
+        
         initialized = false;
     }
 

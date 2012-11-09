@@ -24,7 +24,6 @@ package com.solarwars;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
-import com.solarwars.controls.AbstractControl;
 import com.solarwars.controls.ControlManager;
 import com.solarwars.gamestates.CreateServerState;
 import com.solarwars.gamestates.Gamestate;
@@ -98,7 +97,7 @@ public class SolarWarsGame {
     private SolarWarsApplication application;
     private AssetManager assetManager;
     private NetworkManager networkManager;
-    private ControlManager control;
+    private ControlManager controlManager;
     private InputManager inputManager;
     private FontLoader fontLoader;
     private ActionLib actionLib;
@@ -123,7 +122,7 @@ public class SolarWarsGame {
         assetManager = app.getAssetManager();
         stateManager = app.getStateManager();
 
-        control = app.getControlManager();
+        controlManager = app.getControlManager();
 
         audioManager = AudioManager.getInstance();
         audioManager.initialize();

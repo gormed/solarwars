@@ -298,13 +298,7 @@ public class GamepadControl extends AbstractControl {
 
     public void onSelectPlanet(AbstractPlanet planet) {
         repositCursor(planet);
-        if (selectedNode != null) {
-            selectedNode.enabelDebugMode(false);
-        }
         selectedNode = map.find(planet);
-        if (selectedNode != null) {
-            selectedNode.enabelDebugMode(true);
-        }
     }
 
     /**
@@ -396,7 +390,7 @@ public class GamepadControl extends AbstractControl {
     @Override
     public void addControlListener() {
         if (map == null) {
-            map = new AIMap();
+            map = AIMap.getInstance();
             map.generateMap(SolarWarsGame.getCurrentGameplay().getCurrentLevel());
         }
         inputManager.addListener(gamepadListener,
@@ -452,7 +446,9 @@ public class GamepadControl extends AbstractControl {
         if (cursor.getPlanet() != null) {
             removeCursor();
         }
-        planet.getTransformNode().attachChild(cursor);
+        if (cursor != null) {
+            planet.getTransformNode().attachChild(cursor);
+        }
         cursor.setPlanet(planet);
     }
 
@@ -473,5 +469,13 @@ public class GamepadControl extends AbstractControl {
 //        cursor.updateMarker(tpf);
         super.update(tpf);
         cursor.updateMarker(tpf);
+    }
+
+    @Override
+    protected void cleanUp() {
+        map = null;
+        removeControlListener();
+        super.cleanUp();
+
     }
 }

@@ -171,6 +171,7 @@ public class SingleplayerMatchState extends Gamestate {
         application.getInputManager().removeListener(pausePopup);
         application.getInputManager().removeListener(pauseToggle);
         //level
+        application.getControlManager().freeControllers();
         currentLevel.destroy();
         hub.destroy();
         //3d controls

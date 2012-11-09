@@ -35,10 +35,10 @@ import java.util.Map;
  */
 public class AIMap {
 
+    public static AIMap instance;
     public static final boolean DEBUG_MAP = true;
     public static final boolean DEBUG_MAP_PLANET = true;
     public static final boolean DEBUG_MAP_EDGES = false;
-    
     private HashMap<Integer, AIPlanetNode> map;
     private Node debugNode;
     private Node planetDebugNode;
@@ -46,7 +46,7 @@ public class AIMap {
     /**
      * Instantiates a new aI map.
      */
-    public AIMap() {
+    private AIMap() {
         map = new HashMap<Integer, AIPlanetNode>();
         debugNode = new Node("AIMap Debug Node");
         planetDebugNode = new Node();
@@ -54,6 +54,13 @@ public class AIMap {
         // TODO Hans Debugging?
         enabelDebugMode(DEBUG_MAP);
         SolarWarsApplication.getInstance().getRootNode().attachChild(debugNode);
+    }
+
+    public static AIMap getInstance() {
+        if (instance == null) {
+            return instance = new AIMap();
+        }
+        return instance;
     }
 
     /**

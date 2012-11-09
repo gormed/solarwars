@@ -191,4 +191,11 @@ public class StandardControl extends AbstractControl {
 
         logger.log(Level.FINE, percentageChangeS);
     }
+
+    @Override
+    protected void cleanUp() {
+        removeControlListener();
+        super.cleanUp();
+    }
+    
 }
