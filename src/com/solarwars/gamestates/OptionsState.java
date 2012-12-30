@@ -137,6 +137,13 @@ public class OptionsState extends Gamestate {
         switchToState(SolarWarsGame.MAINMENU_STATE);
     }
 
+    
+    public void onControlsButton() {
+        AudioManager.getInstance().
+                playSoundInstance(AudioManager.SOUND_CLICK);
+        switchToState(SolarWarsGame.CONTROLS_STATE);
+    }
+    
     @NiftyEventSubscriber(id = "planet-quality")
     public void onPlanetQualityChanged(final String id,
             final RadioButtonGroupStateChangedEvent event) {

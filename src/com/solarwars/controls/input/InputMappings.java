@@ -91,23 +91,67 @@ public class InputMappings {
     public static final String DEBUG_NIFTY_GUI = "SOLARWARS_DebugNifty";
     // Select
     public static final String LEFT_CLICK_SELECT = "SOLARWARS_LeftClickSelect";
-    public static final String A_SELECT = "SOLARWARS_ASelect";
-    public static final String RB_SELECT = "SOLARWARS_SequSelect_Forward";
-    public static final String LB_SELECT = "SOLARWARS_SequSelect_Backward";
-    public static final String SELECT_ALL = "SOLARWARS_Select_All";
+    
+    public static final String GAMEPAD_PLAYER1_A_SELECT = "SOLARWARS_Gamepad_Player1_ASelect";
+    public static final String GAMEPAD_PLAYER2_A_SELECT = "SOLARWARS_Gamepad_Player2_ASelect";
+    public static final String GAMEPAD_PLAYER3_A_SELECT = "SOLARWARS_Gamepad_Player3_ASelect";
+    public static final String GAMEPAD_PLAYER4_A_SELECT = "SOLARWARS_Gamepad_Player4_ASelect";
+    
+    public static final String GAMEPAD_PLAYER1_RB_SELECT = "SOLARWARS_Gamepad_Player1_SequSelect_Forward";
+    public static final String GAMEPAD_PLAYER2_RB_SELECT = "SOLARWARS_Gamepad_Player2_SequSelect_Forward";
+    public static final String GAMEPAD_PLAYER3_RB_SELECT = "SOLARWARS_Gamepad_Player3_SequSelect_Forward";
+    public static final String GAMEPAD_PLAYER4_RB_SELECT = "SOLARWARS_Gamepad_Player4_SequSelect_Forward";
+    
+    public static final String GAMEPAD_PLAYER1_LB_SELECT = "SOLARWARS_Gamepad_Player1_SequSelect_Backward";
+    public static final String GAMEPAD_PLAYER2_LB_SELECT = "SOLARWARS_Gamepad_Player2_SequSelect_Backward";
+    public static final String GAMEPAD_PLAYER3_LB_SELECT = "SOLARWARS_Gamepad_Player3_SequSelect_Backward";
+    public static final String GAMEPAD_PLAYER4_LB_SELECT = "SOLARWARS_Gamepad_Player4_SequSelect_Backward";
+    
+    public static final String GAMEPAD_PLAYER1_SELECT_ALL = "SOLARWARS_Gamepad_Player1_Select_All";
+    public static final String GAMEPAD_PLAYER2_SELECT_ALL = "SOLARWARS_Gamepad_Player2_Select_All";
+    public static final String GAMEPAD_PLAYER3_SELECT_ALL = "SOLARWARS_Gamepad_Player3_Select_All";
+    public static final String GAMEPAD_PLAYER4_SELECT_ALL = "SOLARWARS_Gamepad_Player4_Select_All";
     // Attack
     public static final String RIGHT_CLICK_ATTACK = "SOLARWARS_RightClickAttack";
-    public static final String B_ATTACK = "SOLARWARS_BAttack";
+    public static final String GAMEPAD_PLAYER1_B_ATTACK = "SOLARWARS_Gamepad_Player1_BAttack";
+    public static final String GAMEPAD_PLAYER2_B_ATTACK = "SOLARWARS_Gamepad_Player2_BAttack";
+    public static final String GAMEPAD_PLAYER3_B_ATTACK = "SOLARWARS_Gamepad_Player3_BAttack";
+    public static final String GAMEPAD_PLAYER4_B_ATTACK = "SOLARWARS_Gamepad_Player4_BAttack";
     // Percentage
     public static final String PERCENT_WEEL_UP = "SOLARWARS_Wheel_PercentageUp";
     public static final String PERCENT_WEEL_DOWN = "SOLARWARS_Wheel_PercentageDown";
-    public static final String PERCENT_TRIGGER_UP = "SOLARWARS_Trigger_PercentageUp";
-    public static final String PERCENT_TRIGGER_DOWN = "SOLARWARS_Trigger_PercentageDown";
+    
+    public static final String GAMEPAD_PLAYER1_PERCENT_TRIGGER_UP = "SOLARWARS_Gamepad_Player1_Trigger_PercentageUp";
+    public static final String GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN = "SOLARWARS_Gamepad_Player1_Trigger_PercentageDown";
+    
+    public static final String GAMEPAD_PLAYER2_PERCENT_TRIGGER_UP = "SOLARWARS_Gamepad_Player2_Trigger_PercentageUp";
+    public static final String GAMEPAD_PLAYER2_PERCENT_TRIGGER_DOWN = "SOLARWARS_Gamepad_Player2_Trigger_PercentageDown";
+    
+    public static final String GAMEPAD_PLAYER3_PERCENT_TRIGGER_UP = "SOLARWARS_Gamepad_Player3_Trigger_PercentageUp";
+    public static final String GAMEPAD_PLAYER3_PERCENT_TRIGGER_DOWN = "SOLARWARS_Gamepad_Player3_Trigger_PercentageDown";
+    
+    public static final String GAMEPAD_PLAYER4_PERCENT_TRIGGER_UP = "SOLARWARS_Gamepad_Player4_Trigger_PercentageUp";
+    public static final String GAMEPAD_PLAYER4_PERCENT_TRIGGER_DOWN = "SOLARWARS_Gamepad_Player4_Trigger_PercentageDown";
     // Gamepad Mouse
-    public static final String DPAD_LS_DOWN = "Axis LS Down";
-    public static final String DPAD_LS_LEFT = "Axis LS Left";
-    public static final String DPAD_LS_RIGHT = "Axis LS Right";
-    public static final String DPAD_LS_UP = "Axis LS Up";
+    public static final String GAMEPAD_PLAYER1_DPAD_LS_DOWN = "SOLARWARS_Gamepad_Player1_Axis LS Down";
+    public static final String GAMEPAD_PLAYER1_DPAD_LS_LEFT = "SOLARWARS_Gamepad_Player1_Axis LS Left";
+    public static final String GAMEPAD_PLAYER1_DPAD_LS_RIGHT = "SOLARWARS_Gamepad_Player1_Axis LS Right";
+    public static final String GAMEPAD_PLAYER1_DPAD_LS_UP = "SOLARWARS_Gamepad_Player1_Axis LS Up";
+    
+    public static final String GAMEPAD_PLAYER2_DPAD_LS_DOWN = "SOLARWARS_Gamepad_Player2_Axis LS Down";
+    public static final String GAMEPAD_PLAYER2_DPAD_LS_LEFT = "SOLARWARS_Gamepad_Player2_Axis LS Left";
+    public static final String GAMEPAD_PLAYER2_DPAD_LS_RIGHT = "SOLARWARS_Gamepad_Player2_Axis LS Right";
+    public static final String GAMEPAD_PLAYER2_DPAD_LS_UP = "SOLARWARS_Gamepad_Player2_Axis LS Up";
+    
+    public static final String GAMEPAD_PLAYER3_DPAD_LS_DOWN = "SOLARWARS_Gamepad_Player3_Axis LS Down";
+    public static final String GAMEPAD_PLAYER3_DPAD_LS_LEFT = "SOLARWARS_Gamepad_Player3_Axis LS Left";
+    public static final String GAMEPAD_PLAYER3_DPAD_LS_RIGHT = "SOLARWARS_Gamepad_Player3_Axis LS Right";
+    public static final String GAMEPAD_PLAYER3_DPAD_LS_UP = "SOLARWARS_Gamepad_Player3_Axis LS Up";
+    
+    public static final String GAMEPAD_PLAYER4_DPAD_LS_DOWN = "SOLARWARS_Gamepad_Player4_Axis LS Down";
+    public static final String GAMEPAD_PLAYER4_DPAD_LS_LEFT = "SOLARWARS_Gamepad_Player4_Axis LS Left";
+    public static final String GAMEPAD_PLAYER4_DPAD_LS_RIGHT = "SOLARWARS_Gamepad_Player4_Axis LS Right";
+    public static final String GAMEPAD_PLAYER4_DPAD_LS_UP = "SOLARWARS_Gamepad_Player4_Axis LS Up";
     // 
     private static boolean displayOSCursor = true;
 
@@ -121,7 +165,7 @@ public class InputMappings {
         inputManager.addMapping(InputMappings.LEFT_CLICK_SELECT,
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         // Button A JOY0
-        inputManager.addMapping(InputMappings.A_SELECT,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_A_SELECT,
                 new JoyButtonTrigger(0, 0),
                 new JoyButtonTrigger(1, 0),
                 new JoyButtonTrigger(2, 0),
@@ -130,7 +174,7 @@ public class InputMappings {
         inputManager.addMapping(InputMappings.RIGHT_CLICK_ATTACK,
                 new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         // Button B JOY0
-        inputManager.addMapping(InputMappings.B_ATTACK,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_B_ATTACK,
                 new JoyButtonTrigger(0, 1),
                 new JoyButtonTrigger(1, 1),
                 new JoyButtonTrigger(2, 1),
@@ -140,7 +184,7 @@ public class InputMappings {
                 new MouseAxisTrigger(MouseInput.AXIS_WHEEL,
                 false));
         // Button LT JOY0
-        inputManager.addMapping(InputMappings.PERCENT_TRIGGER_DOWN,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN,
                 new JoyAxisTrigger(0, 4, true),
                 new JoyAxisTrigger(1, 4, true),
                 new JoyAxisTrigger(2, 4, true),
@@ -154,7 +198,7 @@ public class InputMappings {
                 new MouseAxisTrigger(MouseInput.AXIS_WHEEL,
                 true));
         // Button RT JOY0
-        inputManager.addMapping(InputMappings.PERCENT_TRIGGER_UP,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_UP,
                 new JoyAxisTrigger(0, 4, false),
                 new JoyAxisTrigger(1, 4, false),
                 new JoyAxisTrigger(2, 4, false),
@@ -164,18 +208,18 @@ public class InputMappings {
 //                new JoyButtonTrigger(2, 9), 
 //                new JoyButtonTrigger(3, 9));
 
-        inputManager.addMapping(InputMappings.LB_SELECT,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_LB_SELECT,
                 new JoyButtonTrigger(0, 4),
                 new JoyButtonTrigger(1, 4),
                 new JoyButtonTrigger(2, 4),
                 new JoyButtonTrigger(3, 4));
-        inputManager.addMapping(InputMappings.RB_SELECT,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_RB_SELECT,
                 new JoyButtonTrigger(0, 5),
                 new JoyButtonTrigger(1, 5),
                 new JoyButtonTrigger(2, 5),
                 new JoyButtonTrigger(3, 5));
 
-        inputManager.addMapping(InputMappings.SELECT_ALL,
+        inputManager.addMapping(InputMappings.GAMEPAD_PLAYER1_SELECT_ALL,
                 new JoyButtonTrigger(0, 3),
                 new JoyButtonTrigger(1, 3),
                 new JoyButtonTrigger(2, 3),
@@ -205,10 +249,10 @@ public class InputMappings {
                 // Button START JOY0
                 new JoyButtonTrigger(0, 7));
 
-        inputManager.addMapping(DPAD_LS_LEFT, new JoyAxisTrigger(0, 6, true));
-        inputManager.addMapping(DPAD_LS_RIGHT, new JoyAxisTrigger(0, 6, false));
-        inputManager.addMapping(DPAD_LS_DOWN, new JoyAxisTrigger(0, 7, true));
-        inputManager.addMapping(DPAD_LS_UP, new JoyAxisTrigger(0, 7, false));
+        inputManager.addMapping(GAMEPAD_PLAYER1_DPAD_LS_LEFT, new JoyAxisTrigger(0, 6, true));
+        inputManager.addMapping(GAMEPAD_PLAYER1_DPAD_LS_RIGHT, new JoyAxisTrigger(0, 6, false));
+        inputManager.addMapping(GAMEPAD_PLAYER1_DPAD_LS_DOWN, new JoyAxisTrigger(0, 7, true));
+        inputManager.addMapping(GAMEPAD_PLAYER1_DPAD_LS_UP, new JoyAxisTrigger(0, 7, false));
 
 //        inputManager.addMapping(DPAD_LS_LEFT, new JoyAxisTrigger(0, JoyInput.AXIS_POV_X, true));
 //        inputManager.addMapping(DPAD_LS_RIGHT, new JoyAxisTrigger(1, JoyInput.AXIS_POV_X, false));

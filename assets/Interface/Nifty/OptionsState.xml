@@ -155,6 +155,15 @@
                                      align="center" valign="center" width="100%">
                                 <interact onClick="onBackButton()"/>
                             </control>
+
+                        </panel>
+                        <panel id="options_controls_align_v" childLayout="vertical" 
+                               width="20%" padding="2%">
+                            <control id="controls" name="sw-button" text="CONTROLS" 
+                                     align="center" valign="center" width="100%">
+                                <interact onClick="onControlsButton()"/>
+                            </control>
+
                         </panel>
                     </panel>
                 </panel>

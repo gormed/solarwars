@@ -25,6 +25,8 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
 import com.solarwars.controls.ControlManager;
+import com.solarwars.controls.input.KeyInputManager;
+import com.solarwars.gamestates.ControlsState;
 import com.solarwars.gamestates.CreateServerState;
 import com.solarwars.gamestates.Gamestate;
 import com.solarwars.gamestates.MainmenuState;
@@ -34,7 +36,6 @@ import com.solarwars.gamestates.OptionsState;
 import com.solarwars.gamestates.ServerLobbyState;
 import com.solarwars.gamestates.SingleplayerMatchState;
 import com.solarwars.gamestates.TutorialState;
-import com.solarwars.controls.input.KeyInputManager;
 import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.ActionLib;
 import com.solarwars.logic.DeathmatchGameplay;
@@ -60,6 +61,8 @@ public class SolarWarsGame {
     public static final String MAINMENU_STATE = "Mainmenu";
     /** The Constant OPTIONS_STATE. */
     public static final String OPTIONS_STATE = "Options";
+    /** The Constant CONTROLS_STATE. */
+    public static final String CONTROLS_STATE = "Controls";
     /** The Constant CREATE_SERVER_STATE. */
     public static final String CREATE_SERVER_STATE = "Create Server";
     /** The Constant SERVER_LOBBY_STATE. */
@@ -154,7 +157,8 @@ public class SolarWarsGame {
         MultiplayerMatchState multiplayerMatchState = new MultiplayerMatchState();
         TutorialState tutorialState = new TutorialState();
         OptionsState optionsState = new OptionsState();
-
+        ControlsState controlsState = new ControlsState();
+        
 //        mainmenu.initialize(stateManager, application);
 //        singleplayer.initialize(stateManager, application);
 //        multiplayer.initialize(stateManager, application);
@@ -172,6 +176,7 @@ public class SolarWarsGame {
         stateManager.attach(optionsState);
         stateManager.attach(serverLobbyState);
         stateManager.attach(tutorialState);
+        stateManager.attach(controlsState);
 
         gamestates.put(MAINMENU_STATE, mainmenu);
         gamestates.put(SINGLEPLAYER_STATE, singleplayer);
@@ -181,6 +186,7 @@ public class SolarWarsGame {
         gamestates.put(MULTIPLAYER_MATCH_STATE, multiplayerMatchState);
         gamestates.put(TUTORIAL_STATE, tutorialState);
         gamestates.put(OPTIONS_STATE, optionsState);
+        gamestates.put(CONTROLS_STATE, controlsState);
 
 //        mainmenu.setEnabled(true);
 
@@ -193,7 +199,7 @@ public class SolarWarsGame {
                 registerScreenController(
                 mainmenu, singleplayer, multiplayer, createServerState,
                 serverLobbyState, multiplayerMatchState, tutorialState,
-                optionsState);
+                optionsState, controlsState);
 
         application.getNiftyGUI().addXml("Interface/Nifty/NiftyClientGUI.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/NiftyPopups.xml");
@@ -205,6 +211,7 @@ public class SolarWarsGame {
         application.getNiftyGUI().addXml("Interface/Nifty/MultiplayerGUI.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/TutorialState.xml");
         application.getNiftyGUI().addXml("Interface/Nifty/OptionsState.xml");
+        application.getNiftyGUI().addXml("Interface/Nifty/ControlsState.xml");
 
         application.getNiftyGUI().gotoScreen("startup");
 

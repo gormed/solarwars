@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import com.jme3.system.AppSettings;
+import com.solarwars.controls.StandardControl;
 
 /**
- * 
+ *
  * @author fxdapokalyse
  */
 public class SolarWarsSettings extends GameSettings {
@@ -31,7 +32,7 @@ public class SolarWarsSettings extends GameSettings {
 
     /**
      * List of supported network property names for convenience use.
-     * 
+     *
      * @author fxdapokalyse
      */
     public static final class Network {
@@ -56,29 +57,29 @@ public class SolarWarsSettings extends GameSettings {
 
     /**
      * List of supported graphic property names for convenience use.
-     * 
+     *
      * @author fxdapokalyse
      */
     public static final class Graphics {
 
         /**
-         *  dimension width of window in px
+         * dimension width of window in px
          */
         public static final String DIMENSION_WIDTH = "Width";
         /**
-         *  dimension height of window in px
+         * dimension height of window in px
          */
         public static final String DIMENSION_HEIGHT = "Height";
         /**
-         * 
+         *
          */
         public static final String BITS_PER_PIXEL = "BitsPerPixel";
         /**
-         * 
+         *
          */
         public static final String FREQUENCY = "Frequency";
         /**
-         * 
+         *
          */
         public static final String DEPTH_BITS = "DepthBits";
         public static final String STENCIL_BITS = "StencilBits";
@@ -97,18 +98,19 @@ public class SolarWarsSettings extends GameSettings {
 
     /**
      * List of supported Control property names for convenience use.
-     * 
+     *
      * @author fxdapokalyse
      */
     public static final class Controls {
 
         public static final String USE_INPUT = "UseInput";
         public static final String DISABLE_JOYSTICKS = "DisableJoysticks";
+        public static final String DEFAULT_CONTROL_DEVICE = "DefaultControlDevice";
     }
 
     /**
      * List of supported Audio property names for convenience use.
-     * 
+     *
      * @author fxdapokalyse
      */
     public static final class Audio {
@@ -120,13 +122,13 @@ public class SolarWarsSettings extends GameSettings {
 
     /**
      * List of supported Game property names for convenience use.
-     * 
+     *
      * @author fxdapokalyse
      */
     public static final class Game {
 
         public static final String SETTINGS_DIALOG_IMAGE = "SettingsDialogImage";
-        public static final String Title = "Title";
+        public static final String TITLE = "Title";
         public static final String ENABLE_LOG_FILES = "game.useLogFiles";
         public static final String LOG_LEVEL = "game.globalLogLevel";
         public static final String PLAYER_NAME = "game.playerName";
@@ -176,17 +178,18 @@ public class SolarWarsSettings extends GameSettings {
         this.put(Audio.SOUNDS_ENABLED, true);
         this.put(Audio.MUSIC_ENABLED, true);
 
-        this.put(Controls.DISABLE_JOYSTICKS, true);
+        this.put(Controls.DISABLE_JOYSTICKS, false);
         this.put(Controls.USE_INPUT, true);
+        this.put(Controls.DEFAULT_CONTROL_DEVICE, StandardControl.class.getName());
 
         this.put(Game.SETTINGS_DIALOG_IMAGE, "/Interface/solarwars_v2.png");
-        this.put(Game.Title, "SolarWars_");
+        this.put(Game.TITLE, "SolarWars_");
         this.put(Game.FAVOURITE_SEED, "42");
         this.put(Game.PLAYER_NAME, "Player");
     }
 
     /**
-     * 
+     *
      */
     @Override
     public File getDefaulfConfigFile() {
@@ -195,10 +198,10 @@ public class SolarWarsSettings extends GameSettings {
 
     /**
      * Rerieve the current global log level.
-     * 
+     *
      * @return the current global log level.
      * @author fxdapokalypse
-     * 
+     *
      */
     public Level getGlobalLogLevel() {
         String level = this.getString(Game.LOG_LEVEL);
@@ -209,20 +212,22 @@ public class SolarWarsSettings extends GameSettings {
     }
 
     /**
-     * Set the global log level by a log Level constant which represents the log level.
-     * </br>
+     * Set the global log level by a log Level constant which represents the log
+     * level. </br>
+     *
      * @param the Level constant
-     * @author fxdapokalypse 
-     * 
+     * @author fxdapokalypse
+     *
      */
     public void setGlobalLogLevel(Level level) {
         this.setGlobalLogLevel(level.getName());
     }
 
     /**
-     * Set the GlobalLogLevel by a string which represents the log level.
-     * </br>
-     * @param level the log level e.g.: ["ALL", "INFO", "ERROR", "OFF", "WARNING"]
+     * Set the GlobalLogLevel by a string which represents the log level. </br>
+     *
+     * @param level the log level e.g.: ["ALL", "INFO", "ERROR", "OFF",
+     * "WARNING"]
      * @throws IllegalArgumentException if the given log level isn't supported.
      * @author fxdapokalypse
      */
@@ -234,28 +239,25 @@ public class SolarWarsSettings extends GameSettings {
         this.put(Game.LOG_LEVEL, level);
     }
 
-    
-    
-    
     /**
-     * Checked if the bloom shader is turned on. 
-     * </br>
+     * Checked if the bloom shader is turned on. </br>
+     *
      * @return true, if the bloom shader is enabled.
-     * @author fxdapokalypse 
+     * @author fxdapokalypse
      */
     public boolean isBloomEnabled() {
         return this.getBoolean(Graphics.BLOOM_ENABLED);
     }
-    
+
     public void setBloomEnabled(boolean value) {
         this.put(Graphics.BLOOM_ENABLED, value);
     }
 
     /**
-     * Checked if the toon_shader is turned on. 
-     * </br>
+     * Checked if the toon_shader is turned on. </br>
+     *
      * @return true, if the toon shader is enabled.
-     * @author fxdapokalypse 
+     * @author fxdapokalypse
      * @deprecated
      */
     @Deprecated
@@ -264,42 +266,42 @@ public class SolarWarsSettings extends GameSettings {
     }
 
     /**
-     * Checks if the log should be written into files.
-     * </br>
-     * @return  true, if "ENABLE_LOG_FILES" is enabled.
-     * @author fxdapokalypse 
+     * Checks if the log should be written into files. </br>
+     *
+     * @return true, if "ENABLE_LOG_FILES" is enabled.
+     * @author fxdapokalypse
      */
     public boolean isFileLoggingEnabled() {
         return this.getBoolean(Game.ENABLE_LOG_FILES);
     }
 
     /**
-     * Checked if DEBUG_RAYCASTS is turned on. 
-     * @TODO: NEED More information about the Setting "DEBUG_RAYCASTS".
-     * </br>
+     * Checked if DEBUG_RAYCASTS is turned on.
+     *
+     * @TODO: NEED More information about the Setting "DEBUG_RAYCASTS". </br>
      * @return true, if DEBUG_RAYCASTS is enabled.
-     * @author fxdapokalypse 
+     * @author fxdapokalypse
      */
     public boolean isDEBUG_RAYCASTSEnabled() {
         return this.getBoolean(Graphics.DEBUG_RAYCASTS);
     }
-    
+
     public int getPlanetQuality() {
         return this.getInteger(Graphics.PLANET_QUALITY);
     }
-    
+
     public void setPlanetQuality(int quality) {
         this.put(Graphics.PLANET_QUALITY, quality);
     }
-    
+
     public int getBackgroundQuality() {
         return this.getInteger(Graphics.BACKGROUND_QUALITY);
     }
-    
+
     public void setBackgroundQuality(int quality) {
         this.put(Graphics.BACKGROUND_QUALITY, quality);
     }
-    
+
     public int getDefaultPort() {
         return this.getInteger(Network.PORT);
     }
@@ -363,5 +365,13 @@ public class SolarWarsSettings extends GameSettings {
             throw new IllegalArgumentException("The player number must greater than 0.");
         }
         this.put(Network.Max_Player_Number, playerNumber);
+    }
+
+    public String getDefaultController() {
+        return this.getString(Controls.DEFAULT_CONTROL_DEVICE);
+    }
+
+    public void setDefaultController(String defaultController) {
+        this.put(Controls.DEFAULT_CONTROL_DEVICE, defaultController);
     }
 }

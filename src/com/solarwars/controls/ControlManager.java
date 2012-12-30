@@ -246,6 +246,14 @@ public class ControlManager {
     public void removeShootable(Spatial spat) {
         shootablesNode.detachChild(spat);
     }
+    
+    /**
+     * Gets a copy of the joysticks detected by jme3.
+     * @return a cloned list.
+     */
+    public ArrayList<Joystick> getJoysticks() {
+        return new ArrayList<Joystick>(joysticks);
+    }
 
     Node getShootablesNode() {
         return shootablesNode;
@@ -273,4 +281,6 @@ public class ControlManager {
 
         unusedControllers.addAll(controllers.values());
     }
+    
+    
 }

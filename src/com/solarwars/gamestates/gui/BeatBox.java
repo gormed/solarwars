@@ -103,6 +103,7 @@ public class BeatBox {
         baseSound = new AudioNode(
                 SolarWarsApplication.getInstance().getAssetManager(),
                 AudioManager.SOUND_HELI);
+        baseSound.setPositional(false);
         baseSound.setLooping(true);
         baseSound.setVolume(0.05f);
         baseSound.setPitch(1.5f);
