@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+    
+    <useControls filename="nifty-default-controls.xml" />
+    <useStyles filename="nifty-default-styles.xml" />
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- control options screen -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <screen id="controls" controller="com.solarwars.gamestates.ControlsState">
+        <layer id="controls_menu" backgroundColor="#0000" childLayout="center">
+            <panel id="controls_menu_panel" height="95%" width="95%" 
+                   align="center" valign="center" backgroundColor="#ffff" childLayout="center" padding="10px">
+                <panel id="controls_panel" align="center" backgroundColor="#00ff" 
+                       childLayout="vertical" visibleToMouse="true" height="100%" width="100%" padding="2%">
+                    <!-- HEADING -->
+                    <panel id="controls_head_panel" align="center" backgroundColor="#0000" 
+                           childLayout="center" visibleToMouse="false" height="15%" width="100%">
+                        <text id="controls_label" font="Interface/Fonts/SolarWarsFont64.fnt" 
+                              color="#ffff" text="Controls" align="center" valign="center">
+                            <effect>
+                                <onActive name="textSizePulsate" startSize="90%" endSize="100%"/>
+                            </effect>
+                        </text>
+                    </panel>
+                    <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                           childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                    <panel childLayout="center" padding="10px" height="42px" width="100%">
+                        <text id="nw-label" text="Available Controls" 
+                              font="Interface/Fonts/SolarWarsFont32.fnt" 
+                              height="32px" align="left"/>
+                    </panel>
+                    <panel id="controls_list_align" childLayout="horizontal" 
+                           height="30%" backgroundColor="#00ab">
+                        <effect>
+                            <onActive name="border" color="#0a8" />
+                        </effect>
+                        <control id="detected_controls_box"
+                                 name="listBox" horizontal="off" displayItems="10" 
+                                 selectionMode="Single" forceSelection="false" vertical="optional">
+                            <!--<control name="detected-control-line" style="favorite-listbox-item" /> -->
+                        </control>
+                    </panel>
+                    <panel childLayout="center" padding="10px" height="42px" width="100%">
+                        <text id="nw-label" text="Control Details" 
+                              font="Interface/Fonts/SolarWarsFont32.fnt" 
+                              height="32px" align="left"/>
+                    </panel>
+                    <panel id="controls_details_align" childLayout="horizontal" 
+                           height="30%" backgroundColor="#00ab">
+                        <effect>
+                            <onActive name="border" color="#0a8" />
+                        </effect>
+
+                    </panel>
+                    <!-- SPACER -->
+                    <panel id="spacer" align="center" backgroundColor="#0000" 
+                           childLayout="center" visibleToMouse="false" height="20px" width="60%"/>
+                    <!-- BOTTOM CONTROLS -->
+                    <panel id="options_bottom_align_h" childLayout="horizontal" 
+                           height="7%">
+                        <panel id="options_back_align_v" childLayout="vertical" 
+                               width="20%" padding="2%">
+                            <control id="back" name="sw-button" text="BACK" 
+                                     align="center" valign="center" width="100%">
+                                <interact onClick="onBackButton()"/>
+                            </control>
+                        </panel>
+                    </panel>
+                </panel>
+            </panel>
+        </layer>
+    </screen>
+</nifty>
