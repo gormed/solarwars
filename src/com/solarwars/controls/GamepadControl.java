@@ -77,215 +77,7 @@ public class GamepadControl extends AbstractControl {
                 }
             }
         };
-        selectionListener = new ActionListener() {
-            final float RIGHT_TOP = (float) (Math.PI * 0.25f);
-            final float LEFT_TOP = (float) (Math.PI * 0.75f);
-            final float LEFT_BOTTOM = (float) (Math.PI * 1.25f);
-            final float RIGHT_BOTTOM = (float) (Math.PI * 1.75f);
-            final float TOLERANCE = 0f;//(float) (Math.PI * 0.167f);
-
-            @Override
-            public void onAction(String name, boolean isPressed, float tpf) {
-                if (!isPressed) {
-                    if (selectedNode == null) {
-                        if (!initSelection()) {
-                            return;
-                        }
-                    }
-
-                    if (name.equals(InputMappings.SELECT_ALL)) {
-//                        selectAllTrigger = !selectAllTrigger;
-                        if (planetSelection.isEmpty()) {
-                            selectAllPlanets();
-                        } else {
-                            deselectAllPlanets();
-
-                        }
-                    }
-                    if (dPadSelector(name)) {
-                    }
-                    if (sequSelect(name)) {
-                    }
-
-
-                } else {
-//                    System.out.println(name + " released");
-                }
-            }
-
-            private AbstractPlanet select(int dir) {
-                ArrayList<AIPlanetEdge> valid = new ArrayList<AIPlanetEdge>();
-                System.out.println("ALL");
-                for (AIPlanetEdge edge : selectedNode.getEdges()) {
-                    System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
-                            + " to " + edge.getTo().getPlanet().getID()
-                            + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
-                    if (dir == 0) {
-                        selectDown(edge, valid);
-                    } else if (dir == 1) {
-                        selectLeft(edge, valid);
-                    } else if (dir == 2) {
-                        selectRight(edge, valid);
-                    } else if (dir == 3) {
-                        selectTop(edge, valid);
-                    }
-                }
-                if (valid.isEmpty()) {
-                    return null;
-                } else {
-                    AbstractPlanet p = getClosest(valid);
-                    System.out.println("VALID");
-                    for (AIPlanetEdge edge : valid) {
-                        System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
-                                + " to " + edge.getTo().getPlanet().getID()
-                                + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
-                    }
-                    return p;
-                }
-            }
-
-            private AbstractPlanet getClosest(ArrayList<AIPlanetEdge> valid) {
-                Comparator<AIPlanetEdge> comparator = new Comparator<AIPlanetEdge>() {
-                    @Override
-                    public int compare(AIPlanetEdge o1, AIPlanetEdge o2) {
-                        if (o1.getLength() <= o2.getLength()) {
-                            return -1;
-                        } else {
-                            return 1;
-                        }
-                    }
-                };
-                Collections.sort(valid, comparator);
-                return valid.get(0).getTo().getPlanet();
-            }
-
-            private void selectDown(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= LEFT_BOTTOM + TOLERANCE
-                        && edge.getAngle() < RIGHT_BOTTOM - TOLERANCE) {
-                    valid.add(edge);
-                }
-            }
-
-            private void selectLeft(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= LEFT_TOP + TOLERANCE
-                        && edge.getAngle() < LEFT_BOTTOM - TOLERANCE) {
-                    valid.add(edge);
-                }
-            }
-
-            private void selectRight(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() < RIGHT_TOP - TOLERANCE
-                        || edge.getAngle() >= RIGHT_BOTTOM + TOLERANCE) {
-                    valid.add(edge);
-                }
-            }
-
-            private void selectTop(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
-                if (edge.getAngle() >= RIGHT_TOP + TOLERANCE
-                        && edge.getAngle() < LEFT_TOP - TOLERANCE) {
-                    valid.add(edge);
-                }
-            }
-
-            private boolean dPadSelector(String name) {
-                AbstractPlanet p = null;
-                // Left and Right & Up and Down switched
-                if (name.equals(InputMappings.DPAD_LS_DOWN)) {
-                    p = select(0);
-                }
-                if (name.equals(InputMappings.DPAD_LS_LEFT)) {
-                    p = select(1);
-                }
-                if (name.equals(InputMappings.DPAD_LS_RIGHT)) {
-                    p = select(2);
-                }
-                if (name.equals(InputMappings.DPAD_LS_UP)) {
-                    p = select(3);
-                }
-                System.out.println(name + " pressed");
-                if (p != null) {
-
-                    onSelectPlanet(p);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            private void sortPlayerPlanets(String name, ArrayList<AbstractPlanet> playerPlanets) {
-                if (name.equals(InputMappings.LB_SELECT)) {
-                    Comparator<AbstractPlanet> shipComarator =
-                            new Comparator<AbstractPlanet>() {
-                                @Override
-                                public int compare(AbstractPlanet o1, AbstractPlanet o2) {
-                                    if (o1.getShipCount() <= o2.getShipCount()) {
-                                        return -1;
-                                    } else {
-                                        return 1;
-                                    }
-                                }
-                            };
-                    Collections.sort(playerPlanets, shipComarator);
-                } else if (name.equals(InputMappings.RB_SELECT)) {
-                    Comparator<AbstractPlanet> shipComarator =
-                            new Comparator<AbstractPlanet>() {
-                                @Override
-                                public int compare(AbstractPlanet o1, AbstractPlanet o2) {
-                                    if (o1.getShipCount() <= o2.getShipCount()) {
-                                        return 1;
-                                    } else {
-                                        return -1;
-                                    }
-                                }
-                            };
-                    Collections.sort(playerPlanets, shipComarator);
-                }
-            }
-
-            private void selectNextPlanet(ArrayList<AbstractPlanet> playerPlanets) {
-                LinkedList<AbstractPlanet> list =
-                        new LinkedList<AbstractPlanet>(playerPlanets);
-
-
-                for (Iterator<AbstractPlanet> it = list.listIterator(0); it.hasNext();) {
-                    if (it.next().getID() == selectedNode.getPlanet().getID()) {
-                        if (it.hasNext()) {
-                            onSelectPlanet(it.next());
-                        } else {
-                            onSelectPlanet(list.get(0));
-                        }
-                    }
-                }
-            }
-
-            private boolean initSelection() {
-                if (!controllingPlayer.getPlanets().isEmpty()) {
-                    onSelectPlanet(controllingPlayer.getPlanets().get(0));
-                } else {
-                    return false;
-                }
-                return true;
-            }
-
-            private boolean sequSelect(String name) {
-                if (name.equals(InputMappings.LB_SELECT) || name.equals(InputMappings.RB_SELECT)) {
-                    if (selectedNode == null
-                            || (selectedNode != null
-                            && selectedNode.getPlanet().getOwner() == null)) {
-                        if (!initSelection()) {
-                            return true;
-                        }
-                    }
-                    ArrayList<AbstractPlanet> playerPlanets =
-                            new ArrayList<AbstractPlanet>(controllingPlayer.getPlanets());
-//                    selectAllTrigger = false;
-                    deselectAllPlanets();
-                    sortPlayerPlanets(name, playerPlanets);
-                    selectNextPlanet(playerPlanets);
-                }
-                return false;
-            }
-        };
+        selectionListener = new SelectionListener();
 
     }
 
@@ -307,11 +99,11 @@ public class GamepadControl extends AbstractControl {
     protected void onGamepadTriggers(String name) {
         Player local = controllingPlayer;
 
-        if (!(name.equals(InputMappings.PERCENT_TRIGGER_DOWN)
-                || name.equals(InputMappings.PERCENT_TRIGGER_UP))) {
+        if (!(name.equals(InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN)
+                || name.equals(InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_UP))) {
             return;
         }
-        boolean down = (name.equals(InputMappings.PERCENT_TRIGGER_DOWN)) ? true : false;
+        boolean down = (name.equals(InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN)) ? true : false;
         float amount = 0.05f;
 
         onPercentageChange(amount, down);
@@ -350,10 +142,10 @@ public class GamepadControl extends AbstractControl {
         //        inputManager.addListener(gamepadListener, "Button A", "Button B", "Button X", "Button Y", "Button LB", "Button RB", "Button BACK", "Button START", "Button LT", "Button RT", "Axis LS Right", "Axis LS Left", "Axis LS Up", "Axis LS Down", "Axis RS Left", "Axis RS Right", "Axis RS Up", "Axis RS Down", "D-Pad Left", "D-Pad Right", "D-Pad Down", "D-Pad Up");
         //</editor-fold>
         inputManager.addListener(gamepadListener,
-                InputMappings.A_SELECT,
-                InputMappings.B_ATTACK,
-                InputMappings.PERCENT_TRIGGER_DOWN,
-                InputMappings.PERCENT_TRIGGER_UP);
+                InputMappings.GAMEPAD_PLAYER1_A_SELECT,
+                InputMappings.GAMEPAD_PLAYER1_B_ATTACK,
+                InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN,
+                InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_UP);
     }
 
     @Override
@@ -362,7 +154,7 @@ public class GamepadControl extends AbstractControl {
 
     @Override
     protected void onSelectionPressed(String name, Vector2f point) {
-        if (name.equals(InputMappings.A_SELECT)) {
+        if (name.equals(InputMappings.GAMEPAD_PLAYER1_A_SELECT)) {
             if (!planetSelection.isEmpty()) {
 //                selectAllTrigger = false;
                 deselectAllPlanets();
@@ -376,12 +168,12 @@ public class GamepadControl extends AbstractControl {
 
     @Override
     protected boolean onSelectEntity(String name, Vector2f point) {
-        boolean attack = (name.equals(InputMappings.A_SELECT)
-                && (name.equals(InputMappings.A_SELECT)
-                || name.equals(InputMappings.B_ATTACK)))
+        boolean attack = (name.equals(InputMappings.GAMEPAD_PLAYER1_A_SELECT)
+                && (name.equals(InputMappings.GAMEPAD_PLAYER1_A_SELECT)
+                || name.equals(InputMappings.GAMEPAD_PLAYER1_B_ATTACK)))
                 ? false : true;
-        if (name.equals(InputMappings.A_SELECT)
-                || name.equals(InputMappings.B_ATTACK)) {
+        if (name.equals(InputMappings.GAMEPAD_PLAYER1_A_SELECT)
+                || name.equals(InputMappings.GAMEPAD_PLAYER1_B_ATTACK)) {
             return onAttackOrSelect(point, attack);
         }
         return false;
@@ -394,19 +186,19 @@ public class GamepadControl extends AbstractControl {
             map.generateMap(SolarWarsGame.getCurrentGameplay().getCurrentLevel());
         }
         inputManager.addListener(gamepadListener,
-                InputMappings.A_SELECT,
-                InputMappings.B_ATTACK,
-                InputMappings.PERCENT_TRIGGER_DOWN,
-                InputMappings.PERCENT_TRIGGER_UP);
+                InputMappings.GAMEPAD_PLAYER1_A_SELECT,
+                InputMappings.GAMEPAD_PLAYER1_B_ATTACK,
+                InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_DOWN,
+                InputMappings.GAMEPAD_PLAYER1_PERCENT_TRIGGER_UP);
 
         inputManager.addListener(selectionListener,
-                InputMappings.DPAD_LS_DOWN,
-                InputMappings.DPAD_LS_LEFT,
-                InputMappings.DPAD_LS_RIGHT,
-                InputMappings.DPAD_LS_UP,
-                InputMappings.LB_SELECT,
-                InputMappings.RB_SELECT,
-                InputMappings.SELECT_ALL);
+                InputMappings.GAMEPAD_PLAYER1_DPAD_LS_DOWN,
+                InputMappings.GAMEPAD_PLAYER1_DPAD_LS_LEFT,
+                InputMappings.GAMEPAD_PLAYER1_DPAD_LS_RIGHT,
+                InputMappings.GAMEPAD_PLAYER1_DPAD_LS_UP,
+                InputMappings.GAMEPAD_PLAYER1_LB_SELECT,
+                InputMappings.GAMEPAD_PLAYER1_RB_SELECT,
+                InputMappings.GAMEPAD_PLAYER1_SELECT_ALL);
 
         if (!controllingPlayer.getPlanets().isEmpty()) {
             onSelectPlanet(controllingPlayer.getPlanets().get(0));
@@ -477,5 +269,220 @@ public class GamepadControl extends AbstractControl {
         removeControlListener();
         super.cleanUp();
 
+    }
+
+    private class SelectionListener implements ActionListener {
+
+
+        final float RIGHT_TOP = (float) (Math.PI * 0.25f);
+        final float LEFT_TOP = (float) (Math.PI * 0.75f);
+        final float LEFT_BOTTOM = (float) (Math.PI * 1.25f);
+        final float RIGHT_BOTTOM = (float) (Math.PI * 1.75f);
+        final float TOLERANCE = 0f;//(float) (Math.PI * 0.167f);
+        
+        public SelectionListener() {
+        }
+        
+        @Override
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (!isPressed) {
+                if (selectedNode == null) {
+                    if (!initSelection()) {
+                        return;
+                    }
+                }
+
+                if (name.equals(InputMappings.GAMEPAD_PLAYER1_SELECT_ALL)) {
+//                        selectAllTrigger = !selectAllTrigger;
+                    if (planetSelection.isEmpty()) {
+                        selectAllPlanets();
+                    } else {
+                        deselectAllPlanets();
+
+                    }
+                }
+                if (dPadSelector(name)) {
+                }
+                if (sequSelect(name)) {
+                }
+
+
+            } else {
+//                    System.out.println(name + " released");
+            }
+        }
+
+        private AbstractPlanet select(int dir) {
+            ArrayList<AIPlanetEdge> valid = new ArrayList<AIPlanetEdge>();
+            System.out.println("ALL");
+            for (AIPlanetEdge edge : selectedNode.getEdges()) {
+                System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
+                        + " to " + edge.getTo().getPlanet().getID()
+                        + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
+                if (dir == 0) {
+                    selectDown(edge, valid);
+                } else if (dir == 1) {
+                    selectLeft(edge, valid);
+                } else if (dir == 2) {
+                    selectRight(edge, valid);
+                } else if (dir == 3) {
+                    selectTop(edge, valid);
+                }
+            }
+            if (valid.isEmpty()) {
+                return null;
+            } else {
+                AbstractPlanet p = getClosest(valid);
+                System.out.println("VALID");
+                for (AIPlanetEdge edge : valid) {
+                    System.out.println("Edge from " + edge.getFrom().getPlanet().getID()
+                            + " to " + edge.getTo().getPlanet().getID()
+                            + " dist: " + edge.getLength() + " angle: " + edge.getAngle());
+                }
+                return p;
+            }
+        }
+
+        private AbstractPlanet getClosest(ArrayList<AIPlanetEdge> valid) {
+            Comparator<AIPlanetEdge> comparator = new Comparator<AIPlanetEdge>() {
+                @Override
+                public int compare(AIPlanetEdge o1, AIPlanetEdge o2) {
+                    if (o1.getLength() <= o2.getLength()) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            };
+            Collections.sort(valid, comparator);
+            return valid.get(0).getTo().getPlanet();
+        }
+
+        private void selectDown(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
+            if (edge.getAngle() >= LEFT_BOTTOM + TOLERANCE
+                    && edge.getAngle() < RIGHT_BOTTOM - TOLERANCE) {
+                valid.add(edge);
+            }
+        }
+
+        private void selectLeft(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
+            if (edge.getAngle() >= LEFT_TOP + TOLERANCE
+                    && edge.getAngle() < LEFT_BOTTOM - TOLERANCE) {
+                valid.add(edge);
+            }
+        }
+
+        private void selectRight(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
+            if (edge.getAngle() < RIGHT_TOP - TOLERANCE
+                    || edge.getAngle() >= RIGHT_BOTTOM + TOLERANCE) {
+                valid.add(edge);
+            }
+        }
+
+        private void selectTop(AIPlanetEdge edge, ArrayList<AIPlanetEdge> valid) {
+            if (edge.getAngle() >= RIGHT_TOP + TOLERANCE
+                    && edge.getAngle() < LEFT_TOP - TOLERANCE) {
+                valid.add(edge);
+            }
+        }
+
+        private boolean dPadSelector(String name) {
+            AbstractPlanet p = null;
+            // Left and Right & Up and Down switched
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_DPAD_LS_DOWN)) {
+                p = select(0);
+            }
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_DPAD_LS_LEFT)) {
+                p = select(1);
+            }
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_DPAD_LS_RIGHT)) {
+                p = select(2);
+            }
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_DPAD_LS_UP)) {
+                p = select(3);
+            }
+            System.out.println(name + " pressed");
+            if (p != null) {
+
+                onSelectPlanet(p);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private void sortPlayerPlanets(String name, ArrayList<AbstractPlanet> playerPlanets) {
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_LB_SELECT)) {
+                Comparator<AbstractPlanet> shipComarator =
+                        new Comparator<AbstractPlanet>() {
+                            @Override
+                            public int compare(AbstractPlanet o1, AbstractPlanet o2) {
+                                if (o1.getShipCount() <= o2.getShipCount()) {
+                                    return -1;
+                                } else {
+                                    return 1;
+                                }
+                            }
+                        };
+                Collections.sort(playerPlanets, shipComarator);
+            } else if (name.equals(InputMappings.GAMEPAD_PLAYER1_RB_SELECT)) {
+                Comparator<AbstractPlanet> shipComarator =
+                        new Comparator<AbstractPlanet>() {
+                            @Override
+                            public int compare(AbstractPlanet o1, AbstractPlanet o2) {
+                                if (o1.getShipCount() <= o2.getShipCount()) {
+                                    return 1;
+                                } else {
+                                    return -1;
+                                }
+                            }
+                        };
+                Collections.sort(playerPlanets, shipComarator);
+            }
+        }
+
+        private void selectNextPlanet(ArrayList<AbstractPlanet> playerPlanets) {
+            LinkedList<AbstractPlanet> list =
+                    new LinkedList<AbstractPlanet>(playerPlanets);
+
+
+            for (Iterator<AbstractPlanet> it = list.listIterator(0); it.hasNext();) {
+                if (it.next().getID() == selectedNode.getPlanet().getID()) {
+                    if (it.hasNext()) {
+                        onSelectPlanet(it.next());
+                    } else {
+                        onSelectPlanet(list.get(0));
+                    }
+                }
+            }
+        }
+
+        private boolean initSelection() {
+            if (!controllingPlayer.getPlanets().isEmpty()) {
+                onSelectPlanet(controllingPlayer.getPlanets().get(0));
+            } else {
+                return false;
+            }
+            return true;
+        }
+
+        private boolean sequSelect(String name) {
+            if (name.equals(InputMappings.GAMEPAD_PLAYER1_LB_SELECT) || name.equals(InputMappings.GAMEPAD_PLAYER1_RB_SELECT)) {
+                if (selectedNode == null
+                        || (selectedNode != null
+                        && selectedNode.getPlanet().getOwner() == null)) {
+                    if (!initSelection()) {
+                        return true;
+                    }
+                }
+                ArrayList<AbstractPlanet> playerPlanets =
+                        new ArrayList<AbstractPlanet>(controllingPlayer.getPlanets());
+//                    selectAllTrigger = false;
+                deselectAllPlanets();
+                sortPlayerPlanets(name, playerPlanets);
+                selectNextPlanet(playerPlanets);
+            }
+            return false;
+        }
     }
 }
