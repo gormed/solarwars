@@ -1,42 +1,27 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * MazeTD Project (c) 2012 by Hady Khalifa, Ahmed Arous and Hans Ferchland
- * 
- * MazeTD rights are by its owners/creators.
- * The project was created for educational purposes and may be used under 
- * the GNU Public license only.
- * 
- * If you modify it please let other people have part of it!
- * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * GNU Public License
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License 3 as published by
- * the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- * 
- * Email us: 
- * hans[dot]ferchland[at]gmx[dot]de
+ * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
  * 
  * 
- * Project: MazeTD Project
- * File: InputMappings.java
- * Type: com.solarwars.InputMappings
+ * SolarWars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
  * 
- * Documentation created: 19.07.2012 - 17:55:16 by Hans Ferchland
+ * SolarWars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or application 
+ * in any way! If that is done by someone, please report it!
+ * 
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
+ * 
+ * Project: SolarWars
+ * File: KeyInputManager.java
+ * Type: gui.KeyInputManager
+ * 
+ * Documentation created: 14.07.2012 - 19:38:00 by Hans Ferchland
+ * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.controls.input;
 
 import com.jme3.input.InputManager;
-import com.jme3.input.JoyInput;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.JoyAxisTrigger;
@@ -113,6 +98,7 @@ public class InputMappings {
     public static final String GAMEPAD_PLAYER4_SELECT_ALL = "SOLARWARS_Gamepad_Player4_Select_All";
     // Attack
     public static final String RIGHT_CLICK_ATTACK = "SOLARWARS_RightClickAttack";
+    
     public static final String GAMEPAD_PLAYER1_B_ATTACK = "SOLARWARS_Gamepad_Player1_BAttack";
     public static final String GAMEPAD_PLAYER2_B_ATTACK = "SOLARWARS_Gamepad_Player2_BAttack";
     public static final String GAMEPAD_PLAYER3_B_ATTACK = "SOLARWARS_Gamepad_Player3_BAttack";

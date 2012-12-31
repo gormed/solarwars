@@ -22,23 +22,40 @@
 package com.solarwars.gamestates;
 
 import com.jme3.input.Joystick;
+import com.jme3.input.JoystickAxis;
+import com.jme3.input.JoystickButton;
 import com.solarwars.AudioManager;
 import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.controls.ControlManager;
+import com.solarwars.gamestates.gui.ControllerItem;
+import com.solarwars.gamestates.gui.MappingItem;
+import com.solarwars.gamestates.gui.SavedServerItem;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
+import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
- * CLass that represents the state to configure the game controls - 
- * either keyboard+mouse or gamepad.
+ * CLass that represents the state to configure the game controls - either
+ * keyboard+mouse or gamepad.
+ *
  * @author Hans Ferchland
  */
 public class ControlsState extends Gamestate {
-    private ListBox controlsListBox;
+
+    public static final String DETECTED_CONTROLS_BOX = "detected_controls_box";
+    public static final String CONTROL_MAPPING_BOX = "control_mapping_box";
+    private static final String[] MAPPINGS = {"SELECT", "ATTACK", "PERCENTAGE UP",
+        "PERCENTAGE DOWN", "SCORES", "EXIT", "PAUSE", 
+        "CHAT", "MOVE VERTICAL", "MOVE HORIZONTAL" };
+    private ListBox<ControllerItem> controlsListBox;
+    private ListBox<MappingItem> mappingsListBox;
 
     public ControlsState() {
         super("Controls");
@@ -48,12 +65,17 @@ public class ControlsState extends Gamestate {
     protected void loadContent() {
         niftyGUI.gotoScreen("controls");
         controlsListBox = screen.findNiftyControl(
-                "detected_controls_box", ListBox.class);
-        
+                DETECTED_CONTROLS_BOX, ListBox.class);
+        mappingsListBox = screen.findNiftyControl(
+                CONTROL_MAPPING_BOX, ListBox.class);
+
+        mappingsListBox.clear();
+        controlsListBox.clear();
+
         for (Joystick j : ControlManager.getInstance().getJoysticks()) {
-            controlsListBox.addItem(j.getName());
+            controlsListBox.addItem(new ControllerItem(j.getName(), j));
         }
-        
+        mappingsListBox.addItem(new MappingItem("Hallo", "Mapping"));
     }
 
     @Override
@@ -66,10 +88,41 @@ public class ControlsState extends Gamestate {
                     new Object[]{e.getMessage(), e.getCause().getMessage()});
         }
     }
-    
+
     public void onBackButton() {
         AudioManager.getInstance().
                 playSoundInstance(AudioManager.SOUND_CLICK);
         switchToState(SolarWarsGame.OPTIONS_STATE);
+    }
+
+    @NiftyEventSubscriber(id = DETECTED_CONTROLS_BOX)
+    public void onListBoxSelectionChanged(final String id,
+            final ListBoxSelectionChangedEvent<ControllerItem> event) {
+        List<ControllerItem> selection = event.getSelection();
+
+        if (!selection.isEmpty() && selection.get(0) != null) {
+            AudioManager.getInstance().
+                    playSoundInstance(AudioManager.SOUND_CLICK);
+            Joystick j = selection.get(0).getJoystick();
+            setMappingsList(j);
+        }
+    }
+
+    private void setMappingsList(Joystick j) {
+        List<JoystickButton> buttons = j.getButtons();
+        List<JoystickAxis> axis = j.getAxes();
+        int idx = 0;
+        mappingsListBox.clear();
+        for (String s : MAPPINGS) {
+            String key;
+            if (idx < buttons.size()) {
+                key = buttons.get(idx).getName();
+            } else {
+                key = axis.get(idx-buttons.size()).getName();
+            }
+            mappingsListBox.addItem(new MappingItem(s,key));
+            idx++;
+        }
+        //JoystickButton b = j.getButton("A");
     }
 }

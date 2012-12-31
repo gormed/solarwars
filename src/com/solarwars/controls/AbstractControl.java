@@ -21,7 +21,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.controls;
 
-import com.solarwars.entities.MarkerNode;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -33,6 +32,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.solarwars.*;
 import com.solarwars.entities.AbstractPlanet;
+import com.solarwars.entities.MarkerNode;
 import com.solarwars.entities.ShipGroup;
 import com.solarwars.gamestates.gui.DragRectangleGUI;
 import com.solarwars.logic.ActionLib;

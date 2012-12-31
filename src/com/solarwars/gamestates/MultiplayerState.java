@@ -56,7 +56,7 @@ public class MultiplayerState extends Gamestate {
     public MultiplayerState() {
         super(SolarWarsGame.MULTIPLAYER_STATE);
         currentIPAddress = SolarWarsSettings.getInstance().
-            getIpAddressFavouriteServer();
+                getIpAddressFavouriteServer();
     }
 
     /* (non-Javadoc)
@@ -70,7 +70,7 @@ public class MultiplayerState extends Gamestate {
      * @see com.solarwars.gamestates.Gamestate#loadContent(com.solarwars.SolarWarsGame)
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     protected void loadContent() {
         // switch to multiplayer_menu gui
         niftyGUI.gotoScreen("multiplayer_menu");
@@ -204,7 +204,7 @@ public class MultiplayerState extends Gamestate {
      */
     public void onJoinServerButton() {
         String ip = currentIPAddress;
-        
+
         if (NetworkManager.checkIP(ip)) {
             AudioManager.getInstance().
                     playSoundInstance(AudioManager.SOUND_CLICK);

@@ -36,9 +36,10 @@
                             <onActive name="border" color="#0a8" />
                         </effect>
                         <control id="detected_controls_box"
-                                 name="listBox" horizontal="off" displayItems="10" 
-                                 selectionMode="Single" forceSelection="false" vertical="optional">
-                            <!--<control name="detected-control-line" style="favorite-listbox-item" /> -->
+                                 name="listBox" horizontal="off" displayItems="5" 
+                                 selectionMode="Single" forceSelection="false" vertical="optional"
+                                 viewConverterClass="com.solarwars.gamestates.gui.ControllerItemConverter">
+                            <control name="detected-control-line" style="favorite-listbox-item" />
                         </control>
                     </panel>
                     <panel childLayout="center" padding="10px" height="42px" width="100%">
@@ -51,7 +52,12 @@
                         <effect>
                             <onActive name="border" color="#0a8" />
                         </effect>
-
+                        <control id="control_mapping_box"
+                                 name="listBox" horizontal="off" displayItems="5" 
+                                 selectionMode="Single" forceSelection="false" vertical="optional"
+                                 viewConverterClass="com.solarwars.gamestates.gui.MappingItemConverter">
+                            <control name="control-mapping-line" style="favorite-listbox-item" />
+                        </control>
                     </panel>
                     <!-- SPACER -->
                     <panel id="spacer" align="center" backgroundColor="#0000" 
