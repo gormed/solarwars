@@ -98,6 +98,10 @@ public class BitmapText extends Node {
         letters.invalidate();
     }
 
+    public float getSize() {
+        return block.getSize();
+    }
+
     /**
      *
      * @param text charsequence to change text to
@@ -180,6 +184,22 @@ public class BitmapText extends Node {
         letters.setColor(color);
         letters.invalidate(); // TODO: Don't have to align.
         needRefresh = true;
+    }
+    
+    /**
+     *  Sets an overall alpha that will be applied to all
+     *  letters.  If the alpha passed is -1 then alpha reverts
+     *  to default... which will be 1 for anything unspecified
+     *  and color tags will be reset to 1 or their encoded
+     *  alpha.
+     */
+    public void setAlpha(float alpha) {
+        letters.setBaseAlpha(alpha);
+        needRefresh = true;
+    }    
+
+    public float getAlpha() {
+        return letters.getBaseAlpha();
     }
 
     /**
@@ -362,6 +382,7 @@ public class BitmapText extends Node {
      * @param wrap NoWrap   : Letters over the text bound is not shown. the last character is set to '...'(0x2026)
      *             Character: Character is split at the end of the line.
      *             Word     : Word is split at the end of the line.
+     *             Clip     : The text is hard-clipped at the border including showing only a partial letter if it goes beyond the text bound.
      */
     public void setLineWrapMode(LineWrapMode wrap) {
         if (block.getLineWrapMode() != wrap) {
@@ -397,19 +418,18 @@ public class BitmapText extends Node {
     }
 
     public void render(RenderManager rm, ColorRGBA color) {
-
         for (BitmapTextPage page : textPages) {
             Material mat = page.getMaterial();
             mat.setTexture("ColorMap", page.getTexture());
-            ColorRGBA original = getColor(mat, "Color");            
-            mat.setColor("Color", color);
+            //ColorRGBA original = getColor(mat, "Color");            
+            //mat.setColor("Color", color);
             mat.render(page, rm);
             
-            if( original == null ) {
-                mat.clearParam("Color");
-            } else {
-                mat.setColor("Color", original);
-            }
+            //if( original == null ) {
+            //    mat.clearParam("Color");
+            //} else {
+            //    mat.setColor("Color", original);
+            //}
         }
     }
 }

@@ -68,14 +68,17 @@ public class RenderDeviceJme implements RenderDevice {
     private HashMap<CachedTextKey, BitmapText> textCacheCurrentFrame = new HashMap<CachedTextKey, BitmapText>();
     private final Quad quad = new Quad(1, -1, true);
     private final Geometry quadGeom = new Geometry("nifty-quad", quad);
-    private final Material unshadedMat;
     private boolean clipWasSet = false;
-    private BlendMode blendMode = null;
     private VertexBuffer quadDefaultTC = quad.getBuffer(Type.TexCoord);
     private VertexBuffer quadModTC = quadDefaultTC.clone();
     private VertexBuffer quadColor;
     private Matrix4f tempMat = new Matrix4f();
     private ColorRGBA tempColor = new ColorRGBA();
+    private RenderState renderState = new RenderState();
+    
+    private Material colorMaterial;
+    private Material textureColorMaterial;
+    private Material vertexColorMaterial;
     
     private static class CachedTextKey {
         
@@ -118,10 +121,22 @@ public class RenderDeviceJme implements RenderDevice {
         
         quadModTC.setUsage(Usage.Stream);
         
-        // GUI material
-        unshadedMat = new Material(display.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        unshadedMat.getAdditionalRenderState().setDepthTest(false);
-        unshadedMat.getAdditionalRenderState().setDepthWrite(false);
+        // Load the 3 material types separately to avoid
+        // reloading the shader when the defines change.
+        
+        // Material with a single color (no texture or vertex color)
+        colorMaterial = new Material(display.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        
+        // Material with a texture and a color (no vertex color)
+        textureColorMaterial = new Material(display.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        
+        // Material with vertex color, used for gradients (no texture)
+        vertexColorMaterial = new Material(display.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        vertexColorMaterial.setBoolean("VertexColor", true);
+        
+        // Shared render state for all materials
+        renderState.setDepthTest(false);
+        renderState.setDepthWrite(false);
     }
     
     public void setResourceLoader(NiftyResourceLoader niftyResourceLoader) {
@@ -163,6 +178,7 @@ public class RenderDeviceJme implements RenderDevice {
         textCacheLastFrame = textCacheCurrentFrame;
         textCacheCurrentFrame = temp;
         textCacheCurrentFrame.clear();
+        rm.setForcedRenderState(null);
     }
     
     public int getWidth() {
@@ -177,12 +193,10 @@ public class RenderDeviceJme implements RenderDevice {
     }
     
     public void setBlendMode(BlendMode blendMode) {
-        if (this.blendMode != blendMode) {
-            this.blendMode = blendMode;
-        }
+        renderState.setBlendMode(convertBlend(blendMode));
     }
     
-    private RenderState.BlendMode convertBlend() {
+    private RenderState.BlendMode convertBlend(BlendMode blendMode) {
         if (blendMode == null) {
             return RenderState.BlendMode.Off;
         } else if (blendMode == BlendMode.BLEND) {
@@ -209,11 +223,7 @@ public class RenderDeviceJme implements RenderDevice {
 
     @Override
     public void renderFont(RenderFont font, String str, int x, int y, Color color, float sizeX, float sizeY) {        
-        if (str.length() == 0) {
-            return;
-        }
-        
-        if (font instanceof RenderFontNull) {
+        if (str.length() == 0 || font instanceof RenderFontNull) {
             return;
         }
         
@@ -229,14 +239,9 @@ public class RenderDeviceJme implements RenderDevice {
         }
         textCacheCurrentFrame.put(key, text);
         
-//        unshadedMat.getAdditionalRenderState().setBlendMode(convertBlend());
-//        unshadedMat.setBoolean("VertexColor", true);
-//        unshadedMat.setColor("Color", convertColor(color, tempColor));        
-//        text.setMaterial(unshadedMat);
-        
-        float width = text.getLineWidth();
+//        float width = text.getLineWidth();
 //        float height = text.getLineHeight();
-        float x0 = x + 0.5f * width * (1f - sizeX);
+        float x0 = x; //+ 0.5f * width * (1f - sizeX);
         float y0 = y; // + 0.5f * height * (1f - sizeY);
         
         tempMat.loadIdentity();
@@ -244,6 +249,9 @@ public class RenderDeviceJme implements RenderDevice {
         tempMat.setScale(sizeX, sizeY, 0);
 
         rm.setWorldMatrix(tempMat);
+        rm.setForcedRenderState(renderState);
+        text.setColor(colorRgba);
+        text.updateLogicalState(0);
         text.render(rm, colorRgba);
         
 //        System.out.format("renderFont(%s, %s, %d, %d, %s, %f, %f)\n", jmeFont.getFont(), str, x, y, color.toString(), sizeX, sizeY);
@@ -253,13 +261,12 @@ public class RenderDeviceJme implements RenderDevice {
             int srcX, int srcY, int srcW, int srcH,
             Color color, float scale,
             int centerX, int centerY) {
+        
         RenderImageJme jmeImage = (RenderImageJme) image;
         Texture2D texture = jmeImage.getTexture();
         
-        unshadedMat.getAdditionalRenderState().setBlendMode(convertBlend());
-        unshadedMat.setColor("Color", convertColor(color, tempColor));
-        unshadedMat.setTexture("ColorMap", texture);        
-        unshadedMat.setBoolean("VertexColor", false);
+        textureColorMaterial.setColor("Color", convertColor(color, tempColor));
+        textureColorMaterial.setTexture("ColorMap", texture);        
         
         float imageWidth = jmeImage.getWidth();
         float imageHeight = jmeImage.getHeight();
@@ -292,7 +299,8 @@ public class RenderDeviceJme implements RenderDevice {
         tempMat.setScale(w * scale, h * scale, 0);
         
         rm.setWorldMatrix(tempMat);
-        unshadedMat.render(quadGeom, rm);
+        rm.setForcedRenderState(renderState);
+        textureColorMaterial.render(quadGeom, rm);
         
         //System.out.format("renderImage2(%s, %d, %d, %d, %d, %d, %d, %d, %d, %s, %f, %d, %d)\n", texture.getKey().toString(),
         //                                                                                       x, y, w, h, srcX, srcY, srcW, srcH,
@@ -304,10 +312,8 @@ public class RenderDeviceJme implements RenderDevice {
         
         RenderImageJme jmeImage = (RenderImageJme) image;
         
-        unshadedMat.getAdditionalRenderState().setBlendMode(convertBlend());
-        unshadedMat.setColor("Color", convertColor(color, tempColor));
-        unshadedMat.setTexture("ColorMap", jmeImage.getTexture());
-        unshadedMat.setBoolean("VertexColor", false);
+        textureColorMaterial.setColor("Color", convertColor(color, tempColor));
+        textureColorMaterial.setTexture("ColorMap", jmeImage.getTexture());
         
         quad.clearBuffer(Type.TexCoord);
         quad.setBuffer(quadDefaultTC);
@@ -320,23 +326,22 @@ public class RenderDeviceJme implements RenderDevice {
         tempMat.setScale(width * imageScale, height * imageScale, 0);
         
         rm.setWorldMatrix(tempMat);
-        unshadedMat.render(quadGeom, rm);
+        rm.setForcedRenderState(renderState);
+        textureColorMaterial.render(quadGeom, rm);
         
         //System.out.format("renderImage1(%s, %d, %d, %d, %d, %s, %f)\n", jmeImage.getTexture().getKey().toString(), x, y, width, height, color.toString(), imageScale);
     }
     
     public void renderQuad(int x, int y, int width, int height, Color color) {
-        unshadedMat.getAdditionalRenderState().setBlendMode(convertBlend());
-        unshadedMat.setColor("Color", convertColor(color, tempColor));                        
-        unshadedMat.setTexture("ColorMap", null);
-        unshadedMat.setBoolean("VertexColor", false);
+        colorMaterial.setColor("Color", convertColor(color, tempColor));                        
 
         tempMat.loadIdentity();
         tempMat.setTranslation(x, getHeight() - y, 0);
         tempMat.setScale(width, height, 0);
 
         rm.setWorldMatrix(tempMat);
-        unshadedMat.render(quadGeom, rm);
+        rm.setForcedRenderState(renderState);
+        colorMaterial.render(quadGeom, rm);
         
         //System.out.format("renderQuad1(%d, %d, %d, %d, %s)\n", x, y, width, height, color.toString());
     }
@@ -355,18 +360,14 @@ public class RenderDeviceJme implements RenderDevice {
         
         buf.flip();
         quadColor.updateData(buf);
-        
-        unshadedMat.getAdditionalRenderState().setBlendMode(convertBlend()); 
-        unshadedMat.setColor("Color", ColorRGBA.White);                        
-        unshadedMat.setTexture("ColorMap", null);
-        unshadedMat.setBoolean("VertexColor", true);
-        
+                                
         tempMat.loadIdentity();
         tempMat.setTranslation(x, getHeight() - y, 0);
         tempMat.setScale(width, height, 0);
         
         rm.setWorldMatrix(tempMat);
-        unshadedMat.render(quadGeom, rm);
+        rm.setForcedRenderState(renderState);
+        vertexColorMaterial.render(quadGeom, rm);
         
         //System.out.format("renderQuad2(%d, %d, %d, %d, %s, %s, %s, %s)\n", x, y, width, height, topLeft.toString(),
         //                                                                                        topRight.toString(),

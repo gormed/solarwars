@@ -1,5 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
+ * SolarWars Project (c) 2012 - 2012 
+ * 
+ *      by gormed, fxdapokalypse, kinxz, Londane, romanh, Senju
  * 
  * 
  * SolarWars is a strategy game in space. You have to eliminate 
@@ -44,9 +46,7 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.JmeContext;
 import com.jme3.system.JmeSystem;
 import com.jme3.util.BufferUtils;
-import com.solarwars.controls.AbstractControl;
 import com.solarwars.controls.ControlManager;
-import com.solarwars.controls.StandardControl;
 import com.solarwars.controls.input.InputMappings;
 import com.solarwars.log.Logging;
 import com.solarwars.net.NetworkManager;

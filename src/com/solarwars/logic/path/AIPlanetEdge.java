@@ -112,12 +112,8 @@ public class AIPlanetEdge {
     }
 
     private void calculateAngle() {
-        Vector3f start = from.getPlanet().getPosition().clone();
-        Vector3f end = to.getPlanet().getPosition().clone();
-        
-        
-        
-        
+//        Vector3f start = from.getPlanet().getPosition().clone();
+//        Vector3f end = to.getPlanet().getPosition().clone();
         Vector2f from2d = new Vector2f(
                 from.getPlanet().getPosition().x,
                 from.getPlanet().getPosition().z);

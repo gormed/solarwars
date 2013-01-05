@@ -108,14 +108,22 @@ MaterialDef Phong Lighting {
         Texture2D ShadowMap1
         Texture2D ShadowMap2
         Texture2D ShadowMap3
+        //pointLights
+        Texture2D ShadowMap4
+        Texture2D ShadowMap5
         
         Float ShadowIntensity
         Vector4 Splits
+        Vector2 FadeInfo
 
         Matrix4 LightViewProjectionMatrix0
         Matrix4 LightViewProjectionMatrix1
         Matrix4 LightViewProjectionMatrix2
         Matrix4 LightViewProjectionMatrix3
+        //pointLight
+        Matrix4 LightViewProjectionMatrix4
+        Matrix4 LightViewProjectionMatrix5   
+        Vector3 LightPos
 
         Float PCFEdge
         Float ShadowMapSize
@@ -180,11 +188,11 @@ MaterialDef Phong Lighting {
             DISCARD_ALPHA : AlphaDiscardThreshold
         }
 
-        RenderState {
+        ForcedRenderState {
             FaceCull Off
             DepthTest On
             DepthWrite On
-            PolyOffset 5 0
+            PolyOffset 5 3
             ColorWrite Off
         }
 
@@ -192,8 +200,8 @@ MaterialDef Phong Lighting {
 
 
     Technique PostShadow15{
-        VertexShader GLSL150:   Common/MatDefs/Shadow/PostShadowPSSM.vert
-        FragmentShader GLSL150: Common/MatDefs/Shadow/PostShadowPSSM15.frag
+        VertexShader GLSL150:   Common/MatDefs/Shadow/PostShadow.vert
+        FragmentShader GLSL150: Common/MatDefs/Shadow/PostShadow15.frag
 
         WorldParameters {
             WorldViewProjectionMatrix
@@ -207,6 +215,9 @@ MaterialDef Phong Lighting {
             DISCARD_ALPHA : AlphaDiscardThreshold
             COLOR_MAP : ColorMap
             SHADOWMAP_SIZE : ShadowMapSize
+            FADE : FadeInfo
+            PSSM : Splits
+            POINTLIGHT : LightViewProjectionMatrix5
         }
 
         ForcedRenderState {
@@ -217,8 +228,8 @@ MaterialDef Phong Lighting {
     }
 
     Technique PostShadow{
-        VertexShader GLSL100:   Common/MatDefs/Shadow/PostShadowPSSM.vert
-        FragmentShader GLSL100: Common/MatDefs/Shadow/PostShadowPSSM.frag
+        VertexShader GLSL100:   Common/MatDefs/Shadow/PostShadow.vert
+        FragmentShader GLSL100: Common/MatDefs/Shadow/PostShadow.frag
 
         WorldParameters {
             WorldViewProjectionMatrix
@@ -232,6 +243,9 @@ MaterialDef Phong Lighting {
             DISCARD_ALPHA : AlphaDiscardThreshold
             COLOR_MAP : ColorMap
             SHADOWMAP_SIZE : ShadowMapSize
+            FADE : FadeInfo
+            PSSM : Splits
+            POINTLIGHT : LightViewProjectionMatrix5
         }
 
         ForcedRenderState {

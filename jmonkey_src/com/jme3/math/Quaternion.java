@@ -278,6 +278,7 @@ public final class Quaternion implements Savable, Cloneable, java.io.Serializabl
     /**
      * <code>toAngles</code> returns this quaternion converted to Euler
      * rotation angles (yaw,roll,pitch).<br/>
+     * Note that the result is not always 100% accurate due to the implications of euler angles.
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm">http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm</a>
      * 
      * @param angles
@@ -826,7 +827,7 @@ public final class Quaternion implements Savable, Cloneable, java.io.Serializabl
      * quaternion multiplication is not commutative so q * p != p * q.
      *
      * It IS safe for q and res to be the same object.
-     * It IS safe for this and res to be the same object.
+     * It IS NOT safe for this and res to be the same object.
      *
      * @param q
      *            the quaternion to multiply this quaternion by.

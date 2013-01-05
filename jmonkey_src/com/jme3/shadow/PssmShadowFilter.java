@@ -61,7 +61,9 @@ import java.io.IOException;
  * API is basically the same as the PssmShadowRenderer;
  * 
  * @author Rémy Bouquet aka Nehon
+ * @deprecated use {@link DirectionalLightShadowFilter}
  */
+@Deprecated
 public class PssmShadowFilter extends Filter {
 
     private PssmShadowRenderer pssmRenderer;
@@ -146,7 +148,7 @@ public class PssmShadowFilter extends Filter {
         return pssmRenderer.getLambda();
     }
 
-    /*
+    /**
      * Adjust the repartition of the different shadow maps in the shadow extend
      * usualy goes from 0.0 to 1.0
      * a low value give a more linear repartition resulting in a constant quality in the shadow over the extends, but near shadows could look very jagged
@@ -244,6 +246,22 @@ public class PssmShadowFilter extends Filter {
      */
     final public void setFilterMode(FilterMode filterMode) {
         pssmRenderer.setFilterMode(filterMode);
+    }
+    
+     /**
+     * Define the length over which the shadow will fade out when using a shadowZextend
+     * @param length the fade length in world units
+     */
+    public void setShadowZFadeLength(float length){
+       pssmRenderer.setShadowZFadeLength(length);        
+    }
+    
+     /**
+     * get the length over which the shadow will fade out when using a shadowZextend
+     * @return the fade length in world units
+     */
+    public float getShadowZFadeLength(){       
+        return pssmRenderer.getShadowZFadeLength();        
     }
 
     @Override

@@ -45,7 +45,6 @@ import com.solarwars.logic.AbstractGameplay;
 import com.solarwars.logic.Level;
 import com.solarwars.logic.Player;
 import com.solarwars.settings.SolarWarsSettings;
-import java.util.Random;
 
 /**
  * The Class AbstractPlanet.

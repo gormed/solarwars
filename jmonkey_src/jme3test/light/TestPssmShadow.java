@@ -32,9 +32,13 @@
 package jme3test.light;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.JmeImporter;
+import com.jme3.export.Savable;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
@@ -63,6 +67,7 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 import com.jme3.util.SkyFactory;
 import com.jme3.util.TangentBinormalGenerator;
+import java.io.IOException;
 
 public class TestPssmShadow extends SimpleApplication implements ActionListener {
 
@@ -123,7 +128,7 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
         ground.setShadowMode(ShadowMode.CastAndReceive);
         rootNode.attachChild(ground);
 
-        DirectionalLight l = new DirectionalLight();
+        l = new DirectionalLight();
         l.setDirection(new Vector3f(-1, -1, -1));
         rootNode.addLight(l);
 
@@ -136,6 +141,7 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
 
         rootNode.attachChild(sky);
     }
+    DirectionalLight l;
 
     @Override
     public void simpleInitApp() {
@@ -148,36 +154,42 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
         loadScene();
 
         pssmRenderer = new PssmShadowRenderer(assetManager, 1024, 3);
-        pssmRenderer.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
-        //  pssmRenderer.setDirection(new Vector3f(0.5973172f, -0.16583486f, 0.7846725f).normalizeLocal());
+        //pssmRenderer.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
+        pssmRenderer.setDirection(new Vector3f(-0.5973172f, -0.56583486f, 0.8846725f).normalizeLocal());
         pssmRenderer.setLambda(0.55f);
         pssmRenderer.setShadowIntensity(0.6f);
         pssmRenderer.setCompareMode(CompareMode.Software);
         pssmRenderer.setFilterMode(FilterMode.Dither);
-        //     pssmRenderer.displayDebug();
+                
+        pssmRenderer.displayFrustum();
         viewPort.addProcessor(pssmRenderer);
 
 
 
         pssmFilter = new PssmShadowFilter(assetManager, 1024, 3);
-        pssmFilter.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
-        //pssmRenderer.setDirection(new Vector3f(0.5973172f, -0.16583486f, 0.7846725f).normalizeLocal());
+        //pssmFilter.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
+        pssmRenderer.setDirection(new Vector3f(-0.5973172f, -0.56583486f, 0.8846725f).normalizeLocal());
         pssmFilter.setLambda(0.55f);
         pssmFilter.setShadowIntensity(0.6f);
         pssmFilter.setCompareMode(CompareMode.Software);
         pssmFilter.setFilterMode(FilterMode.Dither);
         pssmFilter.setEnabled(false);
+        
+
+//        pssmFilter.setShadowZFadeLength(300);
+//        pssmFilter.setShadowZExtend(500);
+        
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         //  fpp.setNumSamples(4);
         fpp.addFilter(pssmFilter);
-       
+
         viewPort.addProcessor(fpp);
 
 
         initInputs();
     }
-    BitmapText infoText;  
-
+    BitmapText infoText;
+    
     private void initInputs() {
         /** Write text on the screen (HUD) */
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
@@ -195,7 +207,20 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
         inputManager.addMapping("lambdaDown", new KeyTrigger(KeyInput.KEY_J));
         inputManager.addMapping("toggleHW", new KeyTrigger(KeyInput.KEY_RETURN));
         inputManager.addMapping("switchGroundMat", new KeyTrigger(KeyInput.KEY_M));
-        inputManager.addListener(this, "lambdaUp", "lambdaDown", "toggleHW", "toggle", "ShadowUp", "ShadowDown", "ThicknessUp", "ThicknessDown", "changeFiltering", "switchGroundMat");
+        inputManager.addMapping("splits", new KeyTrigger(KeyInput.KEY_X));
+
+        inputManager.addMapping("up", new KeyTrigger(KeyInput.KEY_NUMPAD8));
+        inputManager.addMapping("down", new KeyTrigger(KeyInput.KEY_NUMPAD2));
+        inputManager.addMapping("right", new KeyTrigger(KeyInput.KEY_NUMPAD6));
+        inputManager.addMapping("left", new KeyTrigger(KeyInput.KEY_NUMPAD4));
+        inputManager.addMapping("fwd", new KeyTrigger(KeyInput.KEY_PGUP));
+        inputManager.addMapping("back", new KeyTrigger(KeyInput.KEY_PGDN));
+
+
+
+        inputManager.addListener(this, "lambdaUp", "lambdaDown", "toggleHW", "toggle", "ShadowUp", "ShadowDown", "ThicknessUp", "ThicknessDown", "changeFiltering",
+                "switchGroundMat", "splits", "up", "down", "right", "left", "fwd", "back");
+
     }
 
     private void print(String str) {
@@ -246,10 +271,10 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
                     break;
                 case 1:
                     viewPort.removeProcessor(pssmRenderer);
-                    pssmFilter.setEnabled(true);                  
+                    pssmFilter.setEnabled(true);
                     break;
                 case 2:
-                    pssmFilter.setEnabled(false);                   
+                    pssmFilter.setEnabled(false);
                     break;
             }
 
@@ -311,5 +336,78 @@ public class TestPssmShadow extends SimpleApplication implements ActionListener 
             }
         }
 
+//        if (name.equals("splits") && keyPressed) {
+//            pssmRenderer.displayFrustum();
+//        }
+
+
+        if (name.equals("up")) {
+            up = keyPressed;
+        }
+        if (name.equals("down")) {
+            down = keyPressed;
+        }
+        if (name.equals("right")) {
+            right = keyPressed;
+        }
+        if (name.equals("left") ) {
+            left = keyPressed;
+        }
+        if (name.equals("fwd")) {
+            fwd = keyPressed;
+        }
+        if (name.equals("back")) {
+            back = keyPressed;
+        }
+
+    }
+    boolean up = false;
+    boolean down = false;
+    boolean left = false;
+    boolean right = false;
+    boolean fwd = false;
+    boolean back = false;
+    float time = 0;
+    float s = 1f;
+
+    @Override
+    public void simpleUpdate(float tpf) {
+        if (up) {
+            Vector3f v = l.getDirection();
+            v.y += tpf / s;
+            setDir(v);
+        }
+        if (down) {
+            Vector3f v = l.getDirection();
+            v.y -= tpf / s;
+            setDir(v);
+        }
+        if (right) {
+            Vector3f v = l.getDirection();
+            v.x += tpf / s;
+            setDir(v);
+        }
+        if (left) {
+            Vector3f v = l.getDirection();
+            v.x -= tpf / s;
+            setDir(v);
+        }
+        if (fwd) {
+            Vector3f v = l.getDirection();
+            v.z += tpf / s;
+            setDir(v);
+        }
+        if (back) {
+            Vector3f v = l.getDirection();
+            v.z -= tpf / s;
+            setDir(v);
+        }
+
+    }
+
+    private void setDir(Vector3f v) {
+        l.setDirection(v);
+        pssmFilter.setDirection(v);
+        pssmRenderer.setDirection(v);
     }
 }

@@ -51,6 +51,8 @@ class Letters {
     private float totalHeight;
     private ColorTags colorTags = new ColorTags();
     private ColorRGBA baseColor = null;
+    private float baseAlpha = -1;
+    private String plainText;
     
     Letters(BitmapFont font, StringBlock bound, boolean rightToLeft) {
         final String text = bound.getText();
@@ -63,7 +65,7 @@ class Letters {
 
     void setText(final String text) {
         colorTags.setText(text);
-        String plainText = colorTags.getPlainText();
+        plainText = colorTags.getPlainText();
 
         head.setNext(tail);
         tail.setPrevious(head);
@@ -142,8 +144,7 @@ class Letters {
                             }
                         }
                         break;
-                    case NoWrap:
-                        // search last blank character before this word
+                    case NoWrap: 
                         LetterQuad cursor = l.getPrevious();
                         while (cursor.isInvalid(block, ellipsisWidth) && !cursor.isLineStart()) {
                             cursor = cursor.getPrevious();
@@ -155,6 +156,16 @@ class Letters {
                             cursor.setBitmapChar(null);
                             cursor.update(block);
                             cursor = cursor.getNext();
+                        }
+                        break;
+                    case Clip: 
+                        // Clip the character that falls out of bounds
+                        l.clip(block);
+                        
+                        // Clear the rest up to the next line feed.
+                        for( LetterQuad q = l.getNext(); !q.isTail() && !q.isLineFeed(); q = q.getNext() ) {
+                            q.setBitmapChar(null);
+                            q.update(block);
                         }
                         break;
                     }
@@ -338,6 +349,7 @@ class Letters {
      */
     void setColor( ColorRGBA color ) {
         baseColor = color;
+        colorTags.setBaseColor(color);
         setColor( 0, block.getText().length(), color );
     }
 
@@ -359,4 +371,46 @@ class Letters {
             cursor = cursor.getNext();
         }
     }
+ 
+    float getBaseAlpha() {
+        return baseAlpha;
+    }
+    
+    void setBaseAlpha( float alpha ) {        this.baseAlpha = alpha;
+        colorTags.setBaseAlpha(alpha);
+
+        if (alpha == -1) {
+            alpha = baseColor != null ? baseColor.a : 1;
+        }
+
+        // Forward the new alpha to the letter quads
+        LetterQuad cursor = head.getNext();
+        while (!cursor.isTail()) {
+            cursor.setAlpha(alpha);
+            cursor = cursor.getNext();
+        }
+
+        // If the alpha was reset to "default", ie: -1
+        // then the color tags are potentially reset and
+        // we need to reapply them.  This has to be done
+        // second since it may override any alpha values
+        // set above... but you still need to do the above
+        // since non-color tagged text is treated differently
+        // even if part of a color tagged string.
+        if (baseAlpha == -1) {
+            LinkedList<Range> ranges = colorTags.getTags();
+            if (!ranges.isEmpty()) {
+                for (int i = 0; i < ranges.size()-1; i++) {
+                    Range start = ranges.get(i);
+                    Range end = ranges.get(i+1);
+                    setColor(start.start, end.start, start.color);
+                }
+                Range end = ranges.getLast();
+                setColor(end.start, plainText.length(), end.color);
+            }
+        }
+        
+        invalidate();
+    }
+
 }

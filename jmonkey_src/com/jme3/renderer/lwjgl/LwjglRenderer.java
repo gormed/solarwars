@@ -85,6 +85,7 @@ public class LwjglRenderer implements Renderer {
     private final StringBuilder stringBuf = new StringBuilder(250);
     private final IntBuffer intBuf1 = BufferUtils.createIntBuffer(1);
     private final IntBuffer intBuf16 = BufferUtils.createIntBuffer(16);
+    private final FloatBuffer floatBuf16 = BufferUtils.createFloatBuffer(16);
     private final RenderContext context = new RenderContext();
     private final NativeObjectManager objManager = new NativeObjectManager();
     private final EnumSet<Caps> caps = EnumSet.noneOf(Caps.class);
@@ -1763,15 +1764,21 @@ public class LwjglRenderer implements Renderer {
                 throw new UnsupportedOperationException("Unknown texture type: " + tex.getType());
         }
 
-        // R to Texture compare mode
-        if (tex.getShadowCompareMode() != Texture.ShadowCompareMode.Off) {
-            glTexParameteri(target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-            glTexParameteri(target, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-            if (tex.getShadowCompareMode() == Texture.ShadowCompareMode.GreaterOrEqual) {
-                glTexParameteri(target, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
-            } else {
-                glTexParameteri(target, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        if(tex.isNeedCompareModeUpdate()){
+            // R to Texture compare mode
+            if (tex.getShadowCompareMode() != Texture.ShadowCompareMode.Off) {
+                glTexParameteri(target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+                glTexParameteri(target, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);            
+                if (tex.getShadowCompareMode() == Texture.ShadowCompareMode.GreaterOrEqual) {
+                    glTexParameteri(target, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
+                } else {
+                    glTexParameteri(target, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+                }
+            }else{
+                 //restoring default value
+                 glTexParameteri(target, GL_TEXTURE_COMPARE_MODE, GL_NONE);          
             }
+            tex.compareModeUpdated();
         }
     }
 
@@ -1849,6 +1856,17 @@ public class LwjglRenderer implements Renderer {
         if (!GLContext.getCapabilities().GL_ARB_texture_multisample) {
             if (img.getMultiSamples() > 1) {
                 throw new RendererException("Multisample textures not supported by graphics hardware");
+            }
+        }
+        
+        if (target == GL_TEXTURE_CUBE_MAP) {
+            // Check max texture size before upload
+            if (img.getWidth() > maxCubeTexSize || img.getHeight() > maxCubeTexSize) {
+                throw new RendererException("Cannot upload cubemap " + img + ". The maximum supported cubemap resolution is " + maxCubeTexSize);
+            }
+        } else {
+            if (img.getWidth() > maxTexSize || img.getHeight() > maxTexSize) {
+                throw new RendererException("Cannot upload texture " + img + ". The maximum supported texture resolution is " + maxTexSize);
             }
         }
 

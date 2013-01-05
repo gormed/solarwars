@@ -173,6 +173,23 @@ class LetterQuad {
         return x0 > 0 && bound.x+bound.width-gap < getX1();
     }
     
+    void clip(StringBlock block) {
+        Rectangle bound = block.getTextBox();
+        if (bound == null)
+            return;
+            
+        // Clip the right x position and texture coordinate
+        // to the string block
+        float x1 = Math.min(bound.x + bound.width, x0 + width);
+        float newWidth = x1 - x0;
+        if( newWidth == width )
+            return;
+            
+        float rescale = newWidth / width;
+        u1 = u0 + (u1 - u0) * rescale;
+        width = newWidth;  
+    }
+    
     float getX0() {
         return x0;
     }
@@ -246,6 +263,12 @@ class LetterQuad {
     
     void setColor(ColorRGBA color) {
         this.colorInt = color.asIntRGBA();
+        invalidate();
+    }
+
+    void setAlpha(float alpha) {
+        int i = (int)(alpha * 255) & 0xFF;
+        colorInt = (colorInt & 0xffffff00) | i; 
         invalidate();
     }
 

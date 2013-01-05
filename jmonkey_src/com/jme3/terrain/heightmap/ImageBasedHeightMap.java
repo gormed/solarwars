@@ -33,8 +33,7 @@ package com.jme3.terrain.heightmap;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.texture.Image;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
+import com.jme3.texture.image.ImageRaster;
 
 /**
  * <code>ImageBasedHeightMap</code> is a height map created from the grayscale
@@ -49,6 +48,7 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
     
     
     protected Image colorImage;
+    private float backwardsCompScale = 255f;
 
     
     public void setImage(Image image) {
@@ -89,6 +89,14 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
         return (float) (0.299 * red + 0.587 * green + 0.114 * blue);
     }
     
+    protected float calculateHeight(ColorRGBA color) {
+        return (float) (0.299 * color.r + 0.587 * color.g + 0.114 * color.b);
+    }
+    
+    protected ImageRaster getImageRaster() {
+        return ImageRaster.create(colorImage);
+    }
+    
     public boolean load(boolean flipX, boolean flipY) {
 
         int imageWidth = colorImage.getWidth();
@@ -99,8 +107,7 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
                         + " != imageHeight: " + imageHeight);
 
         size = imageWidth;
-
-        ByteBuffer buf = colorImage.getData(0);
+        ImageRaster raster = getImageRaster();
 
         heightData = new float[(imageWidth * imageHeight)];
 
@@ -111,13 +118,15 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
             for (int h = 0; h < imageHeight; ++h) {
                 if (flipX) {
                     for (int w = imageWidth - 1; w >= 0; --w) {
-                        int baseIndex = (h * imageWidth)+ w;
-                        heightData[index++] = getHeightAtPostion(buf, colorImage, baseIndex, colorStore)*heightScale;
+                        //int baseIndex = (h * imageWidth)+ w;
+                        //heightData[index++] = getHeightAtPostion(raster, baseIndex, colorStore)*heightScale;
+                        heightData[index++] = calculateHeight(raster.getPixel(w, h, colorStore))*heightScale*backwardsCompScale;
                     }
                 } else {
                     for (int w = 0; w < imageWidth; ++w) {
-                        int baseIndex = (h * imageWidth)+ w;
-                        heightData[index++] = getHeightAtPostion(buf, colorImage, baseIndex, colorStore)*heightScale;
+                        //int baseIndex = (h * imageWidth)+ w;
+                        //heightData[index++] = getHeightAtPostion(raster, baseIndex, colorStore)*heightScale;
+                        heightData[index++] = calculateHeight(raster.getPixel(w, h, colorStore))*heightScale*backwardsCompScale;
                     }
                 }
             }
@@ -125,13 +134,15 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
             for (int h = imageHeight - 1; h >= 0; --h) {
                 if (flipX) {
                     for (int w = imageWidth - 1; w >= 0; --w) {
-                        int baseIndex = (h * imageWidth)+ w;
-                        heightData[index++] = getHeightAtPostion(buf, colorImage, baseIndex, colorStore)*heightScale;
+                        //int baseIndex = (h * imageWidth)+ w;
+                        //heightData[index++] = getHeightAtPostion(raster, baseIndex, colorStore)*heightScale;
+                        heightData[index++] = calculateHeight(raster.getPixel(w, h, colorStore))*heightScale*backwardsCompScale;
                     }
                 } else {
                     for (int w = 0; w < imageWidth; ++w) {
-                        int baseIndex = (h * imageWidth)+ w;
-                        heightData[index++] = getHeightAtPostion(buf, colorImage, baseIndex, colorStore)*heightScale;
+                        //int baseIndex = (h * imageWidth)+ w;
+                        //heightData[index++] = getHeightAtPostion(raster, baseIndex, colorStore)*heightScale;
+                        heightData[index++] = calculateHeight(raster.getPixel(w, h, colorStore))*heightScale*backwardsCompScale;
                     }
                 }
             }
@@ -140,7 +151,7 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
         return true;
     }
     
-    protected float getHeightAtPostion(ByteBuffer buf, Image image, int position, ColorRGBA store) {
+    /*protected float getHeightAtPostion(ImageRaster image, int position, ColorRGBA store) {
         switch (image.getFormat()){
             case RGBA8:
                 buf.position( position * 4 );
@@ -172,5 +183,5 @@ public class ImageBasedHeightMap extends AbstractHeightMap implements ImageHeigh
     
     private float byte2float(byte b){
         return ((float)(b & 0xFF)) / 255f;
-    }
+    }*/
 }

@@ -25,8 +25,6 @@ import com.jme3.asset.AssetManager;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.scene.Node;
 import com.solarwars.Hub;
-import com.solarwars.SolarWarsApplication;
-import com.solarwars.controls.AbstractControl;
 import com.solarwars.controls.ControlManager;
 import com.solarwars.entities.AbstractPlanet;
 import com.solarwars.entities.AbstractShip;
@@ -40,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 /**
  * The Class Level discribes a level for SolarWars. There may be only one level

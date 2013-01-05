@@ -56,6 +56,7 @@ public class NiftyJmeDisplay implements SceneProcessor {
     protected Nifty nifty;
     protected AssetManager assetManager;
     protected RenderManager renderManager;
+    protected InputManager inputManager;
     protected RenderDeviceJme renderDev;
     protected InputSystemJme inputSys;
     protected SoundDeviceJme soundDev;
@@ -92,6 +93,7 @@ public class NiftyJmeDisplay implements SceneProcessor {
                            AudioRenderer audioRenderer,
                            ViewPort vp){
         this.assetManager = assetManager;
+        this.inputManager = inputManager;
 
         w = vp.getCamera().getWidth();
         h = vp.getCamera().getHeight();
@@ -99,10 +101,7 @@ public class NiftyJmeDisplay implements SceneProcessor {
         soundDev = new SoundDeviceJme(assetManager, audioRenderer);
         renderDev = new RenderDeviceJme(this);
         inputSys = new InputSystemJme(inputManager);
-        if (inputManager != null) {
-            inputManager.addRawInputListener(inputSys);
-        }
-
+        
         nifty = new Nifty(renderDev, soundDev, inputSys, new TimeProvider());
         inputSys.setNifty(nifty);
 
@@ -114,6 +113,10 @@ public class NiftyJmeDisplay implements SceneProcessor {
     public void initialize(RenderManager rm, ViewPort vp) {
         this.renderManager = rm;
         renderDev.setRenderManager(rm);
+        if (inputManager != null) {
+//            inputSys.setInputManager(inputManager);
+            inputManager.addRawInputListener(inputSys);
+        }
         inited = true;
         this.vp = vp;
         this.renderer = rm.getRenderer();
@@ -182,7 +185,9 @@ public class NiftyJmeDisplay implements SceneProcessor {
     public void cleanup() {
         inited = false;
         inputSys.reset();
-//        nifty.exit();
+        if (inputManager != null) {
+            inputManager.removeRawInputListener(inputSys);
+        }
     }
 
 }

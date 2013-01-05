@@ -1,23 +1,23 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * SolarWars Project (c) 2012 - 2012 by Hans Ferchland
- * 
- * 
- * SolarWars is a strategy game in space. You have to eliminate 
- * all enemies to win. You can move ships between planets to capture 
+ *
+ *
+ * SolarWars is a strategy game in space. You have to eliminate
+ * all enemies to win. You can move ships between planets to capture
  * other planets. Its oriented to multiplayer and singleplayer.
- * 
- * SolarWars rights are by its owners/creators. 
- * You have no right to edit, publish and/or deliver the code or application 
+ *
+ * SolarWars rights are by its owners/creators.
+ * You have no right to edit, publish and/or deliver the code or application
  * in any way! If that is done by someone, please report it!
- * 
+ *
  * Email me: hans{dot}ferchland{at}gmx{dot}de
- * 
+ *
  * Project: SolarWars
  * File: ControlsState.java
  * Type: com.solarwars.gamestates.lib.ControlsState
- * 
+ *
  * Documentation created: 30.12.2012 - 22:38:01 by Hans Ferchland
- * 
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.gamestates;
 
@@ -25,19 +25,16 @@ import com.jme3.input.Joystick;
 import com.jme3.input.JoystickAxis;
 import com.jme3.input.JoystickButton;
 import com.solarwars.AudioManager;
-import com.solarwars.Hub;
 import com.solarwars.SolarWarsApplication;
 import com.solarwars.SolarWarsGame;
 import com.solarwars.controls.ControlManager;
 import com.solarwars.gamestates.gui.ControllerItem;
 import com.solarwars.gamestates.gui.MappingItem;
-import com.solarwars.gamestates.gui.SavedServerItem;
 import com.solarwars.settings.GameSettingsException;
 import com.solarwars.settings.SolarWarsSettings;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -52,7 +49,7 @@ public class ControlsState extends Gamestate {
     public static final String DETECTED_CONTROLS_BOX = "detected_controls_box";
     public static final String CONTROL_MAPPING_BOX = "control_mapping_box";
     private static final String[] MAPPINGS = {"SELECT", "ATTACK", "PERCENTAGE UP",
-        "PERCENTAGE DOWN", "SCORES", "EXIT", "PAUSE", 
+        "PERCENTAGE DOWN", "SCORES", "EXIT", "PAUSE",
         "CHAT", "MOVE VERTICAL", "MOVE HORIZONTAL" };
     private ListBox<ControllerItem> controlsListBox;
     private ListBox<MappingItem> mappingsListBox;

@@ -131,7 +131,7 @@ public class InputManager implements RawInputListener {
      */
     public InputManager(MouseInput mouse, KeyInput keys, JoyInput joystick, TouchInput touch) {
         if (keys == null || mouse == null) {
-            throw new NullPointerException("Mouse or keyboard cannot be null");
+            throw new IllegalArgumentException("Mouse or keyboard cannot be null");
         }
 
         this.keys = keys;
@@ -454,10 +454,6 @@ public class InputManager implements RawInputListener {
         int hash = KeyTrigger.keyHash(evt.getKeyCode());
         invokeActions(hash, evt.isPressed());
         invokeTimedActions(hash, evt.getTime(), evt.isPressed());
-    }
-
-    public void simulateEvent( InputEvent evt ) {
-        inputQueue.add(evt);
     }
 
     /**
