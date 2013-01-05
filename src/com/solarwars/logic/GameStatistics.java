@@ -1,37 +1,24 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * MazeTD Project (c) 2012 by Hady Khalifa, Ahmed Arous and Hans Ferchland
+ * solarwars Project (c) 2012 - 2013 
  * 
- * MazeTD rights are by its owners/creators.
- * The project was created for educational purposes and may be used under 
- * the GNU Public license only.
+ * 		by gormed, fxdapokalypse, kinxz, Londane, romanh, Senju
  * 
- * If you modify it please let other people have part of it!
+ * solarwars is a strategy game in space. You have to eliminate 
+ * all enemies to win. You can move ships between planets to capture 
+ * other planets. Its oriented to multiplayer and singleplayer.
  * 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * GNU Public License
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * solarwars rights are by its owners/creators. 
+ * You have no right to edit, publish and/or deliver the code or android 
+ * application in any way! If that is done by someone, please report it!
  * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License 3 as published by
- * the Free Software Foundation.
+ * Email me: hans{dot}ferchland{at}gmx{dot}de
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- * 
- * Email us: 
- * hans[dot]ferchland[at]gmx[dot]de
- * 
- * 
- * Project: MazeTD Project
+ * Project: solarwars
  * File: GameStatistics.java
  * Type: com.solarwars.logic.GameStatistics
  * 
- * Documentation created: 21.07.2012 - 15:07:02 by Hans Ferchland
+ * Documentation created: 05.01.2013 - 22:12:55 by Hans Ferchland
+ * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.solarwars.logic;
 
